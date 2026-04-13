@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}Uplift Rules — GPS Pricing Stage 3{% endblock %}
+
+{% block content %}
+<div class="flex-between" style="margin-bottom:20px">
+  <div class="page-title" style="margin:0">Uplift Rules</div>
+  <button class="btn btn-primary" onclick="showRuleForm(null)">+ New Rule</button>
+</div>
+
+<!-- Rules table -->
+<div class="card">
+  <div id="rulesTableBody"><div class="spinner"></div> Loading…</div>
+</div>
+
+<!-- Inline rule form -->
+<div id="ruleFormCard" class="card" style="display:none">
+  <div class="card-header">
+    <div class="card-title" id="ruleFormTitle">New Rule</div>
+    <button class="btn btn-outline btn-sm" onclick="hideRuleForm()">✕ Cancel</button>
+  </div>
+  <div id="ruleFormAlert"></div>
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Rule ID</label>
+      <input type="text" id="rf_rule_id" placeholder="e.g. SUPPORTSERVICE_EMEA_UPRULE_01">
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" id="rf_description">
+    </div>
+    <div class="form-group">
+      <label>Catalog <span class="text-muted">(determines factor set)</span></label>
+      <select id="rf_catalog_id" onchange="onCatalogChange()">
+        <option value="">— Select catalog —</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="rf_status">
+        <option>Draft</option>
+        <option>Released</option>
+        <option>Retired</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Valid From</label>
+      <input type="date" id="rf_valid_from">
+    </div>
+    <div class="form-group">
+      <label>Valid To</label>
+      <input type="date" id="rf_valid_to">
+    </div>
+  </div>
+
+  <hr class="section-sep">
+  <div class="section-title">Factor Rates</div>
+  <div id="rf_factorsBody">
+    <p class="text-muted">Select a catalog to see its factors.</p>
+  </div>
+  <div id="rf_totalRatio" style="margin-top:12px;font-weight:600;font-size:.95em;color:#1a2438"></div>
+
+  <div style="margin-top:20px">
+    <button class="btn btn-primary" onclick="saveRule()">Save Rule</button>
+    <button class="btn btn-outline" style="margin-left:8px" onclick="hideRuleForm()">Cancel</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allCatalogs = [];
+let editingRuleId = null;
+
+async function loadCatalogsForDropdown() {
+  const r = await fetch("/api/catalogs");
+  allCatalogs = await r.json();
+  const sel = document.getElementById("rf_catalog_id");
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select catalog —</option>' +
+    allCatalogs.map(c =>
+      `<option value="${c.id}"${cur==c.id?' selected':''}>${c.catalog_id} (${c.type_of_service || '?'} / ${c.geo || '?'})</option>`
+    ).join('');
+}
+
+async function loadRulesTable() {
+  const r = await fetch("/api/rules");
+  const rules = await r.json();
+  const el = document.getElementById("rulesTableBody");
+
+  if (!rules.length) {
+    el.innerHTML = '<p class="text-muted">No rules yet. Click <b>+ New Rule</b> to create one.</p>';
+    return;
+  }
+
+  let html = `<table>
+    <tr>
+      <th>Rule ID</th><th>Description</th><th>Catalog</th><th>Type of Service</th><th>GEO</th>
+      <th>Status</th><th>Total Uplift</th><th># Factors</th><th>Valid From</th><th>Valid To</th>
+      <th>Created By</th><th></th>
+    </tr>`;
+  rules.forEach(r => {
+    html += `<tr>
+      <td style="font-family:monospace;font-size:.82em">${r.rule_id}</td>
+      <td>${r.description || ''}</td>
+      <td style="font-size:.82em">${r.catalog_code || ''}</td>
+      <td>${r.type_of_service || ''}</td>
+      <td>${r.geo || ''}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td style="text-align:right">${pct(r.total_uplift_ratio)}</td>
+      <td>${r.factor_count}</td>
+      <td>${r.valid_from || ''}</td>
+      <td>${r.valid_to || ''}</td>
+      <td>${r.created_by || ''}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="showRuleForm(${r.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteRule(${r.id},'${r.rule_id}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+  html += `</table>`;
+  el.innerHTML = html;
+}
+
+async function showRuleForm(dbId) {
+  await loadCatalogsForDropdown();
+  editingRuleId = dbId;
+  const card = document.getElementById("ruleFormCard");
+  document.getElementById("ruleFormAlert").innerHTML = "";
+  document.getElementById("rf_factorsBody").innerHTML = '<p class="text-muted">Select a catalog to see its factors.</p>';
+  document.getElementById("rf_totalRatio").textContent = "";
+
+  if (dbId) {
+    const r = await fetch(`/api/rules/${dbId}`);
+    const rule = await r.json();
+    document.getElementById("ruleFormTitle").textContent = `Edit Rule: ${rule.rule_id}`;
+    document.getElementById("rf_rule_id").value = rule.rule_id;
+    document.getElementById("rf_rule_id").disabled = true;
+    document.getElementById("rf_description").value = rule.description || "";
+    document.getElementById("rf_catalog_id").value = rule.catalog_id || "";
+    document.getElementById("rf_status").value = rule.status || "Draft";
+    document.getElementById("rf_valid_from").value = rule.valid_from || "";
+    document.getElementById("rf_valid_to").value = rule.valid_to || "";
+    renderRuleFactors(rule.catalog_id, rule.factors);
+  } else {
+    document.getElementById("ruleFormTitle").textContent = "New Rule";
+    document.getElementById("rf_rule_id").value = "";
+    document.getElementById("rf_rule_id").disabled = false;
+    document.getElementById("rf_description").value = "";
+    document.getElementById("rf_catalog_id").value = "";
+    document.getElementById("rf_status").value = "Draft";
+    document.getElementById("rf_valid_from").value = "";
+    document.getElementById("rf_valid_to").value = "";
+  }
+
+  card.style.display = "";
+  card.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function onCatalogChange() {
+  const catDbId = document.getElementById("rf_catalog_id").value;
+  if (!catDbId) {
+    document.getElementById("rf_factorsBody").innerHTML = '<p class="text-muted">Select a catalog to see its factors.</p>';
+    document.getElementById("rf_totalRatio").textContent = "";
+    return;
+  }
+  renderRuleFactors(parseInt(catDbId), []);
+}
+
+async function renderRuleFactors(catDbId, existingFactors) {
+  if (!catDbId) return;
+  const r = await fetch(`/api/catalogs/${catDbId}`);
+  const cat = await r.json();
+
+  const existing = {};
+  (existingFactors || []).forEach(f => { existing[f.factor_def_id] = f; });
+
+  const el = document.getElementById("rf_factorsBody");
+  if (!cat.factors || !cat.factors.length) {
+    el.innerHTML = '<p class="text-muted">This catalog has no selected factors.</p>';
+    return;
+  }
+
+  let html = `<table>
+    <tr>
+      <th>Factor</th>
+      <th>Classification</th>
+      <th>Match Values <span class="text-muted">(comma-separated)</span></th>
+      <th>Uplift Ratio (%)</th>
+    </tr>`;
+  cat.factors.forEach(f => {
+    const ef = existing[f.factor_def_id] || {};
+    const vals = ef.factor_values || "";
+    const ratio = ef.uplift_ratio != null ? (ef.uplift_ratio * 100).toFixed(4) : "";
+    html += `<tr>
+      <td>${f.factor_name}</td>
+      <td>${clsBadge(f.classification)}</td>
+      <td><input type="text" class="rf_factor_values" data-fid="${f.factor_def_id}"
+                 placeholder="e.g. GB,DE,FR" value="${vals}" style="width:100%"></td>
+      <td><input type="number" class="rf_factor_ratio" data-fid="${f.factor_def_id}"
+                 placeholder="0.00" step="0.0001" value="${ratio}"
+                 style="width:90px" oninput="updateTotalRatio()"></td>
+    </tr>`;
+  });
+  html += `</table>`;
+  el.innerHTML = html;
+  updateTotalRatio();
+}
+
+function updateTotalRatio() {
+  let total = 0;
+  document.querySelectorAll(".rf_factor_ratio").forEach(inp => {
+    const v = parseFloat(inp.value);
+    if (!isNaN(v)) total += v;
+  });
+  document.getElementById("rf_totalRatio").textContent =
+    `Total Uplift Ratio: ${total.toFixed(4)}% = ${(total/100).toFixed(6)} decimal`;
+}
+
+function hideRuleForm() {
+  document.getElementById("ruleFormCard").style.display = "none";
+  editingRuleId = null;
+}
+
+async function saveRule() {
+  const alertEl = document.getElementById("ruleFormAlert");
+  alertEl.innerHTML = "";
+
+  const rule_id = document.getElementById("rf_rule_id").value.trim();
+  if (!rule_id) {
+    alertEl.innerHTML = '<div class="alert alert-danger">Rule ID is required.</div>';
+    return;
+  }
+
+  const catalog_id = document.getElementById("rf_catalog_id").value;
+  const description = document.getElementById("rf_description").value.trim();
+  const status = document.getElementById("rf_status").value;
+  const valid_from = document.getElementById("rf_valid_from").value || null;
+  const valid_to = document.getElementById("rf_valid_to").value || null;
+
+  const factors = [];
+  document.querySelectorAll(".rf_factor_values").forEach(inp => {
+    const fid = parseInt(inp.dataset.fid);
+    const ratioInp = document.querySelector(`.rf_factor_ratio[data-fid="${fid}"]`);
+    const ratio_pct = parseFloat(ratioInp ? ratioInp.value : 0) || 0;
+    factors.push({
+      factor_def_id: fid,
+      factor_values: inp.value.trim(),
+      uplift_ratio: ratio_pct / 100,
+    });
+  });
+
+  // Derive type_of_service and geo from the selected catalog
+  const cat = allCatalogs.find(c => c.id == catalog_id);
+  const type_of_service = cat ? cat.type_of_service : null;
+  const geo = cat ? cat.geo : null;
+
+  const body = {
+    rule_id, description,
+    catalog_id: catalog_id ? parseInt(catalog_id) : null,
+    type_of_service, geo, valid_from, valid_to, status, factors
+  };
+
+  let r;
+  if (editingRuleId) {
+    r = await api("PUT", `/api/rules/${editingRuleId}`, body);
+  } else {
+    r = await api("POST", "/api/rules", body);
+  }
+  const data = await r.json();
+  if (data.error) {
+    alertEl.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+    return;
+  }
+  hideRuleForm();
+  loadRulesTable();
+}
+
+async function deleteRule(dbId, ruleId) {
+  if (!confirm(`Delete rule "${ruleId}"?`)) return;
+  const r = await api("DELETE", `/api/rules/${dbId}`);
+  const data = await r.json();
+  if (data.error) { alert(data.error); return; }
+  loadRulesTable();
+}
+
+loadRulesTable();
+</script>
+{% endblock %}

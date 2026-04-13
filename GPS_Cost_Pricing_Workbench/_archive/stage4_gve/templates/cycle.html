@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+{% block title %}Cycle — GPS Pricing Workbench{% endblock %}
+
+{% block content %}
+<div id="cycleHeader" style="margin-bottom:20px">
+  <div class="flex-between">
+    <div>
+      <a href="/" style="font-size:.85em;color:#6c757d">← All Cycles</a>
+      <div class="page-title" style="margin:4px 0 0" id="cycleTitle">Loading…</div>
+    </div>
+    <div class="flex" id="cycleActions"></div>
+  </div>
+</div>
+
+<!-- Top tabs -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('import')">1. Import Data</div>
+  <div class="tab" onclick="showTab('matrix')">2. Matrix View</div>
+  <div class="tab" onclick="showTab('gve')">3. GVE Validation</div>
+  <div class="tab" onclick="showTab('listprice')">4. List Price</div>
+  <div class="tab" onclick="showTab('audit')">Audit Log</div>
+</div>
+
+<!-- ===== IMPORT TAB ===== -->
+<div id="tab-import">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Import Pricing Excel</div>
+    </div>
+    <div class="form-group">
+      <label>Select Excel file (.xlsx)</label>
+      <input type="file" id="importFile" accept=".xlsx,.xls">
+    </div>
+    <button class="btn btn-primary" onclick="doImport()">Upload &amp; Import</button>
+    <div id="importResult" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Prior Cycle Baseline (for Year-over-Year comparison)</div>
+      <button class="btn btn-outline btn-sm" onclick="loadBaseline()">Refresh</button>
+    </div>
+    <p class="text-muted" style="margin-bottom:12px">
+      Paste prior-cycle sales costs here so Layer 4 (YoY drift) can compare. Leave blank to skip.
+    </p>
+    <div id="baselineArea">
+      <textarea id="baselineCsv" rows="6"
+        placeholder="part_number,region,prior_sales_cost&#10;5WS0A23748,BENELUX,2.10&#10;5WS0A23748,NORDICS,2.30&#10;..."></textarea>
+      <button class="btn btn-secondary btn-sm mt-1" onclick="saveBaseline()">Save Baseline</button>
+    </div>
+    <div id="baselineMsg" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- ===== MATRIX TAB ===== -->
+<div id="tab-matrix" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Sales Cost Matrix</div>
+      <div class="flex">
+        <select id="matrixRegion" onchange="renderMatrix()" style="width:180px">
+          <option value="">All regions</option>
+        </select>
+        <select id="matrixDtype" onchange="renderMatrix()" style="width:140px">
+          <option value="">All delivery types</option>
+          <option>Onsite</option>
+          <option>Depot</option>
+        </select>
+      </div>
+    </div>
+    <div id="matrixBody"><p class="text-muted">Run import first, then view matrix here.</p></div>
+  </div>
+</div>
+
+<!-- ===== GVE TAB ===== -->
+<div id="tab-gve" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Gradient Validation Engine</div>
+      <div class="flex">
+        <button class="btn btn-primary" onclick="runGVE()">▶ Run GVE</button>
+        <button class="btn btn-success btn-sm" onclick="runListPrice()">▶ Compute List Prices</button>
+      </div>
+    </div>
+    <div id="gveSummary"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Violations</div>
+      <div class="flex">
+        <select id="filterLayer" onchange="loadGVE()" style="width:120px">
+          <option value="">All Layers</option>
+          <option value="1">Layer 1</option>
+          <option value="2">Layer 2</option>
+          <option value="3">Layer 3</option>
+          <option value="4">Layer 4</option>
+        </select>
+        <select id="filterSev" onchange="loadGVE()" style="width:130px">
+          <option value="">All Severities</option>
+          <option>Critical</option>
+          <option>Systemic</option>
+          <option>Warning</option>
+        </select>
+        <select id="filterRegion" onchange="loadGVE()" style="width:140px">
+          <option value="">All Regions</option>
+        </select>
+        <label style="margin:0;display:flex;align-items:center;gap:5px;font-size:.85em">
+          <input type="checkbox" id="filterUnresolved" onchange="loadGVE()"> Unresolved only
+        </label>
+      </div>
+    </div>
+    <div id="gveBody"><p class="text-muted">Run GVE to see results.</p></div>
+  </div>
+</div>
+
+<!-- ===== LIST PRICE TAB ===== -->
+<div id="tab-listprice" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">List Price Output</div>
+      <div class="flex">
+        <select id="lpRegion" onchange="loadListPrice()" style="width:180px">
+          <option value="">All regions</option>
+        </select>
+        <a id="exportCsvLink" class="btn btn-outline btn-sm" href="#">Export CSV</a>
+        <a id="exportGveLink" class="btn btn-outline btn-sm" href="#">Export GVE Report</a>
+      </div>
+    </div>
+    <div id="listPriceBody"><p class="text-muted">Run "Compute List Prices" in the GVE tab first.</p></div>
+  </div>
+</div>
+
+<!-- ===== AUDIT TAB ===== -->
+<div id="tab-audit" style="display:none">
+  <div class="card">
+    <div class="card-title" style="margin-bottom:14px">Audit Log</div>
+    <div id="auditBody"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- Resolve modal -->
+<div class="modal-overlay" id="resolveModal">
+  <div class="modal">
+    <h3>Resolve Violation</h3>
+    <p class="text-muted" style="margin-bottom:12px" id="resolveMsg"></p>
+    <div class="form-group">
+      <label>Explanation (required)</label>
+      <textarea id="resolveExplanation" placeholder="Describe why this deviation is acceptable…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="document.getElementById('resolveModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-success" onclick="submitResolve()">Mark Resolved</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CYCLE_ID = {{ cycle_id }};
+let cycleData = null;
+let matrixData = [];
+let tierSeq = [];
+let allRegions = [];
+let currentResolveId = null;
+
+// ---- Tabs ----
+function showTab(name) {
+  document.querySelectorAll('[id^="tab-"]').forEach(el => el.style.display = "none");
+  document.getElementById("tab-" + name).style.display = "";
+  document.querySelectorAll(".tab").forEach(el => el.classList.remove("active"));
+  event.target.classList.add("active");
+  if (name === "matrix") loadMatrix();
+  if (name === "gve") loadGVE();
+  if (name === "listprice") loadListPrice();
+  if (name === "audit") loadAudit();
+}
+
+// ---- Init ----
+async function init() {
+  const r = await fetch(`/api/cycles/${CYCLE_ID}`);
+  cycleData = await r.json();
+  document.getElementById("cycleTitle").textContent = cycleData.name;
+  const acts = document.getElementById("cycleActions");
+  if (cycleData.status === "draft") {
+    acts.innerHTML = `<button class="btn btn-success" onclick="submitCycle()">Submit Cycle</button>`;
+  } else {
+    acts.innerHTML = `<span class="badge badge-submitted">Submitted ${cycleData.submitted_at ? cycleData.submitted_at.slice(0,10) : ''}</span>`;
+  }
+  // set export links
+  document.getElementById("exportCsvLink").href = `/api/cycles/${CYCLE_ID}/export/skus.csv`;
+  document.getElementById("exportGveLink").href = `/api/cycles/${CYCLE_ID}/export/gve-report.html`;
+}
+
+// ---- Import ----
+async function doImport() {
+  const file = document.getElementById("importFile").files[0];
+  if (!file) { alert("Please select a file."); return; }
+  const res = document.getElementById("importResult");
+  res.innerHTML = '<div class="spinner"></div> Importing…';
+  const fd = new FormData();
+  fd.append("file", file);
+  const r = await fetch(`/api/cycles/${CYCLE_ID}/import`, { method: "POST", body: fd });
+  const data = await r.json();
+  if (!r.ok) {
+    res.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+    return;
+  }
+  let msg = `<div class="alert alert-success">
+    Imported <b>${data.skus_imported}</b> SKUs across <b>${data.price_records}</b> price records.<br>
+    Regions: ${data.regions.join(", ")}<br>
+    Tiers: ${data.tiers_found.join(", ")}`;
+  if (data.warnings && data.warnings.length) {
+    msg += `<br><b>⚠ ${data.warnings.join("<br>")}</b>`;
+  }
+  msg += "</div>";
+  res.innerHTML = msg;
+  allRegions = data.regions;
+  populateRegionFilters();
+}
+
+function populateRegionFilters() {
+  ["matrixRegion","filterRegion","lpRegion"].forEach(id => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    while (sel.options.length > 1) sel.remove(1);
+    allRegions.forEach(r => {
+      const o = document.createElement("option");
+      o.value = r; o.textContent = r;
+      sel.appendChild(o);
+    });
+    sel.value = cur;
+  });
+}
+
+// ---- Baseline ----
+async function loadBaseline() {
+  const r = await fetch(`/api/cycles/${CYCLE_ID}/prior-baseline`);
+  const rows = await r.json();
+  if (rows.length) {
+    const lines = rows.map(r => `${r.part_number},${r.region},${r.prior_sales_cost}`);
+    document.getElementById("baselineCsv").value = lines.join("\n");
+  }
+}
+
+async function saveBaseline() {
+  const raw = document.getElementById("baselineCsv").value.trim();
+  const entries = [];
+  for (const line of raw.split("\n")) {
+    const parts = line.split(",").map(s => s.trim());
+    if (parts.length >= 3 && parts[2]) {
+      entries.push({ part_number: parts[0], region: parts[1], prior_sales_cost: parseFloat(parts[2]) });
+    }
+  }
+  const r = await api("POST", `/api/cycles/${CYCLE_ID}/prior-baseline`, { entries });
+  const data = await r.json();
+  document.getElementById("baselineMsg").innerHTML =
+    `<span class="text-muted">Saved ${data.entries_saved} entries.</span>`;
+}
+
+// ---- Matrix ----
+async function loadMatrix() {
+  const r = await fetch(`/api/cycles/${CYCLE_ID}/matrix`);
+  const data = await r.json();
+  matrixData = data.matrix;
+  tierSeq = data.tier_sequence;
+  allRegions = [...new Set(matrixData.map(m => m.region))].sort();
+  populateRegionFilters();
+  renderMatrix();
+}
+
+function renderMatrix() {
+  const regionFilter = document.getElementById("matrixRegion").value;
+  const dtypeFilter = document.getElementById("matrixDtype").value;
+  const el = document.getElementById("matrixBody");
+
+  let rows = matrixData;
+  if (regionFilter) rows = rows.filter(r => r.region === regionFilter);
+  if (dtypeFilter) rows = rows.filter(r => r.delivery_type === dtypeFilter);
+
+  if (!rows.length) { el.innerHTML = '<p class="text-muted">No data. Import an Excel file first.</p>'; return; }
+
+  // Sort by tier order, then upgrade_years
+  const tierRank = {};
+  tierSeq.forEach(t => tierRank[t.tier_name] = t.sort_order);
+  rows.sort((a, b) =>
+    (tierRank[a.tier] || 999) - (tierRank[b.tier] || 999) ||
+    (a.upgrade_years || 0) - (b.upgrade_years || 0) ||
+    a.delivery_type.localeCompare(b.delivery_type) ||
+    a.region.localeCompare(b.region)
+  );
+
+  const sevClass = { Critical: "sev-critical", Warning: "sev-warning",
+                     Systemic: "sev-systemic", OK: "sev-ok", "": "sev-ok" };
+  const dot = { Critical: "🔴", Warning: "🟡", Systemic: "🟠", OK: "🟢", "": "🟢" };
+
+  let html = `<table>
+    <tr>
+      <th>Tier</th><th>Yrs</th><th>Type</th><th>Region</th>
+      <th>Avg Sales Cost</th><th>Avg Channel Price</th><th>Avg List Price</th>
+      <th>SKUs</th><th>GVE Status</th>
+    </tr>`;
+
+  rows.forEach(r => {
+    const gs = r.gve_status || "OK";
+    html += `<tr>
+      <td>${r.tier}</td>
+      <td>${r.upgrade_years ?? "?"}</td>
+      <td>${r.delivery_type}</td>
+      <td>${r.region}</td>
+      <td>$${r.avg_sales_cost?.toFixed(2) ?? "—"}</td>
+      <td>$${r.avg_channel_price?.toFixed(2) ?? "—"}</td>
+      <td>$${r.avg_list_price?.toFixed(2) ?? "—"}</td>
+      <td>${r.sku_count}</td>
+      <td class="${sevClass[gs]}">${dot[gs] || "🟢"} ${gs}</td>
+    </tr>`;
+  });
+  html += "</table>";
+  el.innerHTML = html;
+}
+
+// ---- GVE ----
+async function runGVE() {
+  document.getElementById("gveSummary").innerHTML = '<div class="spinner"></div> Running…';
+  document.getElementById("gveBody").innerHTML = "";
+  const r = await api("POST", `/api/cycles/${CYCLE_ID}/run-gve`);
+  const data = await r.json();
+  const colors = { Clear: "alert-success", Blocked: "alert-danger",
+                   Systemic: "alert-warning", Warnings: "alert-warning" };
+  document.getElementById("gveSummary").innerHTML =
+    `<div class="alert ${colors[data.status] || 'alert-info'}">
+      GVE Status: <b>${data.status}</b> &mdash;
+      ${data.counts.Critical} Critical, ${data.counts.Systemic || 0} Systemic,
+      ${data.counts.Warning} Warnings (${data.total} total)
+    </div>`;
+  loadGVE();
+}
+
+async function runListPrice() {
+  const r = await api("POST", `/api/cycles/${CYCLE_ID}/run-list-price`);
+  const data = await r.json();
+  if (data.violations && data.violations.length) {
+    alert("List price computed. " + data.violations.length + " channel/PFV issues found — see List Price tab.");
+  } else {
+    alert("List prices computed successfully.");
+  }
+}
+
+async function loadGVE() {
+  const params = new URLSearchParams();
+  const layer = document.getElementById("filterLayer").value;
+  const sev = document.getElementById("filterSev").value;
+  const region = document.getElementById("filterRegion").value;
+  const unresolved = document.getElementById("filterUnresolved").checked;
+  if (layer) params.set("layer", layer);
+  if (sev) params.set("severity", sev);
+  if (region) params.set("region", region);
+  if (unresolved) params.set("unresolved_only", "true");
+
+  const r = await fetch(`/api/cycles/${CYCLE_ID}/gve-results?${params}`);
+  const rows = await r.json();
+  const el = document.getElementById("gveBody");
+
+  if (!rows.length) {
+    el.innerHTML = '<p class="text-muted">No violations matching filters.</p>';
+    return;
+  }
+
+  const sevCls = { Critical: "sev-critical", Warning: "sev-warning", Systemic: "sev-systemic" };
+  const layerLabel = ["", "Monotonicity", "Ratio Bands", "Cross-Geo", "YoY Drift"];
+
+  let html = `<table>
+    <tr>
+      <th>Layer</th><th>Severity</th><th>Region</th><th>Tier</th>
+      <th>Yrs</th><th>Part #</th><th>Message</th><th>Status</th><th></th>
+    </tr>`;
+
+  rows.forEach(v => {
+    const resolved = v.is_resolved;
+    html += `<tr>
+      <td title="${layerLabel[v.layer] || ''}">L${v.layer}</td>
+      <td class="${sevCls[v.severity] || ''}">${v.severity}</td>
+      <td>${v.region || ""}</td>
+      <td>${v.tier || ""}</td>
+      <td>${v.upgrade_years ?? ""}</td>
+      <td style="font-size:.8em">${v.part_number || ""}</td>
+      <td style="max-width:380px">${v.message}
+        ${resolved ? `<br><small style="color:#198754">✔ ${v.resolved_by}: ${v.explanation}</small>` : ""}
+      </td>
+      <td>${resolved ? '<span class="sev-ok">Resolved</span>' : '<span class="sev-critical">Unresolved</span>'}</td>
+      <td>
+        ${resolved
+          ? `<button class="btn btn-outline btn-sm" onclick="unresolve(${v.id})">Undo</button>`
+          : `<button class="btn btn-success btn-sm" onclick="openResolve(${v.id}, '${v.message.replace(/'/g,"\\'")}')">Resolve</button>`
+        }
+      </td>
+    </tr>`;
+  });
+  html += "</table>";
+  el.innerHTML = html;
+}
+
+function openResolve(id, msg) {
+  currentResolveId = id;
+  document.getElementById("resolveMsg").textContent = msg.length > 120 ? msg.slice(0,120) + "…" : msg;
+  document.getElementById("resolveExplanation").value = "";
+  document.getElementById("resolveModal").classList.add("show");
+}
+
+async function submitResolve() {
+  const explanation = document.getElementById("resolveExplanation").value.trim();
+  if (!explanation) { alert("Please enter an explanation."); return; }
+  const r = await api("POST", `/api/gve-results/${currentResolveId}/resolve`, { explanation });
+  document.getElementById("resolveModal").classList.remove("show");
+  if (r.ok) loadGVE();
+}
+
+async function unresolve(id) {
+  if (!confirm("Mark this violation as unresolved?")) return;
+  const r = await api("POST", `/api/gve-results/${id}/unresolve`);
+  if (r.ok) loadGVE();
+}
+
+// ---- List Price ----
+async function loadListPrice() {
+  const region = document.getElementById("lpRegion").value;
+  const params = region ? `?region=${encodeURIComponent(region)}` : "";
+  const r = await fetch(`/api/cycles/${CYCLE_ID}/skus${params}`);
+  const rows = await r.json();
+  const el = document.getElementById("listPriceBody");
+
+  const withB2c = rows.filter(r => r.computed_list_price_b2c);
+  if (!withB2c.length) {
+    el.innerHTML = '<p class="text-muted">No computed prices yet. Run "Compute List Prices" in the GVE tab.</p>';
+    return;
+  }
+
+  let html = `<table>
+    <tr>
+      <th>Part #</th><th>Tier</th><th>Upgrade</th><th>Type</th>
+      <th>Region</th><th>Sales Cost</th><th>B2C List Price</th>
+      <th>B2B Floor</th><th>Actual List Price</th>
+    </tr>`;
+
+  withB2c.forEach(r => {
+    const diff = r.list_price && r.computed_list_price_b2c
+      ? ((r.list_price - r.computed_list_price_b2c) / r.computed_list_price_b2c * 100).toFixed(1)
+      : null;
+    const diffHtml = diff !== null
+      ? ` <small style="color:${Math.abs(diff) > 10 ? '#dc3545' : '#6c757d'}">(${diff > 0 ? '+' : ''}${diff}%)</small>`
+      : "";
+    html += `<tr>
+      <td style="font-size:.8em">${r.part_number}</td>
+      <td>${r.tier}</td>
+      <td style="font-size:.8em">${r.upgrade_description}</td>
+      <td>${r.delivery_type}</td>
+      <td>${r.region}</td>
+      <td>$${r.sales_cost?.toFixed(2) ?? "—"}</td>
+      <td>$${r.computed_list_price_b2c?.toFixed(2) ?? "—"}</td>
+      <td>$${r.computed_quoted_floor_b2b?.toFixed(2) ?? "—"}</td>
+      <td>$${r.list_price?.toFixed(2) ?? "—"}${diffHtml}</td>
+    </tr>`;
+  });
+  html += "</table>";
+  el.innerHTML = html;
+}
+
+// ---- Audit ----
+async function loadAudit() {
+  const r = await fetch(`/api/cycles/${CYCLE_ID}/audit`);
+  const rows = await r.json();
+  const el = document.getElementById("auditBody");
+  if (!rows.length) { el.innerHTML = '<p class="text-muted">No audit entries yet.</p>'; return; }
+
+  let html = `<table>
+    <tr><th>Time</th><th>User</th><th>Table</th><th>Field</th><th>Old</th><th>New</th><th>Reason</th></tr>`;
+  rows.forEach(r => {
+    html += `<tr>
+      <td style="white-space:nowrap">${r.changed_at?.slice(0,16) || ""}</td>
+      <td>${r.changed_by}</td>
+      <td>${r.table_name}</td>
+      <td>${r.field_name}</td>
+      <td style="color:#6c757d">${r.old_value ?? ""}</td>
+      <td>${r.new_value ?? ""}</td>
+      <td>${r.reason ?? ""}</td>
+    </tr>`;
+  });
+  html += "</table>";
+  el.innerHTML = html;
+}
+
+// ---- Submit ----
+async function submitCycle() {
+  if (!confirm("Submit this cycle? It will become read-only after submission.")) return;
+  const r = await api("POST", `/api/cycles/${CYCLE_ID}/submit`);
+  const data = await r.json();
+  if (!r.ok) { alert(data.error); return; }
+  init();
+}
+
+document.getElementById("resolveModal").addEventListener("click", e => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove("show");
+});
+
+init();
+</script>
+{% endblock %}

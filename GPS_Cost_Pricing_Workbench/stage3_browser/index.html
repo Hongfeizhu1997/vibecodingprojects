@@ -1,0 +1,3677 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<script>
+
+window.onerror = function(msg, src, line, col, err) {
+
+  document.getElementById('_err') && (document.getElementById('_err').textContent = 'JS Error (line ' + line + '): ' + msg);
+
+  return false;
+
+};
+
+</script>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GPS Cost Pricing Workbench — Stage 3 Sales Cost</title>
+
+<script src="dexie.min.js"></script>
+
+<script src="xlsx.full.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{font-family:'Helvetica Neue','Lato',Arial,sans-serif;font-size:14px;background:#f3f4f6;color:#1f2937;min-height:100vh}
+
+a{color:#E2232A;text-decoration:none}
+
+/* NAV */
+
+.nav{background:#000000;color:#fff;display:flex;align-items:center;padding:0 20px;height:56px;gap:20px;position:sticky;top:0;z-index:100}
+
+.nav-brand{font-weight:700;font-size:15px;letter-spacing:.3px;white-space:nowrap;color:#fff;text-decoration:none;cursor:pointer}.nav-brand:hover{opacity:.75}
+
+.nav-links{display:flex;gap:4px;flex:1}
+
+.nav-links a{color:#cbd5e1;padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer}
+
+.nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,.15);color:#fff}
+
+.nav-user{color:#94a3b8;font-size:13px;white-space:nowrap}
+
+/* CONTAINER */
+
+.container{max-width:1280px;margin:0 auto;padding:20px}
+
+/* CARD */
+
+.card{background:#fff;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px;margin-bottom:16px}
+
+.card-title{font-size:15px;font-weight:600;margin-bottom:14px;color:#000000}
+
+/* BUTTONS */
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:background .15s}
+
+.btn-primary{background:#E2232A;color:#fff;border-color:#E2232A}.btn-primary:hover{background:#64131E}
+
+.btn-secondary{background:#fff;color:#374151;border-color:#d1d5db}.btn-secondary:hover{background:#f9fafb}
+
+.btn-danger{background:#dc2626;color:#fff;border-color:#dc2626}.btn-danger:hover{background:#b91c1c}
+
+.btn-sm{padding:4px 10px;font-size:12px}
+
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* TABLES */
+
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+
+.tbl th{background:#f8fafc;text-align:left;padding:8px 10px;font-weight:600;color:#374151;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+
+.tbl td{padding:7px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+
+.tbl tr:hover td{background:#fafafa}
+
+/* BADGES */
+
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap}
+
+.badge-draft{background:#fef9c3;color:#854d0e}
+
+.badge-released{background:#dcfce7;color:#166534}
+
+.badge-retired{background:#f1f5f9;color:#475569}
+
+.badge-auto{background:#FAECEB;color:#E2232A}
+
+.badge-norule{background:#fee2e2;color:#991b1b}
+
+.badge-territory{background:#e0e7ff;color:#3730a3}
+
+.badge-hardware{background:#fce7f3;color:#9d174d}
+
+.badge-service-type{background:#d1fae5;color:#065f46}
+
+.badge-service-period{background:#fff7ed;color:#9a3412}
+
+.badge-sla{background:#f3e8ff;color:#6b21a8}
+
+.badge-service-scope{background:#ecfdf5;color:#064e3b}
+
+/* FORMS */
+
+.form-row{display:grid;gap:12px;margin-bottom:12px}
+
+.form-row-2{grid-template-columns:1fr 1fr}
+
+.form-row-3{grid-template-columns:1fr 1fr 1fr}
+
+.form-row-4{grid-template-columns:1fr 1fr 1fr 1fr}
+
+.form-group{display:flex;flex-direction:column;gap:4px}
+
+.form-label{font-size:12px;font-weight:600;color:#374151}
+
+.form-control{padding:7px 10px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#1f2937;background:#fff}
+
+.form-control:focus{outline:none;border-color:#E2232A;box-shadow:0 0 0 2px rgba(226,35,42,.1)}
+
+select.form-control{cursor:pointer}
+
+/* TABS */
+
+.tabs{display:flex;gap:0;border-bottom:2px solid #e5e7eb;margin-bottom:20px}
+
+.tab{padding:10px 18px;font-size:13px;font-weight:500;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
+
+.tab:hover{color:#374151}
+
+.tab.active{color:#E2232A;border-bottom-color:#E2232A;font-weight:600}
+
+/* MODAL */
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000}
+
+.modal-overlay.hidden{display:none}
+
+.modal-box{background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.2);width:560px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column}
+
+.modal-box.wide{width:800px}
+
+.modal-header{padding:16px 20px;border-bottom:1px solid #e5e7eb;font-weight:700;font-size:15px;color:#000000}
+
+.modal-body{padding:20px;overflow-y:auto;flex:1}
+
+.modal-footer{padding:12px 20px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:8px}
+
+/* TOAST */
+
+#toast-container{position:fixed;bottom:20px;right:20px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+
+.toast{padding:10px 16px;border-radius:6px;font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);animation:slideIn .2s ease}
+
+.toast-success{background:#166534;color:#fff}
+
+.toast-error{background:#991b1b;color:#fff}
+
+.toast-info{background:#000000;color:#fff}
+
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* FACTOR SELECTOR */
+
+.factor-selector{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+
+.factor-panel{border:1px solid #d1d5db;border-radius:4px;overflow:hidden}
+
+.factor-panel-title{background:#f8fafc;padding:7px 10px;font-size:12px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb}
+
+.factor-list{min-height:140px;max-height:220px;overflow-y:auto;padding:4px}
+
+.factor-item{padding:5px 8px;border-radius:4px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:6px}
+
+.factor-item:hover{background:#FAECEB}
+
+.factor-arrows{display:flex;flex-direction:column;gap:6px;justify-content:center;align-items:center;padding:8px}
+
+/* UPLOAD ZONE */
+
+.upload-zone{border:2px dashed #d1d5db;border-radius:4px;padding:30px;text-align:center;cursor:pointer;transition:border-color .2s}
+
+.upload-zone:hover,.upload-zone.drag-over{border-color:#E2232A;background:#FAECEB}
+
+.upload-zone .upload-icon{font-size:32px;margin-bottom:8px}
+
+.upload-zone p{color:#6b7280;font-size:13px}
+
+/* STATS GRID */
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+
+.stat-card{background:#fff;border:1px solid #e5e7eb;border-radius:4px;padding:14px;text-align:center}
+
+.stat-card .stat-val{font-size:26px;font-weight:700;color:#000000}
+
+.stat-card .stat-label{font-size:11px;color:#6b7280;margin-top:2px}
+
+/* PAGE HEADER */
+
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+
+.page-header h1{font-size:20px;font-weight:700;color:#000000}
+
+/* PAGINATION */
+
+.pagination{display:flex;align-items:center;gap:6px;margin-top:12px}
+
+.pagination button{padding:5px 10px;font-size:12px;border:1px solid #d1d5db;background:#fff;border-radius:4px;cursor:pointer}
+
+.pagination button:disabled{opacity:.4;cursor:not-allowed}
+
+.pagination .page-info{font-size:12px;color:#6b7280;margin:0 6px}
+
+/* MISC */
+
+.text-muted{color:#6b7280}.text-sm{font-size:12px}.text-right{text-align:right}
+
+.hidden{display:none!important}
+
+.formula-chip{display:inline-block;background:#FAECEB;color:#E2232A;border-radius:3px;padding:1px 5px;font-size:11px;margin:1px}
+
+.section-title{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #e5e7eb}
+
+hr{border:none;border-top:1px solid #e5e7eb;margin:14px 0}
+
+/* LOGIN PAGE */
+
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#000000 0%,#E2232A 100%)}
+
+.login-card{background:#fff;border-radius:12px;padding:40px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+
+.login-card h1{font-size:22px;font-weight:700;color:#000000;margin-bottom:4px}
+
+.login-card p{color:#6b7280;font-size:13px;margin-bottom:24px}
+
+.total-uplift-row{background:#f0fdf4;font-weight:600}
+
+.err-item{color:#991b1b;font-size:12px;padding:3px 0}
+
+/* CATALOG-RULE SPLIT */
+
+.cat-rule-split{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+
+.cat-panel{background:#fff;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden}
+
+.cat-panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #e5e7eb;background:#f8fafc}
+
+.cat-list{overflow-y:auto;max-height:calc(100vh - 220px)}
+
+.cat-item{padding:10px 14px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .12s}
+
+.cat-item:hover{background:#f8fafc}
+
+.cat-item.cat-active{background:#FAECEB;border-left:3px solid #E2232A}
+
+.cat-item-name{font-weight:600;font-size:13px;color:#000000}
+
+.cat-item-meta{font-size:11px;color:#6b7280;margin-top:2px}
+
+.cat-item-actions{margin-top:6px;display:flex;gap:4px}
+
+.rule-panel{min-width:0}
+
+.rule-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="modal-overlay hidden" id="modal-overlay">
+
+  <div class="modal-box" id="modal-box">
+
+    <div class="modal-header" id="modal-header"></div>
+
+    <div class="modal-body" id="modal-body"></div>
+
+    <div class="modal-footer" id="modal-footer"></div>
+
+  </div>
+
+</div>
+
+<div id="toast-container"></div>
+
+<div id="app"><div style="padding:40px;text-align:center;color:#374151"><h2>Loading...</h2><p id="_err" style="color:#991b1b"></p></div></div>
+
+
+
+<script>
+
+'use strict';
+
+
+
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
+
+
+
+const FACTOR_DEFINITIONS = [
+
+  {technical_id:'TYPESRV',   factor_name:'Type of Service',            classification:'Service Type'},
+
+  {technical_id:'SUBTYPESRV',factor_name:'Sub-Type of Service',        classification:'Service Type'},
+
+  {technical_id:'GEO',       factor_name:'GEO',                        classification:'Territory'},
+
+  {technical_id:'COUNTRY',   factor_name:'Country',                    classification:'Territory'},
+
+  {technical_id:'SRVTIER',   factor_name:'Service Tier',               classification:'Hardware'},
+
+  {technical_id:'SUBSRVTIER',factor_name:'Sub Service Tier',           classification:'Hardware'},
+
+  {technical_id:'MT',        factor_name:'Compatible MT',              classification:'Hardware'},
+
+  {technical_id:'SRVTERM',   factor_name:'Service Term',               classification:'Service Period'},
+
+  {technical_id:'UPGFRMTERM',factor_name:'Upgrade From Term',          classification:'Service Period'},
+
+  {technical_id:'UPGFRMTYPE',factor_name:'Upgrade From Type',          classification:'Service Scope'},
+
+  {technical_id:'SABTIME',   factor_name:'Service Availability Time',  classification:'SLA'},
+
+  {technical_id:'RSPTIME',   factor_name:'Service Response Time',      classification:'SLA'},
+
+  {technical_id:'SDTYPE',    factor_name:'Service Delivery Type',      classification:'Service Scope'},
+
+  {technical_id:'ICPS',      factor_name:'Included Premier Service',   classification:'Service Scope'},
+
+  {technical_id:'PSTYPE',    factor_name:'Premier Service Type',       classification:'Service Scope'},
+
+  {technical_id:'ICADP',     factor_name:'Included ADP or ADI Service',classification:'Service Scope'},
+
+  {technical_id:'ICKYD',     factor_name:'Included KYD Service',       classification:'Service Scope'},
+
+  {technical_id:'ICSBTY',    factor_name:'Included SBTY Service',      classification:'Service Scope'},
+
+  {technical_id:'ICISE',     factor_name:'Included ISE Service',       classification:'Service Scope'},
+
+  {technical_id:'ICTICRU',   factor_name:'Included TI CRU Service',    classification:'Service Scope'},
+
+];
+
+
+
+const FACTOR_FIELD_MAP = {
+
+  TYPESRV:'type_of_service', SUBTYPESRV:'sub_type_of_service', GEO:'geo',
+
+  COUNTRY:'country', SRVTIER:'service_tier', SUBSRVTIER:'sub_service_tier',
+
+  MT:'compatible_mt', SRVTERM:'service_term', UPGFRMTERM:'upgrade_from_term', UPGFRMTYPE:'upgrade_from_type',
+
+  SABTIME:'service_availability_time',
+
+  RSPTIME:'service_response_time', SDTYPE:'service_delivery_type',
+
+  ICPS:'included_premier_service', PSTYPE:'premier_service_type',
+
+  ICADP:'included_adp', ICKYD:'included_kyd', ICSBTY:'included_sbty',
+
+  ICISE:'included_ise', ICTICRU:'included_ticru',
+
+};
+
+
+
+const SKU_COLUMN_MAP = {
+
+  'Service PN':'service_pn','Service PN Short Description':'short_description',
+
+  'Service PN Sales& Marketing Description':'sm_description','OH ID':'oh_id',
+
+  'OH Name':'oh_name','Type of Service':'type_of_service',
+
+  'Sub-Type of Service':'sub_type_of_service','Offering Type':'offering_type',
+
+  'Standard Cost ( Base Cost )':'psc_value','Currency':'currency',
+
+  'Sales Cost Source':'sales_cost_source','GEO':'geo','Country':'country',
+
+  'Service Tier':'service_tier','Sub Service Tier':'sub_service_tier',
+
+  'Compatible MT':'compatible_mt','SDF Code':'sdf_code',
+
+  'SDF Code Short Description':'sdf_short_description',
+
+  'SDF Code Long Description':'sdf_long_description','Service Term':'service_term',
+
+  'Unit':'unit','Service Availability Time':'service_availability_time',
+
+  'Service Response Time':'service_response_time',
+
+  'Service Delivery Type':'service_delivery_type',
+
+  'Upgrade From Type':'upgrade_from_type',
+
+  'Upgrade From Term':'upgrade_from_term',
+
+  'Included Premier Service':'included_premier_service',
+
+  'Premier Service Type':'premier_service_type',
+
+  'Included Protection Service':'included_adp','Included KYD Service':'included_kyd',
+
+  'Included SBTY Service':'included_sbty','Included ISE Service':'included_ise',
+
+  'Included TI CRU Service':'included_ticru',
+
+};
+
+const SKIP_COLUMNS = new Set(['Sales Cost']);
+
+
+
+// ── DATABASE ──────────────────────────────────────────────────────────────────
+
+
+
+const db = new Dexie('GPSPricingV1');
+
+db.version(1).stores({
+
+  cycles:                   '++id, &name',
+
+  uplift_factor_definitions:'++id, &technical_id',
+
+  uplift_catalogs:          '++id, &catalog_id, type_of_service, geo, status',
+
+  uplift_catalog_factors:   '++id, [catalog_id+factor_def_id], catalog_id',
+
+  uplift_rules:             '++id, &rule_id, catalog_id, type_of_service, geo, status',
+
+  uplift_rule_factors:      '++id, [rule_id+factor_def_id], rule_id',
+
+  service_pns:              '++id, [cycle_id+service_pn+country], cycle_id, type_of_service, geo',
+
+});
+
+db.version(2).stores({
+
+  uplift_catalogs:          '++id, &catalog_id, service_tier, geo, status',
+
+  uplift_rules:             '++id, &rule_id, catalog_id, service_tier, geo, status',
+
+  service_pns:              '++id, [cycle_id+service_pn+country], cycle_id, service_tier, geo',
+
+}).upgrade(async tx => {
+
+  // Rename type_of_service → service_tier, service_delivery_type → type_of_service
+
+  const migrate = rec => {
+
+    if ('type_of_service' in rec)      { rec.service_tier = rec.type_of_service; delete rec.type_of_service; }
+
+    if ('service_delivery_type' in rec) { rec.type_of_service = rec.service_delivery_type; delete rec.service_delivery_type; }
+
+  };
+
+  await tx.table('service_pns').toCollection().modify(migrate);
+
+  await tx.table('uplift_catalogs').toCollection().modify(rec => {
+
+    if ('type_of_service' in rec) { rec.service_tier = rec.type_of_service; delete rec.type_of_service; }
+
+  });
+
+  await tx.table('uplift_rules').toCollection().modify(rec => {
+
+    if ('type_of_service' in rec) { rec.service_tier = rec.type_of_service; delete rec.type_of_service; }
+
+  });
+
+});
+
+db.version(3).stores({
+
+  uplift_values:        '++id, &value_id, catalog_id, service_tier, geo, status',
+
+  uplift_value_factors: '++id, [value_id+factor_def_id], value_id',
+
+  uplift_rules:         null,
+
+  uplift_rule_factors:  null,
+
+}).upgrade(async tx => {
+
+  // Step 1: copy uplift_rules → uplift_values (rename field rule_id → value_id)
+
+  // and copy uplift_rule_factors → uplift_value_factors (rename field rule_id → value_id)
+
+  const oldRules = await tx.table('uplift_rules').toArray();
+
+  const oldIdToNewId = {};
+
+  for (const r of oldRules) {
+
+    const { id: oldId, rule_id, ...rest } = r;
+
+    const newId = await tx.table('uplift_values').add({ value_id: rule_id, ...rest });
+
+    oldIdToNewId[oldId] = newId;
+
+  }
+
+  const oldFactors = await tx.table('uplift_rule_factors').toArray();
+
+  for (const f of oldFactors) {
+
+    const { id: _id, rule_id: oldRuleId, ...rest } = f;
+
+    const newValueId = oldIdToNewId[oldRuleId];
+
+    if (newValueId != null) {
+
+      await tx.table('uplift_value_factors').add({ value_id: newValueId, ...rest });
+
+    }
+
+  }
+
+});
+
+db.version(4).stores({
+
+  uplift_rules:         '++id, &rule_id, service_tier, geo, status',
+
+  uplift_rule_factors:  '++id, [rule_id+factor_def_id], rule_id',
+
+  uplift_values:        '++id, &value_id, rule_id, service_tier, geo, status',
+
+  uplift_catalogs:      null,
+
+  uplift_catalog_factors: null,
+
+}).upgrade(async tx => {
+
+  // Step 2: copy uplift_catalogs → uplift_rules (rename field catalog_id → rule_id)
+
+  // and copy uplift_catalog_factors → uplift_rule_factors (rename field catalog_id → rule_id)
+
+  // and update uplift_values FK: catalog_id → rule_id with remapped IDs
+
+  const oldCats = await tx.table('uplift_catalogs').toArray();
+
+  const catIdToNewRuleId = {};
+
+  for (const c of oldCats) {
+
+    const { id: oldId, catalog_id, ...rest } = c;
+
+    const newId = await tx.table('uplift_rules').add({ rule_id: catalog_id, ...rest });
+
+    catIdToNewRuleId[oldId] = newId;
+
+  }
+
+  const oldCatFactors = await tx.table('uplift_catalog_factors').toArray();
+
+  for (const f of oldCatFactors) {
+
+    const { id: _id, catalog_id: oldCatId, ...rest } = f;
+
+    const newRuleId = catIdToNewRuleId[oldCatId];
+
+    if (newRuleId != null) {
+
+      await tx.table('uplift_rule_factors').add({ rule_id: newRuleId, ...rest });
+
+    }
+
+  }
+
+  // Update uplift_values: rename FK field catalog_id → rule_id with remapped IDs
+
+  await tx.table('uplift_values').toCollection().modify(rec => {
+
+    if ('catalog_id' in rec) {
+
+      rec.rule_id = catIdToNewRuleId[rec.catalog_id] ?? null;
+
+      delete rec.catalog_id;
+
+    }
+
+  });
+
+});
+
+
+
+db.version(5).stores({
+
+  uplift_rules:  '++id, &rule_id, type_of_service, geo, status',
+
+  uplift_values: '++id, &value_id, rule_id, type_of_service, geo, status',
+
+  service_pns:   '++id, [cycle_id+service_pn+country], cycle_id, type_of_service, geo',
+
+}).upgrade(async tx => {
+
+  // Revert v2: restore type_of_service and service_delivery_type
+
+  await tx.table('service_pns').toCollection().modify(rec => {
+
+    if ('type_of_service' in rec) { rec.service_delivery_type = rec.type_of_service; delete rec.type_of_service; }
+
+    if ('service_tier' in rec)    { rec.type_of_service = rec.service_tier; delete rec.service_tier; }
+
+  });
+
+  await tx.table('uplift_rules').toCollection().modify(rec => {
+
+    if ('service_tier' in rec) { rec.type_of_service = rec.service_tier; delete rec.service_tier; }
+
+  });
+
+  await tx.table('uplift_values').toCollection().modify(rec => {
+
+    if ('service_tier' in rec) { rec.type_of_service = rec.service_tier; delete rec.service_tier; }
+
+  });
+
+});
+
+
+
+async function initDB() {
+
+  const count = await db.uplift_factor_definitions.count();
+
+  if (count === 0) {
+
+    await db.uplift_factor_definitions.bulkAdd(
+
+      FACTOR_DEFINITIONS.map((f,i) => ({...f, description:'', sort_order:i}))
+
+    );
+
+  } else {
+
+    const validIds = new Set(FACTOR_DEFINITIONS.map(f=>f.technical_id));
+
+    // Sync renames and remove obsolete entries
+
+    const all = await db.uplift_factor_definitions.toArray();
+
+    for (const rec of all) {
+
+      if (!validIds.has(rec.technical_id)) {
+
+        await db.uplift_factor_definitions.delete(rec.id);
+
+      }
+
+    }
+
+    for (const def of FACTOR_DEFINITIONS) {
+
+      const rec = await db.uplift_factor_definitions.where('technical_id').equals(def.technical_id).first();
+
+      if (rec && (rec.factor_name !== def.factor_name || rec.classification !== def.classification)) {
+
+        await db.uplift_factor_definitions.update(rec.id, {factor_name:def.factor_name, classification:def.classification});
+
+      }
+
+    }
+
+    // Add any new factor definitions not yet in DB (e.g. restored SRVTIER/SUBSRVTIER)
+
+    for (let i = 0; i < FACTOR_DEFINITIONS.length; i++) {
+
+      const def = FACTOR_DEFINITIONS[i];
+
+      const rec = await db.uplift_factor_definitions.where('technical_id').equals(def.technical_id).first();
+
+      if (!rec) {
+
+        await db.uplift_factor_definitions.add({...def, description:'', sort_order:i});
+
+      }
+
+    }
+
+  }
+
+}
+
+
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+
+
+
+let currentUser = localStorage.getItem('gps_user') || null;
+
+let currentCycleId = null;
+
+let currentTab = 'sku';
+
+let skuPage = 1;
+
+const SKU_PAGE_SIZE = 50;
+
+let upliftRuleFilter = null; // selected uplift rule id in the Uplift tab (null = All)
+
+
+
+// ── UTILITIES ─────────────────────────────────────────────────────────────────
+
+
+
+function el(id) { return document.getElementById(id); }
+
+function app() { return el('app'); }
+
+
+
+function fmt(v, d=2) {
+
+  if (v==null||v===''||isNaN(v)) return '—';
+
+  return Number(v).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+
+}
+
+function pct(v) {
+
+  if (v==null||v===''||isNaN(v)) return '—';
+
+  return (Number(v)*100).toFixed(2)+'%';
+
+}
+
+function safeStr(v) {
+
+  if (v==null) return null;
+
+  const s = String(v).trim();
+
+  return s || null;
+
+}
+
+function safeFloat(v) {
+
+  if (v==null) return null;
+
+  if (typeof v==='number' && isNaN(v)) return null;
+
+  const s = String(v).trim().replace('%','').replace(',','');
+
+  const f = parseFloat(s);
+
+  return isNaN(f) ? null : f;
+
+}
+
+function parseRatio(v) {
+
+  if (v==null) return 0;
+
+  const s = String(v).trim();
+
+  if (s.endsWith('%')) { const f=parseFloat(s); return isNaN(f)?0:f/100; }
+
+  const f = parseFloat(s);
+
+  if (isNaN(f)) return 0;
+
+  return Math.abs(f)>1 ? f/100 : f;
+
+}
+
+function parseDate(v) {
+
+  if (!v) return null;
+
+  const s = String(v).trim();
+
+  const fmts = [
+
+    s => { const d=new Date(s); return isNaN(d)?null:d.toISOString().slice(0,10); },
+
+    s => { const [d,m,y]=s.split('/'); return y?`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`:null; },
+
+    s => { const [d,m,y]=s.split('-'); return y&&y.length===4?`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`:null; },
+
+  ];
+
+  for (const fn of fmts) { try { const r=fn(s); if(r) return r; } catch{} }
+
+  return s||null;
+
+}
+
+function now() { return new Date().toISOString(); }
+
+
+
+function statusBadge(s) {
+
+  const map={Draft:'badge-draft',Released:'badge-released',Retired:'badge-retired'};
+
+  return `<span class="badge ${map[s]||'badge-draft'}">${s||'Draft'}</span>`;
+
+}
+
+function sourceBadge(s) {
+
+  if (!s) return '—';
+
+  if (s==='Auto-Calculation') return '<span class="badge badge-auto">Auto</span>';
+
+  if (s==='No Rule') return '<span class="badge badge-norule">No Rule</span>';
+
+  return `<span class="badge badge-draft">${s}</span>`;
+
+}
+
+function clsBadge(c) {
+
+  const map={'Territory':'badge-territory','Hardware':'badge-hardware','Service Type':'badge-service-type',
+
+    'Service Period':'badge-service-period','SLA':'badge-sla','Service Scope':'badge-service-scope'};
+
+  return `<span class="badge ${map[c]||'badge-draft'}">${c||''}</span>`;
+
+}
+
+
+
+function toast(msg, type='info') {
+
+  const div = document.createElement('div');
+
+  div.className = `toast toast-${type}`;
+
+  div.textContent = msg;
+
+  el('toast-container').appendChild(div);
+
+  setTimeout(() => div.remove(), 3500);
+
+}
+
+
+
+// Modal
+
+function showModal(title, bodyHTML, footerHTML, wide=false) {
+
+  el('modal-header').textContent = title;
+
+  el('modal-body').innerHTML = bodyHTML;
+
+  el('modal-footer').innerHTML = footerHTML || '<button class="btn btn-secondary" onclick="hideModal()">Close</button>';
+
+  el('modal-box').className = 'modal-box' + (wide?' wide':'');
+
+  el('modal-overlay').classList.remove('hidden');
+
+}
+
+function hideModal() { el('modal-overlay').classList.add('hidden'); }
+
+el('modal-overlay').addEventListener('click', e => { if(e.target===el('modal-overlay')) hideModal(); });
+
+
+
+// ── ROUTER ────────────────────────────────────────────────────────────────────
+
+
+
+async function route() {
+
+  if (!currentUser) { renderLogin(); return; }
+
+  const hash = location.hash || '#';
+
+  const m = hash.match(/^#cycle\/(\d+)(?:\/(\w+))?/);
+
+  if (m) {
+
+    currentCycleId = parseInt(m[1]);
+
+    currentTab = m[2] || 'sku';
+
+    await renderCycle();
+
+  } else {
+
+    await renderDashboard();
+
+  }
+
+}
+
+
+
+window.addEventListener('hashchange', route);
+
+
+
+function navigate(hash) { location.hash = hash; }
+
+function setTab(tab) { currentTab = tab; route(); }
+
+
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+
+
+
+function renderLogin() {
+
+  app().innerHTML = `
+
+  <div class="login-page">
+
+    <div class="login-card">
+
+      <h1>GPS Cost Pricing Workbench</h1>
+
+      <p>Stage 3 — Sales Cost Calculator</p>
+
+      <div class="form-group" style="margin-bottom:16px">
+
+        <label class="form-label">Your Name</label>
+
+        <input id="login-name" class="form-control" placeholder="e.g. John Smith" autofocus>
+
+      </div>
+
+      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Enter</button>
+
+    </div>
+
+  </div>`;
+
+  el('login-name').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+}
+
+
+
+function doLogin() {
+
+  const name = el('login-name').value.trim();
+
+  if (!name) { toast('Please enter your name','error'); return; }
+
+  currentUser = name;
+
+  localStorage.setItem('gps_user', name);
+
+  route();
+
+}
+
+
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+
+
+
+async function renderDashboard() {
+
+  const cycles = await db.cycles.orderBy('id').reverse().toArray();
+
+  app().innerHTML = `
+
+  <nav class="nav">
+
+    <a class="nav-brand" href="../GPS_Cost_Pricing_Workbench.html">GPS Cost Pricing Workbench</a>
+
+    <div class="nav-links"><a class="active">Dashboard</a></div>
+
+    <span class="nav-user">${currentUser} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#94a3b8">Sign out</a></span>
+
+  </nav>
+
+  <div class="container">
+
+    <div class="page-header">
+
+      <h1>Pricing Cycles</h1>
+
+      <button class="btn btn-primary" onclick="showCreateCycle()">+ New Cycle</button>
+
+    </div>
+
+    <div class="card">
+
+      ${cycles.length===0
+
+        ? '<p class="text-muted" style="text-align:center;padding:30px">No cycles yet. Create your first cycle to begin.</p>'
+
+        : `<table class="tbl">
+
+          <thead><tr><th>Cycle Name</th><th>Fiscal Year</th><th>Status</th><th>Created By</th><th>Created At</th><th></th></tr></thead>
+
+          <tbody>${cycles.map(c=>`
+
+            <tr>
+
+              <td><strong><a href="#cycle/${c.id}/sku">${c.name}</a></strong></td>
+
+              <td>${c.fiscal_year||'—'}</td>
+
+              <td>${statusBadge(c.status)}</td>
+
+              <td>${c.created_by||'—'}</td>
+
+              <td class="text-muted text-sm">${(c.created_at||'').slice(0,16).replace('T',' ')}</td>
+
+              <td><a class="btn btn-secondary btn-sm" href="#cycle/${c.id}/sku">Open — /a></td>
+
+            </tr>`).join('')}
+
+          </tbody></table>`}
+
+    </div>
+
+  </div>`;
+
+}
+
+
+
+function showCreateCycle() {
+
+  showModal('New Pricing Cycle',
+
+    `<div class="form-row form-row-2">
+
+      <div class="form-group"><label class="form-label">Cycle Name *</label>
+
+        <input id="c-name" class="form-control" placeholder="e.g. FY25 Q2 EMEA"></div>
+
+      <div class="form-group"><label class="form-label">Fiscal Year</label>
+
+        <input id="c-fy" class="form-control" placeholder="e.g. FY2025"></div>
+
+    </div>`,
+
+    `<button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+
+     <button class="btn btn-primary" onclick="createCycle()">Create</button>`
+
+  );
+
+}
+
+
+
+async function createCycle() {
+
+  const name = el('c-name').value.trim();
+
+  const fy = el('c-fy').value.trim();
+
+  if (!name) { toast('Cycle name is required','error'); return; }
+
+  try {
+
+    const id = await db.cycles.add({name, fiscal_year:fy, status:'Draft', created_by:currentUser, created_at:now()});
+
+    hideModal();
+
+    toast('Cycle created','success');
+
+    navigate(`#cycle/${id}/sku`);
+
+  } catch(e) {
+
+    if (String(e).includes('unique') || String(e).includes('constraint')) toast('Cycle name already exists','error');
+
+    else toast('Error: '+e.message,'error');
+
+  }
+
+}
+
+
+
+function logout() { localStorage.removeItem('gps_user'); currentUser=null; route(); }
+
+
+
+// ── CYCLE PAGE ────────────────────────────────────────────────────────────────
+
+
+
+async function renderCycle() {
+
+  const cycle = await db.cycles.get(currentCycleId);
+
+  if (!cycle) { navigate('#'); return; }
+
+  const tabs = [
+
+    {id:'sku',label:'SKU Data'},
+
+    {id:'rules',label:'Uplift'},
+
+    {id:'calculate',label:'Calculate'},
+
+    {id:'export',label:'Export'},
+
+  ];
+
+  app().innerHTML = `
+
+  <nav class="nav">
+
+    <a class="nav-brand" href="../GPS_Cost_Pricing_Workbench.html">GPS Cost Pricing Workbench</a>
+
+    <div class="nav-links">
+
+      <a href="#" onclick="navigate('#')">Dashboard</a>
+
+      <a class="active">${cycle.name}</a>
+
+    </div>
+
+    <span class="nav-user">${currentUser} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#94a3b8">Sign out</a></span>
+
+  </nav>
+
+  <div class="container">
+
+    <div class="page-header">
+
+      <h1>${cycle.name} <span style="font-size:14px;font-weight:400;color:#6b7280">${cycle.fiscal_year||''}</span></h1>
+
+      ${statusBadge(cycle.status)}
+
+    </div>
+
+    <div class="tabs">
+
+      ${tabs.map(t=>`<div class="tab${currentTab===t.id?' active':''}" onclick="navigate('#cycle/${currentCycleId}/${t.id}')">${t.label}</div>`).join('')}
+
+    </div>
+
+    <div id="tab-content"></div>
+
+  </div>`;
+
+
+
+  const tabFns = {sku:renderSkuTab, rules:renderUpliftTab,
+
+                   calculate:renderCalculateTab, export:renderExportTab};
+
+  if (tabFns[currentTab]) await tabFns[currentTab]();
+
+}
+
+
+
+// ── SKU TAB ───────────────────────────────────────────────────────────────────
+
+
+
+async function renderSkuTab() {
+
+  const tc = el('tab-content');
+
+  tc.innerHTML = `
+
+  <div class="card">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+
+      <div class="card-title" style="margin-bottom:0">Import SKU Data</div>
+
+      <button class="btn btn-secondary btn-sm" onclick="downloadTemplate()">— Download Template</button>
+
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch">
+
+      <div class="upload-zone" id="upload-zone" onclick="el('file-input').click()" style="padding:20px;margin:0">
+
+        <div class="upload-icon" style="font-size:24px;margin-bottom:6px">📂</div>
+
+        <p><strong>Click to browse</strong> or drag & drop</p>
+
+        <p style="margin-top:4px">Excel (.xlsx) or CSV — SKU data + Catalogs + Rules</p>
+
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px">
+
+        <div style="font-size:12px;color:#9ca3af;text-align:center">— or paste CSV text —</div>
+
+        <textarea id="csv-paste" class="form-control" rows="4" placeholder="Paste CSV rows here..." style="flex:1;resize:none"></textarea>
+
+        <div style="display:flex;gap:8px;align-items:center">
+
+          <button class="btn btn-secondary btn-sm" onclick="importCSVPaste()">Import CSV Text</button>
+
+          <span id="import-status" class="text-muted text-sm"></span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <input type="file" id="file-input" accept=".xlsx,.csv" class="hidden" onchange="handleFileInput(event)">
+
+  </div>
+
+  <div id="sku-summary"></div>
+
+  <div id="sku-table-wrap"></div>`;
+
+
+
+  // Drag-and-drop
+
+  const zone = el('upload-zone');
+
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+
+
+
+  await renderSkuData();
+
+}
+
+
+
+async function handleFileInput(e) { await handleFiles(e.target.files); }
+
+
+
+function downloadTemplate() {
+
+  const wb = XLSX.utils.book_new();
+
+
+
+  // ── Sheet 1: SKU Data ──────────────────────────────────────────────────────
+
+  const skuHeaders = [
+
+    'Service PN','Service PN Short Description','Service PN Sales& Marketing Description',
+
+    'OH ID','OH Name','Type of Service','Sub-Type of Service','Offering Type',
+
+    'Standard Cost ( Base Cost )','Currency','GEO','Country','Service Tier',
+
+    'Sub Service Tier','Compatible MT','SDF Code','SDF Code Short Description',
+
+    'SDF Code Long Description','Service Term','Unit','Service Availability Time',
+
+    'Service Response Time','Service Delivery Type','Upgrade From Type','Upgrade From Term',
+
+    'Included Premier Service',
+
+    'Premier Service Type','Included Protection Service','Included KYD Service',
+
+    'Included SBTY Service','Included ISE Service','Included TI CRU Service',
+
+  ];
+
+  const skuExample = [
+
+    '5WS0A23813','1Y Onsite NBD ThinkPad','1 Year Onsite Next Business Day - ThinkPad',
+
+    'OH-001','Lenovo Support','ThinkPad Base','Standard','Hardware Support',
+
+    '45.00','USD','EMEA','DE','TP Base',
+
+    'Standard','','SDF-NBD-1Y','NBD 1Y Onsite','Next Business Day Onsite Response 1 Year',
+
+    '12','Each','9x5','NBD','ON-SITE','','','N','','N','N','N','N','N',
+
+  ];
+
+  const skuData = [
+
+    ['Row 1 is for instructions only — do not delete it. Data starts from Row 3.'],
+
+    skuHeaders,
+
+    skuExample,
+
+  ];
+
+  const ws1 = XLSX.utils.aoa_to_sheet(skuData);
+
+  // Style instruction row (wide merged-like cell via column width)
+
+  ws1['!cols'] = skuHeaders.map((h,i) => ({wch: i===0?35:i<=4?22:i<=8?18:14}));
+
+  ws1['!rows'] = [{hpt:20},{hpt:22},{hpt:18}];
+
+  XLSX.utils.book_append_sheet(wb, ws1, 'Maintenance and Search UI');
+
+
+
+  // ── Sheet 2: Catalog template ──────────────────────────────────────────────
+
+  const cat2 = [
+
+    ['Uplift Factors Catalog — Template','','',''],
+
+    ['','','',''],
+
+    ['Uplift Factors ID:','CAT-EMEA-THINKPAD','','Description: EMEA ThinkPad Base Catalog'],
+
+    ['Type of Service','ThinkPad Base','','EMEA'],
+
+    ['Valid From','2025-01-01','','Valid To: 2025-12-31'],
+
+    ['Status','Released','',''],
+
+    ['','Available Uplift Factor List','','Selected Uplift Factor List'],
+
+    ['','GEO','','Country'],
+
+    ['','Service Tier','','Service Term'],
+
+    ['','Service Delivery Type','','GEO'],
+
+    ['','','',''],
+
+    ['Uplift Factors ID:','CAT-EMEA-IDEAPAD','','Description: EMEA IdeaPad Catalog'],
+
+    ['Type of Service','IdeaPad Base','','EMEA'],
+
+    ['Valid From','2025-01-01','','Valid To: 2025-12-31'],
+
+    ['Status','Draft','',''],
+
+    ['','Available Uplift Factor List','','Selected Uplift Factor List'],
+
+    ['','Service Tier','','Country'],
+
+    ['','Service Term','','Service Delivery Type'],
+
+    ['','','',''],
+
+  ];
+
+  const ws2 = XLSX.utils.aoa_to_sheet(cat2);
+
+  ws2['!cols'] = [{wch:30},{wch:28},{wch:28},{wch:35}];
+
+  XLSX.utils.book_append_sheet(wb, ws2, 'Custom Uplift Factors Catalog');
+
+
+
+  // ── Sheet 3: Rules template ────────────────────────────────────────────────
+
+  const rule3 = [
+
+    ['Uplift Formula Rules — Template','','',''],
+
+    ['','','',''],
+
+    ['Uplift Rule ID:','RULE-EMEA-THINKPAD-001','','Description: EMEA ThinkPad Standard Rule'],
+
+    ['Select Uplift Factor Catalog','CAT-EMEA-THINKPAD','',''],
+
+    ['Type of Service','ThinkPad Base','','EMEA'],
+
+    ['Valid From','2025-01-01','','Valid To: 2025-12-31'],
+
+    ['Status','Released','',''],
+
+    ['Uplift Factor Name','Match Values','Uplift %',''],
+
+    ['Country','DE,FR,GB,IT,ES','5%',''],
+
+    ['Service Term','1','3%',''],
+
+    ['Service Delivery Type','Onsite','8%',''],
+
+    ['Uplift Formula Total','','16%',''],
+
+    ['','','',''],
+
+    ['Uplift Rule ID:','RULE-EMEA-THINKPAD-002','','Description: EMEA ThinkPad 3-Year Rule'],
+
+    ['Select Uplift Factor Catalog','CAT-EMEA-THINKPAD','',''],
+
+    ['Type of Service','ThinkPad Base','','EMEA'],
+
+    ['Valid From','2025-01-01','','Valid To: 2025-12-31'],
+
+    ['Status','Draft','',''],
+
+    ['Uplift Factor Name','Match Values','Uplift %',''],
+
+    ['Country','DE,FR,GB','4%',''],
+
+    ['Service Term','3','6%',''],
+
+    ['Service Delivery Type','Onsite','8%',''],
+
+    ['Uplift Formula Total','','18%',''],
+
+    ['','','',''],
+
+  ];
+
+  const ws3 = XLSX.utils.aoa_to_sheet(rule3);
+
+  ws3['!cols'] = [{wch:30},{wch:30},{wch:14},{wch:35}];
+
+  XLSX.utils.book_append_sheet(wb, ws3, 'Customize Uplift Formula');
+
+
+
+  XLSX.writeFile(wb, 'GPS_Pricing_Template.xlsx');
+
+  toast('Template downloaded', 'success');
+
+}
+
+async function handleFiles(files) {
+
+  if (!files||!files.length) return;
+
+  const file = files[0];
+
+  el('import-status').textContent = 'Importing…';
+
+  try {
+
+    const buf = await file.arrayBuffer();
+
+    if (file.name.endsWith('.csv')) {
+
+      const text = new TextDecoder('utf-8').decode(buf);
+
+      await doImportCSV(text);
+
+    } else {
+
+      await doImportExcel(buf);
+
+    }
+
+  } catch(e) { toast('Import failed: '+e.message,'error'); el('import-status').textContent=''; }
+
+}
+
+
+
+async function importCSVPaste() {
+
+  const text = el('csv-paste').value.trim();
+
+  if (!text) { toast('No CSV text to import','error'); return; }
+
+  await doImportCSV(text);
+
+}
+
+
+
+async function renderSkuData() {
+
+  const total = await db.service_pns.where('cycle_id').equals(currentCycleId).count();
+
+  if (total===0) {
+
+    el('sku-summary').innerHTML='';
+
+    el('sku-table-wrap').innerHTML='<p class="text-muted" style="padding:16px">No SKUs imported yet.</p>';
+
+    return;
+
+  }
+
+  // Summary by GEO + ToS
+
+  const all = await db.service_pns.where('cycle_id').equals(currentCycleId).toArray();
+
+  const sumMap = {};
+
+  for (const s of all) {
+
+    const k = `${s.geo||'—'}|${s.type_of_service||'—'}`;
+
+    if (!sumMap[k]) sumMap[k]={geo:s.geo||'—',tos:s.type_of_service||'—',count:0};
+
+    sumMap[k].count++;
+
+  }
+
+  const sums = Object.values(sumMap).sort((a,b)=>a.geo.localeCompare(b.geo));
+
+  el('sku-summary').innerHTML=`
+
+  <div class="card">
+
+    <div class="card-title">Summary — ${total} SKUs</div>
+
+    <table class="tbl">
+
+      <thead><tr><th>GEO</th><th>Type of Service</th><th>SKU Count</th></tr></thead>
+
+      <tbody>${sums.map(s=>`<tr><td>${s.geo}</td><td>${s.tos}</td><td>${s.count}</td></tr>`).join('')}</tbody>
+
+    </table>
+
+  </div>`;
+
+
+
+  // Paginated table
+
+  const totalPages = Math.ceil(total/SKU_PAGE_SIZE);
+
+  if (skuPage>totalPages) skuPage=1;
+
+  const offset = (skuPage-1)*SKU_PAGE_SIZE;
+
+  const page = all.slice(offset, offset+SKU_PAGE_SIZE);
+
+
+
+  el('sku-table-wrap').innerHTML=`
+
+  <div class="card" style="overflow-x:auto">
+
+    <div class="card-title">SKU Details</div>
+
+    <table class="tbl">
+
+      <thead><tr><th>Service PN</th><th>Short Description</th><th>Type of Service</th><th>Service Tier</th><th>GEO</th><th>Country</th><th>Term</th><th>From Type</th><th>From Term</th><th>PSC</th><th>Sales Cost</th><th>Source</th></tr></thead>
+
+      <tbody>${page.map(s=>`
+
+        <tr>
+
+          <td style="font-family:monospace;font-size:12px">${s.service_pn||''}</td>
+
+          <td>${s.short_description||'—'}</td>
+
+          <td>${s.type_of_service||'—'}</td>
+
+          <td>${s.service_tier||'—'}</td>
+
+          <td>${s.geo||'—'}</td>
+
+          <td>${s.country||'—'}</td>
+
+          <td>${s.service_term!=null&&s.service_term!==''?(String(s.service_term).match(/^\d+$/)?s.service_term+'Y':s.service_term):'—'}</td>
+
+          <td>${s.upgrade_from_type||'—'}</td>
+
+          <td>${s.upgrade_from_term!=null&&s.upgrade_from_term!==''?(String(s.upgrade_from_term).match(/^\d+$/)?s.upgrade_from_term+'Y':s.upgrade_from_term):'—'}</td>
+
+          <td class="text-right">${s.psc_value!=null?fmt(s.psc_value):'—'}</td>
+
+          <td class="text-right">${s.sales_cost!=null?fmt(s.sales_cost):'—'}</td>
+
+          <td>${sourceBadge(s.sales_cost_source)}</td>
+
+        </tr>`).join('')}
+
+      </tbody>
+
+    </table>
+
+    <div class="pagination">
+
+      <button onclick="skuPage=${skuPage-1};renderSkuData()" ${skuPage<=1?'disabled':''}>— Prev</button>
+
+      <span class="page-info">Page ${skuPage} of ${totalPages} (${total} rows)</span>
+
+      <button onclick="skuPage=${skuPage+1};renderSkuData()" ${skuPage>=totalPages?'disabled':''}>Next — /button>
+
+    </div>
+
+  </div>`;
+
+}
+
+
+
+// ── EXCEL / CSV IMPORT ENGINE ─────────────────────────────────────────────────
+
+
+
+async function doImportExcel(arrayBuffer) {
+
+  const wb = XLSX.read(arrayBuffer, {type:'array', cellDates:true});
+
+  let skusImported=0, catsImported=0, rulesImported=0;
+
+  const errors=[];
+
+
+
+  // --- Parse SKU sheet ---
+
+  const skuSheetNames = ['Maintenance and Search UI','SKU Data','Service PNs'];
+
+  let skuSheet = null;
+
+  for (const n of skuSheetNames) { if (wb.SheetNames.includes(n)) { skuSheet=wb.Sheets[n]; break; } }
+
+  if (!skuSheet) { errors.push('SKU sheet not found'); }
+
+  else {
+
+    const rows = XLSX.utils.sheet_to_json(skuSheet, {header:1, defval:null, raw:false});
+
+    // row 0 = instructions, row 1 = headers, row 2+ = data
+
+    if (rows.length>=2) {
+
+      const headers = (rows[1]||[]).map(h=>safeStr(h)||'');
+
+      const skus = [];
+
+      for (let i=2;i<rows.length;i++) {
+
+        const row = rows[i];
+
+        if (!row || row.every(c=>c==null||c==='')) continue;
+
+        const sku = buildSkuRow(headers, row);
+
+        if (sku) skus.push(sku);
+
+      }
+
+      const {count, errs} = await upsertSkus(skus);
+
+      skusImported=count; errors.push(...errs);
+
+    }
+
+  }
+
+
+
+  // --- Parse catalog sheet ---
+
+  const catSheetNames = ['Custom Uplift Factors Catalog','Uplift Catalogs','Catalogs'];
+
+  let catSheet = null;
+
+  for (const n of catSheetNames) { if (wb.SheetNames.includes(n)) { catSheet=wb.Sheets[n]; break; } }
+
+  if (catSheet) {
+
+    const cats = parseUpliftRuleSheet(catSheet);
+
+    const {count, errs} = await upsertUpliftRules(cats);
+
+    catsImported=count; errors.push(...errs);
+
+  }
+
+
+
+  // --- Parse rules sheet ---
+
+  const ruleSheetNames = ['Customize Uplift Formula','Uplift Rules','Rules'];
+
+  let ruleSheet = null;
+
+  for (const n of ruleSheetNames) { if (wb.SheetNames.includes(n)) { ruleSheet=wb.Sheets[n]; break; } }
+
+  if (ruleSheet) {
+
+    const rules = parseUpliftValueSheet(ruleSheet);
+
+    const {count, errs} = await upsertUpliftValues(rules);
+
+    rulesImported=count; errors.push(...errs);
+
+  }
+
+
+
+  const msg = `Imported: ${skusImported} SKUs, ${catsImported} catalogs, ${rulesImported} rules`;
+
+  el('import-status').textContent = msg;
+
+  toast(msg, errors.length?'info':'success');
+
+  if (errors.length) showModal('Import Warnings', `<div>${errors.slice(0,20).map(e=>`<div class="err-item">— ${e}</div>`).join('')}</div>`);
+
+  await renderSkuData();
+
+}
+
+
+
+async function doImportCSV(text) {
+
+  const lines = text.split('\n').filter(l=>l.trim());
+
+  if (lines.length<2) { toast('CSV needs a header row + data','error'); return; }
+
+  const headers = parseCSVLine(lines[0]);
+
+  const skus=[];
+
+  for (let i=1;i<lines.length;i++) {
+
+    const vals = parseCSVLine(lines[i]);
+
+    if (!vals.length) continue;
+
+    const row = {};
+
+    headers.forEach((h,j) => row[h.trim()] = vals[j]||null);
+
+    const sku = buildSkuRowFromDict(row);
+
+    if (sku) skus.push(sku);
+
+  }
+
+  if (!skus.length) { toast('No valid SKU rows found','error'); return; }
+
+  const {count, errs} = await upsertSkus(skus);
+
+  const msg = `Imported ${count} SKUs`;
+
+  el('import-status').textContent=msg;
+
+  toast(msg, errs.length?'info':'success');
+
+  el('csv-paste').value='';
+
+  await renderSkuData();
+
+}
+
+
+
+function parseCSVLine(line) {
+
+  const result=[];
+
+  let cur='', inQ=false;
+
+  for (let i=0;i<line.length;i++) {
+
+    const c=line[i];
+
+    if (c==='"') { inQ=!inQ; }
+
+    else if (c===','&&!inQ) { result.push(cur); cur=''; }
+
+    else cur+=c;
+
+  }
+
+  result.push(cur);
+
+  return result;
+
+}
+
+
+
+function buildSkuRow(headers, row) {
+
+  const dict={};
+
+  headers.forEach((h,i) => dict[h] = row[i]??null);
+
+  return buildSkuRowFromDict(dict);
+
+}
+
+
+
+function buildSkuRowFromDict(dict) {
+
+  const sku={};
+
+  let currencySeen=false;
+
+  for (const [col, val] of Object.entries(dict)) {
+
+    const colStr = String(col).trim();
+
+    if (SKIP_COLUMNS.has(colStr)) continue;
+
+    if (colStr==='Currency') { if(!currencySeen){ sku.currency=safeStr(val); currencySeen=true; } continue; }
+
+    const field = SKU_COLUMN_MAP[colStr];
+
+    if (!field) continue;
+
+    if (field==='psc_value') sku[field]=safeFloat(val);
+
+    else if (field==='service_term'||field==='upgrade_from_term') sku[field]=safeStr(val);
+
+    else sku[field]=safeStr(val);
+
+  }
+
+  if (!sku.service_pn) return null;
+
+  return sku;
+
+}
+
+
+
+async function upsertSkus(skus) {
+
+  let count=0; const errs=[];
+
+  // Load existing for this cycle to enable update-or-insert
+
+  const existing = await db.service_pns.where('cycle_id').equals(currentCycleId).toArray();
+
+  const existMap={};
+
+  for (const s of existing) existMap[`${s.service_pn}|${s.country||''}`]=s.id;
+
+
+
+  const toAdd=[], toPut=[];
+
+  for (const sku of skus) {
+
+    if (!sku.service_pn) continue;
+
+    const key=`${sku.service_pn}|${sku.country||''}`;
+
+    const rec={...sku, cycle_id:currentCycleId, imported_by:currentUser, imported_at:now()};
+
+    if (existMap[key]!=null) { rec.id=existMap[key]; toPut.push(rec); }
+
+    else toPut.push(rec);
+
+    count++;
+
+  }
+
+  try { await db.service_pns.bulkPut(toPut); }
+
+  catch(e) { errs.push('SKU upsert error: '+e.message); }
+
+  return {count, errs};
+
+}
+
+
+
+// Uplift Rule block parser
+
+function parseUpliftRuleSheet(sheet) {
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {header:1, defval:null, raw:false});
+
+  const upliftRules=[];
+
+  let i=0;
+
+  while (i<rows.length) {
+
+    const row=rows[i];
+
+    const rv=(row||[]).map(c=>safeStr(c)||'');
+
+    if (rv.some(v=>v.includes('Uplift Factors ID'))) {
+
+      const cat={rule_id:safeStr(row[1]), description:safeStr(row[3]), selected_factor_names:[]};
+
+      i++;
+
+      let factorsHeaderSeen=false;
+
+      while (i<rows.length) {
+
+        const r=rows[i];
+
+        const rv2=(r||[]).map(c=>safeStr(c)||'');
+
+        if (rv2.every(v=>v==='')) break;
+
+        const a=rv2[0]||'';
+
+        const b=safeStr(r&&r[1]);
+
+        const d=safeStr(r&&r[3]);
+
+        if (a.includes('Type of Service')) { cat.type_of_service=b; cat.geo=d; }
+
+        else if (a.includes('Valid From')) { cat.valid_from=parseDate(b); cat.valid_to=parseDate(d); }
+
+        else if (a.includes('Status')&&!cat.status) { cat.status=b||'Draft'; }
+
+        else if (rv2.join(' ').includes('Available Uplift Factor List')||rv2.join(' ').includes('Selected Uplift Factor List')) {
+
+          factorsHeaderSeen=true;
+
+        } else if (factorsHeaderSeen) {
+
+          const cv=safeStr(r&&r[2]);
+
+          if (cv&&!['Selected Uplift Factor List','Available Uplift Factor List','Uplift Factor Name'].includes(cv))
+
+            cat.selected_factor_names.push(cv);
+
+        }
+
+        i++;
+
+      }
+
+      if (cat.rule_id) upliftRules.push(cat);
+
+      continue;
+
+    }
+
+    i++;
+
+  }
+
+  return upliftRules;
+
+}
+
+
+
+async function upsertUpliftRules(cats) {
+
+  let count=0; const errs=[];
+
+  const factorDefs = await db.uplift_factor_definitions.toArray();
+
+  const fnameMap={};
+
+  factorDefs.forEach(f=>fnameMap[f.factor_name.trim().toLowerCase()]=f.id);
+
+
+
+  for (const cat of cats) {
+
+    if (!cat.rule_id) continue;
+
+    try {
+
+      const existing = await db.uplift_rules.where('rule_id').equals(cat.rule_id).first();
+
+      let catDbId;
+
+      const rec={rule_id:cat.rule_id, description:cat.description, type_of_service:cat.type_of_service,
+
+        geo:cat.geo, valid_from:cat.valid_from, valid_to:cat.valid_to, status:cat.status||'Draft',
+
+        created_by:currentUser, created_at:now()};
+
+      if (existing) { catDbId=existing.id; await db.uplift_rules.update(catDbId, rec); }
+
+      else { catDbId=await db.uplift_rules.add(rec); }
+
+
+
+      // Re-insert factors (don't duplicate)
+
+      for (let si=0;si<(cat.selected_factor_names||[]).length;si++) {
+
+        const fname=cat.selected_factor_names[si].trim().toLowerCase();
+
+        const fid=fnameMap[fname];
+
+        if (!fid) continue;
+
+        const already=await db.uplift_rule_factors.where('[rule_id+factor_def_id]').equals([catDbId,fid]).count();
+
+        if (!already) await db.uplift_rule_factors.add({rule_id:catDbId, factor_def_id:fid, sort_order:si});
+
+      }
+
+      count++;
+
+    } catch(e) { errs.push(`Uplift Rule ${cat.rule_id}: ${e.message}`); }
+
+  }
+
+  return {count, errs};
+
+}
+
+
+
+// Uplift Value block parser
+
+function parseUpliftValueSheet(sheet) {
+
+  const rows = XLSX.utils.sheet_to_json(sheet, {header:1, defval:null, raw:false});
+
+  const upliftValues=[];
+
+  let i=0;
+
+  while (i<rows.length) {
+
+    const row=rows[i];
+
+    const rv=(row||[]).map(c=>safeStr(c)||'');
+
+    if (rv.some(v=>v.includes('Uplift Rule ID'))) {
+
+      const rule={value_id:safeStr(row[1]), description:safeStr(row[3]), factors:[]};
+
+      i++;
+
+      let inFactorRows=false;
+
+      const currentFactors=[];
+
+      while (i<rows.length) {
+
+        const r=rows[i];
+
+        const rv2=(r||[]).map(c=>safeStr(c)||'');
+
+        if (rv2.every(v=>v==='')) break;
+
+        const a=rv2[0]||'';
+
+        const b=safeStr(r&&r[1]);
+
+        const d=safeStr(r&&r[3]);
+
+        if (a.includes('Select Uplift Factor Catalog')) { rule.rule_id_text=b; }
+
+        else if (a.includes('Type of Service')) { rule.type_of_service=b; rule.geo=d; }
+
+        else if (a.includes('Valid From')) { rule.valid_from=parseDate(b); rule.valid_to=parseDate(d); }
+
+        else if (a.includes('Status')&&!rule.status) { rule.status=b||'Draft'; }
+
+        else if (a.includes('Uplift Factor Name')) { inFactorRows=true; }
+
+        else if (a.includes('Uplift Formula')||a.includes('Total Uplift')) {
+
+          if (currentFactors.length) rule.factors=currentFactors.slice();
+
+          inFactorRows=false;
+
+        } else if (inFactorRows&&a) {
+
+          // a=factor name, b=values, col C (idx 2)=ratio
+
+          const c=safeStr(r&&r[2]);
+
+          currentFactors.push({factor_name_raw:a.trim(), factor_values:b||'', ratio_raw:c||'0'});
+
+        }
+
+        i++;
+
+      }
+
+      if (inFactorRows&&currentFactors.length) rule.factors=currentFactors.slice();
+
+      if (rule.value_id) upliftValues.push(rule);
+
+      continue;
+
+    }
+
+    i++;
+
+  }
+
+  return upliftValues;
+
+}
+
+
+
+async function upsertUpliftValues(rules) {
+
+  let count=0; const errs=[];
+
+  const factorDefs = await db.uplift_factor_definitions.toArray();
+
+  const fnameMap={};
+
+  factorDefs.forEach(f=>fnameMap[f.factor_name.trim().toLowerCase()]=f);
+
+
+
+  for (const rule of rules) {
+
+    if (!rule.value_id) continue;
+
+    try {
+
+      // Resolve uplift rule (formerly catalog)
+
+      let ruleDbId=null;
+
+      if (rule.rule_id_text) {
+
+        const c=await db.uplift_rules.where('rule_id').equals(rule.rule_id_text.trim()).first();
+
+        if (c) ruleDbId=c.id;
+
+      }
+
+      const existing=await db.uplift_values.where('value_id').equals(rule.value_id).first();
+
+      let valueDbId;
+
+      const rec={value_id:rule.value_id, description:rule.description, rule_id:ruleDbId,
+
+        type_of_service:rule.type_of_service, geo:rule.geo,
+
+        valid_from:rule.valid_from, valid_to:rule.valid_to, status:rule.status||'Draft',
+
+        created_by:currentUser, created_at:now()};
+
+      if (existing) { valueDbId=existing.id; await db.uplift_values.update(valueDbId, rec); }
+
+      else { valueDbId=await db.uplift_values.add(rec); }
+
+
+
+      // Clear and re-insert factors
+
+      await db.uplift_value_factors.where('value_id').equals(valueDbId).delete();
+
+      for (const f of (rule.factors||[])) {
+
+        const fname=(f.factor_name_raw||'').trim().toLowerCase();
+
+        const fd=fnameMap[fname];
+
+        if (!fd) continue;
+
+        await db.uplift_value_factors.add({value_id:valueDbId, factor_def_id:fd.id,
+
+          factor_values:f.factor_values||'', uplift_ratio:parseRatio(f.ratio_raw)});
+
+      }
+
+      count++;
+
+    } catch(e) { errs.push(`Uplift Value ${rule.value_id}: ${e.message}`); }
+
+  }
+
+  return {count, errs};
+
+}
+
+
+
+
+
+async function showUpliftRuleForm(catId=null) {
+
+  const allFactors = await db.uplift_factor_definitions.toArray();
+
+  let cat=null, selectedIds=new Set();
+
+  if (catId) {
+
+    cat=await db.uplift_rules.get(catId);
+
+    const cf=await db.uplift_rule_factors.where('rule_id').equals(catId).toArray();
+
+    selectedIds=new Set(cf.map(x=>x.factor_def_id));
+
+  }
+
+  const available=allFactors.filter(f=>!selectedIds.has(f.id));
+
+  const selected=allFactors.filter(f=>selectedIds.has(f.id));
+
+
+
+  const renderFactor=f=>`<div class="factor-item" data-id="${f.id}" onclick="toggleFactor(this)">
+
+    ${clsBadge(f.classification)} ${f.factor_name}</div>`;
+
+
+
+  showModal(catId?'Edit Uplift Rule':'New Uplift Rule', `
+
+  <div class="form-row form-row-2">
+
+    <div class="form-group"><label class="form-label">Uplift Rule ID *</label>
+
+      <input id="ur-id" class="form-control" value="${cat?.rule_id||''}" ${catId?'disabled':''}></div>
+
+    <div class="form-group"><label class="form-label">Status</label>
+
+      <select id="ur-status" class="form-control">
+
+        ${['Draft','Released','Retired'].map(s=>`<option ${cat?.status===s?'selected':''}>${s}</option>`).join('')}
+
+      </select></div>
+
+  </div>
+
+  <div class="form-group" style="margin-bottom:12px"><label class="form-label">Description</label>
+
+    <input id="ur-desc" class="form-control" value="${cat?.description||''}"></div>
+
+  <div class="form-row form-row-2" style="margin-bottom:12px">
+
+    <div class="form-group"><label class="form-label">Type of Service</label>
+
+      <input id="ur-tos" class="form-control" value="${cat?.type_of_service||''}"></div>
+
+    <div class="form-group"><label class="form-label">GEO</label>
+
+      <input id="ur-geo" class="form-control" value="${cat?.geo||''}"></div>
+
+  </div>
+
+  <div class="form-row form-row-2" style="margin-bottom:12px">
+
+    <div class="form-group"><label class="form-label">Valid From</label>
+
+      <input id="ur-vf" class="form-control" type="date" value="${cat?.valid_from||''}"></div>
+
+    <div class="form-group"><label class="form-label">Valid To</label>
+
+      <input id="ur-vt" class="form-control" type="date" value="${cat?.valid_to||''}"></div>
+
+  </div>
+
+  <div class="section-title">Uplift Factors</div>
+
+  <div class="factor-selector">
+
+    <div class="factor-panel">
+
+      <div class="factor-panel-title">Available</div>
+
+      <div class="factor-list" id="factors-available">${available.map(renderFactor).join('')}</div>
+
+    </div>
+
+    <div class="factor-arrows">
+
+      <button class="btn btn-secondary btn-sm" onclick="moveFactors('available','selected')" title="Add — >— /button>
+
+      <button class="btn btn-secondary btn-sm" onclick="moveFactors('selected','available')" title="— Remove">— /button>
+
+    </div>
+
+    <div class="factor-panel">
+
+      <div class="factor-panel-title">Selected</div>
+
+      <div class="factor-list" id="factors-selected">${selected.map(renderFactor).join('')}</div>
+
+    </div>
+
+  </div>`,
+
+  `<button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+
+   <button class="btn btn-primary" onclick="saveUpliftRule(${catId||'null'})">Save</button>`,
+
+  true);
+
+}
+
+
+
+function toggleFactor(el) {
+
+  el.style.background=el.style.background?'':'' ;
+
+  el.classList.toggle('selected-item');
+
+  el.style.background = el.classList.contains('selected-item') ? '#dbeafe' : '';
+
+}
+
+
+
+function moveFactors(fromId, toId) {
+
+  const from=el('factors-'+fromId), to=el('factors-'+toId);
+
+  const items=[...from.querySelectorAll('.factor-item.selected-item')];
+
+  items.forEach(it=>{ it.classList.remove('selected-item'); it.style.background=''; to.appendChild(it); });
+
+}
+
+
+
+async function saveUpliftRule(catId) {
+
+  const cid=el('ur-id').value.trim();
+
+  if (!cid) { toast('Uplift Rule ID required','error'); return; }
+
+  const selectedEls=el('factors-selected').querySelectorAll('.factor-item');
+
+  const factorIds=[...selectedEls].map(e=>parseInt(e.dataset.id));
+
+  const rec={rule_id:cid, description:safeStr(el('ur-desc').value),
+
+    type_of_service:safeStr(el('ur-tos').value), geo:safeStr(el('ur-geo').value),
+
+    valid_from:safeStr(el('ur-vf').value), valid_to:safeStr(el('ur-vt').value),
+
+    status:el('ur-status').value, created_by:currentUser, created_at:now()};
+
+  try {
+
+    let dbId;
+
+    if (catId) { await db.uplift_rules.update(catId, rec); dbId=catId; }
+
+    else {
+
+      const ex=await db.uplift_rules.where('rule_id').equals(cid).first();
+
+      if (ex) { toast('Uplift Rule ID already exists','error'); return; }
+
+      dbId=await db.uplift_rules.add(rec);
+
+    }
+
+    // Replace factors
+
+    await db.uplift_rule_factors.where('rule_id').equals(dbId).delete();
+
+    for (let i=0;i<factorIds.length;i++)
+
+      await db.uplift_rule_factors.add({rule_id:dbId, factor_def_id:factorIds[i], sort_order:i});
+
+    hideModal(); toast('Uplift Rule saved','success');
+
+    await renderUpliftTab();
+
+  } catch(e) { toast('Save failed: '+e.message,'error'); }
+
+}
+
+
+
+async function deleteUpliftRule(catId) {
+
+  if (!confirm('Delete this uplift rule?')) return;
+
+  await db.uplift_rule_factors.where('rule_id').equals(catId).delete();
+
+  await db.uplift_rules.delete(catId);
+
+  if (upliftRuleFilter===catId) upliftRuleFilter=null;
+
+  toast('Deleted','success'); await renderUpliftTab();
+
+}
+
+
+
+// ── UPLIFT TAB ────────────────────────────────────────────────────────────────
+
+
+
+async function renderUpliftTab() {
+
+  const tc=el('tab-content');
+
+  const cats=await db.uplift_rules.toArray();
+
+  const catMap={}; cats.forEach(c=>catMap[c.id]=c);
+
+
+
+  // Enrich uplift rules with uplift value counts
+
+  const enrichedCats=await Promise.all(cats.map(async c=>{
+
+    const rc=await db.uplift_values.where('rule_id').equals(c.id).count();
+
+    return {...c, rule_count:rc};
+
+  }));
+
+  const totalRules=await db.uplift_values.count();
+
+
+
+  // Load uplift values filtered by selected uplift rule
+
+  let rules;
+
+  if (upliftRuleFilter!=null) {
+
+    rules=await db.uplift_values.where('rule_id').equals(upliftRuleFilter).toArray();
+
+  } else {
+
+    rules=await db.uplift_values.toArray();
+
+  }
+
+  const enriched=await Promise.all(rules.map(async r=>{
+
+    const factors=await db.uplift_value_factors.where('value_id').equals(r.id).toArray();
+
+    const total=factors.reduce((s,f)=>s+f.uplift_ratio,0);
+
+    return {...r, factor_count:factors.length, total_uplift:total};
+
+  }));
+
+  const filterLabel=upliftRuleFilter!=null?catMap[upliftRuleFilter]?.rule_id||'?':'All Uplift Rules';
+
+
+
+  tc.innerHTML=`
+
+  <div class="cat-rule-split">
+
+    <div class="cat-panel">
+
+      <div class="cat-panel-header">
+
+        <span style="font-size:13px;font-weight:600;color:#374151">Uplift Rules</span>
+
+        <button class="btn btn-primary btn-sm" onclick="showUpliftRuleForm()">+ New Uplift Rule</button>
+
+        <button class="btn btn-secondary btn-sm" onclick="seedSampleUpliftData()" title="Load sample EMEA &amp; NA rules based on the Wukong model">Load Sample</button>
+
+      </div>
+
+      <div class="cat-list">
+
+        <div class="cat-item${upliftRuleFilter===null?' cat-active':''}" onclick="setUpliftRuleFilter(null)">
+
+          <div class="cat-item-name">All Uplift Rules</div>
+
+          <div class="cat-item-meta">${totalRules} uplift value(s)</div>
+
+        </div>
+
+        ${enrichedCats.map(c=>`
+
+        <div class="cat-item${upliftRuleFilter===c.id?' cat-active':''}" onclick="setUpliftRuleFilter(${c.id})">
+
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px">
+
+            <div>
+
+              <div class="cat-item-name">${c.rule_id}</div>
+
+              <div class="cat-item-meta">${c.type_of_service||'—'} · ${c.geo||'—'}</div>
+
+              <div style="margin-top:3px">${statusBadge(c.status)}</div>
+
+            </div>
+
+            <div class="text-muted text-sm" style="white-space:nowrap">${c.rule_count} uplift value(s)</div>
+
+          </div>
+
+          <div class="cat-item-actions">
+
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showUpliftRuleForm(${c.id})">Edit</button>
+
+            ${c.status==='Draft'?`<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteUpliftRule(${c.id})">Del</button>`:''}
+
+          </div>
+
+        </div>`).join('')}
+
+        ${enrichedCats.length===0?'<p class="text-muted text-sm" style="padding:14px;text-align:center">No uplift rules yet.</p>':''}
+
+      </div>
+
+    </div>
+
+    <div class="rule-panel">
+
+      <div class="rule-panel-header">
+
+        <span class="text-sm text-muted">${enriched.length} uplift value(s) — ${filterLabel}</span>
+
+        <button class="btn btn-primary btn-sm" onclick="showUpliftValueForm(null,${upliftRuleFilter!==null?upliftRuleFilter:'null'})">+ New Uplift Value</button>
+
+      </div>
+
+      <div class="card" style="overflow-x:auto;margin-bottom:0">
+
+        ${enriched.length===0
+
+          ? '<p class="text-muted" style="text-align:center;padding:24px">No uplift values yet.</p>'
+
+          : `<table class="tbl">
+
+            <thead><tr><th>Value ID</th><th>Description</th><th>Uplift Rule</th><th>Type of Service</th><th>GEO</th><th>Status</th><th>Total Uplift</th><th># Factors</th><th>Valid From</th><th>Valid To</th><th></th></tr></thead>
+
+            <tbody>${enriched.map(r=>`
+
+              <tr>
+
+                <td><strong>${r.value_id}</strong></td>
+
+                <td>${r.description||'—'}</td>
+
+                <td>${r.rule_id?catMap[r.rule_id]?.rule_id||'?':'—'}</td>
+
+                <td>${r.type_of_service||'—'}</td>
+
+                <td>${r.geo||'—'}</td>
+
+                <td>${statusBadge(r.status)}</td>
+
+                <td class="text-right"><strong>${pct(r.total_uplift)}</strong></td>
+
+                <td>${r.factor_count}</td>
+
+                <td class="text-sm text-muted">${r.valid_from||'—'}</td>
+
+                <td class="text-sm text-muted">${r.valid_to||'—'}</td>
+
+                <td style="white-space:nowrap">
+
+                  <button class="btn btn-secondary btn-sm" onclick="showUpliftValueForm(${r.id})">Edit</button>
+
+                  ${r.status==='Draft'?`<button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteUpliftValue(${r.id})">Del</button>`:''}
+
+                </td>
+
+              </tr>`).join('')}
+
+            </tbody></table>`}
+
+      </div>
+
+    </div>
+
+  </div>`;
+
+}
+
+
+
+function setUpliftRuleFilter(id) {
+
+  upliftRuleFilter=id;
+
+  renderUpliftTab();
+
+}
+
+
+
+async function seedSampleUpliftData() {
+
+  const existing = await db.uplift_rules.count();
+
+  if (existing > 0 && !confirm('Uplift rules already exist. Add sample rules alongside existing ones?')) return;
+
+
+
+  const factorDefs = await db.uplift_factor_definitions.toArray();
+
+  const fmap = {};
+
+  factorDefs.forEach(f => fmap[f.factor_name.trim().toLowerCase()] = f);
+
+
+
+  const today = '2026-01-01';
+
+  const forever = '9999-12-31';
+
+
+
+  async function addRule(rule_id, description, type_of_service, geo, factorNames) {
+
+    const rec = { rule_id, description, type_of_service, geo,
+
+      valid_from: today, valid_to: forever, status: 'Released',
+
+      created_by: 'Sample', created_at: now() };
+
+    const dbId = await db.uplift_rules.add(rec);
+
+    for (let i = 0; i < factorNames.length; i++) {
+
+      const fdef = fmap[factorNames[i].toLowerCase()];
+
+      if (fdef) await db.uplift_rule_factors.add({ rule_id: dbId, factor_def_id: fdef.id, sort_order: i });
+
+    }
+
+    return dbId;
+
+  }
+
+
+
+  async function addValue(value_id, description, ruleDbId, type_of_service, geo, factors) {
+
+    const dbId = await db.uplift_values.add({ value_id, description, rule_id: ruleDbId,
+
+      type_of_service, geo, valid_from: today, valid_to: forever, status: 'Released',
+
+      created_by: 'Sample', created_at: now() });
+
+    for (let i = 0; i < factors.length; i++) {
+
+      const { name, match, ratio } = factors[i];
+
+      const fdef = fmap[name.toLowerCase()];
+
+      if (fdef) await db.uplift_value_factors.add({
+
+        value_id: dbId, factor_def_id: fdef.id,
+
+        factor_values: match, uplift_ratio: ratio, sort_order: i });
+
+    }
+
+  }
+
+
+
+  // ── EMEA Rule ────────────────────────────────────────────────────────────────
+
+  const emeaRuleId = await addRule(
+
+    'SUPPORTSERVICE_EMEA_01',
+
+    'EMEA uplift factors for Support Services',
+
+    'Support Services', 'EMEA',
+
+    ['Country','Service Tier','Sub Service Tier','Service Term','Service Delivery Type']
+
+  );
+
+  await addValue(
+
+    'SUPPORTSERVICE_EMEA_UPRULE_01',
+
+    'EMEA standard uplift formula for Support Services',
+
+    emeaRuleId, 'Support Services', 'EMEA',
+
+    [
+
+      { name:'Country',               match:'DE,FR,GB,IT,ES', ratio:0.20 },
+
+      { name:'Service Tier',          match:'TP Halo',        ratio:0.15 },
+
+      { name:'Sub Service Tier',      match:'High-End',       ratio:0.10 },
+
+      { name:'Service Term',          match:'36,60',          ratio:0.05 },
+
+      { name:'Service Delivery Type', match:'ON-SITE',        ratio:0.08 },
+
+    ]
+
+  );
+
+
+
+  // ── NA Rule ──────────────────────────────────────────────────────────────────
+
+  const naRuleId = await addRule(
+
+    'SUPPORTSERVICE_NA_01',
+
+    'NA uplift factors for Support Services',
+
+    'Support Services', 'NA',
+
+    ['Service Tier','Service Term','Service Delivery Type']
+
+  );
+
+  await addValue(
+
+    'SUPPORTSERVICE_NA_UPRULE_01',
+
+    'NA standard uplift formula for Support Services',
+
+    naRuleId, 'Support Services', 'NA',
+
+    [
+
+      { name:'Service Tier',          match:'TP Base',  ratio:0.00 },
+
+      { name:'Service Term',          match:'36,60',    ratio:0.05 },
+
+      { name:'Service Delivery Type', match:'ON-SITE',  ratio:0.08 },
+
+    ]
+
+  );
+
+
+
+  // APJ intentionally has no rule to demonstrate the No Rule edge case
+
+
+
+  toast('Sample uplift rules and values loaded (APJ has no rule — edge case demo)', 'success');
+
+  await renderUpliftTab();
+
+}
+
+
+
+async function showUpliftValueForm(ruleId=null, preselectedCatId=null) {
+
+  const cats=await db.uplift_rules.toArray();
+
+  let rule=null, ruleFactors=[];
+
+  if (ruleId) {
+
+    rule=await db.uplift_values.get(ruleId);
+
+    ruleFactors=await db.uplift_value_factors.where('value_id').equals(ruleId).toArray();
+
+  }
+
+  // Factor rows keyed by factor_def_id for quick lookup
+
+  const rfMap={}; ruleFactors.forEach(f=>rfMap[f.factor_def_id]=f);
+
+
+
+  // Determine effective uplift rule id (edit: from rule; new: from preselectedCatId)
+
+  const effectiveCatId = rule?.rule_id ?? preselectedCatId ?? null;
+
+
+
+  // Get uplift rule factors for the effective uplift rule
+
+  let catFactors=[], initTos='', initGeo='';
+
+  if (effectiveCatId) {
+
+    const cfs=await db.uplift_rule_factors.where('rule_id').equals(effectiveCatId).toArray();
+
+    const allDefs=await db.uplift_factor_definitions.toArray();
+
+    const defMap={}; allDefs.forEach(d=>defMap[d.id]=d);
+
+    catFactors=cfs.map(cf=>defMap[cf.factor_def_id]).filter(Boolean);
+
+    const initCat=await db.uplift_rules.get(effectiveCatId);
+
+    if (initCat) { initTos=initCat.type_of_service||''; initGeo=initCat.geo||''; }
+
+  }
+
+
+
+  showModal(ruleId?'Edit Uplift Value':'New Uplift Value', `
+
+  <div class="form-row form-row-2">
+
+    <div class="form-group"><label class="form-label">Uplift Value ID *</label>
+
+      <input id="uv-id" class="form-control" value="${rule?.value_id||''}" ${ruleId?'disabled':''}></div>
+
+    <div class="form-group"><label class="form-label">Status</label>
+
+      <select id="uv-status" class="form-control">
+
+        ${['Draft','Released','Retired'].map(s=>`<option ${rule?.status===s?'selected':''}>${s}</option>`).join('')}
+
+      </select></div>
+
+  </div>
+
+  <div class="form-group" style="margin-bottom:12px"><label class="form-label">Description</label>
+
+    <input id="uv-desc" class="form-control" value="${rule?.description||''}"></div>
+
+  <div class="form-row form-row-3" style="margin-bottom:12px">
+
+    <div class="form-group"><label class="form-label">Uplift Rule</label>
+
+      <select id="uv-cat" class="form-control" onchange="onUpliftRuleChange(${ruleId||'null'})">
+
+        <option value="">— None —</option>
+
+        ${cats.map(c=>`<option value="${c.id}" ${effectiveCatId===c.id?'selected':''}>${c.rule_id}</option>`).join('')}
+
+      </select></div>
+
+    <div class="form-group"><label class="form-label">Type of Service</label>
+
+      <input id="uv-tos" class="form-control" value="${rule?.type_of_service||initTos}" readonly></div>
+
+    <div class="form-group"><label class="form-label">GEO</label>
+
+      <input id="uv-geo" class="form-control" value="${rule?.geo||initGeo}" readonly></div>
+
+  </div>
+
+  <div class="form-row form-row-2" style="margin-bottom:12px">
+
+    <div class="form-group"><label class="form-label">Valid From</label>
+
+      <input id="uv-vf" class="form-control" type="date" value="${rule?.valid_from||''}"></div>
+
+    <div class="form-group"><label class="form-label">Valid To</label>
+
+      <input id="uv-vt" class="form-control" type="date" value="${rule?.valid_to||''}"></div>
+
+  </div>
+
+  <div class="section-title">Factor Rates</div>
+
+  <div id="factor-rates-wrap">${renderFactorRates(catFactors, rfMap)}</div>`,
+
+  `<button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+
+   <button class="btn btn-primary" onclick="saveUpliftValue(${ruleId||'null'})">Save</button>`,
+
+  true);
+
+}
+
+
+
+function renderFactorRates(catFactors, rfMap={}) {
+
+  if (!catFactors.length) return '<p class="text-muted text-sm">Select an uplift rule to load factor rates.</p>';
+
+  const rows=catFactors.map(f=>{
+
+    const rf=rfMap[f.id]||{};
+
+    return `<tr>
+
+      <td>${f.factor_name} ${clsBadge(f.classification)}</td>
+
+      <td><input class="form-control" data-fid="${f.id}" data-field="values" value="${rf.factor_values||''}" placeholder="comma-separated match values" style="min-width:180px"></td>
+
+      <td><input class="form-control text-right" data-fid="${f.id}" data-field="ratio" value="${rf.uplift_ratio!=null?(rf.uplift_ratio*100).toFixed(2):''}" placeholder="0.00" style="width:80px" oninput="updateTotal()">%</td>
+
+    </tr>`;
+
+  }).join('');
+
+  return `<table class="tbl"><thead><tr><th>Factor</th><th>Match Values</th><th>Uplift %</th></tr></thead>
+
+  <tbody id="factor-rate-rows">${rows}</tbody>
+
+  <tfoot><tr class="total-uplift-row"><td colspan="2" style="text-align:right;font-size:13px">Total Uplift Ratio:</td>
+
+  <td><span id="total-uplift-disp">0.00%</span></td></tr></tfoot></table>`;
+
+}
+
+
+
+function updateTotal() {
+
+  const inputs=document.querySelectorAll('[data-field="ratio"]');
+
+  let total=0;
+
+  inputs.forEach(inp=>{ const v=parseFloat(inp.value); if(!isNaN(v)) total+=v; });
+
+  const d=el('total-uplift-disp');
+
+  if (d) d.textContent=total.toFixed(2)+'%';
+
+}
+
+
+
+async function onUpliftRuleChange(ruleId) {
+
+  const catId=parseInt(el('uv-cat').value)||null;
+
+  if (!catId) { el('factor-rates-wrap').innerHTML='<p class="text-muted text-sm">Select an uplift rule to load factor rates.</p>'; return; }
+
+  const cat=await db.uplift_rules.get(catId);
+
+  if (cat) { el('uv-tos').value=cat.type_of_service||''; el('uv-geo').value=cat.geo||''; }
+
+  const cfs=await db.uplift_rule_factors.where('rule_id').equals(catId).toArray();
+
+  const allDefs=await db.uplift_factor_definitions.toArray();
+
+  const defMap={}; allDefs.forEach(d=>defMap[d.id]=d);
+
+  const catFactors=cfs.map(cf=>defMap[cf.factor_def_id]).filter(Boolean);
+
+  let rfMap={};
+
+  if (ruleId) {
+
+    const rule=await db.uplift_values.get(ruleId);
+
+    if (rule) {
+
+      const rfs=await db.uplift_value_factors.where('value_id').equals(rule.id).toArray();
+
+      rfs.forEach(f=>rfMap[f.factor_def_id]=f);
+
+    }
+
+  }
+
+  el('factor-rates-wrap').innerHTML=renderFactorRates(catFactors, rfMap);
+
+  updateTotal();
+
+}
+
+
+
+async function saveUpliftValue(ruleId) {
+
+  const rid=el('uv-id').value.trim();
+
+  if (!rid) { toast('Uplift Value ID required','error'); return; }
+
+  const catId=parseInt(el('uv-cat').value)||null;
+
+  // Collect factor rates
+
+  const factors=[];
+
+  document.querySelectorAll('[data-field="values"]').forEach(inp=>{
+
+    const fid=parseInt(inp.dataset.fid);
+
+    const ratioInp=document.querySelector(`[data-fid="${fid}"][data-field="ratio"]`);
+
+    const ratio=parseFloat(ratioInp?.value)||0;
+
+    factors.push({factor_def_id:fid, factor_values:inp.value||'', uplift_ratio:ratio/100});
+
+  });
+
+  const rec={value_id:rid, description:safeStr(el('uv-desc').value), rule_id:catId,
+
+    type_of_service:safeStr(el('uv-tos').value), geo:safeStr(el('uv-geo').value),
+
+    valid_from:safeStr(el('uv-vf').value), valid_to:safeStr(el('uv-vt').value),
+
+    status:el('uv-status').value, created_by:currentUser, created_at:now()};
+
+  try {
+
+    let dbId;
+
+    if (ruleId) { await db.uplift_values.update(ruleId, rec); dbId=ruleId; }
+
+    else {
+
+      const ex=await db.uplift_values.where('value_id').equals(rid).first();
+
+      if (ex) { toast('Uplift Value ID already exists','error'); return; }
+
+      dbId=await db.uplift_values.add(rec);
+
+    }
+
+    await db.uplift_value_factors.where('value_id').equals(dbId).delete();
+
+    for (const f of factors)
+
+      await db.uplift_value_factors.add({value_id:dbId, ...f});
+
+    hideModal(); toast('Uplift Value saved','success');
+
+    await renderUpliftTab();
+
+  } catch(e) { toast('Save failed: '+e.message,'error'); }
+
+}
+
+
+
+async function deleteUpliftValue(ruleId) {
+
+  if (!confirm('Delete this uplift value?')) return;
+
+  await db.uplift_value_factors.where('value_id').equals(ruleId).delete();
+
+  await db.uplift_values.delete(ruleId);
+
+  toast('Deleted','success'); await renderUpliftTab();
+
+}
+
+
+
+// ── CALCULATE TAB ─────────────────────────────────────────────────────────────
+
+
+
+async function renderCalculateTab() {
+
+  const tc=el('tab-content');
+
+  tc.innerHTML=`
+
+  <div class="card">
+
+    <div class="card-title">Run Calculation</div>
+
+    <p style="margin-bottom:12px;color:#374151">
+
+      Formula: <strong>Sales Cost = PSC × (1 + Total Uplift Ratio)</strong><br>
+
+      <span class="text-muted text-sm">Matches each SKU to a Released Uplift Value by (Type of Service + GEO). Applies factor ratios for matching values.</span>
+
+    </p>
+
+    <button class="btn btn-primary" id="calc-btn" onclick="runCalculation()">— Run Calculation</button>
+
+    <div id="calc-result" style="margin-top:16px"></div>
+
+  </div>
+
+  <div id="calc-summary"></div>`;
+
+}
+
+
+
+async function runCalculation() {
+
+  el('calc-btn').disabled=true;
+
+  el('calc-btn').textContent='Calculating…';
+
+  el('calc-result').innerHTML='';
+
+  try {
+
+    const result = await calculateCycle(currentCycleId);
+
+    const {calculated, skipped, errors} = result;
+
+    el('calc-result').innerHTML=`
+
+    <div class="stats-grid" style="max-width:500px">
+
+      <div class="stat-card"><div class="stat-val" style="color:#166534">${calculated}</div><div class="stat-label">Calculated</div></div>
+
+      <div class="stat-card"><div class="stat-val" style="color:#9a3412">${skipped}</div><div class="stat-label">Skipped (no rule/PSC)</div></div>
+
+    </div>
+
+    ${errors.length?`<div style="margin-top:8px">${errors.map(e=>`<div class="err-item">— ${e}</div>`).join('')}</div>`:''}`;
+
+    toast(`Calculation complete: ${calculated} calculated, ${skipped} skipped`, 'success');
+
+    await renderCalcSummary();
+
+  } catch(e) { toast('Calculation error: '+e.message,'error'); }
+
+  finally { el('calc-btn').disabled=false; el('calc-btn').textContent='▶ Run Calculation'; }
+
+}
+
+
+
+async function renderCalcSummary() {
+
+  const skus=await db.service_pns.where('cycle_id').equals(currentCycleId).toArray();
+
+  if (!skus.length) return;
+
+  const map={};
+
+  for (const s of skus) {
+
+    const k=`${s.geo||'—'}|${s.type_of_service||'—'}`;
+
+    if (!map[k]) map[k]={geo:s.geo||'—',tos:s.type_of_service||'—',total:0,calc:0,no_rule:0,no_psc:0,psc_sum:0,sc_sum:0,ur_sum:0,ur_n:0};
+
+    const r=map[k];
+
+    r.total++;
+
+    if (s.psc_value==null) r.no_psc++;
+
+    else if (s.sales_cost_source==='Auto-Calculation') {
+
+      r.calc++; r.psc_sum+=s.psc_value; r.sc_sum+=s.sales_cost||0; r.ur_sum+=(s.uplift_ratio||0); r.ur_n++;
+
+    } else if (s.sales_cost_source==='No Rule') r.no_rule++;
+
+  }
+
+  const rows=Object.values(map).sort((a,b)=>a.geo.localeCompare(b.geo));
+
+  el('calc-summary').innerHTML=`
+
+  <div class="card" style="overflow-x:auto">
+
+    <div class="card-title">Results Summary</div>
+
+    <table class="tbl">
+
+      <thead><tr><th>GEO</th><th>Type of Service</th><th>Total</th><th>Calculated</th><th>No Rule</th><th>No PSC</th><th>Avg PSC</th><th>Avg Sales Cost</th><th>Avg Uplift</th></tr></thead>
+
+      <tbody>${rows.map(r=>`
+
+        <tr>
+
+          <td>${r.geo}</td><td>${r.tos}</td><td>${r.total}</td>
+
+          <td><span class="badge badge-auto">${r.calc}</span></td>
+
+          <td>${r.no_rule?`<span class="badge badge-norule">${r.no_rule}</span>`:'0'}</td>
+
+          <td>${r.no_psc||'0'}</td>
+
+          <td class="text-right">${r.psc_sum?fmt(r.psc_sum/r.calc):'—'}</td>
+
+          <td class="text-right">${r.sc_sum?fmt(r.sc_sum/r.calc):'—'}</td>
+
+          <td class="text-right">${r.ur_n?pct(r.ur_sum/r.ur_n):'—'}</td>
+
+        </tr>`).join('')}
+
+      </tbody>
+
+    </table>
+
+  </div>`;
+
+}
+
+
+
+// ── CALCULATION ENGINE ────────────────────────────────────────────────────────
+
+
+
+async function calculateCycle(cycleId) {
+
+  const skus = await db.service_pns.where('cycle_id').equals(cycleId).toArray();
+
+  const withPsc = skus.filter(s=>s.psc_value!=null&&s.psc_value!==0);
+
+  if (!withPsc.length) return {calculated:0, skipped:0, errors:['No SKUs with PSC values found.']};
+
+
+
+  // Load all Released uplift values
+
+  const relRules = await db.uplift_values.where('status').equals('Released').toArray();
+
+  const ruleMap={};
+
+  for (const r of relRules) {
+
+    const k=`${(r.type_of_service||'').trim().toLowerCase()}|${(r.geo||'').trim().toLowerCase()}`;
+
+    if (!ruleMap[k]) ruleMap[k]=r;
+
+  }
+
+
+
+  // Preload all uplift value factors
+
+  const allRuleIds=[...new Set(Object.values(ruleMap).map(r=>r.id))];
+
+  const rfCache={};
+
+  for (const rId of allRuleIds) {
+
+    const factors=await db.uplift_value_factors.where('value_id').equals(rId).toArray();
+
+    const defs=await Promise.all(factors.map(f=>db.uplift_factor_definitions.get(f.factor_def_id)));
+
+    rfCache[rId]=factors.map((f,i)=>({...f, technical_id:defs[i]?.technical_id, factor_name:defs[i]?.factor_name}));
+
+  }
+
+
+
+  let calculated=0, skipped=0;
+
+  const errors=[];
+
+  for (const sku of withPsc) {
+
+    const tos=(sku.type_of_service||'').trim().toLowerCase();
+
+    const geo=(sku.geo||'').trim().toLowerCase();
+
+    const rule=ruleMap[`${tos}|${geo}`];
+
+    if (!rule) {
+
+      await db.service_pns.update(sku.id, {sales_cost_source:'No Rule', sales_cost:null, uplift_formula:null, uplift_ratio:null});
+
+      skipped++; continue;
+
+    }
+
+    try {
+
+      const {salesCost, totalRatio, formula} = calcSku(sku, rfCache[rule.id]||[]);
+
+      await db.service_pns.update(sku.id, {sales_cost:salesCost, sales_cost_source:'Auto-Calculation',
+
+        uplift_ratio:totalRatio, uplift_formula:JSON.stringify(formula)});
+
+      calculated++;
+
+    } catch(e) { errors.push(`SKU ${sku.service_pn}: ${e.message}`); skipped++; }
+
+  }
+
+
+
+  // Mark SKUs without PSC
+
+  for (const sku of skus.filter(s=>s.psc_value==null||s.psc_value===0)) {
+
+    await db.service_pns.update(sku.id, {sales_cost_source:'No PSC', sales_cost:null});
+
+    skipped++;
+
+  }
+
+
+
+  return {calculated, skipped, errors};
+
+}
+
+
+
+function calcSku(sku, ruleFactors) {
+
+  const psc=sku.psc_value;
+
+  let totalRatio=0;
+
+  const formula=[];
+
+  for (const rf of ruleFactors) {
+
+    const field=FACTOR_FIELD_MAP[rf.technical_id];
+
+    if (!field) continue;
+
+    const skuVal=String(sku[field]||'').trim();
+
+    if (!skuVal) continue;
+
+    const allowed=(rf.factor_values||'').split(',').map(v=>v.trim()).filter(Boolean);
+
+    if (allowed.includes(skuVal)) {
+
+      const ratio=rf.uplift_ratio||0;
+
+      totalRatio+=ratio;
+
+      formula.push({factor:rf.factor_name, technical_id:rf.technical_id, sku_value:skuVal, uplift_ratio:ratio});
+
+    }
+
+  }
+
+  return {salesCost:psc*(1+totalRatio), totalRatio, formula};
+
+}
+
+
+
+// ── EXPORT TAB ────────────────────────────────────────────────────────────────
+
+
+
+async function renderExportTab() {
+
+  const tc=el('tab-content');
+
+  const total=await db.service_pns.where('cycle_id').equals(currentCycleId).count();
+
+  const calcTotal=await db.service_pns.where('cycle_id').equals(currentCycleId).filter(s=>s.sales_cost!=null).count();
+
+  tc.innerHTML=`
+
+  <div class="card">
+
+    <div class="card-title">Export Results</div>
+
+    <p class="text-muted" style="margin-bottom:16px">${total} SKU rows ready for export.</p>
+
+    <button class="btn btn-primary" onclick="exportCSV()">Download CSV</button>
+
+    <button class="btn btn-secondary" style="margin-left:8px" onclick="exportExcel()">Download Excel</button>
+
+  </div>
+
+  <div class="card" style="border:2px solid #c4b5fd">
+
+    <div class="card-title" style="color:#E2232A">Send to Stage 4 —'GVE Validation</div>
+
+    <p style="color:#374151;margin-bottom:8px;font-size:13px">
+
+      Converts Stage 3 results into the matrix format expected by Stage 4 (Part# x Region with Cost columns).
+
+      Each country becomes a region column block. Only SKUs with a calculated Sales Cost are included.
+
+    </p>
+
+    <p class="text-muted text-sm" style="margin-bottom:14px">${calcTotal} SKU(s) with Sales Cost ready · ${total-calcTotal} skipped (no rule / no PSC)</p>
+
+    <button class="btn" style="background:#E2232A;color:#fff;border-color:#E2232A" onclick="exportToStage4()" ${calcTotal===0?'disabled':''}>
+
+      Download Stage 4 Input Excel
+
+    </button>
+
+    <p class="text-muted text-sm" style="margin-top:10px">Open <strong>stage4_browser/index.html</strong>, create a cycle, then import this file on the Import Data tab.</p>
+
+  </div>`;
+
+}
+
+
+
+async function exportCSV() {
+
+  const skus=await db.service_pns.where('cycle_id').equals(currentCycleId).toArray();
+
+  if (!skus.length) { toast('No data to export','error'); return; }
+
+  const headers=['service_pn','short_description','sm_description','oh_id','oh_name',
+
+    'type_of_service','sub_type_of_service','offering_type','psc_value','currency',
+
+    'sales_cost','sales_cost_source','uplift_ratio','geo','country','service_tier',
+
+    'sub_service_tier','compatible_mt','sdf_code','sdf_short_description','sdf_long_description',
+
+    'service_term','unit','service_availability_time','service_response_time',
+
+    'service_delivery_type','upgrade_from_type','upgrade_from_term',
+
+    'included_premier_service','premier_service_type',
+
+    'included_adp','included_kyd','included_sbty','included_ise','included_ticru','uplift_formula'];
+
+  const rows=[headers.join(',')];
+
+  for (const s of skus) {
+
+    rows.push(headers.map(h=>{
+
+      const v=s[h];
+
+      if (v==null) return '';
+
+      const str=String(v);
+
+      return str.includes(',')||str.includes('"')||str.includes('\n') ? `"${str.replace(/"/g,'""')}"` : str;
+
+    }).join(','));
+
+  }
+
+  download(rows.join('\n'), 'results.csv', 'text/csv');
+
+  toast('CSV downloaded','success');
+
+}
+
+
+
+async function exportExcel() {
+
+  const skus=await db.service_pns.where('cycle_id').equals(currentCycleId).toArray();
+
+  if (!skus.length) { toast('No data to export','error'); return; }
+
+  const headers=['service_pn','short_description','sm_description','oh_id','oh_name',
+
+    'type_of_service','sub_type_of_service','offering_type','psc_value','currency',
+
+    'sales_cost','sales_cost_source','uplift_ratio','geo','country','service_tier',
+
+    'sub_service_tier','compatible_mt','sdf_code','sdf_short_description','sdf_long_description',
+
+    'service_term','unit','service_availability_time','service_response_time',
+
+    'service_delivery_type','upgrade_from_type','upgrade_from_term',
+
+    'included_premier_service','premier_service_type',
+
+    'included_adp','included_kyd','included_sbty','included_ise','included_ticru','uplift_formula'];
+
+  const data=skus.map(s=>headers.reduce((o,h)=>{o[h]=s[h]??'';return o},{}));
+
+  const ws=XLSX.utils.json_to_sheet(data, {header:headers});
+
+  const wb=XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb,'Results',ws);
+
+  XLSX.writeFile(wb,'results.xlsx');
+
+  toast('Excel downloaded','success');
+
+}
+
+
+
+
+
+async function exportToStage4() {
+
+  const cycle = await db.cycles.get(currentCycleId);
+
+  const skus = await db.service_pns.where('cycle_id').equals(currentCycleId).toArray();
+
+  const calculated = skus.filter(s => s.sales_cost != null);
+
+  if (!calculated.length) { toast('No calculated SKUs to export', 'error'); return; }
+
+
+
+  // Determine unique regions: prefer country, fall back to geo
+
+  const regions = [...new Set(calculated.map(s => s.country || s.geo || 'Unknown'))].sort();
+
+
+
+  // Pivot by service_pn: one row per SKU, one col-block per region
+
+  const pivot = {};
+
+  for (const sku of calculated) {
+
+    const region = sku.country || sku.geo || 'Unknown';
+
+    if (!pivot[sku.service_pn]) {
+
+      pivot[sku.service_pn] = {
+
+        part_number: sku.service_pn,
+
+        tier: sku.service_tier || '',
+
+        base_warranty: sku.service_term || '',
+
+        upgrade: sku.short_description || '',
+
+        type: sku.type_of_service || '',
+
+        adp: sku.included_adp || '',
+
+        kyd: sku.included_kyd || '',
+
+        sbty: sku.included_sbty || '',
+
+        ticru: sku.included_ticru || '',
+
+        premier: sku.included_premier_service || '',
+
+        upg_from_type: sku.upgrade_from_type || '',
+
+        upg_from_term: sku.upgrade_from_term || '',
+
+        prices: {}
+
+      };
+
+    }
+
+    pivot[sku.service_pn].prices[region] = sku.sales_cost;
+
+  }
+
+  const rows = Object.values(pivot);
+
+
+
+  // Fixed columns (12): Part#, Tier, Base Warranty, Upgrade, Type,
+
+  //   ADP, KYD, SBTY, TI CRU, Premier, Upg From Type, Upg From Term
+
+  // Then geo blocks (Cost | C-Price | L-Price per region) starting at col 12
+
+  const FIXED_COLS = 12;
+
+  const geoHeaderRow = ['Part#','Tier','Base Warranty','Upgrade','Type','ADP','KYD','SBTY','TI CRU','Premier','Upg From Type','Upg From Term'];
+
+  const subHeaderRow = ['Part#','Tier','Base Warranty','Upgrade','Type','ADP','KYD','SBTY','TI CRU','Premier','Upg From Type','Upg From Term'];
+
+  const merges = [];
+
+  regions.forEach((region, i) => {
+
+    const startCol = FIXED_COLS + i * 3;
+
+    geoHeaderRow.push(region, '', '');
+
+    subHeaderRow.push('Cost', 'C-Price', 'L-Price');
+
+    merges.push({s:{r:0, c:startCol}, e:{r:0, c:startCol+2}});
+
+  });
+
+
+
+  const data = [geoHeaderRow, subHeaderRow];
+
+  for (const row of rows) {
+
+    const dataRow = [
+
+      row.part_number, row.tier, row.base_warranty, row.upgrade, row.type,
+
+      row.adp, row.kyd, row.sbty, row.ticru, row.premier,
+
+      row.upg_from_type, row.upg_from_term,
+
+    ];
+
+    for (const region of regions) {
+
+      dataRow.push(row.prices[region] ?? '', '', '');
+
+    }
+
+    data.push(dataRow);
+
+  }
+
+
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+
+  ws['!merges'] = merges;
+
+  ws['!cols'] = [
+
+    {wch:20},{wch:12},{wch:14},{wch:28},{wch:20},
+
+    {wch:6},{wch:6},{wch:6},{wch:8},{wch:8},{wch:14},{wch:14},
+
+    ...regions.flatMap(() => [{wch:10},{wch:10},{wch:10}])
+
+  ];
+
+
+
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Pricing');
+
+  const filename = 'Stage4_Input_' + (cycle?.name || 'export').replace(/[^a-zA-Z0-9_-]/g,'_') + '.xlsx';
+
+  XLSX.writeFile(wb, filename);
+
+  toast('Stage 4 input exported: ' + rows.length + ' SKUs across ' + regions.length + ' regions', 'success');
+
+}
+
+
+
+function download(content, filename, mime) {
+
+  const a=document.createElement('a');
+
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+
+  a.download=filename; a.click();
+
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+
+}
+
+
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+
+  try {
+
+    await initDB();
+
+  } catch(e) {
+
+    app().innerHTML=`<div style="padding:40px;text-align:center;color:#991b1b">
+
+      <h2>Failed to initialise database</h2><p>${e.message}</p>
+
+      <p style="margin-top:8px;font-size:13px;color:#6b7280">Ensure you are using a modern browser (Chrome, Edge, Firefox) and not opening the file from a network drive.</p>
+
+    </div>`;
+
+    return;
+
+  }
+
+  window.addEventListener('hashchange', route);
+
+  await route();
+
+});
+
+</script>
+
+<script>
+
+window.addEventListener('error', function(e) {
+
+  var el = document.getElementById('_err');
+
+  if (el) el.textContent = 'Error: ' + e.message + ' (line ' + e.lineno + ')';
+
+});
+
+window.addEventListener('unhandledrejection', function(e) {
+
+  var el = document.getElementById('_err');
+
+  if (el) el.textContent = 'Promise error: ' + (e.reason && e.reason.message || e.reason);
+
+});
+
+</script>
+
+</body>
+
+</html>
+

@@ -1,0 +1,17 @@
+# Compiled / built output
+GPS_Cost_Pricing_Workbench/_archive/dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+*.swp

@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+{% block title %}Settings — GPS Pricing Workbench{% endblock %}
+
+{% block content %}
+<div class="page-title">Settings &amp; Configuration</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showStab('contingency')">Contingency Rates</div>
+  <div class="tab" onclick="showStab('overhead')">Overhead Rate</div>
+  <div class="tab" onclick="showStab('ratiobands')">Ratio Bands</div>
+  <div class="tab" onclick="showStab('tiers')">Tier Sequence</div>
+  <div class="tab" onclick="showStab('gmmarkup')">GM% &amp; Markup%</div>
+  <div class="tab" onclick="showStab('thresholds')">Drift Thresholds</div>
+</div>
+
+<!-- Contingency -->
+<div id="stab-contingency">
+<div class="card">
+  <div class="card-header"><div class="card-title">Contingency Rate Table</div>
+    <button class="btn btn-primary btn-sm" onclick="saveContingency()">Save</button></div>
+  <p class="text-muted" style="margin-bottom:14px">
+    R_contingency is applied in Stage 3: Sales Cost = PSC × (1 + R_contingency) × (1 + R_overhead).
+    Rates are per platform maturity × service window.
+  </p>
+  <table style="max-width:500px">
+    <tr><th>Maturity</th><th>1–3 year window</th><th>4–5 year window</th></tr>
+    <tr>
+      <td>New (first cycle)</td>
+      <td><input type="number" id="c_new_13" step="0.01" min="0" max="1" style="width:90px"></td>
+      <td><input type="number" id="c_new_45" step="0.01" min="0" max="1" style="width:90px"></td>
+    </tr>
+    <tr>
+      <td>Mature Refresh</td>
+      <td><input type="number" id="c_mr_13" step="0.01" min="0" max="1" style="width:90px"></td>
+      <td><input type="number" id="c_mr_45" step="0.01" min="0" max="1" style="width:90px"></td>
+    </tr>
+    <tr>
+      <td>Mature</td>
+      <td><input type="number" id="c_m_13" step="0.01" min="0" max="1" style="width:90px"></td>
+      <td><input type="number" id="c_m_45" step="0.01" min="0" max="1" style="width:90px"></td>
+    </tr>
+  </table>
+  <p class="text-muted mt-2">Enter as decimals, e.g. 0.12 = 12%</p>
+</div>
+</div>
+
+<!-- Overhead -->
+<div id="stab-overhead" style="display:none">
+<div class="card">
+  <div class="card-header"><div class="card-title">Overhead Rate</div>
+    <button class="btn btn-primary btn-sm" onclick="saveOverhead()">Save</button></div>
+  <p class="text-muted" style="margin-bottom:14px">
+    R_overhead = Total GPS Fixed Cost ÷ Projected Units. Enter the inputs and the rate is calculated automatically.
+  </p>
+  <div class="flex" style="gap:20px;align-items:flex-end;flex-wrap:wrap">
+    <div class="form-group" style="margin:0;flex:1;min-width:180px">
+      <label>Total GPS Fixed Cost ($)</label>
+      <input type="number" id="fixedCost" min="0">
+    </div>
+    <div class="form-group" style="margin:0;flex:1;min-width:180px">
+      <label>Projected Units</label>
+      <input type="number" id="projUnits" min="1">
+    </div>
+    <div style="padding-bottom:2px">
+      <div class="text-muted">Calculated R_overhead:</div>
+      <div style="font-size:1.3em;font-weight:700;color:#1a2438" id="overheadCalc">—</div>
+    </div>
+  </div>
+  <script>
+    ["fixedCost","projUnits"].forEach(id => document.getElementById(id)?.addEventListener("input", () => {
+      const fc = parseFloat(document.getElementById("fixedCost").value) || 0;
+      const pu = parseFloat(document.getElementById("projUnits").value) || 0;
+      document.getElementById("overheadCalc").textContent = pu ? (fc/pu).toFixed(4) : "—";
+    }));
+  </script>
+</div>
+</div>
+
+<!-- Ratio Bands -->
+<div id="stab-ratiobands" style="display:none">
+<div class="card">
+  <div class="card-header"><div class="card-title">Ratio Band Thresholds (Layer 2 GVE)</div>
+    <button class="btn btn-primary btn-sm" onclick="saveRatioBands()">Save</button></div>
+  <table style="max-width:500px">
+    <tr><th>Ratio</th><th>Floor (min)</th><th>Ceiling (max)</th></tr>
+    <tr>
+      <td>3yr / 1yr</td>
+      <td><input type="number" id="r31min" step="0.1" style="width:80px"></td>
+      <td><input type="number" id="r31max" step="0.1" style="width:80px"></td>
+    </tr>
+    <tr>
+      <td>5yr / 3yr</td>
+      <td><input type="number" id="r53min" step="0.1" style="width:80px"></td>
+      <td><input type="number" id="r53max" step="0.1" style="width:80px"></td>
+    </tr>
+    <tr>
+      <td>4yr / 2yr</td>
+      <td><input type="number" id="r42min" step="0.1" style="width:80px"></td>
+      <td><input type="number" id="r42max" step="0.1" style="width:80px"></td>
+    </tr>
+  </table>
+  <p class="text-muted mt-2">Below floor = Critical. Above ceiling = Warning.</p>
+</div>
+</div>
+
+<!-- Tiers -->
+<div id="stab-tiers" style="display:none">
+<div class="card">
+  <div class="card-header"><div class="card-title">Tier Sequence (Monotonicity Order)</div>
+    <button class="btn btn-primary btn-sm" onclick="saveTiers()">Save</button></div>
+  <p class="text-muted" style="margin-bottom:14px">
+    Drag rows to reorder, or edit sort order numbers. Lower number = lower cost tier.
+    New tiers detected on import are added automatically at the end.
+  </p>
+  <div id="tierTable"></div>
+  <div class="mt-2">
+    <button class="btn btn-outline btn-sm" onclick="addTierRow()">+ Add Tier</button>
+  </div>
+</div>
+</div>
+
+<!-- GM & Markup -->
+<div id="stab-gmmarkup" style="display:none">
+<div class="card">
+  <div class="card-header"><div class="card-title">GM% (B2C) &amp; Markup% (B2B) per Tier</div>
+    <button class="btn btn-primary btn-sm" onclick="saveGmMarkup()">Save</button></div>
+  <p class="text-muted" style="margin-bottom:14px">
+    B2C List Price = Sales Cost ÷ (1 − GM%). B2B Floor = Sales Cost × (1 + Markup%).
+    Leave tier-specific fields blank to use the default.
+  </p>
+  <div id="gmMarkupTable"></div>
+</div>
+</div>
+
+<!-- Thresholds -->
+<div id="stab-thresholds" style="display:none">
+<div class="card">
+  <div class="card-header"><div class="card-title">Drift &amp; Deviation Thresholds</div>
+    <button class="btn btn-primary btn-sm" onclick="saveThresholds()">Save</button></div>
+  <table style="max-width:550px">
+    <tr><th>Threshold</th><th>Value</th></tr>
+    <tr><td>Cross-geo deviation (Layer 3)</td>
+        <td><input type="number" id="t_crossgeo" step="0.01" style="width:80px"> %</td></tr>
+    <tr><td>YoY individual cell change (Layer 4)</td>
+        <td><input type="number" id="t_yoy_cell" step="0.01" style="width:80px"> %</td></tr>
+    <tr><td>YoY structural ratio change (Layer 4)</td>
+        <td><input type="number" id="t_yoy_ratio" step="0.01" style="width:80px"> %</td></tr>
+    <tr><td>YoY geo-level average change (Layer 4)</td>
+        <td><input type="number" id="t_yoy_geo" step="0.01" style="width:80px"> %</td></tr>
+  </table>
+  <p class="text-muted mt-2">Enter as percentages, e.g. 20 = 20%</p>
+</div>
+</div>
+
+<div id="saveMsg" style="margin-top:10px"></div>
+
+<script>
+let allSettings = {};
+let tiers = [];
+let gmData = {};
+
+function showStab(name) {
+  document.querySelectorAll('[id^="stab-"]').forEach(el => el.style.display = "none");
+  document.getElementById("stab-" + name).style.display = "";
+  document.querySelectorAll(".tab").forEach(el => el.classList.remove("active"));
+  event.target.classList.add("active");
+}
+
+function pct(v) { return v ? (parseFloat(v) * 100).toFixed(1) : ""; }
+function fromPct(v) { return v ? (parseFloat(v) / 100).toFixed(4) : ""; }
+
+async function loadAll() {
+  const [sr, tr, gm] = await Promise.all([
+    fetch("/api/settings").then(r => r.json()),
+    fetch("/api/tier-sequence").then(r => r.json()),
+    fetch("/api/tier-gm-markup").then(r => r.json()),
+  ]);
+  allSettings = sr;
+  tiers = tr;
+  gmData = gm;
+
+  // Contingency
+  document.getElementById("c_new_13").value = pct(sr.contingency_new_1_3yr);
+  document.getElementById("c_new_45").value = pct(sr.contingency_new_4_5yr);
+  document.getElementById("c_mr_13").value  = pct(sr.contingency_mature_refresh_1_3yr);
+  document.getElementById("c_mr_45").value  = pct(sr.contingency_mature_refresh_4_5yr);
+  document.getElementById("c_m_13").value   = pct(sr.contingency_mature_1_3yr);
+  document.getElementById("c_m_45").value   = pct(sr.contingency_mature_4_5yr);
+
+  // Overhead
+  document.getElementById("fixedCost").value = sr.overhead_total_fixed_cost || "";
+  document.getElementById("projUnits").value  = sr.overhead_projected_units || "";
+  const fc = parseFloat(sr.overhead_total_fixed_cost) || 0;
+  const pu = parseFloat(sr.overhead_projected_units) || 0;
+  document.getElementById("overheadCalc").textContent = pu ? (fc/pu).toFixed(4) : "—";
+
+  // Ratio bands
+  document.getElementById("r31min").value = sr.ratio_band_3yr_1yr_min || "";
+  document.getElementById("r31max").value = sr.ratio_band_3yr_1yr_max || "";
+  document.getElementById("r53min").value = sr.ratio_band_5yr_3yr_min || "";
+  document.getElementById("r53max").value = sr.ratio_band_5yr_3yr_max || "";
+  document.getElementById("r42min").value = sr.ratio_band_4yr_2yr_min || "";
+  document.getElementById("r42max").value = sr.ratio_band_4yr_2yr_max || "";
+
+  // Thresholds (stored as 0.20 → display as 20)
+  document.getElementById("t_crossgeo").value = pct(sr.cross_geo_deviation_pct);
+  document.getElementById("t_yoy_cell").value  = pct(sr.yoy_cell_change_pct);
+  document.getElementById("t_yoy_ratio").value = pct(sr.yoy_ratio_change_pct);
+  document.getElementById("t_yoy_geo").value   = pct(sr.yoy_geo_avg_change_pct);
+
+  renderTiers();
+  renderGmMarkup();
+}
+
+function renderTiers() {
+  let html = `<table><tr><th>Tier Name</th><th>Sort Order</th><th></th></tr>`;
+  tiers.forEach((t, i) => {
+    html += `<tr>
+      <td><input type="text" value="${t.tier_name}" data-idx="${i}" data-field="tier_name" style="width:200px"></td>
+      <td><input type="number" value="${t.sort_order}" data-idx="${i}" data-field="sort_order" style="width:80px"></td>
+      <td><button class="btn btn-danger btn-sm" onclick="removeTier(${i})">Remove</button></td>
+    </tr>`;
+  });
+  html += "</table>";
+  document.getElementById("tierTable").innerHTML = html;
+  // bind changes
+  document.querySelectorAll("#tierTable input").forEach(inp => {
+    inp.addEventListener("change", () => {
+      const idx = parseInt(inp.dataset.idx);
+      tiers[idx][inp.dataset.field] = inp.dataset.field === "sort_order" ? parseInt(inp.value) : inp.value;
+    });
+  });
+}
+
+function addTierRow() {
+  const maxOrder = tiers.length ? Math.max(...tiers.map(t => t.sort_order)) + 10 : 10;
+  tiers.push({ tier_name: "New Tier", sort_order: maxOrder });
+  renderTiers();
+}
+
+function removeTier(idx) {
+  tiers.splice(idx, 1);
+  renderTiers();
+}
+
+function renderGmMarkup() {
+  const tierNames = tiers.map(t => t.tier_name);
+  let html = `<table><tr><th>Tier</th><th>GM% (B2C)</th><th>Markup% (B2B)</th></tr>
+    <tr>
+      <td><b>Default</b></td>
+      <td><input type="number" id="gm_default" step="0.1" value="${pct(gmData.gm_pct_default || allSettings.gm_pct_default)}" style="width:80px"> %</td>
+      <td><input type="number" id="mu_default" step="0.1" value="${pct(gmData.markup_pct_default || allSettings.markup_pct_default)}" style="width:80px"> %</td>
+    </tr>`;
+  tierNames.forEach(t => {
+    const safeKey = t.toLowerCase().replace(/ /g,"_").replace(/\//g,"_");
+    const gm = gmData[`gm_pct_${safeKey}`] || "";
+    const mu = gmData[`markup_pct_${safeKey}`] || "";
+    html += `<tr>
+      <td>${t}</td>
+      <td><input type="number" id="gm_${safeKey}" step="0.1" value="${gm ? pct(gm) : ''}" placeholder="use default" style="width:80px"> %</td>
+      <td><input type="number" id="mu_${safeKey}" step="0.1" value="${mu ? pct(mu) : ''}" placeholder="use default" style="width:80px"> %</td>
+    </tr>`;
+  });
+  html += "</table>";
+  document.getElementById("gmMarkupTable").innerHTML = html;
+}
+
+function showSaved(msg = "Saved.") {
+  const el = document.getElementById("saveMsg");
+  el.innerHTML = `<div class="alert alert-success">${msg}</div>`;
+  setTimeout(() => { el.innerHTML = ""; }, 3000);
+}
+
+async function saveContingency() {
+  const body = {
+    contingency_new_1_3yr: fromPct(document.getElementById("c_new_13").value),
+    contingency_new_4_5yr: fromPct(document.getElementById("c_new_45").value),
+    contingency_mature_refresh_1_3yr: fromPct(document.getElementById("c_mr_13").value),
+    contingency_mature_refresh_4_5yr: fromPct(document.getElementById("c_mr_45").value),
+    contingency_mature_1_3yr: fromPct(document.getElementById("c_m_13").value),
+    contingency_mature_4_5yr: fromPct(document.getElementById("c_m_45").value),
+  };
+  await api("POST", "/api/settings", body);
+  showSaved("Contingency rates saved.");
+}
+
+async function saveOverhead() {
+  const fc = document.getElementById("fixedCost").value;
+  const pu = document.getElementById("projUnits").value;
+  await api("POST", "/api/settings", {
+    overhead_total_fixed_cost: fc,
+    overhead_projected_units: pu,
+  });
+  showSaved("Overhead inputs saved.");
+}
+
+async function saveRatioBands() {
+  await api("POST", "/api/settings", {
+    ratio_band_3yr_1yr_min: document.getElementById("r31min").value,
+    ratio_band_3yr_1yr_max: document.getElementById("r31max").value,
+    ratio_band_5yr_3yr_min: document.getElementById("r53min").value,
+    ratio_band_5yr_3yr_max: document.getElementById("r53max").value,
+    ratio_band_4yr_2yr_min: document.getElementById("r42min").value,
+    ratio_band_4yr_2yr_max: document.getElementById("r42max").value,
+  });
+  showSaved("Ratio band thresholds saved.");
+}
+
+async function saveTiers() {
+  await api("POST", "/api/tier-sequence", tiers);
+  showSaved("Tier sequence saved.");
+}
+
+async function saveGmMarkup() {
+  const body = {
+    gm_pct_default: fromPct(document.getElementById("gm_default").value),
+    markup_pct_default: fromPct(document.getElementById("mu_default").value),
+  };
+  tiers.forEach(t => {
+    const safeKey = t.tier_name.toLowerCase().replace(/ /g,"_").replace(/\//g,"_");
+    const gv = document.getElementById(`gm_${safeKey}`)?.value;
+    const mv = document.getElementById(`mu_${safeKey}`)?.value;
+    if (gv) body[`gm_pct_${safeKey}`] = fromPct(gv);
+    if (mv) body[`markup_pct_${safeKey}`] = fromPct(mv);
+  });
+  await api("POST", "/api/tier-gm-markup", body);
+  showSaved("GM% and Markup% saved.");
+}
+
+async function saveThresholds() {
+  await api("POST", "/api/settings", {
+    cross_geo_deviation_pct: fromPct(document.getElementById("t_crossgeo").value),
+    yoy_cell_change_pct: fromPct(document.getElementById("t_yoy_cell").value),
+    yoy_ratio_change_pct: fromPct(document.getElementById("t_yoy_ratio").value),
+    yoy_geo_avg_change_pct: fromPct(document.getElementById("t_yoy_geo").value),
+  });
+  showSaved("Thresholds saved.");
+}
+
+loadAll();
+</script>
+{% endblock %}

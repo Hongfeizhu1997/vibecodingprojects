@@ -1,0 +1,1541 @@
+window.onerror = function(msg, src, line, col, err) {
+  var p = document.getElementById('_err');
+  if (p) p.innerHTML = '<b>JS Error:</b> ' + (err ? err.name + ': ' : '') + msg + '  [line ' + line + ']';
+};
+window.addEventListener('unhandledrejection', function(e) {
+  var p = document.getElementById('_err');
+  if (p) p.innerHTML = '<b>Promise Error:</b> ' + (e.reason && e.reason.message ? e.reason.name+': '+e.reason.message : String(e.reason));
+});
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:#f3f4f6;color:#1f2937;min-height:100vh}
+a{color:#5b21b6;text-decoration:none}
+.nav{background:#2d1b69;color:#fff;display:flex;align-items:center;padding:0 20px;height:50px;gap:20px;position:sticky;top:0;z-index:100}
+.nav-brand{font-weight:700;font-size:15px;letter-spacing:.3px;white-space:nowrap}
+.nav-links{display:flex;gap:4px;flex:1}
+.nav-links a{color:#c4b5fd;padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer}
+.nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,.15);color:#fff}
+.nav-user{color:#a78bfa;font-size:13px;white-space:nowrap}
+.container{max-width:1360px;margin:0 auto;padding:20px}
+.card{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:600;margin-bottom:14px;color:#2d1b69}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:5px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:background .15s}
+.btn-primary{background:#5b21b6;color:#fff;border-color:#5b21b6}.btn-primary:hover{background:#4c1d95}
+.btn-secondary{background:#fff;color:#374151;border-color:#d1d5db}.btn-secondary:hover{background:#f9fafb}
+.btn-danger{background:#dc2626;color:#fff;border-color:#dc2626}.btn-danger:hover{background:#b91c1c}
+.btn-success{background:#16a34a;color:#fff;border-color:#16a34a}.btn-success:hover{background:#15803d}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{background:#f8fafc;text-align:left;padding:8px 10px;font-weight:600;color:#374151;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+.tbl td{padding:7px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.tbl tr:hover td{background:#fafafa}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge-draft{background:#fef9c3;color:#854d0e}
+.badge-submitted{background:#dbeafe;color:#1e40af}
+.sev-critical{background:#fee2e2;color:#991b1b}
+.sev-systemic{background:#ffedd5;color:#9a3412}
+.sev-warning{background:#fef9c3;color:#854d0e}
+.sev-ok{background:#dcfce7;color:#166534}
+.sev-clear{background:#dcfce7;color:#166534}
+.status-blocked{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.status-systemic{background:#ffedd5;color:#9a3412;border:1px solid #fdba74}
+.status-warnings{background:#fef9c3;color:#854d0e;border:1px solid #fde68a}
+.status-clear{background:#dcfce7;color:#166534;border:1px solid #86efac}
+.layer-badge{background:#ede9fe;color:#4c1d95;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px}
+.form-row{display:grid;gap:12px;margin-bottom:12px}
+.form-row-2{grid-template-columns:1fr 1fr}
+.form-row-3{grid-template-columns:1fr 1fr 1fr}
+.form-row-4{grid-template-columns:1fr 1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:12px;font-weight:600;color:#374151}
+.form-control{padding:7px 10px;border:1px solid #d1d5db;border-radius:5px;font-size:13px;color:#1f2937;background:#fff}
+.form-control:focus{outline:none;border-color:#5b21b6;box-shadow:0 0 0 2px rgba(91,33,182,.1)}
+select.form-control{cursor:pointer}
+.tabs{display:flex;gap:0;border-bottom:2px solid #e5e7eb;margin-bottom:20px}
+.tab{padding:10px 18px;font-size:13px;font-weight:500;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab:hover{color:#374151}
+.tab.active{color:#5b21b6;border-bottom-color:#5b21b6;font-weight:600}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal-overlay.hidden{display:none}
+.modal-box{background:#fff;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.2);width:560px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column}
+.modal-box.wide{width:760px}
+.modal-header{padding:16px 20px;border-bottom:1px solid #e5e7eb;font-weight:700;font-size:15px;color:#2d1b69}
+.modal-body{padding:20px;overflow-y:auto;flex:1}
+.modal-footer{padding:12px 20px;border-top:1px solid #e5e7eb;display:flex;justify-content:flex-end;gap:8px}
+#toast-container{position:fixed;bottom:20px;right:20px;z-index:2000;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:6px;font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);animation:slideIn .2s ease}
+.toast-success{background:#166534;color:#fff}
+.toast-error{background:#991b1b;color:#fff}
+.toast-info{background:#4c1d95;color:#fff}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px}
+.stat-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:14px;text-align:center}
+.stat-card .stat-val{font-size:26px;font-weight:700;color:#2d1b69}
+.stat-card .stat-label{font-size:11px;color:#6b7280;margin-top:2px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.page-header h1{font-size:20px;font-weight:700;color:#2d1b69}
+.text-muted{color:#6b7280}.text-sm{font-size:12px}.text-right{text-align:right}
+.hidden{display:none!important}
+.section-title{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #e5e7eb}
+hr{border:none;border-top:1px solid #e5e7eb;margin:14px 0}
+.upload-zone{border:2px dashed #d1d5db;border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s}
+.upload-zone:hover,.upload-zone.drag-over{border-color:#5b21b6;background:#f5f3ff}
+.upload-zone .upload-icon{font-size:28px;margin-bottom:6px}
+.upload-zone p{color:#6b7280;font-size:13px}
+.gve-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.dot-critical{background:#dc2626}.dot-systemic{background:#ea580c}.dot-warning{background:#d97706}.dot-ok{background:#16a34a}
+.resolved-row td{color:#9ca3af}
+.filter-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.alert{padding:12px 16px;border-radius:6px;margin-bottom:14px;font-size:13px}
+.alert-blocked{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b}
+.alert-systemic{background:#ffedd5;border:1px solid #fdba74;color:#9a3412}
+.alert-warnings{background:#fef9c3;border:1px solid #fde68a;color:#854d0e}
+.alert-clear{background:#dcfce7;border:1px solid #86efac;color:#166534}
+.settings-tabs{display:flex;gap:0;border-bottom:2px solid #e5e7eb;margin-bottom:20px;flex-wrap:wrap}
+.settings-tab{padding:8px 14px;font-size:13px;font-weight:500;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.settings-tab.active{color:#5b21b6;border-bottom-color:#5b21b6}
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2d1b69 0%,#5b21b6 100%)}
+.login-card{background:#fff;border-radius:12px;padding:40px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-card h1{font-size:22px;font-weight:700;color:#2d1b69;margin-bottom:4px}
+.login-card p{color:#6b7280;font-size:13px;margin-bottom:24px}
+.err-item{color:#991b1b;font-size:12px;padding:2px 0}
+.pagination{display:flex;align-items:center;gap:6px;margin-top:10px}
+.pagination button{padding:4px 10px;font-size:12px;border:1px solid #d1d5db;background:#fff;border-radius:4px;cursor:pointer}
+.pagination button:disabled{opacity:.4;cursor:not-allowed}
+.pagination .page-info{font-size:12px;color:#6b7280;margin:0 6px}
+.drift-delta{font-size:11px;padding:1px 5px;border-radius:3px}
+.drift-up{background:#fee2e2;color:#991b1b}
+.drift-down{background:#dcfce7;color:#166534}
+</style>
+</head>
+<body>
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header" id="modal-header"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+<div id="toast-container"></div>
+<div id="app"><div style="padding:40px;text-align:center;color:#374151"><h2>Loading...</h2><p id="_err" style="color:#991b1b"></p></div></div>
+
+<script>
+'use strict';
+console.log('[GPS4] script start');
+document.getElementById('_err').textContent = 'Script starting…';
+
+// 鈹€鈹€ CONSTANTS 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+const DEFAULT_SETTINGS = {
+  contingency_new_1_3yr:'0.12', contingency_new_4_5yr:'0.18',
+  contingency_mature_refresh_1_3yr:'0.08', contingency_mature_refresh_4_5yr:'0.13',
+  contingency_mature_1_3yr:'0.05', contingency_mature_4_5yr:'0.09',
+  overhead_total_fixed_cost:'0', overhead_projected_units:'0',
+  ratio_band_3yr_1yr_min:'1.8', ratio_band_3yr_1yr_max:'2.8',
+  ratio_band_5yr_3yr_min:'1.3', ratio_band_5yr_3yr_max:'1.7',
+  ratio_band_4yr_2yr_min:'1.3', ratio_band_4yr_2yr_max:'2.0',
+  cross_geo_deviation_pct:'0.20', yoy_cell_change_pct:'0.25',
+  yoy_ratio_change_pct:'0.15', yoy_geo_avg_change_pct:'0.20',
+  gm_pct_default:'0.30', markup_pct_default:'0.30',
+};
+
+const RATIO_PAIRS = [
+  {hi:3, lo:1, minKey:'ratio_band_3yr_1yr_min', maxKey:'ratio_band_3yr_1yr_max', label:'3yr/1yr'},
+  {hi:5, lo:3, minKey:'ratio_band_5yr_3yr_min', maxKey:'ratio_band_5yr_3yr_max', label:'5yr/3yr'},
+  {hi:4, lo:2, minKey:'ratio_band_4yr_2yr_min', maxKey:'ratio_band_4yr_2yr_max', label:'4yr/2yr'},
+];
+
+// 鈹€鈹€ DATABASE 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+const db = new Dexie('GPSPricingStage4V1');
+db.version(1).stores({
+  cycles:         '++id, &name',
+  tier_sequence:  '++id, &tier_name, sort_order',
+  skus:           '++id, [cycle_id+part_number], cycle_id',
+  sku_prices:     '++id, [sku_id+region], sku_id, cycle_id',
+  prior_baseline: '++id, [cycle_id+part_number+region], cycle_id',
+  gve_results:    '++id, cycle_id, layer, severity, is_resolved',
+  settings:       '&key',
+  cycle_maturity: '++id, [cycle_id+tier_name], cycle_id',
+});
+
+async function initDB() {
+  const cnt = await db.settings.count();
+  if (cnt === 0) {
+    await db.settings.bulkAdd(
+      Object.entries(DEFAULT_SETTINGS).map(([key, value]) => ({key, value, updated_by:'system', updated_at:now()}))
+    );
+  }
+}
+
+async function getSetting(key) {
+  const row = await db.settings.get(key);
+  return row ? parseFloat(row.value) || row.value : (DEFAULT_SETTINGS[key] ?? null);
+}
+async function getSettings() {
+  const rows = await db.settings.toArray();
+  const map = {};
+  rows.forEach(r => map[r.key] = r.value);
+  return map;
+}
+async function saveSetting(key, value, user) {
+  await db.settings.put({key, value:String(value), updated_by:user, updated_at:now()});
+}
+
+// 鈹€鈹€ STATE 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+let currentUser = localStorage.getItem('gps4_user') || null;
+let currentCycleId = null;
+let currentTab = 'import';
+let settingsTab = 'contingency';
+
+// 鈹€鈹€ UTILS 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function el(id) { return document.getElementById(id); }
+function app() { return el('app'); }
+function now() { return new Date().toISOString(); }
+function fmt(v, d=2) {
+  if (v==null||v===''||isNaN(v)) return '—';
+  return Number(v).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+}
+function pct(v) {
+  if (v==null||v===''||isNaN(v)) return '—';
+  return (Number(v)*100).toFixed(1)+'%';
+}
+function safeFloat(v) {
+  if (v==null) return null;
+  if (typeof v==='number') return isNaN(v)?null:v;
+  const s = String(v).replace(/[$,%,\s]/g,'');
+  const f = parseFloat(s);
+  return isNaN(f) ? null : f;
+}
+function safeStr(v) {
+  if (v==null) return null;
+  const s = String(v).trim();
+  return s||null;
+}
+function toast(msg, type='info') {
+  const d=document.createElement('div');
+  d.className=`toast toast-${type}`; d.textContent=msg;
+  el('toast-container').appendChild(d);
+  setTimeout(()=>d.remove(), 3500);
+}
+function showModal(title, body, footer, wide=false) {
+  el('modal-header').textContent=title;
+  el('modal-body').innerHTML=body;
+  el('modal-footer').innerHTML=footer||'<button class="btn btn-secondary" onclick="hideModal()">Close</button>';
+  el('modal-box').className='modal-box'+(wide?' wide':'');
+  el('modal-overlay').classList.remove('hidden');
+}
+function hideModal() { el('modal-overlay').classList.add('hidden'); }
+el('modal-overlay').addEventListener('click', e=>{ if(e.target===el('modal-overlay')) hideModal(); });
+
+function cycleStatusBadge(s) {
+  return s==='submitted'
+    ? '<span class="badge badge-submitted">Submitted</span>'
+    : '<span class="badge badge-draft">Draft</span>';
+}
+function sevBadge(s) {
+  const cls={Critical:'sev-critical',Systemic:'sev-systemic',Warning:'sev-warning',OK:'sev-ok',Clear:'sev-clear'};
+  return `<span class="badge ${cls[s]||'badge-draft'}">${s}</span>`;
+}
+function layerBadge(l) { return `<span class="layer-badge">L${l}</span>`; }
+
+// 鈹€鈹€ ROUTER 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function route() {
+  if (!currentUser) { renderLogin(); return; }
+  const hash = location.hash || '#';
+  if (hash==='#settings') { await renderSettings(); return; }
+  const m = hash.match(/^#cycle\/(\d+)(?:\/(\w+))?/);
+  if (m) {
+    currentCycleId = parseInt(m[1]);
+    currentTab = m[2] || 'import';
+    await renderCycle();
+  } else {
+    await renderDashboard();
+  }
+}
+window.addEventListener('hashchange', route);
+function navigate(h) { location.hash=h; }
+
+// 鈹€鈹€ LOGIN 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function renderLogin() {
+  app().innerHTML=`
+  <div class="login-page">
+    <div class="login-card">
+      <h1>GPS Cost Pricing Workbench</h1>
+      <p>Stage 4 —'GVE Validation Engine</p>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Your Name</label>
+        <input id="login-name" class="form-control" placeholder="e.g. Jane Smith" autofocus>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Enter</button>
+    </div>
+  </div>`;
+  el('login-name').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+}
+function doLogin() {
+  const name=el('login-name').value.trim();
+  if (!name) { toast('Please enter your name','error'); return; }
+  currentUser=name; localStorage.setItem('gps4_user',name); route();
+}
+function logout() { localStorage.removeItem('gps4_user'); currentUser=null; route(); }
+
+// 鈹€鈹€ DASHBOARD 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function renderDashboard() {
+  const cycles=await db.cycles.orderBy('id').reverse().toArray();
+  app().innerHTML=`
+  <nav class="nav">
+    <span class="nav-brand">GPS Cost Pricing Workbench</span>
+    <div class="nav-links">
+      <a class="active" href="#">Dashboard</a>
+      <a href="#settings">Settings</a>
+    </div>
+    <span class="nav-user">${currentUser} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#a78bfa">Sign out</a></span>
+  </nav>
+  <div class="container">
+    <div class="page-header">
+      <h1>Pricing Cycles</h1>
+      <button class="btn btn-primary" onclick="showCreateCycle()">+ New Cycle</button>
+    </div>
+    <div class="card">
+      ${cycles.length===0
+        ? '<p class="text-muted" style="text-align:center;padding:30px">No cycles yet.</p>'
+        : `<table class="tbl">
+          <thead><tr><th>Cycle Name</th><th>Fiscal Year</th><th>Status</th><th>Created By</th><th>Created At</th><th>Submitted At</th><th></th></tr></thead>
+          <tbody>${cycles.map(c=>`
+            <tr>
+              <td><strong><a href="#cycle/${c.id}/import">${c.name}</a></strong></td>
+              <td>${c.fiscal_year||'—'}</td>
+              <td>${cycleStatusBadge(c.status)}</td>
+              <td>${c.created_by||'—'}</td>
+              <td class="text-muted text-sm">${(c.created_at||'').slice(0,16).replace('T',' ')}</td>
+              <td class="text-muted text-sm">${c.submitted_at?(c.submitted_at||'').slice(0,16).replace('T',' '):'—'}</td>
+              <td><a class="btn btn-secondary btn-sm" href="#cycle/${c.id}/import">Open →</a></td>
+            </tr>`).join('')}
+          </tbody></table>`}
+    </div>
+  </div>`;
+}
+function showCreateCycle() {
+  showModal('New Pricing Cycle',
+    `<div class="form-row form-row-2">
+      <div class="form-group"><label class="form-label">Cycle Name *</label>
+        <input id="c-name" class="form-control" placeholder="e.g. FY25 Q3 EMEA"></div>
+      <div class="form-group"><label class="form-label">Fiscal Year</label>
+        <input id="c-fy" class="form-control" placeholder="e.g. FY2025"></div>
+    </div>`,
+    `<button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="createCycle()">Create</button>`
+  );
+}
+async function createCycle() {
+  const name=el('c-name').value.trim(), fy=el('c-fy').value.trim();
+  if (!name) { toast('Cycle name required','error'); return; }
+  try {
+    const id=await db.cycles.add({name, fiscal_year:fy, status:'draft', created_by:currentUser, created_at:now()});
+    hideModal(); toast('Cycle created','success'); navigate(`#cycle/${id}/import`);
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+// 鈹€鈹€ CYCLE PAGE 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function renderCycle() {
+  const cycle=await db.cycles.get(currentCycleId);
+  if (!cycle) { navigate('#'); return; }
+  const tabs=[
+    {id:'import',label:'Import Data'},
+    {id:'matrix',label:'Matrix View'},
+    {id:'gve',label:'GVE Validation'},
+    {id:'listprice',label:'List Price'},
+    {id:'audit',label:'Audit Log'},
+  ];
+  app().innerHTML=`
+  <nav class="nav">
+    <span class="nav-brand">GPS Cost Pricing Workbench</span>
+    <div class="nav-links">
+      <a href="#">Dashboard</a>
+      <a href="#settings">Settings</a>
+      <a class="active">${cycle.name}</a>
+    </div>
+    <span class="nav-user">${currentUser} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#a78bfa">Sign out</a></span>
+  </nav>
+  <div class="container">
+    <div class="page-header">
+      <h1>${cycle.name} <span style="font-size:14px;font-weight:400;color:#6b7280">${cycle.fiscal_year||''}</span></h1>
+      <div style="display:flex;gap:8px;align-items:center">
+        ${cycleStatusBadge(cycle.status)}
+        ${cycle.status==='draft'?`<button class="btn btn-success btn-sm" onclick="submitCycle(${cycle.id})">Submit Cycle</button>`:''}
+      </div>
+    </div>
+    <div class="tabs">
+      ${tabs.map(t=>`<div class="tab${currentTab===t.id?' active':''}" onclick="navigate('#cycle/${currentCycleId}/${t.id}')">${t.label}</div>`).join('')}
+    </div>
+    <div id="tab-content"></div>
+  </div>`;
+
+  const fns={import:renderImportTab, matrix:renderMatrixTab, gve:renderGVETab,
+              listprice:renderListPriceTab, audit:renderAuditTab};
+  if (fns[currentTab]) await fns[currentTab]();
+}
+
+async function submitCycle(cycleId) {
+  // Check for unresolved Critical violations
+  const critical = await db.gve_results
+    .where('cycle_id').equals(cycleId)
+    .filter(r => r.severity==='Critical' && !r.is_resolved)
+    .count();
+  if (critical > 0) {
+    toast(`Cannot submit: ${critical} unresolved Critical violation(s)`, 'error'); return;
+  }
+  if (!confirm('Submit this cycle? It will become read-only.')) return;
+  await db.cycles.update(cycleId, {status:'submitted', submitted_at:now(), submitted_by:currentUser});
+  toast('Cycle submitted','success');
+  await renderCycle();
+}
+
+// 鈹€鈹€ IMPORT TAB 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function renderImportTab() {
+  const tc=el('tab-content');
+  const cycle=await db.cycles.get(currentCycleId);
+  const skuCount=await db.skus.where('cycle_id').equals(currentCycleId).count();
+  const priorCount=await db.prior_baseline.where('cycle_id').equals(currentCycleId).count();
+  const isLocked=cycle.status==='submitted';
+
+  tc.innerHTML=`
+  <div class="card">
+    <div class="card-title">Import Pricing Matrix (Excel)</div>
+    ${isLocked?'<div class="alert alert-blocked">This cycle is submitted \u2014 import is locked.</div>':''}
+    <div class="upload-zone" id="upload-zone" ${isLocked?'style="opacity:.5;pointer-events:none"':''} onclick="el('xl-input').click()">
+      <div class="upload-icon">馃搳</div>
+      <p><strong>Click to browse</strong> or drag & drop an Excel file (.xlsx / .xls)</p>
+      <p style="margin-top:4px">Expected format: fixed columns (Part#, Tier, Base Warranty, Upgrade, Type) then geo blocks (Cost | C-Price | GP% | ESS | L-Price)</p>
+    </div>
+    <input type="file" id="xl-input" accept=".xlsx,.xls" class="hidden" onchange="handleExcelImport(event)">
+    <div id="import-result" style="margin-top:12px"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Prior Cycle Baseline (for Layer 4 YoY)</div>
+    <p class="text-muted text-sm" style="margin-bottom:10px">Paste CSV with columns: <code>part_number,region,prior_sales_cost</code> —'one row per SKU+region.</p>
+    ${priorCount?`<p class="text-sm" style="color:#166534;margin-bottom:8px">鉁?${priorCount} baseline entries loaded.</p>`:''}
+    <textarea id="baseline-csv" class="form-control" rows="5" placeholder="part_number,region,prior_sales_cost&#10;5WS0A23748,BENELUX,10.50&#10;5WS0A23748,NORDICS,11.00" ${isLocked?'disabled':''}></textarea>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button class="btn btn-secondary btn-sm" onclick="saveBaseline()" ${isLocked?'disabled':''}>Save Baseline</button>
+      ${priorCount?`<button class="btn btn-danger btn-sm" onclick="clearBaseline()" ${isLocked?'disabled':''}>Clear</button>`:''}
+    </div>
+  </div>
+  ${skuCount?`<div class="card"><p class="text-muted text-sm">鉁?${skuCount} SKUs currently imported for this cycle. <button class="btn btn-secondary btn-sm" onclick="navigate('#cycle/${currentCycleId}/matrix')">View Matrix →</button></p></div>`:''}`;
+
+  const zone=el('upload-zone');
+  if (!isLocked) {
+    zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', ()=>zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e=>{ e.preventDefault(); zone.classList.remove('drag-over'); handleExcelFile(e.dataTransfer.files[0]); });
+  }
+}
+
+async function handleExcelImport(e) { if(e.target.files[0]) await handleExcelFile(e.target.files[0]); }
+async function handleExcelFile(file) {
+  el('import-result').innerHTML='<span class="text-muted text-sm">Parsing\u2026</span>';
+  try {
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array', cellDates:true, raw:false});
+    const parsed = parseStage4Excel(wb);
+    if (parsed.error) { toast('Parse error: '+parsed.error,'error'); el('import-result').innerHTML=''; return; }
+
+    // Clear existing SKUs and prices for this cycle
+    const existingSkus = await db.skus.where('cycle_id').equals(currentCycleId).toArray();
+    const skuIds = existingSkus.map(s=>s.id);
+    if (skuIds.length) {
+      await db.sku_prices.where('sku_id').anyOf(skuIds).delete();
+      await db.skus.where('cycle_id').equals(currentCycleId).delete();
+    }
+    await db.gve_results.where('cycle_id').equals(currentCycleId).delete();
+
+    // Upsert tier_sequence for new tiers
+    const existingTiers = await db.tier_sequence.toArray();
+    const existingTierNames = new Set(existingTiers.map(t=>t.tier_name));
+    const maxOrder = existingTiers.reduce((m,t)=>Math.max(m,t.sort_order),0);
+    let tierOrder = maxOrder;
+    for (const t of (parsed.tiers||[])) {
+      if (!existingTierNames.has(t)) {
+        tierOrder++;
+        await db.tier_sequence.add({tier_name:t, sort_order:tierOrder});
+      }
+    }
+
+    // Insert SKUs and prices
+    let skuCount=0, priceCount=0;
+    for (const row of parsed.rows) {
+      const skuId = await db.skus.add({
+        cycle_id:currentCycleId, part_number:row.part_number, tier:row.tier,
+        base_warranty:row.base_warranty, upgrade_description:row.upgrade_description,
+        delivery_type:row.delivery_type, upgrade_years:row.upgrade_years,
+      });
+      skuCount++;
+      for (const [region, prices] of Object.entries(row.prices)) {
+        await db.sku_prices.add({sku_id:skuId, cycle_id:currentCycleId, region,
+          sales_cost:prices.sales_cost, channel_price:prices.channel_price,
+          list_price:prices.list_price, computed_list_price_b2c:null, computed_quoted_floor_b2b:null});
+        priceCount++;
+      }
+    }
+
+    const warnings = parsed.warnings||[];
+    el('import-result').innerHTML=`
+      <div class="alert alert-clear">Imported ${skuCount} SKUs, ${priceCount} price records across ${parsed.regions?.length||0} regions.
+        ${warnings.length?`<br><strong>${warnings.length} warning(s):</strong> ${warnings.slice(0,3).join('; ')}`:''}
+      </div>`;
+    toast(`Imported ${skuCount} SKUs`, 'success');
+    await renderImportTab();
+  } catch(e) {
+    toast('Import failed: '+e.message,'error');
+    el('import-result').innerHTML=`<div class="alert alert-blocked">Error: ${e.message}</div>`;
+  }
+}
+
+async function saveBaseline() {
+  const text=el('baseline-csv').value.trim();
+  if (!text) { toast('No CSV text','error'); return; }
+  const lines=text.split('\n').filter(l=>l.trim());
+  if (lines.length<2) { toast('Need header + data rows','error'); return; }
+  const headers=lines[0].split(',').map(h=>h.trim().toLowerCase());
+  const pnIdx=headers.indexOf('part_number'), regIdx=headers.indexOf('region'), scIdx=headers.indexOf('prior_sales_cost');
+  if (pnIdx<0||regIdx<0||scIdx<0) { toast('CSV must have part_number, region, prior_sales_cost columns','error'); return; }
+
+  await db.prior_baseline.where('cycle_id').equals(currentCycleId).delete();
+  let count=0;
+  for (let i=1;i<lines.length;i++) {
+    const cols=lines[i].split(',').map(c=>c.trim());
+    const pn=cols[pnIdx], reg=cols[regIdx], sc=parseFloat(cols[scIdx]);
+    if (pn&&reg&&!isNaN(sc)) {
+      await db.prior_baseline.put({cycle_id:currentCycleId, part_number:pn, region:reg, prior_sales_cost:sc, entered_by:currentUser, entered_at:now()});
+      count++;
+    }
+  }
+  toast(`Saved ${count} baseline entries`,'success');
+  el('baseline-csv').value='';
+  await renderImportTab();
+}
+async function clearBaseline() {
+  if (!confirm('Clear all baseline entries?')) return;
+  await db.prior_baseline.where('cycle_id').equals(currentCycleId).delete();
+  toast('Baseline cleared','success'); await renderImportTab();
+}
+
+// 鈹€鈹€ MATRIX TAB 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function renderMatrixTab() {
+  const tc=el('tab-content');
+  const allPrices = await loadCyclePrices(currentCycleId);
+  if (!allPrices.length) {
+    tc.innerHTML='<div class="card"><p class="text-muted" style="text-align:center;padding:30px">No data imported yet. Go to Import Data first.</p></div>';
+    return;
+  }
+  const regions=[...new Set(allPrices.map(r=>r.region))].sort();
+  const delivTypes=[...new Set(allPrices.map(r=>r.delivery_type).filter(Boolean))].sort();
+  const tierSeq=await db.tier_sequence.orderBy('sort_order').toArray();
+
+  // Load GVE violations for status dots
+  const violations=await db.gve_results.where('cycle_id').equals(currentCycleId).filter(r=>!r.is_resolved).toArray();
+  const violMap={};
+  for (const v of violations) {
+    const k=`${v.tier||''}|${v.upgrade_years||''}|${v.region||''}`;
+    if (!violMap[k]||sevOrder(v.severity)<sevOrder(violMap[k])) violMap[k]=v.severity;
+  }
+
+  tc.innerHTML=`
+  <div class="filter-bar">
+    <div class="form-group"><label class="form-label">Region</label>
+      <select id="m-region" class="form-control" onchange="renderMatrixTab()">
+        <option value="">All Regions</option>
+        ${regions.map(r=>`<option>${r}</option>`).join('')}
+      </select></div>
+    <div class="form-group"><label class="form-label">Delivery Type</label>
+      <select id="m-dtype" class="form-control" onchange="renderMatrixTab()">
+        <option value="">All Types</option>
+        ${delivTypes.map(d=>`<option>${d}</option>`).join('')}
+      </select></div>
+  </div>
+  <div id="matrix-table"></div>`;
+
+  renderMatrixTable(allPrices, tierSeq, violMap);
+}
+
+function sevOrder(s) { return {Critical:0,Systemic:1,Warning:2,OK:3}[s]??9; }
+
+function renderMatrixTable(allPrices, tierSeq, violMap) {
+  const regionFilter = el('m-region')?.value||'';
+  const dtFilter = el('m-dtype')?.value||'';
+
+  const filtered = allPrices.filter(r=>
+    (!regionFilter||r.region===regionFilter)&&
+    (!dtFilter||r.delivery_type===dtFilter)
+  );
+
+  // Group by (tier, upgrade_years, delivery_type, region)
+  const groups={};
+  for (const r of filtered) {
+    const k=`${r.tier}|${r.upgrade_years}|${r.delivery_type}|${r.region}`;
+    if (!groups[k]) groups[k]={tier:r.tier, years:r.upgrade_years, dtype:r.delivery_type,
+      region:r.region, sc:[],cp:[],lp:[],b2c:[],b2b:[]};
+    if (r.sales_cost!=null) groups[k].sc.push(r.sales_cost);
+    if (r.channel_price!=null) groups[k].cp.push(r.channel_price);
+    if (r.list_price!=null) groups[k].lp.push(r.list_price);
+    if (r.computed_list_price_b2c!=null) groups[k].b2c.push(r.computed_list_price_b2c);
+    if (r.computed_quoted_floor_b2b!=null) groups[k].b2b.push(r.computed_quoted_floor_b2b);
+  }
+
+  const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
+  const tierOrder = {}; tierSeq.forEach((t,i)=>tierOrder[t.tier_name]=i);
+
+  const rows = Object.values(groups).sort((a,b)=>{
+    const ta=(tierOrder[a.tier]??99)-(tierOrder[b.tier]??99);
+    if (ta!==0) return ta;
+    if ((a.years??0)!==(b.years??0)) return (a.years??0)-(b.years??0);
+    return (a.region||'').localeCompare(b.region||'');
+  });
+
+  const dotHtml = (tier, years, region) => {
+    const k=`${tier||''}|${years||''}|${region||''}`;
+    const sev=violMap[k];
+    if (!sev) return '<span class="gve-dot dot-ok" title="OK"></span>';
+    const cls={Critical:'dot-critical',Systemic:'dot-systemic',Warning:'dot-warning'};
+    return `<span class="gve-dot ${cls[sev]||'dot-ok'}" title="${sev}"></span>`;
+  };
+
+  el('matrix-table').innerHTML = rows.length===0
+    ? '<div class="card"><p class="text-muted" style="text-align:center;padding:20px">No data for selected filters.</p></div>'
+    : `<div class="card" style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th>Tier</th><th>Yrs</th><th>Type</th><th>Region</th><th>Avg Sales Cost</th><th>Avg Channel Price</th><th>Avg List Price</th><th>Computed B2C</th><th>Computed B2B Floor</th><th>SKUs</th><th>GVE</th></tr></thead>
+        <tbody>${rows.map(r=>{
+          const asc=avg(r.sc), acp=avg(r.cp), alp=avg(r.lp), ab2c=avg(r.b2c), ab2b=avg(r.b2b);
+          return `<tr>
+            <td><strong>${r.tier||'—'}</strong></td>
+            <td>${r.years??'—'}</td>
+            <td>${r.dtype||'—'}</td>
+            <td>${r.region||'—'}</td>
+            <td class="text-right">${fmt(asc)}</td>
+            <td class="text-right">${fmt(acp)}</td>
+            <td class="text-right">${fmt(alp)}</td>
+            <td class="text-right">${fmt(ab2c)}</td>
+            <td class="text-right">${fmt(ab2b)}</td>
+            <td>${r.sc.length}</td>
+            <td>${dotHtml(r.tier, r.years, r.region)}</td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// Helper: load all SKU + price records for a cycle as a flat list
+async function loadCyclePrices(cycleId) {
+  const skus = await db.skus.where('cycle_id').equals(cycleId).toArray();
+  if (!skus.length) return [];
+  const skuIds = skus.map(s=>s.id);
+  const prices = await db.sku_prices.where('sku_id').anyOf(skuIds).toArray();
+  const skuMap = {}; skus.forEach(s=>skuMap[s.id]=s);
+  return prices.map(p => ({...skuMap[p.sku_id], ...p, sku_row_id:skuMap[p.sku_id]?.id}));
+}
+
+// 鈹€鈹€ GVE TAB 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function renderGVETab() {
+  const tc=el('tab-content');
+  const summary = await getGVESummary(currentCycleId);
+  const totalViols = summary.Critical.total+summary.Systemic.total+summary.Warning.total;
+
+  tc.innerHTML=`
+  <div class="card">
+    <div class="card-title">Run GVE Validation</div>
+    <p class="text-muted text-sm" style="margin-bottom:12px">Runs all 4 validation layers: Monotonicity, Ratio Bands, Cross-Geo Consistency, YoY Drift.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="gve-btn" onclick="runGVE()">▶ Run GVE</button>
+      <button class="btn btn-secondary" onclick="runListPrice()">▶ Compute List Prices</button>
+    </div>
+    <div id="gve-run-result" style="margin-top:12px"></div>
+  </div>
+  ${totalViols>0 ? renderGVEAlert(summary) : ''}
+  <div class="filter-bar">
+    <div class="form-group"><label class="form-label">Layer</label>
+      <select id="gve-layer" class="form-control" onchange="refreshViolTable()">
+        <option value="">All Layers</option>
+        <option value="1">Layer 1 —'Monotonicity</option>
+        <option value="2">Layer 2 —'Ratio Bands</option>
+        <option value="3">Layer 3 —'Cross-Geo</option>
+        <option value="4">Layer 4 —'YoY Drift</option>
+      </select></div>
+    <div class="form-group"><label class="form-label">Severity</label>
+      <select id="gve-sev" class="form-control" onchange="refreshViolTable()">
+        <option value="">All</option>
+        <option>Critical</option><option>Systemic</option><option>Warning</option>
+      </select></div>
+    <div class="form-group"><label class="form-label">Region</label>
+      <select id="gve-region" class="form-control" onchange="refreshViolTable()">
+        <option value="">All Regions</option>
+      </select></div>
+    <div class="form-group"><label class="form-label">&nbsp;</label>
+      <label style="display:flex;align-items:center;gap:6px;padding:7px 0;font-size:13px">
+        <input type="checkbox" id="gve-unresolved" onchange="refreshViolTable()"> Unresolved only
+      </label></div>
+  </div>
+  <div id="viol-table"></div>`;
+
+  await populateGVERegionFilter();
+  await refreshViolTable();
+}
+
+function renderGVEAlert(summary) {
+  const {Critical, Systemic, Warning} = summary;
+  let cls='alert-clear', label='All Clear', detail='No violations found.';
+  if (Critical.unresolved>0) { cls='alert-blocked'; label='BLOCKED'; detail=`${Critical.unresolved} unresolved Critical violation(s). Must resolve before submitting.`; }
+  else if (Systemic.unresolved>0) { cls='alert-systemic'; label='SYSTEMIC'; detail=`${Systemic.unresolved} Systemic violation(s) unresolved.`; }
+  else if (Warning.unresolved>0) { cls='alert-warnings'; label='WARNINGS'; detail=`${Warning.unresolved} Warning(s) unresolved.`; }
+  return `<div class="alert ${cls}"><strong>${label}</strong> —'${detail}
+    &nbsp; Critical: ${Critical.unresolved}/${Critical.total} unresolved &nbsp;|&nbsp;
+    Systemic: ${Systemic.unresolved}/${Systemic.total} &nbsp;|&nbsp;
+    Warning: ${Warning.unresolved}/${Warning.total}
+  </div>`;
+}
+
+async function getGVESummary(cycleId) {
+  const results=await db.gve_results.where('cycle_id').equals(cycleId).toArray();
+  const summary={Critical:{total:0,resolved:0,unresolved:0},Systemic:{total:0,resolved:0,unresolved:0},Warning:{total:0,resolved:0,unresolved:0}};
+  for (const r of results) {
+    const s=summary[r.severity];
+    if (!s) continue;
+    s.total++;
+    if (r.is_resolved) s.resolved++; else s.unresolved++;
+  }
+  return summary;
+}
+
+async function populateGVERegionFilter() {
+  const viols=await db.gve_results.where('cycle_id').equals(currentCycleId).toArray();
+  const regions=[...new Set(viols.map(v=>v.region).filter(Boolean))].sort();
+  const sel=el('gve-region'); if(!sel) return;
+  sel.innerHTML='<option value="">All Regions</option>'+regions.map(r=>`<option>${r}</option>`).join('');
+}
+
+async function refreshViolTable() {
+  const layerF=el('gve-layer')?.value||'';
+  const sevF=el('gve-sev')?.value||'';
+  const regionF=el('gve-region')?.value||'';
+  const unresolvedOnly=el('gve-unresolved')?.checked||false;
+
+  let results=await db.gve_results.where('cycle_id').equals(currentCycleId).toArray();
+  if (layerF) results=results.filter(r=>String(r.layer)===layerF);
+  if (sevF) results=results.filter(r=>r.severity===sevF);
+  if (regionF) results=results.filter(r=>r.region===regionF);
+  if (unresolvedOnly) results=results.filter(r=>!r.is_resolved);
+
+  results.sort((a,b)=>sevOrder(a.severity)-sevOrder(b.severity));
+
+  if (!el('viol-table')) return;
+  if (!results.length) {
+    el('viol-table').innerHTML='<div class="card"><p class="text-muted" style="text-align:center;padding:20px">No violations match the current filter.</p></div>';
+    return;
+  }
+  el('viol-table').innerHTML=`
+  <div class="card" style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr><th>Layer</th><th>Severity</th><th>Region</th><th>Tier</th><th>Years</th><th>Part #</th><th>Message</th><th>Status</th><th></th></tr></thead>
+      <tbody>${results.map(v=>`
+        <tr class="${v.is_resolved?'resolved-row':''}">
+          <td>${layerBadge(v.layer)}</td>
+          <td>${sevBadge(v.severity)}</td>
+          <td>${v.region||'—'}</td>
+          <td>${v.tier||'—'}</td>
+          <td>${v.upgrade_years??'—'}</td>
+          <td style="font-family:monospace;font-size:11px">${v.part_number||'—'}</td>
+          <td style="max-width:320px;font-size:12px">${v.message||''}</td>
+          <td>${v.is_resolved
+            ? `<span style="color:#166534;font-size:12px">鉁?Resolved by ${v.resolved_by||'?'}</span>`
+            : '<span style="color:#6b7280;font-size:12px">Unresolved</span>'}</td>
+          <td style="white-space:nowrap">
+            ${!v.is_resolved
+              ? `<button class="btn btn-secondary btn-sm" onclick="showResolveModal(${v.id})">Resolve</button>`
+              : `<button class="btn btn-secondary btn-sm" onclick="unresolveViolation(${v.id})">Undo</button>`}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function showResolveModal(violId) {
+  showModal('Resolve Violation',
+    `<div class="form-group"><label class="form-label">Explanation (required)</label>
+      <textarea id="resolve-exp" class="form-control" rows="4" placeholder="Explain why this violation is accepted or has been addressed—'></textarea>
+    </div>`,
+    `<button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+     <button class="btn btn-success" onclick="resolveViolation(${violId})">Mark Resolved</button>`
+  );
+}
+async function resolveViolation(violId) {
+  const exp=el('resolve-exp').value.trim();
+  if (!exp) { toast('Explanation required','error'); return; }
+  await db.gve_results.update(violId, {is_resolved:1, explanation:exp, resolved_by:currentUser, resolved_at:now()});
+  hideModal(); toast('Violation resolved','success');
+  await refreshViolTable();
+  // Refresh alert
+  const summary=await getGVESummary(currentCycleId);
+  const alertEl=el('tab-content').querySelector('.alert');
+  if (alertEl) alertEl.outerHTML=renderGVEAlert(summary);
+}
+async function unresolveViolation(violId) {
+  await db.gve_results.update(violId, {is_resolved:0, explanation:null, resolved_by:null, resolved_at:null});
+  toast('Resolution undone','info');
+  await refreshViolTable();
+}
+
+async function runGVE() {
+  const btn=el('gve-btn');
+  btn.disabled=true; btn.textContent='Running—';
+  try {
+    const violations = await runAllGVE(currentCycleId);
+    // Clear old results and save new
+    await db.gve_results.where('cycle_id').equals(currentCycleId).delete();
+    for (const v of violations)
+      await db.gve_results.add({...v, cycle_id:currentCycleId, is_resolved:0, created_at:now()});
+    toast(`GVE complete: ${violations.length} violation(s) found`, violations.length?'info':'success');
+    await renderGVETab();
+  } catch(e) { toast('GVE error: '+e.message,'error'); }
+  finally { if(btn){ btn.disabled=false; btn.textContent='▶ Run GVE'; } }
+}
+
+async function runListPrice() {
+  try {
+    const violations = await computeListPrices(currentCycleId);
+    toast(`List prices computed. ${violations.length} pricing violation(s).`, violations.length?'info':'success');
+    await renderGVETab();
+  } catch(e) { toast('List price error: '+e.message,'error'); }
+}
+
+// 鈹€鈹€ LIST PRICE TAB 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function renderListPriceTab() {
+  const tc=el('tab-content');
+  const allPrices=await loadCyclePrices(currentCycleId);
+  if (!allPrices.length) {
+    tc.innerHTML='<div class="card"><p class="text-muted" style="text-align:center;padding:30px">No data. Import pricing matrix first.</p></div>';
+    return;
+  }
+  const regions=[...new Set(allPrices.map(r=>r.region))].sort();
+
+  tc.innerHTML=`
+  <div class="filter-bar">
+    <div class="form-group"><label class="form-label">Region</label>
+      <select id="lp-region" class="form-control" onchange="renderListPriceTable()">
+        <option value="">All Regions</option>
+        ${regions.map(r=>`<option>${r}</option>`).join('')}
+      </select></div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn btn-secondary btn-sm" onclick="exportCSV()">猬?Export CSV</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportGVEReport()">猬?GVE Report</button>
+    </div>
+  </div>
+  <div id="lp-table"></div>`;
+
+  await renderListPriceTable(allPrices);
+}
+
+async function renderListPriceTable(allPrices) {
+  if (!allPrices) allPrices=await loadCyclePrices(currentCycleId);
+  const regionF=el('lp-region')?.value||'';
+  const filtered=allPrices.filter(r=>!regionF||r.region===regionF);
+  const PAGE=100;
+  const rows=filtered.slice(0,PAGE);
+
+  if (!el('lp-table')) return;
+  el('lp-table').innerHTML = rows.length===0
+    ? '<div class="card"><p class="text-muted" style="text-align:center;padding:20px">No data.</p></div>'
+    : `<div class="card" style="overflow-x:auto">
+      ${filtered.length>PAGE?`<p class="text-sm text-muted" style="margin-bottom:8px">Showing first ${PAGE} of ${filtered.length} rows.</p>`:''}
+      <table class="tbl">
+        <thead><tr><th>Part #</th><th>Tier</th><th>Upgrade</th><th>Type</th><th>Region</th><th>Sales Cost</th><th>Channel Price</th><th>Actual List Price</th><th>Computed B2C</th><th>Computed B2B Floor</th><th>Variance</th></tr></thead>
+        <tbody>${rows.map(r=>{
+          const diff = r.computed_list_price_b2c!=null&&r.list_price!=null
+            ? (r.computed_list_price_b2c-r.list_price)/Math.abs(r.list_price||1)*100 : null;
+          const varHtml = diff!=null
+            ? `<span class="${Math.abs(diff)>10?'drift-up':'drift-delta'}" style="background:${Math.abs(diff)>10?'':'#f0f9ff'};color:${Math.abs(diff)>10?'':'#0369a1'}">${diff>0?'+':''}${diff.toFixed(1)}%</span>`
+            : '—';
+          return `<tr>
+            <td style="font-family:monospace;font-size:11px">${r.part_number||''}</td>
+            <td>${r.tier||'—'}</td>
+            <td>${r.upgrade_description||'—'}</td>
+            <td>${r.delivery_type||'—'}</td>
+            <td>${r.region||'—'}</td>
+            <td class="text-right">${fmt(r.sales_cost)}</td>
+            <td class="text-right">${fmt(r.channel_price)}</td>
+            <td class="text-right">${fmt(r.list_price)}</td>
+            <td class="text-right">${fmt(r.computed_list_price_b2c)}</td>
+            <td class="text-right">${fmt(r.computed_quoted_floor_b2b)}</td>
+            <td class="text-right">${varHtml}</td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// 鈹€鈹€ AUDIT TAB 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function renderAuditTab() {
+  const tc=el('tab-content');
+  tc.innerHTML='<div class="card"><p class="text-muted text-sm">Audit log tracks cycle submissions and key actions.</p><div id="audit-body"></div></div>';
+
+  const cycle=await db.cycles.get(currentCycleId);
+  const entries=[];
+  if (cycle.submitted_at)
+    entries.push({time:cycle.submitted_at, user:cycle.submitted_by||'—', action:'Cycle submitted', detail:''});
+
+  const violations=await db.gve_results.where('cycle_id').equals(currentCycleId).filter(r=>r.is_resolved).toArray();
+  for (const v of violations)
+    entries.push({time:v.resolved_at||'', user:v.resolved_by||'—', action:`Resolved L${v.layer} ${v.severity}`, detail:v.explanation||''});
+
+  entries.sort((a,b)=>b.time.localeCompare(a.time));
+  el('audit-body').innerHTML = entries.length===0
+    ? '<p class="text-muted" style="padding:16px;text-align:center">No audit entries yet.</p>'
+    : `<table class="tbl" style="margin-top:12px">
+      <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Detail</th></tr></thead>
+      <tbody>${entries.map(e=>`<tr>
+        <td class="text-sm text-muted">${(e.time||'').slice(0,16).replace('T',' ')}</td>
+        <td>${e.user}</td><td>${e.action}</td>
+        <td class="text-sm text-muted" style="max-width:300px">${e.detail}</td>
+      </tr>`).join('')}</tbody></table>`;
+}
+
+// 鈹€鈹€ SETTINGS PAGE 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function renderSettings() {
+  const stabs=[
+    {id:'contingency',label:'Contingency Rates'},
+    {id:'overhead',label:'Overhead'},
+    {id:'ratio',label:'Ratio Bands'},
+    {id:'tiers',label:'Tier Sequence'},
+    {id:'gm',label:'GM% & Markup%'},
+    {id:'drift',label:'Drift Thresholds'},
+  ];
+  app().innerHTML=`
+  <nav class="nav">
+    <span class="nav-brand">GPS Cost Pricing Workbench</span>
+    <div class="nav-links">
+      <a href="#">Dashboard</a>
+      <a class="active" href="#settings">Settings</a>
+    </div>
+    <span class="nav-user">${currentUser} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#a78bfa">Sign out</a></span>
+  </nav>
+  <div class="container">
+    <div class="page-header"><h1>Settings</h1></div>
+    <div class="settings-tabs">
+      ${stabs.map(t=>`<div class="settings-tab${settingsTab===t.id?' active':''}" onclick="settingsTab='${t.id}';renderSettings()">${t.label}</div>`).join('')}
+    </div>
+    <div id="settings-content"></div>
+  </div>`;
+  await renderSettingsTab();
+}
+
+async function renderSettingsTab() {
+  const s = await getSettings();
+  const sc = el('settings-content');
+  if (!sc) return;
+
+  if (settingsTab==='contingency') {
+    sc.innerHTML=`
+    <div class="card">
+      <div class="card-title">Contingency Rates (%)</div>
+      <table class="tbl"><thead><tr><th>Maturity</th><th>1—' yr</th><th>4—' yr</th></tr></thead><tbody>
+        ${[['New','new'],['Mature Refresh','mature_refresh'],['Mature','mature']].map(([label,key])=>`
+        <tr><td>${label}</td>
+          <td><input class="form-control" style="width:100px" id="c_${key}_1_3yr" value="${((parseFloat(s[`contingency_${key}_1_3yr`])||0)*100).toFixed(1)}">%</td>
+          <td><input class="form-control" style="width:100px" id="c_${key}_4_5yr" value="${((parseFloat(s[`contingency_${key}_4_5yr`])||0)*100).toFixed(1)}">%</td>
+        </tr>`).join('')}
+      </tbody></table>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveContingency()">Save</button>
+    </div>`;
+  }
+  else if (settingsTab==='overhead') {
+    const fixed=parseFloat(s.overhead_total_fixed_cost)||0;
+    const units=parseFloat(s.overhead_projected_units)||0;
+    sc.innerHTML=`
+    <div class="card">
+      <div class="card-title">Overhead Rate</div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label class="form-label">Total GPS Fixed Cost ($)</label>
+          <input id="oh-fixed" class="form-control" value="${fixed}"></div>
+        <div class="form-group"><label class="form-label">Projected Units</label>
+          <input id="oh-units" class="form-control" value="${units}"></div>
+      </div>
+      <p class="text-muted text-sm">R_overhead = ${units>0?(fixed/units).toFixed(4):'—'} per unit</p>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveOverhead()">Save</button>
+    </div>`;
+  }
+  else if (settingsTab==='ratio') {
+    sc.innerHTML=`
+    <div class="card">
+      <div class="card-title">Ratio Band Thresholds</div>
+      <table class="tbl"><thead><tr><th>Ratio</th><th>Floor (min)</th><th>Ceiling (max)</th></tr></thead><tbody>
+        ${RATIO_PAIRS.map(p=>`<tr><td>${p.label}</td>
+          <td><input class="form-control" style="width:100px" id="rb_${p.minKey}" value="${s[p.minKey]||''}"></td>
+          <td><input class="form-control" style="width:100px" id="rb_${p.maxKey}" value="${s[p.maxKey]||''}"></td>
+        </tr>`).join('')}
+      </tbody></table>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveRatioBands()">Save</button>
+    </div>`;
+  }
+  else if (settingsTab==='tiers') {
+    const tiers=await db.tier_sequence.orderBy('sort_order').toArray();
+    sc.innerHTML=`
+    <div class="card">
+      <div class="card-title">Tier Sequence (lower order = lower cost tier)</div>
+      <table class="tbl" id="tier-tbl"><thead><tr><th>Tier Name</th><th>Sort Order</th><th></th></tr></thead>
+      <tbody>${tiers.map(t=>`<tr data-id="${t.id}">
+        <td><input class="form-control" data-field="name" value="${t.tier_name}"></td>
+        <td><input class="form-control" data-field="order" value="${t.sort_order}" style="width:80px"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteTier(${t.id})">Remove</button></td>
+      </tr>`).join('')}</tbody></table>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="addTierRow()">+ Add Tier</button>
+        <button class="btn btn-primary btn-sm" onclick="saveTiers()">Save</button>
+      </div>
+    </div>`;
+  }
+  else if (settingsTab==='gm') {
+    const tiers=await db.tier_sequence.orderBy('sort_order').toArray();
+    const tierKey=t=>t.tier_name.toLowerCase().replace(/[\s\/]+/g,'_');
+    sc.innerHTML=`
+    <div class="card">
+      <div class="card-title">GM% and Markup% (per tier)</div>
+      <table class="tbl"><thead><tr><th>Tier</th><th>GM %</th><th>Markup %</th></tr></thead><tbody>
+        <tr><td><strong>Default</strong></td>
+          <td><input class="form-control" style="width:100px" id="gm_default" value="${((parseFloat(s.gm_pct_default)||0)*100).toFixed(1)}">%</td>
+          <td><input class="form-control" style="width:100px" id="mk_default" value="${((parseFloat(s.markup_pct_default)||0)*100).toFixed(1)}">%</td>
+        </tr>
+        ${tiers.map(t=>{
+          const k=tierKey(t);
+          const gm=s[`gm_pct_${k}`]?((parseFloat(s[`gm_pct_${k}`])||0)*100).toFixed(1):'';
+          const mk=s[`markup_pct_${k}`]?((parseFloat(s[`markup_pct_${k}`])||0)*100).toFixed(1):'';
+          return `<tr><td>${t.tier_name}</td>
+            <td><input class="form-control" style="width:100px" id="gm_${k}" value="${gm}" placeholder="use default">%</td>
+            <td><input class="form-control" style="width:100px" id="mk_${k}" value="${mk}" placeholder="use default">%</td>
+          </tr>`;
+        }).join('')}
+      </tbody></table>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveGMMarkup()">Save</button>
+    </div>`;
+  }
+  else if (settingsTab==='drift') {
+    sc.innerHTML=`
+    <div class="card">
+      <div class="card-title">Drift Thresholds</div>
+      <table class="tbl"><thead><tr><th>Threshold</th><th>Value (%)</th></tr></thead><tbody>
+        ${[
+          ['cross_geo_deviation_pct','Layer 3: Cross-geo deviation %'],
+          ['yoy_cell_change_pct','Layer 4: YoY individual cell change %'],
+          ['yoy_ratio_change_pct','Layer 4: YoY structural ratio change %'],
+          ['yoy_geo_avg_change_pct','Layer 4: YoY geo-level average change %'],
+        ].map(([k,label])=>`<tr><td>${label}</td>
+          <td><input class="form-control" style="width:100px" id="dt_${k}" value="${((parseFloat(s[k])||0)*100).toFixed(1)}">%</td>
+        </tr>`).join('')}
+      </tbody></table>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveDrift()">Save</button>
+    </div>`;
+  }
+}
+
+async function saveContingency() {
+  const keys=[['new','1_3yr'],['new','4_5yr'],['mature_refresh','1_3yr'],['mature_refresh','4_5yr'],['mature','1_3yr'],['mature','4_5yr']];
+  for (const [m,w] of keys) {
+    const v=parseFloat(el(`c_${m}_${w}`)?.value||'0')/100;
+    await saveSetting(`contingency_${m}_${w}`, v, currentUser);
+  }
+  toast('Saved','success');
+}
+async function saveOverhead() {
+  await saveSetting('overhead_total_fixed_cost', el('oh-fixed').value, currentUser);
+  await saveSetting('overhead_projected_units', el('oh-units').value, currentUser);
+  toast('Saved','success'); await renderSettingsTab();
+}
+async function saveRatioBands() {
+  for (const p of RATIO_PAIRS) {
+    await saveSetting(p.minKey, el(`rb_${p.minKey}`)?.value||'0', currentUser);
+    await saveSetting(p.maxKey, el(`rb_${p.maxKey}`)?.value||'0', currentUser);
+  }
+  toast('Saved','success');
+}
+function addTierRow() {
+  const tbody=el('tier-tbl').querySelector('tbody');
+  const tr=document.createElement('tr');
+  tr.dataset.id='new';
+  tr.innerHTML=`<td><input class="form-control" data-field="name" placeholder="Tier Name"></td>
+    <td><input class="form-control" data-field="order" value="${tbody.children.length+1}" style="width:80px"></td>
+    <td></td>`;
+  tbody.appendChild(tr);
+}
+async function saveTiers() {
+  const rows=[...el('tier-tbl').querySelectorAll('tbody tr')];
+  for (const tr of rows) {
+    const name=tr.querySelector('[data-field="name"]')?.value?.trim();
+    const order=parseInt(tr.querySelector('[data-field="order"]')?.value)||0;
+    if (!name) continue;
+    const id=tr.dataset.id;
+    if (id==='new') await db.tier_sequence.add({tier_name:name, sort_order:order});
+    else await db.tier_sequence.update(parseInt(id), {tier_name:name, sort_order:order});
+  }
+  toast('Saved','success'); await renderSettingsTab();
+}
+async function deleteTier(id) {
+  if (!confirm('Remove this tier?')) return;
+  await db.tier_sequence.delete(id);
+  await renderSettingsTab();
+}
+async function saveGMMarkup() {
+  const tiers=await db.tier_sequence.toArray();
+  const tierKey=t=>t.tier_name.toLowerCase().replace(/[\s\/]+/g,'_');
+  const gd=parseFloat(el('gm_default')?.value||'0')/100;
+  const md=parseFloat(el('mk_default')?.value||'0')/100;
+  await saveSetting('gm_pct_default', gd, currentUser);
+  await saveSetting('markup_pct_default', md, currentUser);
+  for (const t of tiers) {
+    const k=tierKey(t);
+    const gv=el(`gm_${k}`)?.value?.trim();
+    const mv=el(`mk_${k}`)?.value?.trim();
+    if (gv) await saveSetting(`gm_pct_${k}`, parseFloat(gv)/100, currentUser);
+    if (mv) await saveSetting(`markup_pct_${k}`, parseFloat(mv)/100, currentUser);
+  }
+  toast('Saved','success');
+}
+async function saveDrift() {
+  const keys=['cross_geo_deviation_pct','yoy_cell_change_pct','yoy_ratio_change_pct','yoy_geo_avg_change_pct'];
+  for (const k of keys) {
+    const v=parseFloat(el(`dt_${k}`)?.value||'0')/100;
+    await saveSetting(k, v, currentUser);
+  }
+  toast('Saved','success');
+}
+
+// 鈹€鈹€ EXCEL PARSER 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function parseStage4Excel(workbook) {
+  // Find pricing sheet
+  const sheetName = workbook.SheetNames.find(n=>n.toLowerCase().includes('pricing'))
+                    || workbook.SheetNames[0];
+  if (!sheetName) return {error:'No sheets found in workbook'};
+  const ws = workbook.Sheets[sheetName];
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:null, raw:false});
+
+  // Find subheader row: contains "Cost" and "C-Price" or "Channel"
+  let subHeaderRow=-1;
+  for (let i=0;i<Math.min(rows.length,10);i++) {
+    const r=rows[i]||[];
+    const s=r.map(c=>String(c||'').toLowerCase()).join(' ');
+    if (s.includes('cost')&&(s.includes('c-price')||s.includes('channel')||s.includes('l-price'))) {
+      subHeaderRow=i; break;
+    }
+  }
+  if (subHeaderRow<0) return {error:'Could not find header row. Expected columns: Cost, C-Price, L-Price.'};
+  const geoHeaderRow=subHeaderRow-1;
+  if (geoHeaderRow<0) return {error:'No row above subheader for region names'};
+
+  // Use merge info to map columns to geo names
+  const merges=ws['!merges']||[];
+  const colToGeo={};
+  const geoRow=rows[geoHeaderRow]||[];
+
+  // From merges: cells that span geoHeaderRow
+  for (const merge of merges) {
+    if (merge.s.r===geoHeaderRow&&merge.e.r===geoHeaderRow) {
+      const cellAddr=XLSX.utils.encode_cell({r:merge.s.r, c:merge.s.c});
+      const val=ws[cellAddr]?.v;
+      if (val) for (let c=merge.s.c;c<=merge.e.c;c++) colToGeo[c]=String(val).trim();
+    }
+  }
+  // Non-merged geo cells
+  geoRow.forEach((v,c)=>{ if(v&&!colToGeo[c]) colToGeo[c]=String(v).trim(); });
+
+  // Map subheader columns to roles
+  const subRow=rows[subHeaderRow]||[];
+  const colToRole={};
+  for (let c=5;c<subRow.length;c++) {
+    const h=String(subRow[c]||'').toLowerCase().trim();
+    if (h==='cost'||h.includes('sales cost')) colToRole[c]='sales_cost';
+    else if (h.includes('c-price')||h.includes('channel')) colToRole[c]='channel_price';
+    else if (h.includes('l-price')||h.includes('list')) colToRole[c]='list_price';
+  }
+
+  const dataStart=subHeaderRow+1;
+  const result=[];
+  const warnings=[];
+  const tiersFound=new Set();
+
+  for (let i=dataStart;i<rows.length;i++) {
+    const row=rows[i]||[];
+    if (row.every(c=>c==null||c==='')) continue;
+    const partNumber=safeStr(row[0]);
+    if (!partNumber) continue;
+    const tier=safeStr(row[1]);
+    const baseWarranty=safeStr(row[2]);
+    const upgradeDesc=safeStr(row[3]);
+    const deliveryType=safeStr(row[4]);
+    // Extract upgrade_years from description (e.g. "3Y Onsite NBD" →<3)
+    const yearsMatch=(upgradeDesc||'').match(/(\d+)\s*[Yy]/);
+    const upgradeYears=yearsMatch?parseInt(yearsMatch[1]):null;
+    if (tier) tiersFound.add(tier);
+
+    const prices={};
+    for (let c=5;c<row.length;c++) {
+      const geo=colToGeo[c]; const role=colToRole[c];
+      if (!geo||!role) continue;
+      if (!prices[geo]) prices[geo]={};
+      const raw=String(row[c]||'').replace(/[$,\s]/g,'');
+      prices[geo][role]=safeFloat(raw);
+    }
+    result.push({part_number:partNumber, tier, base_warranty:baseWarranty,
+      upgrade_description:upgradeDesc, delivery_type:deliveryType,
+      upgrade_years:upgradeYears, prices});
+  }
+
+  const allRegions=[...new Set(result.flatMap(r=>Object.keys(r.prices)))].filter(Boolean);
+  return {rows:result, tiers:[...tiersFound], regions:allRegions, warnings};
+}
+
+// 鈹€鈹€ GVE ENGINE 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function runAllGVE(cycleId) {
+  const flatData = await loadCyclePrices(cycleId);
+  if (!flatData.length) return [{layer:1, severity:'Warning', violation_type:'NO_DATA', message:'No SKU data found for this cycle.', region:null, tier:null, upgrade_years:null, part_number:null}];
+
+  const tierSeq = await db.tier_sequence.orderBy('sort_order').toArray();
+  const s = await getSettings();
+
+  const violations = [];
+  violations.push(...runLayer1(flatData, tierSeq));
+  violations.push(...runLayer2(flatData, s));
+  violations.push(...runLayer3(flatData, s));
+
+  const baseline = await db.prior_baseline.where('cycle_id').equals(cycleId).toArray();
+  if (baseline.length) violations.push(...runLayer4(flatData, baseline, s));
+
+  return violations;
+}
+
+// Group helper
+function groupBy(arr, keyFn) {
+  const m=new Map();
+  for (const item of arr) {
+    const k=keyFn(item);
+    if (!m.has(k)) m.set(k,[]);
+    m.get(k).push(item);
+  }
+  return m;
+}
+function avg(arr) { return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null; }
+
+function runLayer1(flatData, tierSeq) {
+  if (!tierSeq.length) return [{layer:1, severity:'Warning', violation_type:'NO_TIER_SEQUENCE', message:'No tier sequence configured. Go to Settings →<Tier Sequence.', region:null, tier:null, upgrade_years:null, part_number:null}];
+  const tierOrder={}; tierSeq.forEach(t=>tierOrder[t.tier_name]=t.sort_order);
+  const violations=[];
+
+  // Group by (upgrade_years, delivery_type, region)
+  const groups=groupBy(flatData.filter(r=>r.sales_cost!=null),
+    r=>`${r.upgrade_years}|${r.delivery_type}|${r.region}`);
+
+  for (const [key, items] of groups) {
+    const [years,dtype,region]=key.split('|');
+    // Avg cost per tier
+    const tierCosts={};
+    for (const item of items) {
+      if (!item.tier) continue;
+      if (!tierCosts[item.tier]) tierCosts[item.tier]=[];
+      tierCosts[item.tier].push(item.sales_cost);
+    }
+    const tiersInGroup=Object.keys(tierCosts).filter(t=>tierOrder[t]!=null)
+      .sort((a,b)=>tierOrder[a]-tierOrder[b]);
+
+    for (let i=0;i<tiersInGroup.length-1;i++) {
+      const tLow=tiersInGroup[i], tHigh=tiersInGroup[i+1];
+      const costLow=avg(tierCosts[tLow]), costHigh=avg(tierCosts[tHigh]);
+      if (costLow!=null&&costHigh!=null&&costLow>costHigh) {
+        violations.push({layer:1, severity:'Critical', violation_type:'MONOTONICITY_BREACH',
+          region, tier:`${tLow} > ${tHigh}`, upgrade_years:parseInt(years)||null, part_number:null,
+          message:`Monotonicity breach: ${tLow} avg cost ${fmt(costLow)} > ${tHigh} avg cost ${fmt(costHigh)} —'${dtype} ${years}yr in ${region}`});
+      }
+    }
+  }
+  return violations;
+}
+
+function runLayer2(flatData, s) {
+  const violations=[];
+  for (const pair of RATIO_PAIRS) {
+    const min=parseFloat(s[pair.minKey])||0, max=parseFloat(s[pair.maxKey])||999;
+    // Group by (tier, delivery_type, region)
+    const groups=groupBy(flatData.filter(r=>r.sales_cost!=null),
+      r=>`${r.tier}|${r.delivery_type}|${r.region}`);
+
+    for (const [key, items] of groups) {
+      const [tier,dtype,region]=key.split('|');
+      const costsLo=items.filter(r=>r.upgrade_years===pair.lo).map(r=>r.sales_cost);
+      const costsHi=items.filter(r=>r.upgrade_years===pair.hi).map(r=>r.sales_cost);
+      if (!costsLo.length||!costsHi.length) continue;
+      const avgLo=avg(costsLo), avgHi=avg(costsHi);
+      if (!avgLo||!avgHi||avgLo===0) continue;
+      const ratio=avgHi/avgLo;
+      if (ratio<min) violations.push({layer:2, severity:'Critical', violation_type:'RATIO_BELOW_FLOOR',
+        region, tier, upgrade_years:pair.hi, part_number:null,
+        message:`${pair.label} ratio ${ratio.toFixed(3)} < floor ${min} for ${tier} ${dtype} in ${region}`});
+      else if (ratio>max) violations.push({layer:2, severity:'Warning', violation_type:'RATIO_ABOVE_CEILING',
+        region, tier, upgrade_years:pair.hi, part_number:null,
+        message:`${pair.label} ratio ${ratio.toFixed(3)} > ceiling ${max} for ${tier} ${dtype} in ${region}`});
+    }
+  }
+  return violations;
+}
+
+function runLayer3(flatData, s) {
+  const threshold=parseFloat(s.cross_geo_deviation_pct)||0.20;
+  const violations=[];
+  // Group by (tier, delivery_type, upgrade_years)
+  const groups=groupBy(flatData.filter(r=>r.sales_cost!=null),
+    r=>`${r.tier}|${r.delivery_type}|${r.upgrade_years}`);
+
+  for (const [key, items] of groups) {
+    const [tier,dtype,yearsStr]=key.split('|');
+    const years=parseInt(yearsStr)||null;
+    // Avg per region
+    const regionCosts={};
+    for (const item of items) {
+      if (!item.region) continue;
+      if (!regionCosts[item.region]) regionCosts[item.region]=[];
+      regionCosts[item.region].push(item.sales_cost);
+    }
+    const regionAvgs=Object.fromEntries(Object.entries(regionCosts).map(([r,arr])=>[r,avg(arr)]));
+    const allAvgs=Object.values(regionAvgs).filter(v=>v!=null);
+    if (allAvgs.length<2) continue;
+    const crossMean=avg(allAvgs);
+    if (!crossMean) continue;
+
+    const breaching=[];
+    for (const [region, ravg] of Object.entries(regionAvgs)) {
+      if (ravg==null) continue;
+      const dev=Math.abs(ravg-crossMean)/Math.abs(crossMean);
+      if (dev>threshold) breaching.push({region, ravg, dev});
+    }
+    if (!breaching.length) continue;
+    const severity=breaching.length>=3?'Systemic':'Warning';
+    const vtype=breaching.length>=3?'SYSTEMIC_CROSS_GEO':'CROSS_GEO_DEVIATION';
+    for (const b of breaching) {
+      violations.push({layer:3, severity, violation_type:vtype,
+        region:b.region, tier, upgrade_years:years, part_number:null,
+        message:`Cross-geo deviation ${(b.dev*100).toFixed(1)}% for ${tier} ${dtype} ${years}yr —'region ${b.region} avg ${fmt(b.ravg)} vs cross-mean ${fmt(crossMean)}${severity==='Systemic'?' (systemic: '+breaching.length+' regions)':''}`});
+    }
+  }
+  return violations;
+}
+
+function runLayer4(flatData, baseline, s) {
+  const cellThresh=parseFloat(s.yoy_cell_change_pct)||0.25;
+  const geoThresh=parseFloat(s.yoy_geo_avg_change_pct)||0.20;
+  const violations=[];
+
+  // Build current map: part_number+region →<avg sales_cost (take first occurrence)
+  const currentMap={};
+  for (const r of flatData) {
+    if (r.sales_cost==null||!r.part_number||!r.region) continue;
+    const k=`${r.part_number}|${r.region}`;
+    if (!currentMap[k]) currentMap[k]=[];
+    currentMap[k].push(r.sales_cost);
+  }
+  const currentAvg=Object.fromEntries(Object.entries(currentMap).map(([k,arr])=>[k,avg(arr)]));
+
+  // Build prior map
+  const priorMap={};
+  for (const b of baseline) priorMap[`${b.part_number}|${b.region}`]=b.prior_sales_cost;
+
+  // Cell-level check
+  const regionChanges={};
+  for (const [k, curVal] of Object.entries(currentAvg)) {
+    const priorVal=priorMap[k];
+    if (priorVal==null||priorVal===0) continue;
+    const [pn, region]=k.split('|');
+    const pctChange=(curVal-priorVal)/Math.abs(priorVal);
+    if (!regionChanges[region]) regionChanges[region]=[];
+    regionChanges[region].push(pctChange);
+    if (Math.abs(pctChange)>cellThresh) {
+      violations.push({layer:4, severity:'Critical', violation_type:'YOY_CELL_DRIFT',
+        region, tier:null, upgrade_years:null, part_number:pn,
+        message:`YoY cell drift ${(pctChange*100).toFixed(1)}% for ${pn} in ${region} (current: ${fmt(curVal)}, prior: ${fmt(priorVal)})`});
+    }
+  }
+  // Geo-level average check
+  for (const [region, changes] of Object.entries(regionChanges)) {
+    const avgChg=avg(changes);
+    if (avgChg!=null&&Math.abs(avgChg)>geoThresh) {
+      violations.push({layer:4, severity:'Warning', violation_type:'YOY_GEO_AVG_DRIFT',
+        region, tier:null, upgrade_years:null, part_number:null,
+        message:`YoY geo-avg drift ${(avgChg*100).toFixed(1)}% for region ${region} (avg across ${changes.length} SKUs)`});
+    }
+  }
+  return violations;
+}
+
+// 鈹€鈹€ LIST PRICE ENGINE 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function computeListPrices(cycleId) {
+  const s=await getSettings();
+  const tiers=await db.tier_sequence.toArray();
+  const tierKey=t=>t.tier_name.toLowerCase().replace(/[\s\/]+/g,'_');
+  const tierGM={}, tierMK={};
+  tiers.forEach(t=>{
+    const k=tierKey(t);
+    tierGM[t.tier_name]=parseFloat(s[`gm_pct_${k}`])||parseFloat(s.gm_pct_default)||0.30;
+    tierMK[t.tier_name]=parseFloat(s[`markup_pct_${k}`])||parseFloat(s.markup_pct_default)||0.30;
+  });
+  const defaultGM=parseFloat(s.gm_pct_default)||0.30;
+  const defaultMK=parseFloat(s.markup_pct_default)||0.30;
+
+  const allPrices=await loadCyclePrices(cycleId);
+  const violations=[];
+  for (const r of allPrices) {
+    if (r.sales_cost==null) continue;
+    const gm=tierGM[r.tier]??defaultGM;
+    const mk=tierMK[r.tier]??defaultMK;
+    const b2c=gm<1?r.sales_cost/(1-gm):r.sales_cost;
+    const b2b=r.sales_cost*(1+mk);
+
+    // Check channel price floor
+    if (r.channel_price!=null&&r.channel_price<r.sales_cost) {
+      violations.push({type:'CHANNEL_BELOW_COST', severity:'Critical',
+        message:`Channel price ${fmt(r.channel_price)} < sales cost ${fmt(r.sales_cost)} for ${r.part_number} in ${r.region}`});
+    }
+
+    await db.sku_prices.update(r.id, {computed_list_price_b2c:b2c, computed_quoted_floor_b2b:b2b});
+  }
+  return violations;
+}
+
+// 鈹€鈹€ EXPORT 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+async function exportCSV() {
+  const allPrices=await loadCyclePrices(currentCycleId);
+  if (!allPrices.length) { toast('No data to export','error'); return; }
+  const headers=['Part Number','Tier','Base Warranty','Upgrade','Delivery Type','Upgrade Years','Region',
+    'Sales Cost','Channel Price','Actual List Price','Computed B2C List Price','Computed B2B Floor'];
+  const rows=[headers.join(',')];
+  for (const r of allPrices) {
+    rows.push([r.part_number,r.tier,r.base_warranty,r.upgrade_description,r.delivery_type,
+      r.upgrade_years??'',r.region,r.sales_cost??'',r.channel_price??'',r.list_price??'',
+      r.computed_list_price_b2c??'',r.computed_quoted_floor_b2b??''
+    ].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  }
+  downloadFile(rows.join('\n'), 'gve_results.csv', 'text/csv');
+  toast('CSV downloaded','success');
+}
+
+async function exportGVEReport() {
+  const cycle=await db.cycles.get(currentCycleId);
+  const violations=await db.gve_results.where('cycle_id').equals(currentCycleId).toArray();
+  const summary=await getGVESummary(currentCycleId);
+  const {Critical,Systemic,Warning}=summary;
+  const status=Critical.unresolved>0?'BLOCKED':Systemic.unresolved>0?'SYSTEMIC':Warning.unresolved>0?'WARNINGS':'CLEAR';
+  const statusColor={'BLOCKED':'#dc2626','SYSTEMIC':'#ea580c','WARNINGS':'#d97706','CLEAR':'#16a34a'};
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>GVE Report —'${cycle.name}</title>
+  <style>body{font-family:sans-serif;font-size:13px;color:#1f2937;padding:24px}
+  h1{color:#2d1b69;margin-bottom:4px}.summary{display:flex;gap:16px;margin:16px 0}
+  .sc{padding:12px 20px;border-radius:6px;background:#f3f4f6;text-align:center}
+  .sc .v{font-size:24px;font-weight:700}.sc .l{font-size:11px;color:#6b7280}
+  table{width:100%;border-collapse:collapse;margin-top:16px}th,td{text-align:left;padding:7px 10px;border-bottom:1px solid #e5e7eb}
+  th{background:#f8fafc;font-weight:600}.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .cr{background:#fee2e2;color:#991b1b}.sy{background:#ffedd5;color:#9a3412}.wa{background:#fef9c3;color:#854d0e}
+  </style></head><body>
+  <h1>GVE Validation Report —'${cycle.name}</h1>
+  <p>Fiscal Year: ${cycle.fiscal_year||'—'} &nbsp;|&nbsp; Generated: ${new Date().toISOString().slice(0,16).replace('T',' ')}
+  &nbsp;|&nbsp; Status: <strong style="color:${statusColor[status]}">${status}</strong></p>
+  <div class="summary">
+    <div class="sc"><div class="v" style="color:#dc2626">${Critical.total}</div><div class="l">Critical (${Critical.unresolved} unresolved)</div></div>
+    <div class="sc"><div class="v" style="color:#ea580c">${Systemic.total}</div><div class="l">Systemic (${Systemic.unresolved} unresolved)</div></div>
+    <div class="sc"><div class="v" style="color:#d97706">${Warning.total}</div><div class="l">Warnings (${Warning.unresolved} unresolved)</div></div>
+  </div>
+  <table><thead><tr><th>Layer</th><th>Severity</th><th>Region</th><th>Tier</th><th>Years</th><th>Part #</th><th>Message</th><th>Resolved</th><th>Explanation</th></tr></thead>
+  <tbody>${violations.sort((a,b)=>sevOrder(a.severity)-sevOrder(b.severity)).map(v=>{
+    const cls={Critical:'cr',Systemic:'sy',Warning:'wa'}[v.severity]||'';
+    return `<tr><td>L${v.layer}</td><td><span class="badge ${cls}">${v.severity}</span></td>
+      <td>${v.region||'—'}</td><td>${v.tier||'—'}</td><td>${v.upgrade_years??'—'}</td>
+      <td style="font-family:monospace;font-size:11px">${v.part_number||'—'}</td>
+      <td>${v.message}</td><td>${v.is_resolved?'Yes':'No'}</td><td>${v.explanation||''}</td></tr>`;
+  }).join('')}</tbody></table><script>
+window.addEventListener('error', function(e) {
+  var el = document.getElementById('_err');
+  if (el) el.textContent = 'Error: ' + e.message + ' (line ' + e.lineno + ')';
+});
+window.addEventListener('unhandledrejection', function(e) {
+  var el = document.getElementById('_err');
+  if (el) el.textContent = 'Promise error: ' + (e.reason && e.reason.message || e.reason);
+});
+<\/script>
+</body></html>`;
+
+  downloadFile(html, `gve_report_${cycle.name.replace(/\s+/g,'_')}.html`, 'text/html');
+  toast('GVE report downloaded','success');
+}
+
+function downloadFile(content, filename, mime) {
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download=filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+// 鈹€鈹€ INIT 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
+
+function showFatal(title, detail) {
+  app().innerHTML=`<div style="padding:40px;text-align:center;color:#991b1b">
+    <h2>${title}</h2>
+    <pre style="margin:12px auto;max-width:700px;text-align:left;background:#fef2f2;border:1px solid #fca5a5;border-radius:6px;padding:12px;font-size:12px;white-space:pre-wrap;color:#7f1d1d">${detail}</pre>
+    <p style="margin-top:8px;font-size:13px;color:#6b7280">Use Chrome or Edge &nbsp;·&nbsp; Open as a local file (not a network drive) &nbsp;·&nbsp; Allow local file access if prompted</p>
+  </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('[GPS4] DOMContentLoaded fired');
+  document.getElementById('_err').textContent = 'DOMContentLoaded — opening database…';
+  // Timeout guard: if initDB hangs for >6 s, surface a diagnostic message
+  let dbDone = false;
+  const timer = setTimeout(() => {
+    if (!dbDone) showFatal('Database timed out',
+      'IndexedDB did not respond within 6 seconds.\n\nPossible causes:\n' +
+      '  • File opened from a network / UNC path (\\\\server\\share\\...)\n' +
+      '  • Browser blocking IndexedDB for file:// pages\n' +
+      '  • Another tab has this database open in a broken state\n\n' +
+      'Try: open in Chrome or Edge → address bar should start with  file:///C:/...');
+  }, 6000);
+
+  try {
+    await initDB();
+    dbDone = true;
+    clearTimeout(timer);
+  } catch(e) {
+    dbDone = true;
+    clearTimeout(timer);
+    showFatal('Failed to initialise database',
+      (e.name ? e.name + ': ' : '') + e.message + (e.stack ? '\n\n' + e.stack : ''));
+    return;
+  }
+  currentUser=localStorage.getItem('gps4_user');
+  window.addEventListener('hashchange', route);
+  try {
+    await route();
+  } catch(e) {
+    showFatal('Error rendering page', (e.name?e.name+': ':'')+e.message+(e.stack?'\n\n'+e.stack:''));
+  }
+});

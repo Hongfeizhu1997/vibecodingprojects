@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — GPS Pricing Stage 3</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", Arial, sans-serif; background: #f0f2f5; color: #212529;
+           min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .login-card { background: #fff; border-radius: 10px; padding: 40px 36px;
+                  box-shadow: 0 2px 12px rgba(0,0,0,.10); width: 360px; max-width: 95vw; }
+    .brand { font-size: 1.1em; font-weight: 700; color: #1a2438; margin-bottom: 4px; }
+    .brand span { color: #4ea8de; }
+    .subtitle { font-size: .85em; color: #6c757d; margin-bottom: 28px; }
+    label { display: block; font-size: .875em; font-weight: 500; margin-bottom: 5px; color: #495057; }
+    input[type=text] { width: 100%; padding: 9px 12px; border: 1px solid #dee2e6; border-radius: 6px;
+                       font-size: .9em; font-family: inherit; outline: none; margin-bottom: 18px; }
+    input[type=text]:focus { border-color: #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,.15); }
+    .btn { width: 100%; padding: 9px; border-radius: 6px; border: none;
+           background: #0d6efd; color: #fff; font-size: .9em; font-weight: 600;
+           cursor: pointer; transition: filter .15s; }
+    .btn:hover { filter: brightness(.92); }
+    .error { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7;
+             border-radius: 6px; padding: 10px 14px; font-size: .85em; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="brand">GPS Pricing <span>Stage 3</span></div>
+    <div class="subtitle">Sales Cost Workbench</div>
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+    <form method="POST" action="/login">
+      <label for="username">Your name</label>
+      <input type="text" id="username" name="username" placeholder="Enter your name"
+             autocomplete="off" autofocus>
+      <button type="submit" class="btn">Login</button>
+    </form>
+  </div>
+</body>
+</html>

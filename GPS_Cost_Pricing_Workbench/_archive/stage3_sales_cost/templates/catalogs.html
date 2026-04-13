@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% block title %}Uplift Catalogs — GPS Pricing Stage 3{% endblock %}
+
+{% block content %}
+<div class="flex-between" style="margin-bottom:20px">
+  <div class="page-title" style="margin:0">Uplift Catalogs</div>
+  <button class="btn btn-primary" onclick="showCatalogForm(null)">+ New Catalog</button>
+</div>
+
+<!-- Catalogs table -->
+<div class="card">
+  <div id="catalogsTableBody"><div class="spinner"></div> Loading…</div>
+</div>
+
+<!-- Inline catalog form -->
+<div id="catalogFormCard" class="card" style="display:none">
+  <div class="card-header">
+    <div class="card-title" id="catalogFormTitle">New Catalog</div>
+    <button class="btn btn-outline btn-sm" onclick="hideCatalogForm()">✕ Cancel</button>
+  </div>
+  <div id="catalogFormAlert"></div>
+  <div class="grid-2">
+    <div class="form-group">
+      <label>Catalog ID</label>
+      <input type="text" id="cf_catalog_id" placeholder="e.g. SUPPORTSERVICE_EMEA_01">
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" id="cf_description" placeholder="Short description">
+    </div>
+    <div class="form-group">
+      <label>Type of Service</label>
+      <input type="text" id="cf_tos" placeholder="e.g. Support Service">
+    </div>
+    <div class="form-group">
+      <label>GEO</label>
+      <input type="text" id="cf_geo" placeholder="e.g. EMEA">
+    </div>
+    <div class="form-group">
+      <label>Valid From</label>
+      <input type="date" id="cf_valid_from">
+    </div>
+    <div class="form-group">
+      <label>Valid To</label>
+      <input type="date" id="cf_valid_to">
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="cf_status">
+        <option>Draft</option>
+        <option>Released</option>
+        <option>Retired</option>
+      </select>
+    </div>
+  </div>
+
+  <hr class="section-sep">
+  <div class="section-title">Factor Selection</div>
+  <p class="text-muted" style="margin-bottom:12px">
+    Click a factor to move it between panels. Selected factors define which dimensions this catalog covers.
+  </p>
+  <div class="factor-selector">
+    <div style="flex:1">
+      <div class="factor-panel-header">Available Factors</div>
+      <div class="factor-panel" id="cf_availPanel"></div>
+    </div>
+    <div style="flex:1">
+      <div class="factor-panel-header">Selected Factors</div>
+      <div class="factor-panel" id="cf_selectedPanel"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px">
+    <button class="btn btn-primary" onclick="saveCatalog()">Save Catalog</button>
+    <button class="btn btn-outline" style="margin-left:8px" onclick="hideCatalogForm()">Cancel</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let allFactorDefs = [];
+let editingCatalogId = null;
+
+async function loadFactorDefs() {
+  if (allFactorDefs.length) return;
+  const r = await fetch("/api/uplift-factors");
+  allFactorDefs = await r.json();
+}
+
+async function loadCatalogsTable() {
+  const r = await fetch("/api/catalogs");
+  const cats = await r.json();
+  const el = document.getElementById("catalogsTableBody");
+
+  if (!cats.length) {
+    el.innerHTML = '<p class="text-muted">No catalogs yet. Click <b>+ New Catalog</b> to create one.</p>';
+    return;
+  }
+
+  let html = `<table>
+    <tr>
+      <th>Catalog ID</th><th>Description</th><th>Type of Service</th><th>GEO</th>
+      <th>Status</th><th># Factors</th><th>Valid From</th><th>Valid To</th><th>Created By</th><th></th>
+    </tr>`;
+  cats.forEach(c => {
+    html += `<tr>
+      <td style="font-family:monospace;font-size:.82em">${c.catalog_id}</td>
+      <td>${c.description || ''}</td>
+      <td>${c.type_of_service || ''}</td>
+      <td>${c.geo || ''}</td>
+      <td>${statusBadge(c.status)}</td>
+      <td>${c.factor_count}</td>
+      <td>${c.valid_from || ''}</td>
+      <td>${c.valid_to || ''}</td>
+      <td>${c.created_by || ''}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="showCatalogForm(${c.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteCatalog(${c.id},'${c.catalog_id}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+  html += `</table>`;
+  el.innerHTML = html;
+}
+
+async function showCatalogForm(dbId) {
+  await loadFactorDefs();
+  editingCatalogId = dbId;
+  const card = document.getElementById("catalogFormCard");
+  document.getElementById("catalogFormAlert").innerHTML = "";
+
+  let selectedIds = new Set();
+  let selectedFactors = [];
+
+  if (dbId) {
+    const r = await fetch(`/api/catalogs/${dbId}`);
+    const cat = await r.json();
+    document.getElementById("catalogFormTitle").textContent = `Edit Catalog: ${cat.catalog_id}`;
+    document.getElementById("cf_catalog_id").value = cat.catalog_id;
+    document.getElementById("cf_catalog_id").disabled = true;
+    document.getElementById("cf_description").value = cat.description || "";
+    document.getElementById("cf_tos").value = cat.type_of_service || "";
+    document.getElementById("cf_geo").value = cat.geo || "";
+    document.getElementById("cf_valid_from").value = cat.valid_from || "";
+    document.getElementById("cf_valid_to").value = cat.valid_to || "";
+    document.getElementById("cf_status").value = cat.status || "Draft";
+    selectedIds = new Set((cat.factors || []).map(f => f.factor_def_id));
+    selectedFactors = cat.factors || [];
+  } else {
+    document.getElementById("catalogFormTitle").textContent = "New Catalog";
+    document.getElementById("cf_catalog_id").value = "";
+    document.getElementById("cf_catalog_id").disabled = false;
+    document.getElementById("cf_description").value = "";
+    document.getElementById("cf_tos").value = "";
+    document.getElementById("cf_geo").value = "";
+    document.getElementById("cf_valid_from").value = "";
+    document.getElementById("cf_valid_to").value = "";
+    document.getElementById("cf_status").value = "Draft";
+  }
+
+  renderFactorPanels(selectedIds, selectedFactors);
+  card.style.display = "";
+  card.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderFactorPanels(selectedIds, selectedFactors) {
+  const availEl = document.getElementById("cf_availPanel");
+  const selEl   = document.getElementById("cf_selectedPanel");
+  availEl.innerHTML = "";
+  selEl.innerHTML = "";
+
+  const defMap = {};
+  allFactorDefs.forEach(f => defMap[f.id] = f);
+
+  allFactorDefs.forEach(f => {
+    if (!selectedIds.has(f.id)) availEl.appendChild(makeFactorItem(f, false));
+  });
+
+  const selOrder = selectedFactors && selectedFactors.length
+    ? selectedFactors.map(f => defMap[f.factor_def_id]).filter(Boolean)
+    : allFactorDefs.filter(f => selectedIds.has(f.id));
+  selOrder.forEach(f => selEl.appendChild(makeFactorItem(f, true)));
+}
+
+function makeFactorItem(f, isSelected) {
+  const div = document.createElement("div");
+  div.className = "factor-item";
+  div.dataset.id = f.id;
+  div.innerHTML = `<span>${f.factor_name}</span> ${clsBadge(f.classification)}`;
+  div.onclick = () => toggleFactor(f.id, isSelected);
+  return div;
+}
+
+function toggleFactor(fid, isCurrentlySelected) {
+  const availEl = document.getElementById("cf_availPanel");
+  const selEl   = document.getElementById("cf_selectedPanel");
+  const defMap  = {};
+  allFactorDefs.forEach(f => defMap[f.id] = f);
+  const f = defMap[fid];
+
+  if (isCurrentlySelected) {
+    const item = selEl.querySelector(`[data-id="${fid}"]`);
+    if (item) selEl.removeChild(item);
+    availEl.appendChild(makeFactorItem(f, false));
+  } else {
+    const item = availEl.querySelector(`[data-id="${fid}"]`);
+    if (item) availEl.removeChild(item);
+    selEl.appendChild(makeFactorItem(f, true));
+  }
+}
+
+function hideCatalogForm() {
+  document.getElementById("catalogFormCard").style.display = "none";
+  editingCatalogId = null;
+}
+
+async function saveCatalog() {
+  const alertEl = document.getElementById("catalogFormAlert");
+  alertEl.innerHTML = "";
+
+  const catalog_id = document.getElementById("cf_catalog_id").value.trim();
+  const description = document.getElementById("cf_description").value.trim();
+  const type_of_service = document.getElementById("cf_tos").value.trim();
+  const geo = document.getElementById("cf_geo").value.trim();
+  const valid_from = document.getElementById("cf_valid_from").value || null;
+  const valid_to = document.getElementById("cf_valid_to").value || null;
+  const status = document.getElementById("cf_status").value;
+
+  if (!catalog_id) {
+    alertEl.innerHTML = '<div class="alert alert-danger">Catalog ID is required.</div>';
+    return;
+  }
+
+  const selEl = document.getElementById("cf_selectedPanel");
+  const factor_def_ids = [...selEl.querySelectorAll(".factor-item")].map(el => parseInt(el.dataset.id));
+
+  const body = { catalog_id, description, type_of_service, geo, valid_from, valid_to, status, factor_def_ids };
+
+  let r;
+  if (editingCatalogId) {
+    r = await api("PUT", `/api/catalogs/${editingCatalogId}`, body);
+  } else {
+    r = await api("POST", "/api/catalogs", body);
+  }
+  const data = await r.json();
+  if (data.error) {
+    alertEl.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+    return;
+  }
+  hideCatalogForm();
+  loadCatalogsTable();
+}
+
+async function deleteCatalog(dbId, catalogId) {
+  if (!confirm(`Delete catalog "${catalogId}"? This cannot be undone.`)) return;
+  const r = await api("DELETE", `/api/catalogs/${dbId}`);
+  const data = await r.json();
+  if (data.error) { alert(data.error); return; }
+  loadCatalogsTable();
+}
+
+loadCatalogsTable();
+</script>
+{% endblock %}

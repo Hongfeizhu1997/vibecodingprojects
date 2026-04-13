@@ -1,0 +1,96 @@
+You are helping me build an offline desktop tool called the **GPS Pricing Workbench** for Lenovo's Global Product Support (GPS) division. This tool manages the end-to-end service pricing workflow — from standard cost input through to validated list price output.
+
+## Business context
+
+GPS sells warranty and service products (base warranty, extended warranty, ADP accidental damage protection, Premier Support) attached to Lenovo hardware (ThinkPad, IdeaPad, Legion, Commercial). Pricing is set at point-of-sale but costs are incurred over a 3–5 year delivery window, so prices must be forward-looking, not just based on historical actuals.
+
+The current process is entirely Excel-based and manual. This tool replaces it with a structured, validated, auditable workflow.
+
+## Core data dimensions
+
+Every cost and price record is identified by four dimensions:
+- **Product category**: ThinkPad, IdeaPad, Legion, Commercial
+- **Service type**: 1yr Base, 3yr Base, 5yr Base, 3yr ADP, Premier 3yr
+- **Geography**: NA, EMEA, APJ, China
+- **Cycle year**: annual pricing cycle (e.g. FY2025, FY2026)
+
+## The five-stage workflow the tool must support
+
+**Stage 1 — Standard Cost import**
+Users import a Standard Cost matrix (CSV or manual entry) segmented by the four dimensions above. Standard Cost is the backward-looking actuals baseline produced by Finance. No calculation happens here — it is input only.
+
+**Stage 2 — Forward Adjustment (Standard Cost → Projected Service Cost)**
+For each cell, the user applies five forward adjustment factors:
+- F_failure: failure rate adjustment (ratio of projected vs historical failure rate)
+- F_parts: weighted component cost index (accounts for NAND cycles, panel indices, obsolescence risk)
+- F_labor: regional labor and logistics inflation
+- F_mix: product mix and attach rate correction
+Each factor must have a source label and an owner field. The formula is:
+`PSC = Standard Cost × F_failure × F_parts × F_labor × F_mix`
+Factors can be set at cell level, row level (applies to all service types for a product), or column level (applies to all products for a service type). Cell-level overrides row/column defaults.
+
+**Stage 3 — Sales Cost calculation**
+`Sales Cost = PSC × (1 + R_contingency) × (1 + R_overhead)`
+- R_contingency is selected from a lookup table based on platform maturity (new / mature refresh / mature) and service window (1–3yr / 4–5yr). These six rates are configurable in settings.
+- R_overhead is a single global rate set annually in settings (total GPS fixed cost ÷ projected units).
+Sales Cost is the inviolable pricing floor — it must never be manually overridden to a lower value.
+
+**Stage 4 — Gradient Validation Engine (GVE)**
+After Sales Cost is calculated for all cells in a geography, run automated validation across the full matrix. This is the most important feature of the tool. Four validation layers:
+
+**Layer 1 — Directional monotonicity (hard blocks)**
+- Within each product row: 1yr < 3yr < 5yr; ADP > 3yr Base; Premier > 3yr Base
+- Within each service column: Commercial ≥ ThinkPad ≥ Legion ≥ IdeaPad
+Any violation = Critical flag, blocks submission.
+
+**Layer 2 — Ratio bands (amber/red by threshold)**
+Check these ratios per product row and flag if outside band:
+- 3yr/1yr: expected 1.8×–2.8×
+- 5yr/3yr: expected 1.3×–1.7×
+- ADP/3yr: expected 1.6×–2.8×
+- Premier/3yr: expected 1.4×–2.2×
+Below floor = Critical. Above ceiling = Warning.
+
+**Layer 3 — Cross-geo structural consistency**
+Compare the same structural ratios (e.g. ThinkPad/IdeaPad per service column, 5yr/3yr per product row) across all four geographies. If any geography deviates >20% from the cross-geo mean for the same ratio, flag it as a Warning. If the same violation appears in 3+ geographies, escalate it as Systemic — this indicates a methodology error, not a data error.
+
+**Layer 4 — Year-over-year drift**
+Compare each cell to prior cycle's validated Sales Cost:
+- Individual cell change >±25%: requires a written explanation before submission
+- Structural ratio change >±15%: flag for Pricing Committee review
+- Geo-level average change >±20%: flag for Supply Chain review
+
+GVE produces a Gradient Health Report per geography with status: Clear / Blocked (critical flags unresolved) / Systemic (cross-geo methodology issue). A geography cannot proceed to list price derivation until its GVE status is Clear.
+
+**Stage 5 — List Price derivation**
+Two models:
+- B2C: `List Price = Sales Cost ÷ (1 – Target GM%)` — GM% is configurable per product category
+- B2B: `Quoted Price Floor = Sales Cost × (1 + Target Markup%)` — Markup% is configurable per product category; system also outputs a pricing band (floor to ceiling)
+
+Additionally, run three output validation checks and surface results alongside the list price:
+- Competitive check: compare derived list price against a manually-maintained competitive price index (user enters Dell/HP benchmark prices per cell); flag if list price exceeds competitive ceiling
+- Device price ratio check: user enters device list price per product category; flag if service/device ratio exceeds configurable threshold (default 20% for consumer, 15% for commercial)
+- Attach rate sensitivity: for a given price elasticity assumption (configurable), show projected attach rate at base price, +5%, and -5%, with the resulting net margin per unit at each scenario
+
+## Data persistence and audit trail
+
+- All data stored locally (SQLite is fine, or JSON flat files — your choice based on what works best offline)
+- Every change to any factor, rate, or override must be logged: timestamp, user (simple name field, no auth required), old value, new value, reason field
+- Each pricing cycle is a versioned snapshot — prior cycles are read-only once submitted
+- Export: full matrix as CSV, Gradient Health Report as PDF or formatted HTML, list price output as CSV
+
+## UI requirements
+
+- Desktop app (Electron, Tauri, or a local web server with browser UI — recommend whichever gives the best offline experience)
+- The central UI is a matrix table view: rows = product categories, columns = service types, with geography tabs. Each cell shows the current stage value (standard cost / PSC / sales cost / list price depending on active stage view) with a colored status indicator (green/amber/red from GVE)
+- Side panel: when a cell is selected, show all inputs, computed values, factor breakdown, and any GVE flags for that cell
+- GVE issues panel: a dedicated view listing all violations across the full matrix with filter by severity, geography, and systemic status
+- Settings page: R_overhead, R_contingency lookup table, GM% and markup% by product, ratio band thresholds, competitive price index, device prices
+
+## What to build first
+
+Start with the data model, the Stage 1–3 workflow (import → forward adjustment → sales cost), and the Stage 4 GVE validation engine with the matrix view UI. Stage 5 list price and export can follow once the core pipeline is working.
+
+Use whichever stack you judge best for a reliable offline desktop tool. Prioritize correctness of the GVE validation logic and the audit trail over visual polish in the first version.
+
+I will provide more detail on specific formulas, edge cases, and UI preferences as we go. Ask me clarifying questions if anything is ambiguous before writing significant amounts of code.

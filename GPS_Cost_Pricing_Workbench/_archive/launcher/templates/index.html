@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPS Pricing Workbench</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #1a1d27;
+      border-bottom: 1px solid #2d3148;
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header .brand {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #e2031a;
+    }
+    header .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #f0f4ff;
+    }
+    header .divider { color: #3a3f5c; }
+
+    /* ── Pipeline bar ── */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 32px 40px 8px;
+    }
+    .pipe-step {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .pipe-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: default;
+    }
+    .pipe-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      border: 2px solid;
+      transition: box-shadow .2s;
+    }
+    .pipe-node.active   .pipe-circle { background: #1e3a5f; border-color: #4a9eff; color: #4a9eff; }
+    .pipe-node.coming   .pipe-circle { background: #1a1d27; border-color: #3a3f5c; color: #4a5068; }
+    .pipe-label {
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .pipe-node.active .pipe-label { color: #94b8e0; }
+    .pipe-node.coming .pipe-label { color: #3a4060; }
+
+    .pipe-arrow {
+      width: 48px;
+      height: 2px;
+      background: #2d3148;
+      position: relative;
+      margin: 0 2px;
+      margin-bottom: 22px;
+    }
+    .pipe-arrow::after {
+      content: "";
+      position: absolute;
+      right: -1px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left-color: #2d3148;
+    }
+
+    /* ── Cards grid ── */
+    .cards {
+      display: flex;
+      gap: 20px;
+      padding: 24px 40px 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 10px;
+      width: 200px;
+      padding: 22px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .card.active { border-color: #2a3d5c; }
+    .card.active:hover { border-color: #4a9eff; box-shadow: 0 0 16px rgba(74,158,255,.12); }
+    .card.coming { opacity: .45; }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .stage-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .card.active  .stage-badge { background: #1e3a5f; color: #4a9eff; }
+    .card.coming  .stage-badge { background: #1e1f2e; color: #4a5068; }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 3px;
+      flex-shrink: 0;
+      transition: background .4s;
+    }
+    .dot-running  { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.5); }
+    .dot-offline  { background: #4a5068; }
+    .dot-checking { background: #f59e0b; }
+    .dot-soon     { background: #2d3148; }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #c8d8f0;
+      line-height: 1.3;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: #5a6480;
+      line-height: 1.5;
+      flex: 1;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+    .port-label {
+      font-size: 11px;
+      color: #3a4060;
+      font-family: monospace;
+    }
+    .open-btn {
+      display: inline-block;
+      padding: 5px 14px;
+      background: #1e3a5f;
+      color: #4a9eff;
+      border: 1px solid #2a5080;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .open-btn:hover { background: #254a78; border-color: #4a9eff; }
+    .open-btn.disabled {
+      background: #1a1d27;
+      color: #3a4060;
+      border-color: #2d3148;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .soon-label {
+      font-size: 11px;
+      color: #3a4060;
+      font-style: italic;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      text-align: center;
+      font-size: 11px;
+      color: #3a4060;
+      padding-bottom: 24px;
+    }
+    #last-checked { color: #4a5068; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="brand">Lenovo GPS</span>
+  <span class="divider">|</span>
+  <span class="title">Pricing Workbench</span>
+</header>
+
+<!-- Pipeline bar -->
+<div class="pipeline">
+  {% for stage in stages %}
+    <div class="pipe-step">
+      <div class="pipe-node {{ 'active' if stage.status == 'active' else 'coming' }}">
+        <div class="pipe-circle">{{ stage.id }}</div>
+        <div class="pipe-label">{{ stage.name }}</div>
+      </div>
+      {% if not loop.last %}
+      <div class="pipe-arrow"></div>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Stage cards -->
+<div class="cards">
+  {% for stage in stages %}
+  <div class="card {{ 'active' if stage.status == 'active' else 'coming' }}" id="card-{{ stage.id }}">
+    <div class="card-header">
+      <span class="stage-badge">Stage {{ stage.id }}</span>
+      <span class="status-dot {{ 'dot-checking' if stage.status == 'active' else 'dot-soon' }}"
+            id="dot-{{ stage.id }}"></span>
+    </div>
+    <div class="card-title">{{ stage.name }}</div>
+    <div class="card-desc">{{ stage.description }}</div>
+    <div class="card-footer">
+      <span class="port-label">:{{ stage.port }}</span>
+      {% if stage.status == 'active' %}
+        <a class="open-btn disabled" id="btn-{{ stage.id }}"
+           href="http://localhost:{{ stage.port }}" target="_blank">Open</a>
+      {% else %}
+        <span class="soon-label">Coming soon</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="status-bar">
+  Auto-refreshing status &mdash; last checked: <span id="last-checked">—</span>
+</div>
+
+<script>
+  async function refreshStatus() {
+    try {
+      const res = await fetch("/api/status");
+      const data = await res.json();
+      for (const [id, state] of Object.entries(data)) {
+        const dot = document.getElementById("dot-" + id);
+        const btn = document.getElementById("btn-" + id);
+        if (!dot) continue;
+        dot.className = "status-dot";
+        if (state === "running") {
+          dot.classList.add("dot-running");
+          if (btn) btn.classList.remove("disabled");
+        } else if (state === "offline") {
+          dot.classList.add("dot-offline");
+          if (btn) btn.classList.add("disabled");
+        } else {
+          dot.classList.add("dot-soon");
+        }
+      }
+      const now = new Date();
+      document.getElementById("last-checked").textContent =
+        now.toLocaleTimeString();
+    } catch (e) {
+      // launcher itself may be starting up
+    }
+  }
+
+  refreshStatus();
+  setInterval(refreshStatus, 10000);
+</script>
+
+</body>
+</html>

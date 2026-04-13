@@ -1,0 +1,919 @@
+{% extends "base.html" %}
+{% block title %}Cycle — GPS Pricing Stage 3{% endblock %}
+
+{% block content %}
+<div id="cycleHeader" style="margin-bottom:20px">
+  <div class="flex-between">
+    <div>
+      <a href="/" style="font-size:.85em;color:#6c757d">← All Cycles</a>
+      <div class="page-title" style="margin:4px 0 0" id="cycleTitle">Loading…</div>
+    </div>
+    <div class="flex" id="cycleActions"></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active"  onclick="showTab('import',   this)">1. SKU Data</div>
+  <div class="tab"         onclick="showTab('catalogs', this)">2. Catalogs</div>
+  <div class="tab"         onclick="showTab('rules',    this)">3. Rules</div>
+  <div class="tab"         onclick="showTab('calc',     this)">4. Calculate</div>
+  <div class="tab"         onclick="showTab('export',   this)">5. Export</div>
+</div>
+
+<!-- ===== TAB 1: SKU DATA ===== -->
+<div id="tab-import">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Import SKU Data</div>
+    </div>
+    <div class="alert alert-info" style="margin-bottom:16px">
+      Upload an Excel file (.xlsx) matching the reference format, or a CSV file.
+      Excel files can also contain Uplift Catalogs and Rules.
+    </div>
+
+    <!-- Drop zone -->
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('importFile').click()">
+      <p>Drag &amp; drop an .xlsx or .csv file here, or click to browse</p>
+      <input type="file" id="importFile" accept=".xlsx,.csv,.txt"
+             style="display:none" onchange="doFileImport(this.files[0])">
+      <button class="btn btn-outline btn-sm" type="button">Browse…</button>
+    </div>
+
+    <hr class="section-sep">
+
+    <div class="form-group">
+      <label>Or paste CSV text</label>
+      <textarea id="importText" rows="5"
+        placeholder="Service PN,Short Description,Type of Service,GEO,Country,Standard Cost ( Base Cost ),Currency&#10;..."></textarea>
+    </div>
+    <button class="btn btn-secondary" onclick="doTextImport()">Import from Text</button>
+
+    <div id="importResult" style="margin-top:16px"></div>
+  </div>
+
+  <!-- Summary -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">SKU Summary</div>
+      <button class="btn btn-outline btn-sm" onclick="loadSkuSummary()">Refresh</button>
+    </div>
+    <div id="skuSummaryBody"><p class="text-muted">No data yet.</p></div>
+  </div>
+
+  <!-- SKU table -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Imported SKUs</div>
+      <div class="flex">
+        <select id="filterGeo" style="width:120px" onchange="loadSkuTable(1)">
+          <option value="">All GEOs</option>
+        </select>
+        <select id="filterTos" style="width:160px" onchange="loadSkuTable(1)">
+          <option value="">All Service Types</option>
+        </select>
+      </div>
+    </div>
+    <div id="skuTableBody"><p class="text-muted">Import data to see SKUs.</p></div>
+    <div id="skuPagination" class="pagination" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- ===== TAB 2: CATALOGS ===== -->
+<div id="tab-catalogs" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Uplift Catalogs</div>
+      <button class="btn btn-primary" onclick="showCatalogForm(null)">+ New Catalog</button>
+    </div>
+    <div id="catalogsTableBody"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Inline catalog form -->
+  <div id="catalogFormCard" class="card" style="display:none">
+    <div class="card-header">
+      <div class="card-title" id="catalogFormTitle">New Catalog</div>
+      <button class="btn btn-outline btn-sm" onclick="hideCatalogForm()">✕ Cancel</button>
+    </div>
+    <div id="catalogFormAlert"></div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Catalog ID</label>
+        <input type="text" id="cf_catalog_id" placeholder="e.g. SUPPORTSERVICE_EMEA_01">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="cf_description" placeholder="Short description">
+      </div>
+      <div class="form-group">
+        <label>Type of Service</label>
+        <input type="text" id="cf_tos" placeholder="e.g. Support Service">
+      </div>
+      <div class="form-group">
+        <label>GEO</label>
+        <input type="text" id="cf_geo" placeholder="e.g. EMEA">
+      </div>
+      <div class="form-group">
+        <label>Valid From</label>
+        <input type="date" id="cf_valid_from">
+      </div>
+      <div class="form-group">
+        <label>Valid To</label>
+        <input type="date" id="cf_valid_to">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="cf_status">
+          <option>Draft</option>
+          <option>Released</option>
+          <option>Retired</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="section-sep">
+    <div class="section-title">Factor Selection</div>
+    <p class="text-muted" style="margin-bottom:12px">Click a factor to move it between panels. Selected factors will be included in this catalog.</p>
+    <div class="factor-selector">
+      <div style="flex:1">
+        <div class="factor-panel-header">Available Factors</div>
+        <div class="factor-panel" id="cf_availPanel"></div>
+      </div>
+      <div style="flex:1">
+        <div class="factor-panel-header">Selected Factors</div>
+        <div class="factor-panel" id="cf_selectedPanel"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      <button class="btn btn-primary" onclick="saveCatalog()">Save Catalog</button>
+      <button class="btn btn-outline" style="margin-left:8px" onclick="hideCatalogForm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 3: RULES ===== -->
+<div id="tab-rules" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Uplift Rules</div>
+      <button class="btn btn-primary" onclick="showRuleForm(null)">+ New Rule</button>
+    </div>
+    <div id="rulesTableBody"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Inline rule form -->
+  <div id="ruleFormCard" class="card" style="display:none">
+    <div class="card-header">
+      <div class="card-title" id="ruleFormTitle">New Rule</div>
+      <button class="btn btn-outline btn-sm" onclick="hideRuleForm()">✕ Cancel</button>
+    </div>
+    <div id="ruleFormAlert"></div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Rule ID</label>
+        <input type="text" id="rf_rule_id" placeholder="e.g. SUPPORTSERVICE_EMEA_UPRULE_01">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" id="rf_description">
+      </div>
+      <div class="form-group">
+        <label>Catalog <span class="text-muted">(determines factor set)</span></label>
+        <select id="rf_catalog_id" onchange="onCatalogChange()">
+          <option value="">— Select catalog —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="rf_status">
+          <option>Draft</option>
+          <option>Released</option>
+          <option>Retired</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Valid From</label>
+        <input type="date" id="rf_valid_from">
+      </div>
+      <div class="form-group">
+        <label>Valid To</label>
+        <input type="date" id="rf_valid_to">
+      </div>
+    </div>
+
+    <hr class="section-sep">
+    <div class="section-title">Factor Rates</div>
+    <div id="rf_factorsBody">
+      <p class="text-muted">Select a catalog to see its factors.</p>
+    </div>
+    <div id="rf_totalRatio" style="margin-top:12px;font-weight:600;font-size:.95em;color:#1a2438"></div>
+
+    <div style="margin-top:20px">
+      <button class="btn btn-primary" onclick="saveRule()">Save Rule</button>
+      <button class="btn btn-outline" style="margin-left:8px" onclick="hideRuleForm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 4: CALCULATE ===== -->
+<div id="tab-calc" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Run Calculation</div>
+    </div>
+    <div class="alert alert-info" style="margin-bottom:16px">
+      <b>Formula:</b> Sales Cost = PSC &times; (1 + Total Uplift Ratio)<br>
+      Each SKU is matched against the active <em>Released</em> rule for its
+      <b>Type of Service + GEO</b> combination. All matching factor ratios are summed.
+    </div>
+    <button class="btn btn-primary" onclick="runCalculation()">&#9654; Run Calculation</button>
+    <div id="calcResult" style="margin-top:16px"></div>
+  </div>
+
+  <div class="card" id="calcSummaryCard" style="display:none">
+    <div class="card-header">
+      <div class="card-title">Results Summary</div>
+    </div>
+    <div id="calcSummaryBody"></div>
+  </div>
+</div>
+
+<!-- ===== TAB 5: EXPORT ===== -->
+<div id="tab-export" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Export Results</div>
+    </div>
+    <p class="text-muted" style="margin-bottom:16px">
+      Download all SKUs with their calculated Sales Cost values as a CSV file.
+      Columns include: Service PN, Short Description, Type of Service, GEO, Country,
+      PSC, Sales Cost, Sales Cost Source, Uplift Ratio, Uplift Formula, and all
+      service attribute fields.
+    </p>
+    <button class="btn btn-success" onclick="downloadResults()">Export Results as CSV</button>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const CYCLE_ID = {{ cycle_id }};
+
+let skuPage = 1;
+let skuTotalPages = 1;
+let allFactorDefs = [];    // [{id, technical_id, factor_name, classification}]
+let allCatalogs = [];      // for rule form dropdown
+let editingCatalogId = null; // DB id when editing
+let editingRuleId = null;
+
+// =========================================================
+// TAB SWITCHING
+// =========================================================
+function showTab(name, el) {
+  document.querySelectorAll('[id^="tab-"]').forEach(d => d.style.display = "none");
+  document.getElementById("tab-" + name).style.display = "";
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  if (el) el.classList.add("active");
+
+  if (name === "import")   { loadSkuSummary(); loadSkuTable(1); }
+  if (name === "catalogs") { loadCatalogsTable(); loadFactorDefs(); }
+  if (name === "rules")    { loadRulesTable(); loadCatalogsForRules(); }
+  if (name === "calc")     { loadCalcSummary(); }
+}
+
+// =========================================================
+// INIT
+// =========================================================
+async function init() {
+  const r = await fetch(`/api/cycles/${CYCLE_ID}`);
+  if (!r.ok) { document.getElementById("cycleTitle").textContent = "Cycle not found"; return; }
+  const cycle = await r.json();
+  document.getElementById("cycleTitle").textContent = cycle.name;
+  document.getElementById("cycleActions").innerHTML =
+    `<span class="text-muted" style="font-size:.85em">${cycle.fiscal_year}</span> ${statusBadge(cycle.status)}`;
+
+  // Setup drop zone
+  const dz = document.getElementById("dropZone");
+  dz.addEventListener("dragover", e => { e.preventDefault(); dz.classList.add("dragover"); });
+  dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+  dz.addEventListener("drop", e => {
+    e.preventDefault(); dz.classList.remove("dragover");
+    if (e.dataTransfer.files[0]) doFileImport(e.dataTransfer.files[0]);
+  });
+
+  loadSkuSummary();
+  loadSkuTable(1);
+}
+
+// =========================================================
+// TAB 1 — IMPORT
+// =========================================================
+async function doFileImport(file) {
+  if (!file) return;
+  const res = document.getElementById("importResult");
+  res.innerHTML = '<div class="spinner"></div> Importing…';
+
+  const fd = new FormData();
+  fd.append("file", file);
+  const r = await fetch(`/api/cycles/${CYCLE_ID}/import`, { method: "POST", body: fd });
+  const data = await r.json();
+  showImportResult(data);
+  loadSkuSummary();
+  loadSkuTable(1);
+}
+
+async function doTextImport() {
+  const text = document.getElementById("importText").value.trim();
+  if (!text) { alert("Please paste CSV text first."); return; }
+  const res = document.getElementById("importResult");
+  res.innerHTML = '<div class="spinner"></div> Importing…';
+  const r = await api("POST", `/api/cycles/${CYCLE_ID}/import`, { csv_text: text });
+  const data = await r.json();
+  showImportResult(data);
+  loadSkuSummary();
+  loadSkuTable(1);
+}
+
+function showImportResult(data) {
+  const res = document.getElementById("importResult");
+  if (data.error) {
+    res.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+    return;
+  }
+  const hasErrors = data.errors && data.errors.length;
+  let cls = hasErrors ? "alert-warning" : "alert-success";
+  let html = `<div class="alert ${cls}">
+    <b>${data.skus_imported || 0}</b> SKU(s) imported.`;
+  if (data.catalogs_imported) html += ` <b>${data.catalogs_imported}</b> catalog(s) imported.`;
+  if (data.rules_imported) html += ` <b>${data.rules_imported}</b> rule(s) imported.`;
+  if (hasErrors) {
+    html += `<ul style="margin-top:8px;padding-left:18px">`;
+    data.errors.slice(0, 20).forEach(e => { html += `<li>${e}</li>`; });
+    if (data.errors.length > 20) html += `<li>…and ${data.errors.length - 20} more</li>`;
+    html += `</ul>`;
+  }
+  html += `</div>`;
+  res.innerHTML = html;
+}
+
+async function loadSkuSummary() {
+  const r = await fetch(`/api/cycles/${CYCLE_ID}/skus/summary`);
+  const data = await r.json();
+  const el = document.getElementById("skuSummaryBody");
+  if (!data.total) {
+    el.innerHTML = '<p class="text-muted">No SKU data imported yet.</p>';
+    return;
+  }
+  let html = `<table style="width:auto">
+    <tr><th>GEO</th><th>Type of Service</th><th>Count</th></tr>`;
+  data.by_geo_tos.forEach(row => {
+    html += `<tr><td>${row.geo || '—'}</td><td>${row.type_of_service || '—'}</td><td>${row.count}</td></tr>`;
+  });
+  html += `<tr style="font-weight:600;border-top:2px solid #dee2e6">
+    <td colspan="2">Total</td><td>${data.total}</td></tr>`;
+  html += `</table>`;
+  el.innerHTML = html;
+
+  // Populate filter dropdowns
+  const geos = [...new Set(data.by_geo_tos.map(r => r.geo).filter(Boolean))].sort();
+  const toss = [...new Set(data.by_geo_tos.map(r => r.type_of_service).filter(Boolean))].sort();
+  const geoSel = document.getElementById("filterGeo");
+  const tosSel = document.getElementById("filterTos");
+  const curGeo = geoSel.value;
+  const curTos = tosSel.value;
+  geoSel.innerHTML = '<option value="">All GEOs</option>' + geos.map(g => `<option${curGeo===g?' selected':''}>${g}</option>`).join('');
+  tosSel.innerHTML = '<option value="">All Service Types</option>' + toss.map(t => `<option${curTos===t?' selected':''}>${t}</option>`).join('');
+}
+
+async function loadSkuTable(page) {
+  skuPage = page;
+  const geo = document.getElementById("filterGeo").value;
+  const tos = document.getElementById("filterTos").value;
+  let url = `/api/cycles/${CYCLE_ID}/skus?page=${page}&per_page=50`;
+  if (geo) url += `&geo=${encodeURIComponent(geo)}`;
+  if (tos) url += `&type_of_service=${encodeURIComponent(tos)}`;
+
+  const r = await fetch(url);
+  const data = await r.json();
+  const el = document.getElementById("skuTableBody");
+
+  if (!data.total) {
+    el.innerHTML = '<p class="text-muted">No SKUs found.</p>';
+    document.getElementById("skuPagination").innerHTML = "";
+    return;
+  }
+
+  skuTotalPages = data.pages;
+  let html = `<div style="overflow-x:auto"><table>
+    <tr>
+      <th>Service PN</th><th>Short Description</th><th>Type of Service</th>
+      <th>GEO</th><th>Country</th><th>Service Tier</th><th>Term</th>
+      <th>Delivery Type</th><th style="text-align:right">PSC</th>
+      <th style="text-align:right">Sales Cost</th><th>Source</th>
+    </tr>`;
+  data.skus.forEach(s => {
+    const psc = s.psc_value != null ? fmt(s.psc_value) : '—';
+    const sc  = s.sales_cost != null ? fmt(s.sales_cost) : '—';
+    let srcCls = '';
+    if (s.sales_cost_source === 'Auto-Calculation') srcCls = 'cell-calculated';
+    else if (s.sales_cost_source === 'No Rule') srcCls = 'cell-no-rule';
+    html += `<tr>
+      <td style="font-family:monospace;font-size:.82em">${s.service_pn || ''}</td>
+      <td>${s.short_description || ''}</td>
+      <td>${s.type_of_service || ''}</td>
+      <td>${s.geo || ''}</td>
+      <td>${s.country || ''}</td>
+      <td>${s.service_tier || ''}</td>
+      <td>${s.service_term || ''}</td>
+      <td>${s.service_delivery_type || ''}</td>
+      <td style="text-align:right">${psc}</td>
+      <td class="${srcCls}" style="text-align:right">${sc}</td>
+      <td style="font-size:.8em">${s.sales_cost_source || ''}</td>
+    </tr>`;
+  });
+  html += `</table></div>`;
+  el.innerHTML = html;
+  renderPagination("skuPagination", data.page, data.pages, p => loadSkuTable(p));
+}
+
+function renderPagination(containerId, page, pages, onPage) {
+  const el = document.getElementById(containerId);
+  if (pages <= 1) { el.innerHTML = ""; return; }
+  let html = `<button class="page-btn" ${page<=1?'disabled':''} onclick="(${onPage.toString()})(${page-1})">‹ Prev</button>`;
+  const start = Math.max(1, page - 2);
+  const end = Math.min(pages, page + 2);
+  for (let p = start; p <= end; p++) {
+    html += `<button class="page-btn ${p===page?'active':''}" onclick="(${onPage.toString()})(${p})">${p}</button>`;
+  }
+  html += `<button class="page-btn" ${page>=pages?'disabled':''} onclick="(${onPage.toString()})(${page+1})">Next ›</button>`;
+  html += `<span class="text-muted" style="font-size:.82em;margin-left:8px">Page ${page} of ${pages}</span>`;
+  el.innerHTML = html;
+}
+
+// =========================================================
+// TAB 2 — CATALOGS
+// =========================================================
+async function loadFactorDefs() {
+  if (allFactorDefs.length) return;
+  const r = await fetch("/api/uplift-factors");
+  allFactorDefs = await r.json();
+}
+
+async function loadCatalogsTable() {
+  const r = await fetch("/api/catalogs");
+  const cats = await r.json();
+  const el = document.getElementById("catalogsTableBody");
+  if (!cats.length) {
+    el.innerHTML = '<p class="text-muted">No catalogs yet. Click <b>+ New Catalog</b> to create one.</p>';
+    return;
+  }
+  let html = `<table>
+    <tr><th>Catalog ID</th><th>Description</th><th>Type of Service</th><th>GEO</th>
+        <th>Status</th><th># Factors</th><th>Valid From</th><th>Valid To</th><th></th></tr>`;
+  cats.forEach(c => {
+    html += `<tr>
+      <td style="font-family:monospace;font-size:.82em">${c.catalog_id}</td>
+      <td>${c.description || ''}</td>
+      <td>${c.type_of_service || ''}</td>
+      <td>${c.geo || ''}</td>
+      <td>${statusBadge(c.status)}</td>
+      <td>${c.factor_count}</td>
+      <td>${c.valid_from || ''}</td>
+      <td>${c.valid_to || ''}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="showCatalogForm(${c.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteCatalog(${c.id},'${c.catalog_id}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+  html += `</table>`;
+  el.innerHTML = html;
+}
+
+async function showCatalogForm(dbId) {
+  await loadFactorDefs();
+  editingCatalogId = dbId;
+  const card = document.getElementById("catalogFormCard");
+  document.getElementById("catalogFormAlert").innerHTML = "";
+
+  let cat = null;
+  let selectedIds = new Set();
+
+  if (dbId) {
+    const r = await fetch(`/api/catalogs/${dbId}`);
+    cat = await r.json();
+    document.getElementById("catalogFormTitle").textContent = `Edit Catalog: ${cat.catalog_id}`;
+    document.getElementById("cf_catalog_id").value = cat.catalog_id;
+    document.getElementById("cf_catalog_id").disabled = true;
+    document.getElementById("cf_description").value = cat.description || "";
+    document.getElementById("cf_tos").value = cat.type_of_service || "";
+    document.getElementById("cf_geo").value = cat.geo || "";
+    document.getElementById("cf_valid_from").value = cat.valid_from || "";
+    document.getElementById("cf_valid_to").value = cat.valid_to || "";
+    document.getElementById("cf_status").value = cat.status || "Draft";
+    selectedIds = new Set((cat.factors || []).map(f => f.factor_def_id));
+  } else {
+    document.getElementById("catalogFormTitle").textContent = "New Catalog";
+    document.getElementById("cf_catalog_id").value = "";
+    document.getElementById("cf_catalog_id").disabled = false;
+    document.getElementById("cf_description").value = "";
+    document.getElementById("cf_tos").value = "";
+    document.getElementById("cf_geo").value = "";
+    document.getElementById("cf_valid_from").value = "";
+    document.getElementById("cf_valid_to").value = "";
+    document.getElementById("cf_status").value = "Draft";
+  }
+
+  renderFactorPanels(selectedIds, cat ? cat.factors : []);
+  card.style.display = "";
+  card.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderFactorPanels(selectedIds, selectedFactors) {
+  const availEl = document.getElementById("cf_availPanel");
+  const selEl   = document.getElementById("cf_selectedPanel");
+  availEl.innerHTML = "";
+  selEl.innerHTML   = "";
+
+  // Map id → factor def
+  const defMap = {};
+  allFactorDefs.forEach(f => defMap[f.id] = f);
+
+  // Available = not selected
+  allFactorDefs.forEach(f => {
+    if (!selectedIds.has(f.id)) {
+      availEl.appendChild(makeFactorItem(f, false));
+    }
+  });
+
+  // Selected
+  // Use order from selectedFactors if available, else use allFactorDefs order
+  const selOrder = selectedFactors && selectedFactors.length
+    ? selectedFactors.map(f => defMap[f.factor_def_id]).filter(Boolean)
+    : allFactorDefs.filter(f => selectedIds.has(f.id));
+  selOrder.forEach(f => {
+    selEl.appendChild(makeFactorItem(f, true));
+  });
+}
+
+function makeFactorItem(f, isSelected) {
+  const div = document.createElement("div");
+  div.className = "factor-item";
+  div.dataset.id = f.id;
+  div.innerHTML = `<span>${f.factor_name}</span> ${clsBadge(f.classification)}`;
+  div.onclick = () => toggleFactor(f.id, isSelected);
+  return div;
+}
+
+function toggleFactor(fid, isCurrentlySelected) {
+  const availEl = document.getElementById("cf_availPanel");
+  const selEl   = document.getElementById("cf_selectedPanel");
+  const defMap = {};
+  allFactorDefs.forEach(f => defMap[f.id] = f);
+  const f = defMap[fid];
+
+  if (isCurrentlySelected) {
+    // Move from selected → available
+    const item = selEl.querySelector(`[data-id="${fid}"]`);
+    if (item) selEl.removeChild(item);
+    availEl.appendChild(makeFactorItem(f, false));
+  } else {
+    // Move from available → selected
+    const item = availEl.querySelector(`[data-id="${fid}"]`);
+    if (item) availEl.removeChild(item);
+    selEl.appendChild(makeFactorItem(f, true));
+  }
+}
+
+function hideCatalogForm() {
+  document.getElementById("catalogFormCard").style.display = "none";
+  editingCatalogId = null;
+}
+
+async function saveCatalog() {
+  const alertEl = document.getElementById("catalogFormAlert");
+  alertEl.innerHTML = "";
+
+  const catalog_id = document.getElementById("cf_catalog_id").value.trim();
+  const description = document.getElementById("cf_description").value.trim();
+  const type_of_service = document.getElementById("cf_tos").value.trim();
+  const geo = document.getElementById("cf_geo").value.trim();
+  const valid_from = document.getElementById("cf_valid_from").value || null;
+  const valid_to = document.getElementById("cf_valid_to").value || null;
+  const status = document.getElementById("cf_status").value;
+
+  if (!catalog_id) { alertEl.innerHTML = '<div class="alert alert-danger">Catalog ID is required.</div>'; return; }
+
+  // Collect selected factor IDs (in order)
+  const selEl = document.getElementById("cf_selectedPanel");
+  const factor_def_ids = [...selEl.querySelectorAll(".factor-item")].map(el => parseInt(el.dataset.id));
+
+  const body = { catalog_id, description, type_of_service, geo, valid_from, valid_to, status, factor_def_ids };
+
+  let r;
+  if (editingCatalogId) {
+    r = await api("PUT", `/api/catalogs/${editingCatalogId}`, body);
+  } else {
+    r = await api("POST", "/api/catalogs", body);
+  }
+  const data = await r.json();
+  if (data.error) {
+    alertEl.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+    return;
+  }
+  hideCatalogForm();
+  loadCatalogsTable();
+}
+
+async function deleteCatalog(dbId, catalogId) {
+  if (!confirm(`Delete catalog "${catalogId}"? This cannot be undone.`)) return;
+  const r = await api("DELETE", `/api/catalogs/${dbId}`);
+  const data = await r.json();
+  if (data.error) { alert(data.error); return; }
+  loadCatalogsTable();
+}
+
+// =========================================================
+// TAB 3 — RULES
+// =========================================================
+async function loadCatalogsForRules() {
+  const r = await fetch("/api/catalogs");
+  allCatalogs = await r.json();
+  const sel = document.getElementById("rf_catalog_id");
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select catalog —</option>' +
+    allCatalogs.map(c => `<option value="${c.id}"${cur==c.id?' selected':''}>${c.catalog_id}</option>`).join('');
+}
+
+async function loadRulesTable() {
+  const r = await fetch("/api/rules");
+  const rules = await r.json();
+  const el = document.getElementById("rulesTableBody");
+  if (!rules.length) {
+    el.innerHTML = '<p class="text-muted">No rules yet. Click <b>+ New Rule</b> to create one.</p>';
+    return;
+  }
+  let html = `<table>
+    <tr><th>Rule ID</th><th>Description</th><th>Catalog</th><th>Type of Service</th>
+        <th>GEO</th><th>Status</th><th>Total Uplift</th><th># Factors</th><th>Valid From</th><th>Valid To</th><th></th></tr>`;
+  rules.forEach(r => {
+    html += `<tr>
+      <td style="font-family:monospace;font-size:.82em">${r.rule_id}</td>
+      <td>${r.description || ''}</td>
+      <td style="font-size:.82em">${r.catalog_code || ''}</td>
+      <td>${r.type_of_service || ''}</td>
+      <td>${r.geo || ''}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td>${pct(r.total_uplift_ratio)}</td>
+      <td>${r.factor_count}</td>
+      <td>${r.valid_from || ''}</td>
+      <td>${r.valid_to || ''}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="showRuleForm(${r.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deleteRule(${r.id},'${r.rule_id}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+  html += `</table>`;
+  el.innerHTML = html;
+}
+
+async function showRuleForm(dbId) {
+  await loadCatalogsForRules();
+  editingRuleId = dbId;
+  const card = document.getElementById("ruleFormCard");
+  document.getElementById("ruleFormAlert").innerHTML = "";
+  document.getElementById("rf_factorsBody").innerHTML = '<p class="text-muted">Select a catalog to see its factors.</p>';
+  document.getElementById("rf_totalRatio").textContent = "";
+
+  if (dbId) {
+    const r = await fetch(`/api/rules/${dbId}`);
+    const rule = await r.json();
+    document.getElementById("ruleFormTitle").textContent = `Edit Rule: ${rule.rule_id}`;
+    document.getElementById("rf_rule_id").value = rule.rule_id;
+    document.getElementById("rf_rule_id").disabled = true;
+    document.getElementById("rf_description").value = rule.description || "";
+    document.getElementById("rf_catalog_id").value = rule.catalog_id || "";
+    document.getElementById("rf_status").value = rule.status || "Draft";
+    document.getElementById("rf_valid_from").value = rule.valid_from || "";
+    document.getElementById("rf_valid_to").value = rule.valid_to || "";
+    // Load factors from rule
+    renderRuleFactors(rule.catalog_id, rule.factors);
+  } else {
+    document.getElementById("ruleFormTitle").textContent = "New Rule";
+    document.getElementById("rf_rule_id").value = "";
+    document.getElementById("rf_rule_id").disabled = false;
+    document.getElementById("rf_description").value = "";
+    document.getElementById("rf_catalog_id").value = "";
+    document.getElementById("rf_status").value = "Draft";
+    document.getElementById("rf_valid_from").value = "";
+    document.getElementById("rf_valid_to").value = "";
+  }
+
+  card.style.display = "";
+  card.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function onCatalogChange() {
+  const catDbId = document.getElementById("rf_catalog_id").value;
+  if (!catDbId) {
+    document.getElementById("rf_factorsBody").innerHTML = '<p class="text-muted">Select a catalog to see its factors.</p>';
+    document.getElementById("rf_totalRatio").textContent = "";
+    return;
+  }
+  renderRuleFactors(parseInt(catDbId), []);
+}
+
+async function renderRuleFactors(catDbId, existingFactors) {
+  if (!catDbId) return;
+  const r = await fetch(`/api/catalogs/${catDbId}`);
+  const cat = await r.json();
+
+  const existing = {};
+  (existingFactors || []).forEach(f => {
+    existing[f.factor_def_id] = f;
+  });
+
+  const el = document.getElementById("rf_factorsBody");
+  if (!cat.factors || !cat.factors.length) {
+    el.innerHTML = '<p class="text-muted">This catalog has no selected factors.</p>';
+    return;
+  }
+
+  let html = `<table>
+    <tr>
+      <th>Factor</th>
+      <th>Classification</th>
+      <th>Match Values <span class="text-muted">(comma-separated)</span></th>
+      <th>Uplift Ratio (%)</th>
+    </tr>`;
+  cat.factors.forEach(f => {
+    const ef = existing[f.factor_def_id] || {};
+    const vals = ef.factor_values || "";
+    const ratio = ef.uplift_ratio != null ? (ef.uplift_ratio * 100).toFixed(4) : "";
+    html += `<tr>
+      <td>${f.factor_name}</td>
+      <td>${clsBadge(f.classification)}</td>
+      <td><input type="text" class="rf_factor_values" data-fid="${f.factor_def_id}"
+                 placeholder="e.g. GB,DE,FR" value="${vals}" style="width:100%"></td>
+      <td><input type="number" class="rf_factor_ratio" data-fid="${f.factor_def_id}"
+                 placeholder="0.00" step="0.0001" value="${ratio}"
+                 style="width:90px" oninput="updateTotalRatio()"></td>
+    </tr>`;
+  });
+  html += `</table>`;
+  el.innerHTML = html;
+  updateTotalRatio();
+}
+
+function updateTotalRatio() {
+  let total = 0;
+  document.querySelectorAll(".rf_factor_ratio").forEach(inp => {
+    const v = parseFloat(inp.value);
+    if (!isNaN(v)) total += v;
+  });
+  document.getElementById("rf_totalRatio").textContent =
+    `Total Uplift Ratio: ${total.toFixed(4)}% = ${(total/100).toFixed(6)} decimal`;
+}
+
+function hideRuleForm() {
+  document.getElementById("ruleFormCard").style.display = "none";
+  editingRuleId = null;
+}
+
+async function saveRule() {
+  const alertEl = document.getElementById("ruleFormAlert");
+  alertEl.innerHTML = "";
+
+  const rule_id = document.getElementById("rf_rule_id").value.trim();
+  if (!rule_id) { alertEl.innerHTML = '<div class="alert alert-danger">Rule ID is required.</div>'; return; }
+
+  const catalog_id = document.getElementById("rf_catalog_id").value;
+  const description = document.getElementById("rf_description").value.trim();
+  const status = document.getElementById("rf_status").value;
+  const valid_from = document.getElementById("rf_valid_from").value || null;
+  const valid_to = document.getElementById("rf_valid_to").value || null;
+
+  // Collect factors
+  const factors = [];
+  const valInputs = document.querySelectorAll(".rf_factor_values");
+  const ratioInputs = document.querySelectorAll(".rf_factor_ratio");
+  valInputs.forEach(inp => {
+    const fid = parseInt(inp.dataset.fid);
+    const ratioInp = document.querySelector(`.rf_factor_ratio[data-fid="${fid}"]`);
+    const ratio_pct = parseFloat(ratioInp ? ratioInp.value : 0) || 0;
+    factors.push({
+      factor_def_id: fid,
+      factor_values: inp.value.trim(),
+      uplift_ratio: ratio_pct / 100,
+    });
+  });
+
+  const body = { rule_id, description, catalog_id: catalog_id ? parseInt(catalog_id) : null,
+                 type_of_service: null, geo: null, valid_from, valid_to, status, factors };
+
+  // Derive type_of_service and geo from catalog
+  const cat = allCatalogs.find(c => c.id == catalog_id);
+  if (cat) {
+    body.type_of_service = cat.type_of_service;
+    body.geo = cat.geo;
+  }
+
+  let r;
+  if (editingRuleId) {
+    r = await api("PUT", `/api/rules/${editingRuleId}`, body);
+  } else {
+    r = await api("POST", "/api/rules", body);
+  }
+  const data = await r.json();
+  if (data.error) {
+    alertEl.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+    return;
+  }
+  hideRuleForm();
+  loadRulesTable();
+}
+
+async function deleteRule(dbId, ruleId) {
+  if (!confirm(`Delete rule "${ruleId}"?`)) return;
+  const r = await api("DELETE", `/api/rules/${dbId}`);
+  const data = await r.json();
+  if (data.error) { alert(data.error); return; }
+  loadRulesTable();
+}
+
+// =========================================================
+// TAB 4 — CALCULATE
+// =========================================================
+async function runCalculation() {
+  const calcResult = document.getElementById("calcResult");
+  calcResult.innerHTML = '<div class="spinner"></div> Running calculation…';
+  document.getElementById("calcSummaryCard").style.display = "none";
+
+  const r = await api("POST", `/api/cycles/${CYCLE_ID}/calculate`);
+  const data = await r.json();
+
+  if (data.error) {
+    calcResult.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+    return;
+  }
+
+  const hasErrors = data.errors && data.errors.length;
+  let cls = hasErrors ? "alert-warning" : "alert-success";
+  let html = `<div class="alert ${cls}">
+    <b>${data.calculated}</b> SKU(s) calculated.
+    <b>${data.skipped}</b> skipped (no matching rule).`;
+  if (hasErrors) {
+    html += `<ul style="margin-top:6px;padding-left:18px">`;
+    data.errors.slice(0,10).forEach(e => { html += `<li>${e}</li>`; });
+    if (data.errors.length > 10) html += `<li>…and ${data.errors.length-10} more</li>`;
+    html += `</ul>`;
+  }
+  html += `</div>`;
+  calcResult.innerHTML = html;
+  loadCalcSummary();
+}
+
+async function loadCalcSummary() {
+  const r = await fetch(`/api/cycles/${CYCLE_ID}/results?per_page=1`);
+  const data = await r.json();
+  if (!data.summary || !data.summary.length) return;
+
+  const el = document.getElementById("calcSummaryBody");
+  let html = `<table>
+    <tr><th>GEO</th><th>Type of Service</th><th>Total</th>
+        <th>Calculated</th><th>No Rule</th><th>No PSC</th>
+        <th>Avg PSC</th><th>Avg Sales Cost</th><th>Avg Uplift %</th></tr>`;
+  data.summary.forEach(row => {
+    html += `<tr>
+      <td>${row.geo || '—'}</td>
+      <td>${row.type_of_service || '—'}</td>
+      <td>${row.total}</td>
+      <td class="cell-calculated" style="text-align:right">${row.calculated}</td>
+      <td class="cell-no-rule" style="text-align:right">${row.no_rule}</td>
+      <td class="cell-no-psc" style="text-align:right">${row.no_psc}</td>
+      <td style="text-align:right">${fmt(row.avg_psc, 4)}</td>
+      <td style="text-align:right">${fmt(row.avg_sales_cost, 4)}</td>
+      <td style="text-align:right">${pct(row.avg_uplift)}</td>
+    </tr>`;
+  });
+  html += `</table>`;
+  el.innerHTML = html;
+  document.getElementById("calcSummaryCard").style.display = "";
+}
+
+// =========================================================
+// TAB 5 — EXPORT
+// =========================================================
+function downloadResults() {
+  window.location = `/api/cycles/${CYCLE_ID}/results/export`;
+}
+
+// =========================================================
+// BOOT
+// =========================================================
+init();
+</script>
+{% endblock %}

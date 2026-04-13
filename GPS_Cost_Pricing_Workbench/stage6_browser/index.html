@@ -1,0 +1,1266 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPS Pricing · Stage 6 — Price Gradient Validation</title>
+<script src="dexie.min.js"></script>
+<script src="xlsx.full.min.js"></script>
+<script>
+window.onerror = function(msg, src, line, col, err) {
+  var p = document.getElementById('_err');
+  if (p) p.innerHTML = '<b>JS Error:</b> ' + (err ? err.name + ': ' : '') + msg + ' [line ' + line + ']';
+};
+window.addEventListener('unhandledrejection', function(e) {
+  var p = document.getElementById('_err');
+  if (p) p.innerHTML = '<b>Promise Error:</b> ' + (e.reason && e.reason.message ? e.reason.name + ': ' + e.reason.message : String(e.reason));
+});
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue','Lato',Arial,sans-serif;font-size:14px;background:#f3f4f6;color:#1A1A1A;min-height:100vh}
+a{color:#E2232A;text-decoration:none}
+
+/* NAV */
+.nav{background:#000;color:#fff;display:flex;align-items:center;padding:0 20px;height:56px;gap:16px;position:sticky;top:0;z-index:100;flex-wrap:nowrap}
+.nav-brand{font-weight:700;font-size:15px;letter-spacing:.3px;white-space:nowrap;color:#fff;text-decoration:none;cursor:pointer}.nav-brand:hover{opacity:.75}
+.nav-brand span{color:#E2232A}
+.nav-links{display:flex;gap:2px;flex:1}
+.nav-links a{color:#9ca3af;padding:6px 11px;border-radius:4px;font-size:13px;cursor:pointer;white-space:nowrap}
+.nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,.15);color:#fff}
+.nav-user{color:#6F7170;font-size:12px;white-space:nowrap}
+
+/* LAYOUT */
+.container{max-width:1400px;margin:0 auto;padding:20px}
+.card{background:#fff;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:600;margin-bottom:14px;color:#000}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.page-header h1{font-size:20px;font-weight:700;color:#000}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:background .15s}
+.btn-primary{background:#E2232A;color:#fff;border-color:#E2232A}.btn-primary:hover{background:#64131E}
+.btn-secondary{background:#fff;color:#374151;border-color:#D9D8D6}.btn-secondary:hover{background:#f9fafb}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{background:#f8fafc;text-align:left;padding:8px 10px;font-weight:600;color:#374151;border-bottom:2px solid #D9D8D6;white-space:nowrap}
+.tbl td{padding:7px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.tbl tr:hover td{background:#fafafa}
+.tbl-scroll{overflow-x:auto;width:100%}
+
+/* SEVERITY BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap}
+.sev-critical{background:#fee2e2;color:#991b1b}
+.sev-systemic{background:#ffedd5;color:#9a3412}
+.sev-warning{background:#fef9c3;color:#854d0e}
+.sev-ok{background:#dcfce7;color:#166534}
+.layer-badge{background:#FAECEB;color:#E2232A;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+.stat-card{background:#fff;border:1px solid #D9D8D6;border-radius:4px;padding:14px;text-align:center}
+.stat-card .stat-val{font-size:26px;font-weight:700;color:#000}
+.stat-card .stat-label{font-size:11px;color:#6F7170;margin-top:2px}
+.stat-card.stat-critical .stat-val{color:#991b1b}
+.stat-card.stat-warn .stat-val{color:#854d0e}
+.stat-card.stat-ok .stat-val{color:#166534}
+
+/* STATUS BANNER */
+.status-banner{padding:12px 16px;border-radius:4px;margin-bottom:16px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px}
+.status-blocked{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b}
+.status-warnings{background:#fef9c3;border:1px solid #fde68a;color:#854d0e}
+.status-clear{background:#dcfce7;border:1px solid #86efac;color:#166534}
+.status-nodata{background:#f3f4f6;border:1px solid #D9D8D6;color:#6F7170}
+
+/* FORMS */
+.form-row{display:grid;gap:12px;margin-bottom:12px}
+.form-row-2{grid-template-columns:1fr 1fr}
+.form-row-3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:12px;font-weight:600;color:#374151}
+.form-control{padding:7px 10px;border:1px solid #D9D8D6;border-radius:4px;font-size:13px;color:#1A1A1A;background:#fff;width:100%}
+.form-control:focus{outline:none;border-color:#E2232A;box-shadow:0 0 0 2px rgba(226,35,42,.1)}
+select.form-control{cursor:pointer}
+
+/* SETTINGS */
+.settings-section-title{font-size:14px;font-weight:700;color:#000;margin-bottom:14px;padding-bottom:6px;border-bottom:2px solid #D9D8D6}
+.tier-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1f5f9}
+.tier-row:last-child{border-bottom:none}
+.tier-handle{color:#D9D8D6;cursor:grab;font-size:16px;user-select:none}
+
+/* TOAST */
+#toast-container{position:fixed;top:64px;right:20px;z-index:2000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{padding:10px 16px;border-radius:4px;font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.15);animation:slideIn .2s ease;pointer-events:auto;max-width:340px}
+.toast-success{background:#166534;color:#fff}
+.toast-error{background:#991b1b;color:#fff}
+.toast-info{background:#000;color:#fff}
+.toast-warn{background:#92400e;color:#fff}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* MISC */
+.text-muted{color:#6F7170}.text-sm{font-size:12px}
+.hidden{display:none!important}
+.section-title{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #D9D8D6}
+hr{border:none;border-top:1px solid #D9D8D6;margin:14px 0}
+.alert{padding:12px 16px;border-radius:4px;margin-bottom:14px;font-size:13px}
+.alert-info{background:#dbeafe;border:1px solid #93c5fd;color:#1e40af}
+.alert-warn{background:#fef9c3;border:1px solid #fde68a;color:#854d0e}
+.alert-error{background:#fee2e2;border:1px solid #fca5a5;color:#991b1b}
+.cycle-chip{background:#FAECEB;color:#E2232A;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.filter-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px;padding:10px 12px;background:#f8fafc;border-radius:4px;border:1px solid #D9D8D6}
+.filter-bar label{font-size:12px;font-weight:600;color:#374151;white-space:nowrap}
+.filter-bar select{padding:4px 8px;border:1px solid #D9D8D6;border-radius:4px;font-size:12px;background:#fff}
+.resolved-row td{color:#9ca3af;text-decoration:line-through}
+
+/* LOGIN */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#000 0%,#1A1A1A 100%)}
+.login-card{background:#fff;border-radius:4px;padding:40px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-card h1{font-size:22px;font-weight:700;color:#000;margin-bottom:4px}
+.login-card p{color:#6F7170;font-size:13px;margin-bottom:24px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:3000}
+.modal-overlay.hidden{display:none!important}
+.modal-box{background:#fff;border-radius:4px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden}
+.modal-header{padding:16px 20px;border-bottom:1px solid #D9D8D6;display:flex;align-items:center;justify-content:space-between}
+.modal-header h2{font-size:16px;font-weight:700;color:#000;margin:0}
+.modal-body{padding:20px}
+.modal-footer{padding:12px 20px;border-top:1px solid #D9D8D6;display:flex;justify-content:flex-end;gap:8px}
+.badge-draft{background:#e5e7eb;color:#374151}
+.badge-submitted{background:#d1fae5;color:#065f46}
+</style>
+</head>
+<body>
+<div id="toast-container"></div>
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="modal-title"></h2>
+      <button onclick="hideModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6F7170;line-height:1">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+<div id="app">
+  <div style="padding:60px;text-align:center;color:#374151">
+    <h2>Loading GPS Pricing Stage 6&hellip;</h2>
+    <p id="_err" style="color:#991b1b;margin-top:12px"></p>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════════
+
+const RATIO_PAIRS = [
+  {hi:3, lo:1, minKey:'ratio_3yr_1yr_min', maxKey:'ratio_3yr_1yr_max', label:'3yr/1yr'},
+  {hi:5, lo:3, minKey:'ratio_5yr_3yr_min', maxKey:'ratio_5yr_3yr_max', label:'5yr/3yr'},
+  {hi:4, lo:2, minKey:'ratio_4yr_2yr_min', maxKey:'ratio_4yr_2yr_max', label:'4yr/2yr'},
+];
+
+const DEFAULT_SETTINGS = {
+  ratio_3yr_1yr_min: '1.8', ratio_3yr_1yr_max: '2.8',
+  ratio_5yr_3yr_min: '1.3', ratio_5yr_3yr_max: '1.7',
+  ratio_4yr_2yr_min: '1.3', ratio_4yr_2yr_max: '2.0',
+  cross_geo_deviation_pct: '0.20',
+};
+
+// Default tier sequence: ascending cost order
+const DEFAULT_TIER_SEQUENCE = [
+  {name:'education', sort_order:1},
+  {name:'tablet',    sort_order:2},
+  {name:'classic',   sort_order:3},
+  {name:'premium',   sort_order:4},
+  {name:'edge',      sort_order:5},
+];
+
+// ══════════════════════════════════════════════════════
+// DATABASE
+// ══════════════════════════════════════════════════════
+
+// Stage 6 DB — settings, violations, and imported data (single active dataset)
+const db6 = new Dexie('GPSPricingStage6V1');
+db6.version(1).stores({
+  settings:   '&key',
+  violations: '++id, cycle_id, layer, severity',
+});
+db6.version(2).stores({
+  settings:        '&key',
+  violations:      '++id, cycle_key, layer, severity',
+  imported_cycles: '++id, &name',
+  imported_items:  '++id, cycle_key',
+});
+// v3: single-cycle standalone — drop imported_cycles, simplify indexes
+db6.version(3).stores({
+  settings:       '&key',
+  violations:     '++id, layer, severity',
+  imported_items: '++id',
+});
+// v4: formal workflow — add cycles table, scope violations/items by cycle_id
+db6.version(4).stores({
+  cycles:         '++id, &name, status',
+  settings:       '&key',
+  violations:     '++id, cycle_id, layer, severity, is_resolved',
+  imported_items: '++id, cycle_id',
+}).upgrade(async tx => {
+  const count = await tx.table('imported_items').count();
+  if (count > 0) {
+    const id = await tx.table('cycles').add({
+      name: 'Imported', status: 'draft', created_by: 'system',
+      created_at: new Date().toISOString(), row_count: count, validation_run_at: null,
+    });
+    await tx.table('imported_items').toCollection().modify({cycle_id: id});
+    await tx.table('violations').toCollection().modify({cycle_id: id, is_resolved: 0});
+  }
+});
+
+async function initDB() {
+  const cnt = await db6.settings.count();
+  if (cnt === 0) {
+    await db6.settings.bulkPut(
+      Object.entries(DEFAULT_SETTINGS).map(([key, value]) => ({key, value}))
+    );
+    await db6.settings.put({key: 'tier_sequence', value: JSON.stringify(DEFAULT_TIER_SEQUENCE)});
+  }
+}
+
+async function getSetting(key) {
+  const row = await db6.settings.get(key);
+  return row ? row.value : (DEFAULT_SETTINGS[key] ?? null);
+}
+async function getAllSettings() {
+  const rows = await db6.settings.toArray();
+  const map = {};
+  rows.forEach(r => { map[r.key] = r.value; });
+  return {...DEFAULT_SETTINGS, ...map};
+}
+async function saveSetting(key, value) {
+  await db6.settings.put({key, value: String(value)});
+}
+async function getTierSequence() {
+  const raw = await getSetting('tier_sequence');
+  try { return JSON.parse(raw); } catch(e) { return DEFAULT_TIER_SEQUENCE; }
+}
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+
+const STATE = {
+  currentCycleId:     null,
+  currentCycleName:   null,
+  currentCycleStatus: null,   // 'draft' | 'submitted'
+  currentTab:         'summary',
+  lastViolations:     null,   // null = not yet run; array = run (may be empty)
+};
+
+let currentUser = localStorage.getItem('gps_user') || null;
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+
+function el(id) { return document.getElementById(id); }
+function fmt(n) { return n == null ? '—' : '$' + Number(n).toFixed(2); }
+function pct(n) { return n == null ? '—' : (n * 100).toFixed(1) + '%'; }
+function now() { return new Date().toISOString(); }
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function csvRow(arr) {
+  return arr.map(v => {
+    const s = String(v == null ? '' : v);
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }).join(',');
+}
+function download(content, filename, mime) {
+  const blob = new Blob([content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function groupBy(arr, keyFn) {
+  const m = new Map();
+  for (const item of arr) {
+    const k = keyFn(item);
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push(item);
+  }
+  return m;
+}
+function avg(arr) { return arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : null; }
+
+function normTier(tier) {
+  let s = String(tier || '').toLowerCase().replace(/^tp[\s_]+/, '').trim();
+  if (s.startsWith('edu')) return 'education';
+  if (s === 'tablet')    return 'tablet';
+  if (s === 'premium')   return 'premium';
+  if (s === 'classic')   return 'classic';
+  if (s === 'edge')      return 'edge';
+  return s;
+}
+
+function toast(msg, type = 'info') {
+  const c = el('toast-container');
+  if (!c) return;
+  const d = document.createElement('div');
+  d.className = 'toast toast-' + type;
+  d.textContent = msg;
+  c.appendChild(d);
+  setTimeout(() => {
+    d.style.animation = 'slideIn .2s ease reverse';
+    setTimeout(() => d.remove(), 200);
+  }, 3500);
+}
+
+function sevBadge(sev) {
+  const cls = sev === 'Critical' ? 'sev-critical' : sev === 'Systemic' ? 'sev-systemic' : 'sev-warning';
+  return `<span class="badge ${cls}">${esc(sev)}</span>`;
+}
+
+function cycleStatusBadge(status) {
+  return status === 'submitted'
+    ? '<span class="badge badge-submitted">Submitted</span>'
+    : '<span class="badge badge-draft">Draft</span>';
+}
+
+function showModal(title, body, footer) {
+  el('modal-title').innerHTML = title;
+  el('modal-body').innerHTML  = body;
+  el('modal-footer').innerHTML = footer;
+  el('modal-overlay').classList.remove('hidden');
+}
+function hideModal() {
+  el('modal-overlay').classList.add('hidden');
+}
+
+// ══════════════════════════════════════════════════════
+// DATA LOADING
+// ══════════════════════════════════════════════════════
+
+async function loadCycleItems() {
+  if (!STATE.currentCycleId) return [];
+  return await db6.imported_items.where('cycle_id').equals(STATE.currentCycleId).toArray();
+}
+
+// ══════════════════════════════════════════════════════
+// VALIDATION ENGINE
+// ══════════════════════════════════════════════════════
+
+async function runValidation() {
+  if (!STATE.currentCycleId) { toast('Open or create a cycle first', 'error'); return; }
+  if (STATE.currentCycleStatus === 'submitted') { toast('Submitted cycles are read-only', 'error'); return; }
+
+  const items = await loadCycleItems();
+  if (!items.length) {
+    toast('No items found — import a file first.', 'warn');
+    STATE.lastViolations = [];
+    renderCurrentTab();
+    return;
+  }
+
+  toast('Running price gradient validation…', 'info');
+
+  const settings = await getAllSettings();
+  const tierSeq  = await getTierSequence();
+
+  const violations = [];
+  violations.push(...runL1(items, tierSeq));
+  violations.push(...runL2(items, settings));
+  violations.push(...runL3(items, settings));
+
+  await db6.violations.where('cycle_id').equals(STATE.currentCycleId).delete();
+  if (violations.length) {
+    await db6.violations.bulkAdd(violations.map(v => ({
+      ...v,
+      cycle_id:    STATE.currentCycleId,
+      is_resolved: 0,
+      run_at:      now(),
+      run_by:      currentUser || '—',
+    })));
+  }
+  await db6.cycles.update(STATE.currentCycleId, {validation_run_at: now()});
+
+  STATE.lastViolations = violations;
+
+  const critCount = violations.filter(v => v.severity === 'Critical').length;
+  const warnCount = violations.filter(v => v.severity !== 'Critical').length;
+  const msg = violations.length === 0
+    ? 'Validation passed — no gradient violations found'
+    : `Found ${critCount} Critical + ${warnCount} Warning/Systemic violations`;
+  toast(msg, violations.length === 0 ? 'success' : critCount > 0 ? 'error' : 'warn');
+
+  renderNav();
+}
+
+function runL1(items, tierSeq) {
+  if (!tierSeq.length) return [];
+  const tierOrder = {};
+  tierSeq.forEach(t => { tierOrder[normTier(t.name)] = t.sort_order; });
+
+  const groups = groupBy(
+    items,
+    r => `${r.upgrade_years}|${r.delivery_type || ''}|${r.region}`
+  );
+
+  const violations = [];
+  for (const [key, group] of groups) {
+    const [years, dtype, region] = key.split('|');
+    const tierPrices = {};
+    for (const item of group) {
+      const tk = normTier(item.tier);
+      if (tierOrder[tk] == null) continue;
+      if (!tierPrices[tk]) tierPrices[tk] = [];
+      tierPrices[tk].push(item.list_price_calc);
+    }
+    const tiers = Object.keys(tierPrices)
+      .filter(t => tierOrder[t] != null)
+      .sort((a,b) => tierOrder[a] - tierOrder[b]);
+
+    for (let i = 0; i < tiers.length - 1; i++) {
+      const tLow = tiers[i], tHigh = tiers[i+1];
+      const avgLow  = avg(tierPrices[tLow]);
+      const avgHigh = avg(tierPrices[tHigh]);
+      if (avgLow != null && avgHigh != null && avgLow > avgHigh) {
+        violations.push({
+          layer: 1, severity: 'Critical', violation_type: 'MONOTONICITY_BREACH',
+          region, tier: `${tLow} > ${tHigh}`,
+          upgrade_years: parseFloat(years) || null, part_number: null,
+          message: `Price breach: ${tLow} avg ${fmt(avgLow)} > ${tHigh} avg ${fmt(avgHigh)} — ${dtype || 'all'} ${years}yr in ${region}`,
+        });
+      }
+    }
+  }
+  return violations;
+}
+
+function runL2(items, s) {
+  const violations = [];
+  for (const pair of RATIO_PAIRS) {
+    const min = parseFloat(s[pair.minKey]) || 0;
+    const max = parseFloat(s[pair.maxKey]) || 999;
+
+    const groups = groupBy(items, r => `${normTier(r.tier)}|${r.delivery_type || ''}|${r.region}`);
+
+    for (const [key, group] of groups) {
+      const [tier, dtype, region] = key.split('|');
+      const pricesLo = group.filter(r => Math.round(r.upgrade_years) === pair.lo).map(r => r.list_price_calc);
+      const pricesHi = group.filter(r => Math.round(r.upgrade_years) === pair.hi).map(r => r.list_price_calc);
+      if (!pricesLo.length || !pricesHi.length) continue;
+      const avgLo = avg(pricesLo), avgHi = avg(pricesHi);
+      if (!avgLo || !avgHi || avgLo === 0) continue;
+      const ratio = avgHi / avgLo;
+      if (ratio < min) {
+        violations.push({
+          layer: 2, severity: 'Critical', violation_type: 'RATIO_BELOW_FLOOR',
+          region, tier, upgrade_years: pair.hi, part_number: null,
+          message: `${pair.label} price ratio ${ratio.toFixed(3)} < floor ${min} — ${tier} ${dtype || 'all'} in ${region}`,
+        });
+      } else if (ratio > max) {
+        violations.push({
+          layer: 2, severity: 'Warning', violation_type: 'RATIO_ABOVE_CEILING',
+          region, tier, upgrade_years: pair.hi, part_number: null,
+          message: `${pair.label} price ratio ${ratio.toFixed(3)} > ceiling ${max} — ${tier} ${dtype || 'all'} in ${region}`,
+        });
+      }
+    }
+  }
+  return violations;
+}
+
+function runL3(items, s) {
+  const threshold = parseFloat(s.cross_geo_deviation_pct) || 0.20;
+  const violations = [];
+
+  const groups = groupBy(items, r => `${normTier(r.tier)}|${r.delivery_type || ''}|${r.upgrade_years}`);
+
+  for (const [key, group] of groups) {
+    const [tier, dtype, yearsStr] = key.split('|');
+    const years = parseFloat(yearsStr) || null;
+
+    const regionPrices = {};
+    for (const item of group) {
+      if (!item.region) continue;
+      if (!regionPrices[item.region]) regionPrices[item.region] = [];
+      regionPrices[item.region].push(item.list_price_calc);
+    }
+    const regionAvgs = Object.fromEntries(
+      Object.entries(regionPrices).map(([r, arr]) => [r, avg(arr)])
+    );
+    const allAvgs = Object.values(regionAvgs).filter(v => v != null);
+    if (allAvgs.length < 2) continue;
+    const crossMean = avg(allAvgs);
+    if (!crossMean) continue;
+
+    const breaching = [];
+    for (const [region, ravg] of Object.entries(regionAvgs)) {
+      if (ravg == null) continue;
+      const dev = Math.abs(ravg - crossMean) / Math.abs(crossMean);
+      if (dev > threshold) breaching.push({region, ravg, dev});
+    }
+    if (!breaching.length) continue;
+
+    const isSystemic = breaching.length >= 3;
+    const severity   = isSystemic ? 'Systemic' : 'Warning';
+    const vtype      = isSystemic ? 'SYSTEMIC_CROSS_GEO' : 'CROSS_GEO_DEVIATION';
+
+    for (const b of breaching) {
+      violations.push({
+        layer: 3, severity, violation_type: vtype,
+        region: b.region, tier, upgrade_years: years, part_number: null,
+        message: `Cross-geo price deviation ${(b.dev*100).toFixed(1)}% — ${tier} ${dtype || 'all'} ${years}yr: ${b.region} avg ${fmt(b.ravg)} vs cross-mean ${fmt(crossMean)}${isSystemic ? ` (systemic: ${breaching.length} regions)` : ''}`,
+      });
+    }
+  }
+  return violations;
+}
+
+// ══════════════════════════════════════════════════════
+// NAV + ROUTING
+// ══════════════════════════════════════════════════════
+
+function renderNav() {
+  const hasCycle = !!STATE.currentCycleId;
+  const tabs = [
+    {id:'summary',    label:'Summary'},
+    {id:'violations', label:'Violations'},
+    {id:'export',     label:'Export'},
+    {id:'settings',   label:'Settings'},
+  ];
+
+  const navRight = hasCycle ? `
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <span class="cycle-chip">${esc(STATE.currentCycleName || '')}</span>
+      ${cycleStatusBadge(STATE.currentCycleStatus)}
+      ${STATE.currentCycleStatus === 'draft' && STATE.lastViolations !== null
+        ? `<button class="btn btn-sm" style="background:#166534;color:#fff;border-color:#166534" onclick="submitCycle()">Submit &#10003;</button>`
+        : ''}
+    </div>` : '';
+
+  el('app').innerHTML = `
+    <nav class="nav">
+      <a class="nav-brand" onclick="goToDashboard()" style="cursor:pointer">GPS Pricing · <span>Stage 6</span></a>
+      ${hasCycle ? `
+      <a onclick="goToDashboard()" style="color:#9ca3af;cursor:pointer;white-space:nowrap;padding:6px 11px;border-radius:4px;font-size:13px;flex-shrink:0"
+         onmouseover="this.style.background='rgba(255,255,255,.15)'" onmouseout="this.style.background=''">&#8592; Cycles</a>
+      <div class="nav-links">
+        ${tabs.map(t => `<a id="nav-${t.id}" class="${STATE.currentTab === t.id ? 'active' : ''}" onclick="switchTab('${t.id}')">${t.label}</a>`).join('')}
+      </div>` : `<div class="nav-links" style="flex:1"></div>`}
+      ${navRight}
+      <span class="nav-user">${esc(currentUser)} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#9ca3af">Sign out</a></span>
+    </nav>
+    <div class="container" id="tab-content">
+      <p id="_err" style="color:#991b1b;font-size:12px;padding:4px 0"></p>
+    </div>
+  `;
+
+  if (hasCycle) renderCurrentTab(); else renderDashboard();
+}
+
+function switchTab(tabId) {
+  STATE.currentTab = tabId;
+  ['summary','violations','export','settings'].forEach(t => {
+    const a = el('nav-' + t);
+    if (a) a.className = t === tabId ? 'active' : '';
+  });
+  renderCurrentTab();
+}
+
+function renderCurrentTab() {
+  const content = el('tab-content');
+  if (!content) return;
+  content.innerHTML = '<p id="_err" style="color:#991b1b;font-size:12px;padding:4px 0"></p>';
+
+  if (!STATE.currentCycleId) { renderDashboard(); return; }
+
+  if (STATE.lastViolations === null && STATE.currentTab !== 'summary' && STATE.currentTab !== 'settings') {
+    content.innerHTML += `
+      <div class="card" style="text-align:center;padding:40px">
+        <div style="font-size:48px;margin-bottom:12px">&#128203;</div>
+        <h2 style="color:#000;margin-bottom:8px">No Validation Run Yet</h2>
+        <p class="text-muted">Go to <a onclick="switchTab('summary')" style="cursor:pointer;color:#E2232A">Summary</a> to import data and run validation.</p>
+      </div>`;
+    return;
+  }
+
+  switch (STATE.currentTab) {
+    case 'summary':    renderSummaryTab(content); break;
+    case 'violations': renderViolationsTab(content); break;
+    case 'export':     renderExportTab(content); break;
+    case 'settings':   renderSettingsTab(content); break;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// CYCLE MANAGEMENT
+// ══════════════════════════════════════════════════════
+
+async function renderDashboard() {
+  const content = el('tab-content');
+  if (!content) return;
+  const cycles = await db6.cycles.orderBy('id').reverse().toArray();
+
+  const rows = cycles.length === 0
+    ? `<tr><td colspan="7" style="text-align:center;color:#6F7170;padding:30px">No cycles yet — click "+ New Cycle" to get started.</td></tr>`
+    : cycles.map(c => `
+        <tr>
+          <td><strong><a onclick="openCycle(${c.id})" style="cursor:pointer;color:#E2232A">${esc(c.name)}</a></strong></td>
+          <td>${cycleStatusBadge(c.status)}</td>
+          <td>${c.row_count || '—'}</td>
+          <td class="text-muted text-sm">${esc(c.created_by || '—')}</td>
+          <td class="text-muted text-sm">${(c.created_at || '').slice(0,16).replace('T',' ')}</td>
+          <td class="text-muted text-sm">${c.submitted_at ? c.submitted_at.slice(0,16).replace('T',' ') : '—'}</td>
+          <td><button class="btn btn-secondary btn-sm" onclick="openCycle(${c.id})">Open →</button></td>
+        </tr>`).join('');
+
+  content.innerHTML = `
+    <p id="_err" style="color:#991b1b;font-size:12px;padding:4px 0"></p>
+    <div class="page-header">
+      <h1>Pricing Cycles</h1>
+      <button class="btn btn-primary" onclick="showCreateCycleModal()">+ New Cycle</button>
+    </div>
+    <div class="card">
+      <div class="tbl-scroll">
+        <table class="tbl">
+          <thead><tr><th>Cycle Name</th><th>Status</th><th>Rows</th><th>Created By</th><th>Created At</th><th>Submitted At</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+async function openCycle(id) {
+  const c = await db6.cycles.get(id);
+  if (!c) { toast('Cycle not found', 'error'); return; }
+  STATE.currentCycleId     = c.id;
+  STATE.currentCycleName   = c.name;
+  STATE.currentCycleStatus = c.status;
+  STATE.lastViolations     = c.validation_run_at ? [] : null;
+  STATE.currentTab         = 'summary';
+  await db6.settings.put({key: 'lastCycleId', value: String(c.id)});
+  renderNav();
+}
+
+async function goToDashboard() {
+  STATE.currentCycleId     = null;
+  STATE.currentCycleName   = null;
+  STATE.currentCycleStatus = null;
+  STATE.lastViolations     = null;
+  await db6.settings.put({key: 'lastCycleId', value: ''});
+  renderNav();
+}
+
+function showCreateCycleModal() {
+  showModal('New Pricing Cycle',
+    `<div class="form-group">
+      <label class="form-label">Cycle Name *</label>
+      <input id="new-cycle-name" class="form-control" placeholder="e.g. FY25 Q3 EMEA">
+    </div>`,
+    `<button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="createCycle()">Create</button>`
+  );
+  setTimeout(() => { const inp = el('new-cycle-name'); if (inp) inp.focus(); }, 50);
+}
+
+async function createCycle() {
+  const name = (el('new-cycle-name')?.value || '').trim();
+  if (!name) { toast('Cycle name is required', 'error'); return; }
+  try {
+    const id = await db6.cycles.add({
+      name, status: 'draft', created_by: currentUser,
+      created_at: now(), row_count: 0, validation_run_at: null,
+    });
+    hideModal();
+    toast(`Cycle "${name}" created`, 'success');
+    await openCycle(id);
+  } catch(e) {
+    if (e.name === 'ConstraintError') toast('A cycle with that name already exists', 'error');
+    else toast('Error: ' + e.message, 'error');
+  }
+}
+
+async function submitCycle() {
+  if (!STATE.currentCycleId || STATE.currentCycleStatus !== 'draft') return;
+  const blockers = await db6.violations
+    .where('cycle_id').equals(STATE.currentCycleId)
+    .filter(r => r.severity === 'Critical' && !r.is_resolved)
+    .count();
+  if (blockers > 0) {
+    toast(`Cannot submit: ${blockers} unresolved Critical violation(s)`, 'error'); return;
+  }
+  if (!confirm('Submit this cycle? It will become read-only.')) return;
+  await db6.cycles.update(STATE.currentCycleId, {
+    status: 'submitted', submitted_by: currentUser, submitted_at: now(),
+  });
+  STATE.currentCycleStatus = 'submitted';
+  toast('Cycle submitted', 'success');
+  renderNav();
+}
+
+// ══════════════════════════════════════════════════════
+// TAB: SUMMARY
+// ══════════════════════════════════════════════════════
+
+async function renderSummaryTab(content) {
+  const isLocked   = STATE.currentCycleStatus === 'submitted';
+  const itemCount  = await db6.imported_items.where('cycle_id').equals(STATE.currentCycleId).count();
+
+  // ── Import card ──────────────────────────────────────
+  let importStatusHtml = itemCount > 0 ? `
+    <div style="margin-top:12px;display:flex;align-items:center;gap:12px;padding:10px 12px;background:#f0fdf4;border:1px solid #86efac;border-radius:4px">
+      <span style="color:#166534;font-weight:600">&#10003; ${itemCount} rows loaded</span>
+      ${!isLocked ? `<span style="font-size:12px;color:#6F7170;margin-left:auto">Drop a new file to replace</span>` : ''}
+    </div>` : '';
+
+  const importCard = isLocked
+    ? `<div class="card">
+        <div class="card-title">Import Data</div>
+        <div class="alert alert-warn">This cycle has been submitted and is read-only. Create a new cycle to import fresh data.</div>
+        ${importStatusHtml}
+       </div>`
+    : `<div class="card">
+        <div class="card-title">Import Data</div>
+        <div id="upload-zone" style="border:2px dashed #D9D8D6;border-radius:4px;padding:20px;text-align:center;cursor:pointer;background:#fafafa;transition:border-color .15s;margin-top:12px"
+          ondragover="event.preventDefault();this.style.borderColor='#E2232A'"
+          ondragleave="this.style.borderColor='#D9D8D6'"
+          ondrop="event.preventDefault();this.style.borderColor='#D9D8D6';handleImportFile(event.dataTransfer.files[0])"
+          onclick="el('file-input-s6').click()">
+          <div style="font-size:28px;margin-bottom:6px">&#128194;</div>
+          <div style="font-size:13px;font-weight:500;color:#374151"><strong>Click to browse</strong> or drag &amp; drop</div>
+          <div style="font-size:12px;color:#6F7170;margin-top:4px">CSV or Excel (.xlsx) &mdash; requires: part_number, tier, upgrade_years, region, list_price_calc</div>
+        </div>
+        <input id="file-input-s6" type="file" accept=".csv,.xlsx,.xls" class="hidden" onchange="if(this.files[0])handleImportFile(this.files[0])">
+        ${importStatusHtml}
+       </div>`;
+
+  // ── Validation section ────────────────────────────────
+  let validationHtml = '';
+  if (itemCount > 0) {
+    let statusHtml = '', statsHtml = '';
+
+    if (STATE.lastViolations === null) {
+      statusHtml = `<div class="status-banner status-nodata">Validation not yet run. Click "Run Validation" to begin.</div>`;
+    } else {
+      const allViols      = await db6.violations.where('cycle_id').equals(STATE.currentCycleId).toArray();
+      const critCount     = allViols.filter(v => v.severity === 'Critical').length;
+      const sysCount      = allViols.filter(v => v.severity === 'Systemic').length;
+      const warnCount     = allViols.filter(v => v.severity === 'Warning').length;
+      const resolvedCount = allViols.filter(v => v.is_resolved).length;
+      const unresCrit     = allViols.filter(v => v.severity === 'Critical' && !v.is_resolved).length;
+      const l1 = allViols.filter(v => v.layer === 1).length;
+      const l2 = allViols.filter(v => v.layer === 2).length;
+      const l3 = allViols.filter(v => v.layer === 3).length;
+
+      if (allViols.length === 0) {
+        statusHtml = `<div class="status-banner status-clear">&#10003; All gradient checks passed — no violations found.</div>`;
+      } else if (unresCrit > 0) {
+        statusHtml = `<div class="status-banner status-blocked">&#9888; Blocked — ${unresCrit} unresolved Critical violation(s).</div>`;
+      } else if (critCount > 0) {
+        statusHtml = `<div class="status-banner status-warnings">&#9888; All Criticals resolved — ${sysCount + warnCount} lower-severity violations remain.</div>`;
+      } else {
+        statusHtml = `<div class="status-banner status-warnings">&#9888; Passed with warnings — ${sysCount + warnCount} non-critical violations.</div>`;
+      }
+
+      if (allViols.length > 0) {
+        statsHtml = `
+          <div class="stats-grid" style="margin-bottom:16px">
+            <div class="stat-card ${critCount>0?'stat-critical':'stat-ok'}"><div class="stat-val">${allViols.length}</div><div class="stat-label">Total</div></div>
+            <div class="stat-card ${unresCrit>0?'stat-critical':''}"><div class="stat-val">${critCount}</div><div class="stat-label">Critical</div></div>
+            <div class="stat-card ${sysCount>0?'stat-warn':''}"><div class="stat-val">${sysCount}</div><div class="stat-label">Systemic</div></div>
+            <div class="stat-card ${warnCount>0?'stat-warn':''}"><div class="stat-val">${warnCount}</div><div class="stat-label">Warning</div></div>
+            <div class="stat-card stat-ok"><div class="stat-val">${resolvedCount}</div><div class="stat-label">Resolved</div></div>
+            <div class="stat-card ${l1>0?'stat-critical':'stat-ok'}"><div class="stat-val">${l1}</div><div class="stat-label">L1 Mono</div></div>
+            <div class="stat-card ${l2>0?'stat-critical':'stat-ok'}"><div class="stat-val">${l2}</div><div class="stat-label">L2 Ratio</div></div>
+            <div class="stat-card ${l3>0?'stat-warn':'stat-ok'}"><div class="stat-val">${l3}</div><div class="stat-label">L3 Cross-Geo</div></div>
+          </div>`;
+      }
+    }
+
+    const items      = await loadCycleItems();
+    const noPfvCount = items.filter(r => r.pfv_status === 'no_pfv').length;
+    const pfvNote    = noPfvCount > 0
+      ? `<span style="color:#854d0e">&#9888; ${noPfvCount} item(s) excluded — pfv_status = no_pfv.</span>` : '';
+
+    validationHtml = `
+      ${statusHtml}
+      ${statsHtml}
+      <div class="card">
+        <div class="card-title">Validation</div>
+        <div style="margin-bottom:12px;font-size:13px;color:#6F7170">${pfvNote}</div>
+        <div class="stats-grid" style="margin-bottom:14px">
+          <div class="stat-card"><div class="stat-val">${itemCount}</div><div class="stat-label">Total Items</div></div>
+          <div class="stat-card"><div class="stat-val">${itemCount - noPfvCount}</div><div class="stat-label">In Scope</div></div>
+          <div class="stat-card"><div class="stat-val">${noPfvCount}</div><div class="stat-label">Excluded</div></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          ${!isLocked ? `<button class="btn btn-primary" onclick="runValidation()">&#9654; Run Validation</button>` : ''}
+          ${STATE.lastViolations !== null ? `<button class="btn btn-secondary" onclick="switchTab('export')">&#8595; Export</button>` : ''}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">What Each Layer Checks</div>
+        <table class="tbl">
+          <thead><tr><th>Layer</th><th>Check</th><th>Severity</th><th>Grouped By</th></tr></thead>
+          <tbody>
+            <tr><td><span class="layer-badge">L1</span></td><td>Monotonicity — list price non-decreasing across tiers</td><td><span class="badge sev-critical">Critical</span></td><td>region × term × delivery type</td></tr>
+            <tr><td><span class="layer-badge">L2</span></td><td>Ratio Bands — 3yr/1yr, 5yr/3yr, 4yr/2yr within floor/ceiling</td><td><span class="badge sev-critical">Critical</span> / <span class="badge sev-warning">Warning</span></td><td>tier × region × delivery type</td></tr>
+            <tr><td><span class="layer-badge">L3</span></td><td>Cross-Geo — per-region deviation from cross-region mean</td><td><span class="badge sev-warning">Warning</span> / <span class="badge sev-systemic">Systemic</span></td><td>tier × term × delivery type</td></tr>
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  content.innerHTML += `
+    <div class="page-header">
+      <h1>Summary</h1>
+      ${STATE.lastViolations !== null && !isLocked
+        ? `<button class="btn btn-secondary" onclick="switchTab('violations')">View All Violations &#8594;</button>`
+        : ''}
+    </div>
+    ${importCard}
+    ${validationHtml}
+  `;
+}
+
+// ══════════════════════════════════════════════════════
+// TAB: VIOLATION DETAILS (L1 / L2 / L3)
+// ══════════════════════════════════════════════════════
+
+async function renderViolationsTab(content) {
+  // Always read from DB so resolve/undo changes are reflected immediately
+  const allViols   = await db6.violations.where('cycle_id').equals(STATE.currentCycleId).toArray();
+  const isLocked   = STATE.currentCycleStatus === 'submitted';
+
+  const fLayer        = STATE.filter_viol_layer  || '';
+  const fSev          = STATE.filter_viol_sev    || '';
+  const fRegion       = STATE.filter_viol_region || '';
+  const unresolvedOnly = STATE.filter_viol_unresolved || false;
+
+  let filtered = allViols;
+  if (fLayer)        filtered = filtered.filter(v => String(v.layer) === fLayer);
+  if (fSev)          filtered = filtered.filter(v => v.severity === fSev);
+  if (fRegion)       filtered = filtered.filter(v => v.region === fRegion);
+  if (unresolvedOnly) filtered = filtered.filter(v => !v.is_resolved);
+
+  const layerLabel = {1:'L1', 2:'L2', 3:'L3'};
+  const rows = filtered.length === 0
+    ? `<tr><td colspan="9" style="text-align:center;color:#6F7170;padding:24px">${allViols.length === 0 ? '&#10003; No violations found.' : 'No violations match the current filter.'}</td></tr>`
+    : filtered.map(v => `
+        <tr class="${v.is_resolved ? 'resolved-row' : ''}">
+          <td><span class="layer-badge">${layerLabel[v.layer] || v.layer}</span></td>
+          <td>${sevBadge(v.severity)}</td>
+          <td>${esc(v.tier || '—')}</td>
+          <td>${esc(v.region || '—')}</td>
+          <td>${v.upgrade_years != null ? v.upgrade_years + 'yr' : '—'}</td>
+          <td style="color:#374151;font-size:12px">${esc(v.message)}</td>
+          <td>${v.is_resolved
+            ? `<span style="color:#166534;font-size:12px">&#10003; ${esc(v.resolved_by || '?')}</span>`
+            : `<span style="color:#6b7280;font-size:12px">Unresolved</span>`}</td>
+          <td style="white-space:nowrap">
+            ${!isLocked
+              ? (v.is_resolved
+                  ? `<button class="btn btn-secondary btn-sm" onclick="unresolveViolation(${v.id})">Undo</button>`
+                  : `<button class="btn btn-secondary btn-sm" onclick="showResolveModal(${v.id})">Resolve</button>`)
+              : ''}
+          </td>
+        </tr>`).join('');
+
+  const severities = [...new Set(allViols.map(v => v.severity))].sort();
+  const regions    = [...new Set(allViols.map(v => v.region).filter(Boolean))].sort();
+
+  const layerOpts = ['', '1', '2', '3'].map(l =>
+    `<option value="${l}" ${fLayer === l ? 'selected' : ''}>${l ? 'L' + l : 'All Layers'}</option>`).join('');
+  const sevOpts = ['', ...severities].map(s =>
+    `<option value="${s}" ${fSev === s ? 'selected' : ''}>${s || 'All Severities'}</option>`).join('');
+  const regionOpts = ['', ...regions].map(r =>
+    `<option value="${r}" ${fRegion === r ? 'selected' : ''}>${r || 'All Regions'}</option>`).join('');
+
+  const unresolvedCount = allViols.filter(v => !v.is_resolved).length;
+  const statusClass = allViols.length === 0 ? 'status-clear'
+    : allViols.some(v => v.severity === 'Critical' && !v.is_resolved) ? 'status-blocked' : 'status-warnings';
+  const statusText = allViols.length === 0 ? '&#10003; No violations'
+    : `${allViols.length} violation(s) &mdash; ${unresolvedCount} unresolved`;
+
+  content.innerHTML += `
+    <div class="page-header"><h1>Violations</h1></div>
+    <div class="status-banner ${statusClass}" style="margin-bottom:16px">${statusText}</div>
+    <div class="card">
+      <div class="filter-bar">
+        <label>Layer:</label>
+        <select onchange="setViolFilter('layer',this.value)">${layerOpts}</select>
+        <label>Severity:</label>
+        <select onchange="setViolFilter('sev',this.value)">${sevOpts}</select>
+        <label>Region:</label>
+        <select onchange="setViolFilter('region',this.value)">${regionOpts}</select>
+        ${!isLocked ? `
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer">
+          <input type="checkbox" ${unresolvedOnly ? 'checked' : ''} onchange="setViolFilter('unresolved',this.checked)">
+          Unresolved only
+        </label>` : ''}
+        <span class="text-sm text-muted">${filtered.length} of ${allViols.length} shown</span>
+        ${!isLocked ? `<button class="btn btn-primary btn-sm" onclick="runValidation()" style="margin-left:auto">&#9654; Re-run</button>` : ''}
+      </div>
+      <div class="tbl-scroll">
+        <table class="tbl">
+          <thead>
+            <tr><th>Layer</th><th>Severity</th><th>Tier</th><th>Region</th><th>Term</th><th>Detail</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function setViolFilter(field, value) {
+  if (field === 'layer')      STATE.filter_viol_layer      = value;
+  if (field === 'sev')        STATE.filter_viol_sev        = value;
+  if (field === 'region')     STATE.filter_viol_region     = value;
+  if (field === 'unresolved') STATE.filter_viol_unresolved = value;
+  renderCurrentTab();
+}
+
+function showResolveModal(violId) {
+  showModal('Resolve Violation',
+    `<div class="form-group">
+      <label class="form-label">Explanation (required)</label>
+      <textarea id="resolve-exp" class="form-control" rows="4"
+        placeholder="Explain why this violation is accepted or has been addressed"></textarea>
+    </div>`,
+    `<button class="btn btn-secondary" onclick="hideModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="resolveViolation(${violId})">Mark Resolved</button>`
+  );
+  setTimeout(() => { const ta = el('resolve-exp'); if (ta) ta.focus(); }, 50);
+}
+
+async function resolveViolation(violId) {
+  const exp = (el('resolve-exp')?.value || '').trim();
+  if (!exp) { toast('Explanation is required', 'error'); return; }
+  await db6.violations.update(violId, {
+    is_resolved: 1, explanation: exp, resolved_by: currentUser, resolved_at: now(),
+  });
+  hideModal();
+  toast('Violation resolved', 'success');
+  renderCurrentTab();
+}
+
+async function unresolveViolation(violId) {
+  await db6.violations.update(violId, {
+    is_resolved: 0, explanation: null, resolved_by: null, resolved_at: null,
+  });
+  toast('Resolution undone', 'info');
+  renderCurrentTab();
+}
+
+// ══════════════════════════════════════════════════════
+// TAB: EXPORT
+// ══════════════════════════════════════════════════════
+
+async function renderExportTab(content) {
+  const hasRun = STATE.lastViolations !== null;
+  const count  = hasRun && STATE.currentCycleId
+    ? await db6.violations.where('cycle_id').equals(STATE.currentCycleId).count()
+    : 0;
+
+  content.innerHTML += `
+    <div class="page-header">
+      <h1>Export Violations</h1>
+      <span class="cycle-chip">${esc(STATE.currentCycleName || '')}</span>
+    </div>
+    <div class="card">
+      <div class="card-title">Download</div>
+      ${!hasRun ? '<div class="alert alert-warn">Validation has not been run yet.</div>' : ''}
+      ${hasRun && count === 0 ? '<div class="alert" style="background:#dcfce7;border:1px solid #86efac;color:#166534">No violations to export — all checks passed.</div>' : ''}
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="exportViolationsCsv()" ${!hasRun || count === 0 ? 'disabled' : ''}>&#8595; Download CSV</button>
+      </div>
+      ${count > 0 ? `<div style="margin-top:12px;font-size:13px;color:#6F7170">${count} violation(s) across L1/L2/L3 will be exported (includes resolution status).</div>` : ''}
+    </div>
+  `;
+}
+
+async function exportViolationsCsv() {
+  if (!STATE.currentCycleId) return;
+  const violations = await db6.violations.where('cycle_id').equals(STATE.currentCycleId).toArray();
+  const headers = ['Layer', 'Severity', 'Violation Type', 'Tier', 'Region', 'Term (yr)', 'Part Number', 'Message', 'Status', 'Resolved By', 'Resolution', 'Cycle'];
+  const lines   = [csvRow(headers)];
+  for (const v of violations) {
+    lines.push(csvRow([
+      'L' + v.layer, v.severity, v.violation_type,
+      v.tier || '', v.region || '',
+      v.upgrade_years != null ? v.upgrade_years : '',
+      v.part_number || '', v.message,
+      v.is_resolved ? 'Resolved' : 'Unresolved',
+      v.resolved_by || '', v.explanation || '',
+      STATE.currentCycleName || '',
+    ]));
+  }
+  const cycleName = (STATE.currentCycleName || 'export').replace(/[^a-zA-Z0-9_-]/g, '_');
+  download(lines.join('\n'), `GPS_Stage6_Violations_${cycleName}.csv`, 'text/csv;charset=utf-8');
+  toast('Violations exported', 'success');
+}
+
+// ══════════════════════════════════════════════════════
+// TAB: IMPORT DATA
+// ══════════════════════════════════════════════════════
+
+const IMPORT_COL_MAP = {
+  part_number:    ['part_number','partnumber','part#','part #','sku','part'],
+  tier:           ['tier','tier_name','tiername'],
+  upgrade_years:  ['upgrade_years','upgradeyr','upgrade_yr','years','year','term','upgrade years','term_years'],
+  delivery_type:  ['delivery_type','deliverytype','delivery','type'],
+  region:         ['region','geo','country'],
+  list_price_calc:['list_price_calc','list_price','listprice','list price','lp','price'],
+};
+
+function normalizeHeader(h) {
+  return String(h || '').toLowerCase().replace(/[\s_\-]+/g, '_').trim();
+}
+
+function mapHeaders(rawHeaders) {
+  const map = {};  // canonicalField -> colIndex
+  rawHeaders.forEach((h, i) => {
+    const norm = normalizeHeader(h);
+    for (const [field, aliases] of Object.entries(IMPORT_COL_MAP)) {
+      if (aliases.includes(norm) && map[field] == null) map[field] = i;
+    }
+  });
+  return map;
+}
+
+function parseImportRows(rawHeaders, rawRows) {
+  const colMap = mapHeaders(rawHeaders);
+  const missing = ['part_number','tier','upgrade_years','region','list_price_calc']
+    .filter(f => colMap[f] == null);
+  if (missing.length) return {error: 'Missing required columns: ' + missing.join(', ')};
+
+  const parsed = [];
+  for (const row of rawRows) {
+    const lp = parseFloat(row[colMap.list_price_calc]);
+    if (isNaN(lp)) continue;
+    parsed.push({
+      part_number:    String(row[colMap.part_number] ?? ''),
+      tier:           String(row[colMap.tier] ?? ''),
+      upgrade_years:  parseFloat(row[colMap.upgrade_years]) || null,
+      delivery_type:  colMap.delivery_type != null ? String(row[colMap.delivery_type] ?? '') : '',
+      region:         String(row[colMap.region] ?? ''),
+      list_price_calc: lp,
+      pfv_status:     'pfv',
+    });
+  }
+  return {parsed, colMap};
+}
+
+async function handleImportFile(file) {
+  if (STATE.currentCycleStatus === 'submitted') { toast('Submitted cycles are read-only', 'error'); return; }
+  if (!STATE.currentCycleId) { toast('Open or create a cycle first', 'error'); return; }
+  const ext = file.name.split('.').pop().toLowerCase();
+  let rawHeaders = [], rawRows = [];
+  try {
+    if (ext === 'csv') {
+      const text = await file.text();
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      if (!lines.length) { toast('File is empty', 'error'); return; }
+      // Simple CSV parse (handles quoted fields)
+      function parseCSVLine(line) {
+        const result = []; let cur = '', inQ = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+          else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
+          else cur += ch;
+        }
+        result.push(cur);
+        return result;
+      }
+      rawHeaders = parseCSVLine(lines[0]);
+      rawRows    = lines.slice(1).map(parseCSVLine);
+    } else if (['xlsx','xls'].includes(ext)) {
+      if (!window.XLSX) { toast('SheetJS not loaded — use CSV format or run setup_offline_all.bat', 'error'); return; }
+      const buf  = await file.arrayBuffer();
+      const wb   = XLSX.read(buf, {type:'array'});
+      const ws   = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      if (!data.length) { toast('Sheet is empty', 'error'); return; }
+      rawHeaders = data[0].map(String);
+      rawRows    = data.slice(1);
+    } else {
+      toast('Unsupported file type — use CSV or Excel (.xlsx)', 'error'); return;
+    }
+  } catch(e) { toast('File read error: ' + e.message, 'error'); return; }
+
+  const result = parseImportRows(rawHeaders, rawRows);
+  if (result.error) { toast(result.error, 'error'); return; }
+  if (!result.parsed.length) { toast('No valid rows found', 'warn'); return; }
+
+  await db6.violations.where('cycle_id').equals(STATE.currentCycleId).delete();
+  await db6.imported_items.where('cycle_id').equals(STATE.currentCycleId).delete();
+  await db6.imported_items.bulkAdd(result.parsed.map(r => ({...r, cycle_id: STATE.currentCycleId})));
+  await db6.cycles.update(STATE.currentCycleId, {row_count: result.parsed.length, validation_run_at: null});
+  STATE.lastViolations = null;
+  toast(`Imported ${result.parsed.length} rows`, 'success');
+  renderCurrentTab();
+}
+
+// ══════════════════════════════════════════════════════
+// TAB: SETTINGS
+// ══════════════════════════════════════════════════════
+
+async function renderSettingsTab(content) {
+  const s       = await getAllSettings();
+  const tierSeq = await getTierSequence();
+
+  const tierRows = tierSeq
+    .sort((a,b) => a.sort_order - b.sort_order)
+    .map((t,i) => `
+      <div class="tier-row" data-tier="${esc(t.name)}">
+        <span class="tier-handle">&#8801;</span>
+        <span style="font-size:13px;font-weight:500;color:#1A1A1A;width:100px">${esc(t.name)}</span>
+        <span style="font-size:12px;color:#6F7170">Sort order: ${t.sort_order}</span>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn btn-secondary btn-sm" onclick="moveTier('${esc(t.name)}',-1)" ${i===0?'disabled':''}>&#8593;</button>
+          <button class="btn btn-secondary btn-sm" onclick="moveTier('${esc(t.name)}',1)" ${i===tierSeq.length-1?'disabled':''}>&#8595;</button>
+        </div>
+      </div>`).join('');
+
+  content.innerHTML += `
+    <div class="page-header"><h1>Settings</h1></div>
+
+    <div class="card">
+      <div class="settings-section-title">Tier Sequence (ascending cost order)</div>
+      <div style="font-size:12px;color:#6F7170;margin-bottom:12px">First tier = cheapest. Monotonicity checks that each next tier has a higher average list price.</div>
+      <div id="tier-seq-list">${tierRows}</div>
+    </div>
+
+    <div class="card">
+      <div class="settings-section-title">Ratio Band Thresholds</div>
+      <div class="form-row form-row-3">
+        ${RATIO_PAIRS.map(p => `
+          <div>
+            <div class="section-title">${p.label}</div>
+            <div class="form-row form-row-2" style="margin-top:8px">
+              <div class="form-group">
+                <label class="form-label">Floor (min)</label>
+                <input class="form-control" type="number" step="0.01" id="s-${p.minKey}" value="${parseFloat(s[p.minKey]).toFixed(2)}" onchange="saveSetting('${p.minKey}',this.value)">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ceiling (max)</label>
+                <input class="form-control" type="number" step="0.01" id="s-${p.maxKey}" value="${parseFloat(s[p.maxKey]).toFixed(2)}" onchange="saveSetting('${p.maxKey}',this.value)">
+              </div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="settings-section-title">Cross-Geo Deviation</div>
+      <div class="form-row form-row-2">
+        <div class="form-group">
+          <label class="form-label">Max deviation from cross-region mean (%)</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input class="form-control" type="number" step="1" min="1" max="100" style="width:100px"
+              id="s-cross-geo"
+              value="${(parseFloat(s.cross_geo_deviation_pct)*100).toFixed(0)}"
+              onchange="saveSetting('cross_geo_deviation_pct',(parseFloat(this.value)/100).toFixed(4))">
+            <span class="text-sm text-muted">% (e.g. 20 = flag if region differs by more than 20% from mean)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function moveTier(tierName, direction) {
+  const tierSeq = await getTierSequence();
+  const sorted  = tierSeq.sort((a,b) => a.sort_order - b.sort_order);
+  const idx     = sorted.findIndex(t => normTier(t.name) === normTier(tierName));
+  if (idx < 0) return;
+  const swapIdx = idx + direction;
+  if (swapIdx < 0 || swapIdx >= sorted.length) return;
+  const tmpOrder = sorted[idx].sort_order;
+  sorted[idx].sort_order     = sorted[swapIdx].sort_order;
+  sorted[swapIdx].sort_order = tmpOrder;
+  await saveSetting('tier_sequence', JSON.stringify(sorted));
+  toast('Tier order updated', 'success');
+  renderCurrentTab();
+}
+
+// ══════════════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════════════
+
+function renderLogin() {
+  el('app').innerHTML = `
+    <div class="login-page">
+      <div class="login-card">
+        <h1>GPS Pricing</h1>
+        <p>Stage 6 &middot; Price Gradient Validation</p>
+        <p style="margin-bottom:24px">Enter your name to continue</p>
+        <div class="form-group" style="margin-bottom:16px">
+          <label class="form-label">Your Name</label>
+          <input id="login-name" class="form-control" placeholder="e.g. John Smith" autofocus>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Enter</button>
+      </div>
+    </div>`;
+  el('login-name').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+}
+
+function doLogin() {
+  const name = el('login-name').value.trim();
+  if (!name) { toast('Please enter your name', 'error'); return; }
+  currentUser = name;
+  localStorage.setItem('gps_user', name);
+  boot();
+}
+
+function logout() {
+  localStorage.removeItem('gps_user');
+  currentUser = null;
+  el('app').innerHTML = '';
+  renderLogin();
+}
+
+// ══════════════════════════════════════════════════════
+// BOOTSTRAP
+// ══════════════════════════════════════════════════════
+
+async function boot() {
+  if (!currentUser) { renderLogin(); return; }
+  try {
+    await initDB();
+
+    const lastIdRow = await db6.settings.get('lastCycleId');
+    if (lastIdRow?.value) {
+      const c = await db6.cycles.get(Number(lastIdRow.value));
+      if (c) {
+        STATE.currentCycleId     = c.id;
+        STATE.currentCycleName   = c.name;
+        STATE.currentCycleStatus = c.status;
+        STATE.lastViolations     = c.validation_run_at ? [] : null;
+        STATE.currentTab         = 'summary';
+      }
+    }
+    renderNav();
+
+  } catch(err) {
+    el('app').innerHTML = `<div style="padding:40px;color:#991b1b"><h2>Startup Error</h2><pre>${esc(err.stack || err.message)}</pre></div>`;
+    console.error('Boot error:', err);
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
