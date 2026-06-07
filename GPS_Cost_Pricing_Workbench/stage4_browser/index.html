@@ -2759,6 +2759,28 @@ var lastCCResults = null;
 
 // ── D5: Rule Designer for Cross-check ─────────────────────────────────────────
 
+async function showCCDistinctValues() {
+  var cf = document.getElementById('ccr-cf').value;
+  var div = document.getElementById('ccr-distinct-vals');
+  if (!div) return;
+  div.textContent = 'Loading…';
+  try {
+    var items = await db.service_pns.where('cycle_id').equals(currentCycleId).toArray();
+    var vals = new Set();
+    var field = cf;
+    if (cf === 'service_tier') field = 'tier';
+    if (cf === 'country') field = 'country';
+    if (cf === 'geo') field = 'geo';
+    if (cf === 'delivery_type') field = 'delivery_type';
+    if (cf === 'upgrade_years') field = 'upgrade_years';
+    if (cf === 'type_of_service') field = 'type_of_service';
+    items.forEach(function(r) { var v = r[field]; if (v != null && v !== '') vals.add(String(v)); });
+    var arr = Array.from(vals).sort();
+    if (arr.length === 0) div.textContent = 'No data loaded — import SKUs first.';
+    else div.innerHTML = 'Available in data: <b style="color:#374151">' + arr.join(', ') + '</b>';
+  } catch(e) { div.textContent = 'Could not load values: ' + e.message; }
+}
+
 function showCCRuleDesigner(editId) {
   var rules = loadCCRules();
   var rule = editId ? rules.find(function(r) { return r.id === editId; }) : null;
@@ -2783,11 +2805,12 @@ function showCCRuleDesigner(editId) {
   h += '</div></div>';
   
   h += '<div class="form-group"><label class="form-label">Compare Factor</label>';
-  h += '<select id="ccr-cf" class="form-control">';
+  h += '<select id="ccr-cf" class="form-control" onchange="showCCDistinctValues()">';
   factors.forEach(function(f) {
     h += '<option value="' + f + '"' + (f === selFactor ? ' selected' : '') + '>' + f + '</option>';
   });
-  h += '</select></div>';
+  h += '</select>';
+  h += '<div id="ccr-distinct-vals" style="font-size:11px;color:#6b7280;margin-top:4px;min-height:16px"></div></div>';
   
   h += '<div class="form-group"><label class="form-label">Compare Priority (one per line, low→high)</label>';
   h += '<textarea id="ccr-priority" class="form-control" rows="6">' + (priority||'') + '</textarea></div>';
