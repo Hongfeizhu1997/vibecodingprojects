@@ -1782,6 +1782,61 @@ async function loadSampleUpliftCSV() {
   }
 }
 
+async function exportUpliftCSV() {
+  try {
+    var values = await db.uplift_values.toArray();
+    if (!values.length) { toast('No uplift values to export', 'warn'); return; }
+    var allFactors = await db.uplift_value_factors.toArray();
+    var allRules = await db.uplift_rules.toArray();
+    var ruleMap = {}; allRules.forEach(function(r) { ruleMap[r.id] = r; });
+    var defs = await db.uplift_factor_definitions.toArray();
+    var defMap = {}; defs.forEach(function(d) { defMap[d.id] = d; });
+    
+    var rows = [];
+    rows.push(['Uplift Factors ID','Description','Type of Service','GEO','Factor Name','Factor Values','Uplift Value','Status']);
+    
+    for (var vi = 0; vi < values.length; vi++) {
+      var v = values[vi];
+      var rule = ruleMap[v.rule_id] || {};
+      var factors = allFactors.filter(function(f) { return f.value_id === v.id; });
+      if (factors.length === 0) {
+        // Output single row with no factor
+        rows.push([v.value_id, v.description||'', v.type_of_service||'', v.geo||'', '', '', '', v.status||'']);
+      }
+      for (var fi = 0; fi < factors.length; fi++) {
+        var f = factors[fi];
+        var def = defMap[f.factor_def_id] || {};
+        var upliftVal = f.uplift_type === 'absolute' ? f.uplift_ratio : (f.uplift_ratio*100).toFixed(2);
+        rows.push([
+          rule.rule_id || v.value_id,
+          rule.description || v.description||'',
+          v.type_of_service||'',
+          v.geo||'',
+          def.factor_name || f.factor_name || '',
+          f.factor_values||'',
+          upliftVal,
+          v.status||'Draft'
+        ]);
+      }
+    }
+    
+    var csv = rows.map(function(r) {
+      return r.map(function(c) {
+        var s = String(c==null?'':c);
+        return s.includes(',')||s.includes('"')||s.includes('\n') ? '"'+s.replace(/"/g,'""')+'"' : s;
+      }).join(',');
+    }).join('\n');
+    
+    var blob = new Blob([csv], {type:'text/csv'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'uplift_values_export.csv';
+    a.click();
+    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+    toast('Exported ' + (rows.length-1) + ' rows', 'success');
+  } catch(e) { toast('Export error: ' + e.message, 'error'); }
+}
+
 async function importUpliftCSV(e) {
   var file = e.target.files[0];
   if (!file) return;
@@ -2953,7 +3008,8 @@ async function renderUpliftTab() {
 
         <span class="text-sm text-muted">${enriched.length} uplift value(s) — ${filterLabel}</span>
 
-        <button class="btn btn-outline btn-sm" onclick="el('uplift-csv-import').click()" style="margin-right:4px">📥 Import Uplift CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="el('uplift-csv-import').click()" style="margin-right:4px">📥 Import</button>
+        <button class="btn btn-outline btn-sm" onclick="exportUpliftCSV()" style="margin-right:4px">📤 Export</button>
         <input type="file" id="uplift-csv-import" accept=".csv" class="hidden" onchange="importUpliftCSV(event)">
         <button class="btn btn-primary btn-sm" onclick="showUpliftValueForm(null,${upliftRuleFilter!==null?upliftRuleFilter:'null'})">+ New Uplift Value</button>
 

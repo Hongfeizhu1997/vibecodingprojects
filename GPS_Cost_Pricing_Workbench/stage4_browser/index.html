@@ -2905,6 +2905,46 @@ function duplicateCCRule(id) {
   showCCRuleManager();
 }
 
+
+function exportCCRules() {
+  var rules = loadCCRules();
+  if (!rules.length) { toast('No rules to export', 'warn'); return; }
+  var json = JSON.stringify(rules, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'crosscheck_rules_export.json';
+  a.click();
+  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+  toast('Exported ' + rules.length + ' rule(s)', 'success');
+}
+
+function importCCRules(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var imported = JSON.parse(ev.target.result);
+      if (!Array.isArray(imported)) { toast('Invalid format — expected array of rules', 'error'); return; }
+      var existing = loadCCRules();
+      var existingIds = new Set(existing.map(function(r) { return r.id; }));
+      var added = 0, skipped = 0;
+      imported.forEach(function(r) {
+        if (existingIds.has(r.id)) { skipped++; return; }
+        existing.push(r);
+        existingIds.add(r.id);
+        added++;
+      });
+      saveCCRules(existing);
+      toast('Imported ' + added + ' rule(s), skipped ' + skipped + ' duplicates', 'success');
+      showCCRuleManager();
+    } catch(err) { toast('Invalid JSON file: ' + err.message, 'error'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
 function showCCRuleManager() {
   var rules = loadCCRules();
   var h = '<div style="max-height:65vh;overflow-y:auto">';
@@ -2919,7 +2959,12 @@ function showCCRuleManager() {
     h += '<td><button onclick="showCCRuleDesigner(\'' + r.id + '\')" style="font-size:11px">Edit</button></td></tr>';
   });
   h += '</tbody></table>';
-  h += '<button onclick="showCCRuleDesigner(null)" style="margin-top:8px">+ New Rule</button>';
+  h += '<div style="margin-top:12px;display:flex;gap:8px">';
+  h += '<button onclick="showCCRuleDesigner(null)">+ New Rule</button>';
+  h += '<button class="btn btn-outline btn-sm" onclick="exportCCRules()">Export Rules</button>';
+  h += '<button class="btn btn-outline btn-sm" onclick="document.getElementById(\'cc-import-file\').click()">Import Rules</button>';
+  h += '<input type="file" id="cc-import-file" accept=".json" style="display:none" onchange="importCCRules(event)">';
+  h += '</div>';
   h += '</div>';
   UI.showModal('Cross-Check Rules', h, '', true);
 }
