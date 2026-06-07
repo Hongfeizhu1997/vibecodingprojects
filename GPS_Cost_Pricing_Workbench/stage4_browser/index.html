@@ -1500,7 +1500,7 @@ async function refreshViolTable() {
 
     <table class="tbl">
 
-      <thead><tr><th>Layer</th><th>Severity</th><th>Region</th><th>Tier</th><th>Years</th><th>Part #</th><th>Message</th><th>Status</th><th></th></tr></thead>
+      <thead><tr><th>Layer</th><th>Severity</th><th>Region</th><th>Tier</th><th>Years</th><th>Part #</th><th>Message</th><th style="width:28px">✎</th><th>Status</th><th></th></tr></thead>
 
       <tbody>${results.map(v=>`
 
@@ -1520,6 +1520,9 @@ async function refreshViolTable() {
 
           <td style="max-width:320px;font-size:12px">${v.message||''}</td>
 
+          <td style="text-align:center;cursor:pointer" onclick="event.stopPropagation();toggleNotes(${v.id})" title="Add notes">
+            <span id="note-icon-${v.id}" style="font-size:14px;color:${v.notes?'#E1251B':'#9ca3af'}">${v.notes?'&#9998;':'&#9998;'}</span>
+          </td>
           <td>${v.is_resolved
 
             ? `<span style="color:#166534;font-size:12px">&#10003;Acknowledged by ${v.resolved_by||'?'}</span>`
@@ -1579,6 +1582,38 @@ async function batchAcknowledge() {
   const now=new Date().toISOString(); for(const id of ids) await db.gve_results.update(id,{is_resolved:1,explanation:exp,resolved_by:currentUser,resolved_at:now});
   hideModal(); toast('Acknowledged '+ids.length+' violation(s)','success'); await refreshViolTable();
   const summary=await getGVESummary(currentCycleId); const alertEl=el('tab-content').querySelector('.alert'); if(alertEl)alertEl.outerHTML=renderGVEAlert(summary);
+}
+
+function toggleNotes(violId) {
+  const existing = document.getElementById('notes-inline-' + violId);
+  if (existing) { existing.remove(); return; }
+  
+  // Find the row and insert a notes row below it
+  const icon = document.getElementById('note-icon-' + violId);
+  if (!icon) return;
+  const tr = icon.closest('tr');
+  if (!tr) return;
+  
+  db.gve_results.get(violId).then(v => {
+    const notesRow = document.createElement('tr');
+    notesRow.id = 'notes-inline-' + violId;
+    notesRow.innerHTML = '<td colspan="10" style="padding:4px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0">' +
+      '<textarea id="notes-text-' + violId + '" style="width:100%;min-height:60px;padding:6px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;font-family:inherit" ' +
+      'placeholder="Add working notes about this violation..." ' +
+      'onchange="saveNotes(' + violId + ')">' + (v.notes||'') + '</textarea>' +
+      '<div style="font-size:11px;color:#6b7280;margin-top:2px">Notes are auto-saved. Separate from the acknowledgment explanation.</div>' +
+      '</td>';
+    tr.parentNode.insertBefore(notesRow, tr.nextSibling);
+  });
+}
+
+async function saveNotes(violId) {
+  const ta = document.getElementById('notes-text-' + violId);
+  if (!ta) return;
+  const notes = ta.value.trim() || null;
+  await db.gve_results.update(violId, {notes: notes});
+  const icon = document.getElementById('note-icon-' + violId);
+  if (icon) icon.style.color = notes ? '#E1251B' : '#9ca3af';
 }
 function showAckModal(violId) {
 
