@@ -25,19 +25,22 @@ window.onerror = function(msg, src, line, col, err) {
 <script src="dexie.min.js"></script>
 
 <script src="xlsx.full.min.js"></script>
+<script src="../shared/ui-components.js"></script>
+<script src="../shared/stage-bridge.js"></script>
+<script src="../shared/audit-log.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 
 *{box-sizing:border-box;margin:0;padding:0}
 
-body{font-family:'Helvetica Neue','Lato',Arial,sans-serif;font-size:14px;background:#f3f4f6;color:#1f2937;min-height:100vh}
+body{font-family:'Montserrat','Helvetica Neue',Arial,sans-serif;font-size:14px;background:#F4F4F4;color:#1E0013;min-height:100vh}
 
-a{color:#E2232A;text-decoration:none}
+a{color:#E1251B;text-decoration:none}
 
 /* NAV */
 
-.nav{background:#000000;color:#fff;display:flex;align-items:center;padding:0 20px;height:56px;gap:20px;position:sticky;top:0;z-index:100}
+.nav{background:#11184F;color:#fff;display:flex;align-items:center;padding:0 20px;height:56px;gap:20px;position:sticky;top:0;z-index:100}
 
 .nav-brand{font-weight:700;font-size:15px;letter-spacing:.3px;white-space:nowrap;color:#fff;text-decoration:none;cursor:pointer}.nav-brand:hover{opacity:.75}
 
@@ -47,7 +50,7 @@ a{color:#E2232A;text-decoration:none}
 
 .nav-links a:hover,.nav-links a.active{background:rgba(255,255,255,.15);color:#fff}
 
-.nav-user{color:#94a3b8;font-size:13px;white-space:nowrap}
+.nav-user{color:#ABA8B1;font-size:13px;white-space:nowrap}
 
 /* CONTAINER */
 
@@ -63,9 +66,9 @@ a{color:#E2232A;text-decoration:none}
 
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:background .15s}
 
-.btn-primary{background:#E2232A;color:#fff;border-color:#E2232A}.btn-primary:hover{background:#64131E}
+.btn-primary{background:#E1251B;color:#fff;border-color:#E1251B}.btn-primary:hover{background:#64131E}
 
-.btn-secondary{background:#fff;color:#374151;border-color:#d1d5db}.btn-secondary:hover{background:#f9fafb}
+.btn-secondary{background:#fff;color:#374151;border-color:#d1d5db}.btn-secondary:hover{background:#EAEEF5}
 
 .btn-danger{background:#dc2626;color:#fff;border-color:#dc2626}.btn-danger:hover{background:#b91c1c}
 
@@ -77,7 +80,7 @@ a{color:#E2232A;text-decoration:none}
 
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
 
-.tbl th{background:#f8fafc;text-align:left;padding:8px 10px;font-weight:600;color:#374151;border-bottom:2px solid #e5e7eb;white-space:nowrap}
+.tbl th{background:#FAFAFA;text-align:left;padding:8px 10px;font-weight:600;color:#374151;border-bottom:2px solid #e5e7eb;white-space:nowrap}
 
 .tbl td{padding:7px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
 
@@ -89,11 +92,11 @@ a{color:#E2232A;text-decoration:none}
 
 .badge-draft{background:#fef9c3;color:#854d0e}
 
-.badge-released{background:#dcfce7;color:#166534}
+.badge-released{background:#ecfdf5;color:#065f46}
 
 .badge-retired{background:#f1f5f9;color:#475569}
 
-.badge-auto{background:#FAECEB;color:#E2232A}
+.badge-auto{background:#FAECEB;color:#E1251B}
 
 .badge-norule{background:#fee2e2;color:#991b1b}
 
@@ -123,9 +126,9 @@ a{color:#E2232A;text-decoration:none}
 
 .form-label{font-size:12px;font-weight:600;color:#374151}
 
-.form-control{padding:7px 10px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#1f2937;background:#fff}
+.form-control{padding:7px 10px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;color:#1E0013;background:#fff}
 
-.form-control:focus{outline:none;border-color:#E2232A;box-shadow:0 0 0 2px rgba(226,35,42,.1)}
+.form-control:focus{outline:none;border-color:#E1251B;box-shadow:0 0 0 2px rgba(226,35,42,.1)}
 
 select.form-control{cursor:pointer}
 
@@ -133,11 +136,11 @@ select.form-control{cursor:pointer}
 
 .tabs{display:flex;gap:0;border-bottom:2px solid #e5e7eb;margin-bottom:20px}
 
-.tab{padding:10px 18px;font-size:13px;font-weight:500;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
+.tab{padding:10px 18px;font-size:13px;font-weight:500;color:#6F7170;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
 
 .tab:hover{color:#374151}
 
-.tab.active{color:#E2232A;border-bottom-color:#E2232A;font-weight:600}
+.tab.active{color:#E1251B;border-bottom-color:#E1251B;font-weight:600}
 
 /* MODAL */
 
@@ -175,7 +178,7 @@ select.form-control{cursor:pointer}
 
 .factor-panel{border:1px solid #d1d5db;border-radius:4px;overflow:hidden}
 
-.factor-panel-title{background:#f8fafc;padding:7px 10px;font-size:12px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb}
+.factor-panel-title{background:#FAFAFA;padding:7px 10px;font-size:12px;font-weight:600;color:#374151;border-bottom:1px solid #e5e7eb}
 
 .factor-list{min-height:140px;max-height:220px;overflow-y:auto;padding:4px}
 
@@ -189,21 +192,21 @@ select.form-control{cursor:pointer}
 
 .upload-zone{border:2px dashed #d1d5db;border-radius:4px;padding:30px;text-align:center;cursor:pointer;transition:border-color .2s}
 
-.upload-zone:hover,.upload-zone.drag-over{border-color:#E2232A;background:#FAECEB}
+.upload-zone:hover,.upload-zone.drag-over{border-color:#E1251B;background:#FAECEB}
 
 .upload-zone .upload-icon{font-size:32px;margin-bottom:8px}
 
-.upload-zone p{color:#6b7280;font-size:13px}
+.upload-zone p{color:#6F7170;font-size:13px}
 
 /* STATS GRID */
 
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
 
-.stat-card{background:#fff;border:1px solid #e5e7eb;border-radius:4px;padding:14px;text-align:center}
+.stat-card{background:#fff;border:1px solid #E6E2E4;border-radius:4px;padding:14px;text-align:center}
 
 .stat-card .stat-val{font-size:26px;font-weight:700;color:#000000}
 
-.stat-card .stat-label{font-size:11px;color:#6b7280;margin-top:2px}
+.stat-card .stat-label{font-size:11px;color:#6F7170;margin-top:2px}
 
 /* PAGE HEADER */
 
@@ -219,15 +222,15 @@ select.form-control{cursor:pointer}
 
 .pagination button:disabled{opacity:.4;cursor:not-allowed}
 
-.pagination .page-info{font-size:12px;color:#6b7280;margin:0 6px}
+.pagination .page-info{font-size:12px;color:#6F7170;margin:0 6px}
 
 /* MISC */
 
-.text-muted{color:#6b7280}.text-sm{font-size:12px}.text-right{text-align:right}
+.text-muted{color:#6F7170}.text-sm{font-size:12px}.text-right{text-align:right}
 
 .hidden{display:none!important}
 
-.formula-chip{display:inline-block;background:#FAECEB;color:#E2232A;border-radius:3px;padding:1px 5px;font-size:11px;margin:1px}
+.formula-chip{display:inline-block;background:#FAECEB;color:#E1251B;border-radius:3px;padding:1px 5px;font-size:11px;margin:1px}
 
 .section-title{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #e5e7eb}
 
@@ -235,13 +238,13 @@ hr{border:none;border-top:1px solid #e5e7eb;margin:14px 0}
 
 /* LOGIN PAGE */
 
-.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#000000 0%,#E2232A 100%)}
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#000000 0%,#E1251B 100%)}
 
 .login-card{background:#fff;border-radius:12px;padding:40px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 
 .login-card h1{font-size:22px;font-weight:700;color:#000000;margin-bottom:4px}
 
-.login-card p{color:#6b7280;font-size:13px;margin-bottom:24px}
+.login-card p{color:#6F7170;font-size:13px;margin-bottom:24px}
 
 .total-uplift-row{background:#f0fdf4;font-weight:600}
 
@@ -253,19 +256,19 @@ hr{border:none;border-top:1px solid #e5e7eb;margin:14px 0}
 
 .cat-panel{background:#fff;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden}
 
-.cat-panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #e5e7eb;background:#f8fafc}
+.cat-panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #e5e7eb;background:#FAFAFA}
 
 .cat-list{overflow-y:auto;max-height:calc(100vh - 220px)}
 
 .cat-item{padding:10px 14px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .12s}
 
-.cat-item:hover{background:#f8fafc}
+.cat-item:hover{background:#FAFAFA}
 
-.cat-item.cat-active{background:#FAECEB;border-left:3px solid #E2232A}
+.cat-item.cat-active{background:#FAECEB;border-left:3px solid #E1251B}
 
 .cat-item-name{font-weight:600;font-size:13px;color:#000000}
 
-.cat-item-meta{font-size:11px;color:#6b7280;margin-top:2px}
+.cat-item-meta{font-size:11px;color:#6F7170;margin-top:2px}
 
 .cat-item-actions{margin-top:6px;display:flex;gap:4px}
 
@@ -423,7 +426,224 @@ const SKU_COLUMN_MAP = {
 
 const SKIP_COLUMNS = new Set(['Sales Cost']);
 
+// ── DATA ENRICHMENT ───────────────────────────────────────────────────────────
+// Auto-extracts computed fields (pos_or_apos, starting_point, term_label)
+// from raw SKU import data. Design reference: Cross Check App dataTransform.ts.
 
+const DataEnrich = {
+  classifyPosOrApos: function(desc) {
+    if (!desc) return 'POS';
+    var u = String(desc).toUpperCase();
+    if (u.includes('APOS')) return 'APOS';
+    if (u.includes('POST WARRANTY')) return 'APOS';
+    if (/\bPW\b/.test(u)) return 'APOS';
+    if (/\bPOST\b/.test(u) && (u.includes('WARRANTY') || u.includes('POST SALE'))) return 'APOS';
+    return 'POS';
+  },
+
+  extractStartingPoint: function(desc, upT, upTerm) {
+    if (!desc) return DataEnrich._sp(upT, upTerm);
+    var n = String(desc).toLowerCase().replace(/\s+/g, ' ').trim();
+    var idx = n.indexOf('upgrade from');
+    if (idx === -1) return DataEnrich._sp(upT, upTerm);
+    var orig = String(desc);
+    var oi = 0, ni = 0, t = idx + 12;
+    for (var i = 0; i < orig.length && ni < t; i++) {
+      if (orig[i].toLowerCase() === n[ni]) ni++;
+      oi = i;
+    }
+    var after = orig.substring(oi + 1);
+    var end = after.length;
+    [' for', ' upgrade'].forEach(function(m) {
+      var mi = after.toLowerCase().indexOf(m);
+      if (mi !== -1 && mi < end) end = mi;
+    });
+    var ext = after.substring(0, end).trim();
+    return ext || DataEnrich._sp(upT, upTerm);
+  },
+
+  _sp: function(upT, upTerm) {
+    if (!upT) return '';
+    var s = String(upT).trim();
+    if (upTerm) s += ' ' + String(upTerm).trim();
+    return s;
+  },
+
+  extractTermLabel: function(shortDesc) {
+    if (!shortDesc) return '';
+    return String(shortDesc).trim().substring(0, 2);
+  },
+
+  enrich: function(sku) {
+    var e = {};
+    for (var k in sku) Object.prototype.hasOwnProperty.call(sku, k) && (e[k] = sku[k]);
+    e.pos_or_apos = DataEnrich.classifyPosOrApos(sku.sm_description);
+    e.starting_point = DataEnrich.extractStartingPoint(sku.sm_description, sku.upgrade_from_type, sku.upgrade_from_term);
+    e.term_label = DataEnrich.extractTermLabel(sku.short_description);
+    return e;
+  }
+};
+
+
+
+
+
+// ── COLUMN VISIBILITY ───────────────────────────────────────────────────────────
+// User-configurable column visibility, persisted to localStorage.
+
+const SKU_COLUMNS = [
+  { key: 'service_pn', label: 'Service PN', def: true, render: function(s) { return '<td style="font-family:monospace;font-size:12px">' + (s.service_pn||'') + '</td>'; } },
+  { key: 'short_description', label: 'Short Description', def: true, render: function(s) { return '<td>' + (s.short_description||'—') + '</td>'; } },
+  { key: 'type_of_service', label: 'Type of Service', def: true, render: function(s) { return '<td>' + (s.type_of_service||'—') + '</td>'; } },
+  { key: 'service_tier', label: 'Service Tier', def: true, render: function(s) { return '<td>' + (s.service_tier||'—') + '</td>'; } },
+  { key: 'pos_or_apos', label: 'POS/APOS', def: true, render: function(s) { return '<td>' + (s.pos_or_apos||'—') + '</td>'; } },
+  { key: 'term_label', label: 'Term Label', def: true, render: function(s) { return '<td>' + (s.term_label||'—') + '</td>'; } },
+  { key: 'starting_point', label: 'Starting Point', def: true, render: function(s) { return '<td>' + (s.starting_point||'—') + '</td>'; } },
+  { key: 'geo', label: 'GEO', def: true, render: function(s) { return '<td>' + (s.geo||'—') + '</td>'; } },
+  { key: 'country', label: 'Country', def: true, render: function(s) { return '<td>' + (s.country||'—') + '</td>'; } },
+  { key: 'service_term', label: 'Term (mo)', def: false, render: function(s) {
+    var v = s.service_term;
+    if (v==null||v==='') return '<td>—</td>';
+    return '<td>' + (String(v).match(/^\d+$/) ? v+'Y' : v) + '</td>';
+  } },
+  { key: 'upgrade_from_type', label: 'From Type', def: false, render: function(s) { return '<td>' + (s.upgrade_from_type||'—') + '</td>'; } },
+  { key: 'upgrade_from_term', label: 'From Term', def: false, render: function(s) {
+    var v = s.upgrade_from_term;
+    if (v==null||v==='') return '<td>—</td>';
+    return '<td>' + (String(v).match(/^\d+$/) ? v+'Y' : v) + '</td>';
+  } },
+  { key: 'psc_value', label: 'PSC', def: true, render: function(s) { return '<td class="text-right">' + (s.psc_value!=null ? fmt(s.psc_value) : '—') + '</td>'; } },
+  { key: 'sales_cost', label: 'Sales Cost', def: true, render: function(s) { return '<td class="text-right">' + (s.sales_cost!=null ? fmt(s.sales_cost) : '—') + '</td>'; } },
+  { key: 'sales_cost_source', label: 'Source', def: true, render: function(s) { return '<td>' + sourceBadge(s.sales_cost_source) + '</td>'; } },
+  { key: 'offering_type', label: 'Offering Type', def: false, render: function(s) { return '<td>' + (s.offering_type||'—') + '</td>'; } },
+  { key: 'sub_service_tier', label: 'Sub Tier', def: false, render: function(s) { return '<td>' + (s.sub_service_tier||'—') + '</td>'; } },
+  { key: 'service_delivery_type', label: 'Delivery Type', def: false, render: function(s) { return '<td>' + (s.service_delivery_type||'—') + '</td>'; } },
+  { key: '_actions', label: '', def: true, render: function(s) { return renderSkuActions(s); } },
+];
+
+var skuVisibleCols = (function() {
+  try {
+    var saved = localStorage.getItem('stage3_visible_cols');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  var defs = [];
+  SKU_COLUMNS.forEach(function(c) { if (c.def) defs.push(c.key); });
+  return defs;
+})();
+
+function saveVisibleCols() {
+  try { localStorage.setItem('stage3_visible_cols', JSON.stringify(skuVisibleCols)); } catch(e) {}
+}
+
+function isColVisible(key) { return skuVisibleCols.indexOf(key) !== -1; }
+
+function toggleCol(key) {
+  var idx = skuVisibleCols.indexOf(key);
+  if (idx === -1) skuVisibleCols.push(key); else skuVisibleCols.splice(idx, 1);
+  saveVisibleCols();
+}
+
+function renderColToggle() {
+  var html = '<div class="col-toggle"><button class="btn btn-sm" onclick="this.nextElementSibling.classList.toggle(\'hidden\')">\u2699 Columns</button>';
+  html += '<div class="col-dropdown hidden" style="position:absolute;background:#fff;border:1px solid #ddd;border-radius:4px;padding:8px;z-index:10;max-height:400px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.1);min-width:200px">';
+  SKU_COLUMNS.forEach(function(c) {
+    var ch = isColVisible(c.key) ? ' checked' : '';
+    html += '<label style="display:block;padding:4px 8px;cursor:pointer;white-space:nowrap;font-size:13px"><input type="checkbox"' + ch + ' onchange="toggleCol(\'' + c.key + '\');renderSkuData()"> ' + c.label + '</label>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function renderSkuTableHeader() {
+  var h = '';
+  SKU_COLUMNS.forEach(function(c) {
+    if (isColVisible(c.key)) h += '<th>' + c.label + '</th>';
+  });
+  return '<thead><tr>' + h + '</tr></thead>';
+}
+
+function renderSkuRow(sku) {
+  var r = '';
+  SKU_COLUMNS.forEach(function(c) {
+    if (isColVisible(c.key)) r += c.render(sku);
+  });
+  return '<tr>' + r + '</tr>';
+}
+
+
+
+// ── SKU FILTERS ────────────────────────────────────────────────────────────────
+var skuFilters = { search: '', service_tier: 'all', country: 'all', geo: 'all', pos_or_apos: 'all', type_of_service: 'all' };
+
+function resetSkuFilters() {
+  skuFilters = { search: '', service_tier: 'all', country: 'all', geo: 'all', pos_or_apos: 'all', type_of_service: 'all' };
+  skuPage = 1;
+}
+
+function applySkuFilters(skus) {
+  return skus.filter(function(s) {
+    if (skuFilters.search) {
+      var q = skuFilters.search.toLowerCase();
+      var match = (s.service_pn||'').toLowerCase().indexOf(q) !== -1 ||
+                  (s.short_description||'').toLowerCase().indexOf(q) !== -1 ||
+                  (s.country||'').toLowerCase().indexOf(q) !== -1 ||
+                  (s.service_tier||'').toLowerCase().indexOf(q) !== -1 ||
+                  (s.type_of_service||'').toLowerCase().indexOf(q) !== -1;
+      if (!match) return false;
+    }
+    if (skuFilters.service_tier !== 'all' && s.service_tier !== skuFilters.service_tier) return false;
+    if (skuFilters.country !== 'all' && s.country !== skuFilters.country) return false;
+    if (skuFilters.geo !== 'all' && s.geo !== skuFilters.geo) return false;
+    if (skuFilters.pos_or_apos !== 'all' && s.pos_or_apos !== skuFilters.pos_or_apos) return false;
+    if (skuFilters.type_of_service !== 'all' && s.type_of_service !== skuFilters.type_of_service) return false;
+    return true;
+  });
+}
+
+function getFilterOptions(all) {
+  var opts = { service_tier: {}, country: {}, geo: {}, pos_or_apos: {}, type_of_service: {} };
+  all.forEach(function(s) {
+    if (s.service_tier) opts.service_tier[s.service_tier] = 1;
+    if (s.country) opts.country[s.country] = 1;
+    if (s.geo) opts.geo[s.geo] = 1;
+    if (s.pos_or_apos) opts.pos_or_apos[s.pos_or_apos] = 1;
+    if (s.type_of_service) opts.type_of_service[s.type_of_service] = 1;
+  });
+  return opts;
+}
+
+function renderFilterBar() {
+  var active = 0;
+  for (var k in skuFilters) { if (skuFilters[k] !== 'all' && skuFilters[k] !== '') active++; }
+  var h = '<div class="filter-bar" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;padding:8px 0">';
+  h += '<input type="text" id="sku-search" placeholder="Search..." value="' + (skuFilters.search||'') + '" oninput="skuFilters.search=this.value;skuPage=1;renderSkuData()" style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;font-size:13px;width:180px">';
+  h += renderFilterSelect('service_tier', 'Tier');
+  h += renderFilterSelect('country', 'Country');
+  h += renderFilterSelect('geo', 'GEO');
+  h += renderFilterSelect('pos_or_apos', 'POS/APOS');
+  h += renderFilterSelect('type_of_service', 'Type');
+  if (active > 0) {
+    h += '<button onclick="resetSkuFilters();renderSkuData()" class="btn btn-sm" style="color:#e53e3e">× Clear (' + active + ')</button>';
+  }
+  h += '<span style="font-size:12px;color:#ABA8B1;margin-left:auto">' + active + ' active filter(s)</span>';
+  h += '</div>';
+  return h;
+}
+
+function renderFilterSelect(key, label) {
+  var h = '<select onchange="skuFilters.' + key + '=this.value;skuPage=1;renderSkuData()" style="padding:6px 8px;border:1px solid #ddd;border-radius:4px;font-size:12px">';
+  h += '<option value="all"' + (skuFilters[key]==='all'?' selected':'') + '>' + label + ': All</option>';
+  if (filterOptionCache && filterOptionCache[key]) {
+    var vals = Object.keys(filterOptionCache[key]).sort();
+    vals.forEach(function(v) {
+      h += '<option value="' + v + '"' + (skuFilters[key]===v?' selected':'') + '>' + v + '</option>';
+    });
+  }
+  h += '</select>';
+  return h;
+}
+
+var filterOptionCache = null;
 
 // ── DATABASE ──────────────────────────────────────────────────────────────────
 
@@ -807,7 +1027,7 @@ function parseDate(v) {
 
 }
 
-function now() { return new Date().toISOString(); }
+function now() { return new Date().toISOString(); }  // kept for Dexie compat
 
 
 
@@ -875,7 +1095,7 @@ function showModal(title, bodyHTML, footerHTML, wide=false) {
 
 }
 
-function hideModal() { el('modal-overlay').classList.add('hidden'); }
+function hideModal() { UI.hideModal(); }
 
 el('modal-overlay').addEventListener('click', e => { if(e.target===el('modal-overlay')) hideModal(); });
 
@@ -989,11 +1209,12 @@ async function renderDashboard() {
 
     <div class="nav-links"><a class="active">Dashboard</a></div>
 
-    <span class="nav-user">${currentUser} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#94a3b8">Sign out</a></span>
+    <span class="nav-user">${currentUser} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#ABA8B1">Sign out</a></span>
 
   </nav>
 
   <div class="container">
+<div class="step-indicator" style="display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap"><span style="background:#4263C7;color:#fff;padding:4px 12px;border-radius:4px;font-size:12px;font-weight:600">1. SKU Import</span><span style="color:#6F7170;font-size:12px;padding:4px 0">Import → Enrich → Calculate</span></div>
 
     <div class="page-header">
 
@@ -1137,7 +1358,7 @@ async function renderCycle() {
 
     </div>
 
-    <span class="nav-user">${currentUser} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#94a3b8">Sign out</a></span>
+    <span class="nav-user">${currentUser} &nbsp;|&nbsp; <a href="#" onclick="logout()" style="color:#ABA8B1">Sign out</a></span>
 
   </nav>
 
@@ -1145,7 +1366,7 @@ async function renderCycle() {
 
     <div class="page-header">
 
-      <h1>${cycle.name} <span style="font-size:14px;font-weight:400;color:#6b7280">${cycle.fiscal_year||''}</span></h1>
+      <h1>${cycle.name} <span style="font-size:14px;font-weight:400;color:#6F7170">${cycle.fiscal_year||''}</span></h1>
 
       ${statusBadge(cycle.status)}
 
@@ -1176,6 +1397,29 @@ async function renderCycle() {
 // ── SKU TAB ───────────────────────────────────────────────────────────────────
 
 
+
+
+function downloadSKUTemplate() {
+  var headers = ['Service PN','Service PN Short Description','Service PN Sales& Marketing Description',
+    'OH ID','OH Name','Type of Service','Sub-Type of Service','Offering Type',
+    'Standard Cost ( Base Cost )','Currency','GEO','Country','Service Tier','Sub Service Tier',
+    'Compatible MT','SDF Code','SDF Code Short Description','SDF Code Long Description',
+    'Service Term','Unit','Service Availability Time','Service Response Time',
+    'Service Delivery Type','Upgrade From Type','Upgrade From Term',
+    'Included Premier Service','Premier Service Type','Included Protection Service',
+    'Included KYD Service','Included SBTY Service','Included ISE Service','Included TI CRU Service'];
+  var sample = ['5WS1U93867','1Y Premier Support AIPC','1Y Premier Support for AIPC upgrade from 1Y Courier/Carry-in',
+    'H00000000NQ1','Premier Support for AIPC','Support Services','Premier Portfolio','Premier Support for AIPC',
+    '50.10','USD','EMEA','GB','Next Gen','','','','','','12','Each','9x5','NBD','ON-SITE','Courier/Carry-in','1Y',
+    'N','','N','N','N','N','N'];
+  var csv = headers.join(',') + '\n' + sample.join(',');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'stage3_sku_template.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
 
 async function renderSkuTab() {
 
@@ -1471,6 +1715,140 @@ async function handleFiles(files) {
 
 
 
+
+
+async function loadSampleUpliftCSV() {
+  try {
+    var resp = await fetch('../sample_data/Stage3_Uplift_Values.csv');
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var text = await resp.text();
+    // Parse and import just like importUpliftCSV does
+    var lines = text.split('\n').filter(function(l) { return l.trim(); });
+    if (lines.length < 2) { toast('No data in sample file', 'error'); return; }
+    
+    var headers = parseCSVLine(lines[0]);
+    var colMap = {};
+    headers.forEach(function(h, i) { colMap[h.trim()] = i; });
+    
+    var count = 0;
+    for (var i = 1; i < lines.length; i++) {
+      var vals = parseCSVLine(lines[i]);
+      if (!vals.length) continue;
+      
+      var ruleId = vals[colMap['Uplift Factors ID'] || 0] || '';
+      var description = vals[colMap['Description'] || 1] || '';
+      var typeOfService = vals[colMap['Type of Service'] || 2] || '';
+      var geo = vals[colMap['GEO'] || 3] || '';
+      var status = vals[colMap['Status'] || 8] || 'Draft';
+      
+      var existingRules = await db.uplift_rules.where('rule_id').equals(ruleId).toArray();
+      var rule;
+      if (existingRules.length) {
+        rule = existingRules[0];
+      } else {
+        var ruleId2 = await db.uplift_rules.add({
+          rule_id: ruleId, description: description,
+          type_of_service: typeOfService, geo: geo,
+          status: status, created_by: currentUser, created_at: now()
+        });
+        rule = { id: ruleId2 };
+      }
+      
+      var factorName = vals[colMap['Factor Name'] || 5] || '';
+      var factorValues = vals[colMap['Factor Values'] || 6] || '';
+      var upliftValue = parseFloat(vals[colMap['Uplift Value'] || 7]) || 0;
+      
+      if (factorName && upliftValue) {
+        var valueId = await db.uplift_values.add({
+          rule_id: rule.id,
+          value_id: ruleId + '_' + factorName.replace(/[^a-zA-Z0-9]/g, '_'),
+          description: factorName + '=' + factorValues,
+          type_of_service: typeOfService, geo: geo,
+          status: status, created_by: currentUser, created_at: now(),
+          valid_from: now().slice(0,10), valid_to: '9999-12-31'
+        });
+        await db.uplift_value_factors.add({
+          value_id: valueId, factor_name: factorName,
+          factor_values: factorValues, uplift_ratio: upliftValue
+        });
+        count++;
+      }
+    }
+    
+    toast('Loaded ' + count + ' uplift values from sample', 'success');
+    await renderUpliftTab();
+  } catch(e) {
+    toast('Failed to load sample: ' + e.message, 'error');
+  }
+}
+
+async function importUpliftCSV(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var text = await file.text();
+  var lines = text.split('\n').filter(function(l) { return l.trim(); });
+  if (lines.length < 2) { toast('CSV needs header + data', 'error'); return; }
+  
+  var headers = parseCSVLine(lines[0]);
+  var colMap = {};
+  headers.forEach(function(h, i) { colMap[h.trim()] = i; });
+  
+  var count = 0, errs = [];
+  for (var i = 1; i < lines.length; i++) {
+    var vals = parseCSVLine(lines[i]);
+    if (!vals.length) continue;
+    
+    var ruleId = vals[colMap['Uplift Factors ID'] || 0] || '';
+    var description = vals[colMap['Description'] || 1] || '';
+    var typeOfService = vals[colMap['Type of Service'] || 2] || '';
+    var geo = vals[colMap['GEO'] || 3] || '';
+    var status = vals[colMap['Status'] || 8] || 'Draft';
+    
+    // Upsert uplift rule
+    var existingRules = await db.uplift_rules.where('rule_id').equals(ruleId).toArray();
+    var rule;
+    if (existingRules.length) {
+      rule = existingRules[0];
+      if (status === 'Released') {
+        await db.uplift_rules.update(rule.id, { status: 'Released' });
+      }
+    } else {
+      var ruleId2 = await db.uplift_rules.add({
+        rule_id: ruleId, description: description,
+        type_of_service: typeOfService, geo: geo,
+        status: status, created_by: currentUser, created_at: now()
+      });
+      rule = { id: ruleId2 };
+    }
+    
+    // Add uplift value
+    var factorName = vals[colMap['Factor Name'] || 5] || '';
+    var factorValues = vals[colMap['Factor Values'] || 6] || '';
+    var upliftValue = parseFloat(vals[colMap['Uplift Value'] || 7]) || 0;
+    
+    if (factorName && upliftValue) {
+      var valueId = await db.uplift_values.add({
+        rule_id: rule.id, value_id: ruleId + '_' + factorName.replace(/[^a-zA-Z0-9]/g, '_'),
+        description: factorName + '=' + factorValues,
+        type_of_service: typeOfService, geo: geo,
+        status: status, created_by: currentUser, created_at: now(),
+        valid_from: now().slice(0,10), valid_to: '9999-12-31'
+      });
+      var upliftType = 'percentage';
+    try { upliftType = document.getElementById('uv-type').value; } catch(e) {}
+    await db.uplift_value_factors.add({
+        value_id: valueId, factor_name: factorName,
+        factor_values: factorValues, uplift_ratio: upliftValue, uplift_type: upliftType
+      });
+      count++;
+    }
+  }
+  
+  toast('Imported ' + count + ' uplift values', count ? 'success' : 'error');
+  el('uplift-csv-import').value = '';
+  await renderUpliftTab();
+}
+
 async function importCSVPaste() {
 
   const text = el('csv-paste').value.trim();
@@ -1482,6 +1860,63 @@ async function importCSVPaste() {
 }
 
 
+
+
+// ── MANUAL EDIT / DELETE ──────────────────────────────────────────────────────
+
+function showEditSKU(id) {
+  db.service_pns.get(id).then(function(sku) {
+    if (!sku) { toast('SKU not found', 'error'); return; }
+    var h = '<div style="max-height:60vh;overflow-y:auto">';
+    var fields = ['service_pn','short_description','type_of_service','service_tier','sub_service_tier',
+      'offering_type','geo','country','psc_value','service_term','service_delivery_type',
+      'upgrade_from_type','upgrade_from_term'];
+    fields.forEach(function(f) {
+      var val = sku[f] != null ? String(sku[f]).replace(/"/g,'&quot;') : '';
+      h += '<div class="form-group"><label class="form-label">' + f + '</label>';
+      h += '<input id="esku-' + f + '" class="form-control" value="' + val + '"></div>';
+    });
+    h += '<button class="btn btn-primary btn-sm" onclick="saveEditSKU(' + id + ')">Save</button>';
+    h += '</div>';
+    UI.showModal('Edit SKU: ' + (sku.service_pn||''), h, '', true);
+  });
+}
+
+function saveEditSKU(id) {
+  var fields = ['service_pn','short_description','type_of_service','service_tier','sub_service_tier',
+    'offering_type','geo','country','psc_value','service_term','service_delivery_type',
+    'upgrade_from_type','upgrade_from_term'];
+  var updates = {};
+  fields.forEach(function(f) {
+    var el = document.getElementById('esku-' + f);
+    if (el) {
+      var v = el.value.trim();
+      updates[f] = f === 'psc_value' ? parseFloat(v) || 0 : v;
+    }
+  });
+  db.service_pns.update(id, updates).then(function() {
+    UI.hideModal();
+    toast('SKU updated', 'success');
+    renderSkuData();
+  }).catch(function(e) {
+    toast('Update failed: ' + e.message, 'error');
+  });
+}
+
+function deleteSKU(id, pn) {
+  if (!confirm('Delete ' + pn + '?')) return;
+  db.service_pns.delete(id).then(function() {
+    toast('Deleted ' + pn, 'success');
+    renderSkuData();
+  });
+}
+
+function renderSkuActions(sku) {
+  return '<td style="white-space:nowrap">' +
+    '<button onclick="showEditSKU(' + sku.id + ')" style="font-size:11px;margin-right:4px" class="btn btn-sm">✏</button>' +
+    '<button onclick="deleteSKU(' + sku.id + ',\'' + (sku.service_pn||'').replace(/'/g,"\\'") + '\')" style="font-size:11px;color:#ef4444" class="btn btn-sm">✕</button>' +
+    '</td>';
+}
 
 async function renderSkuData() {
 
@@ -1500,6 +1935,9 @@ async function renderSkuData() {
   // Summary by GEO + ToS
 
   const all = await db.service_pns.where('cycle_id').equals(currentCycleId).toArray();
+  filterOptionCache = getFilterOptions(all);
+  var filtered = applySkuFilters(all);
+  var totalFiltered = filtered.length;
 
   const sumMap = {};
 
@@ -1519,7 +1957,7 @@ async function renderSkuData() {
 
   <div class="card">
 
-    <div class="card-title">Summary — ${total} SKUs</div>
+    <div class="card-title">Summary — ${total} SKUs${filtered.length!==total?' (filtered: '+totalFiltered+')':''}</div>
 
     <table class="tbl">
 
@@ -1547,53 +1985,29 @@ async function renderSkuData() {
 
   el('sku-table-wrap').innerHTML=`
 
+  ${renderFilterBar()}
+
   <div class="card" style="overflow-x:auto">
 
-    <div class="card-title">SKU Details</div>
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>SKU Details</span>
+      ${renderColToggle()}
+    </div>
 
     <table class="tbl">
 
-      <thead><tr><th>Service PN</th><th>Short Description</th><th>Type of Service</th><th>Service Tier</th><th>GEO</th><th>Country</th><th>Term</th><th>From Type</th><th>From Term</th><th>PSC</th><th>Sales Cost</th><th>Source</th></tr></thead>
+      ${renderSkuTableHeader()}
 
-      <tbody>${page.map(s=>`
-
-        <tr>
-
-          <td style="font-family:monospace;font-size:12px">${s.service_pn||''}</td>
-
-          <td>${s.short_description||'—'}</td>
-
-          <td>${s.type_of_service||'—'}</td>
-
-          <td>${s.service_tier||'—'}</td>
-
-          <td>${s.geo||'—'}</td>
-
-          <td>${s.country||'—'}</td>
-
-          <td>${s.service_term!=null&&s.service_term!==''?(String(s.service_term).match(/^\d+$/)?s.service_term+'Y':s.service_term):'—'}</td>
-
-          <td>${s.upgrade_from_type||'—'}</td>
-
-          <td>${s.upgrade_from_term!=null&&s.upgrade_from_term!==''?(String(s.upgrade_from_term).match(/^\d+$/)?s.upgrade_from_term+'Y':s.upgrade_from_term):'—'}</td>
-
-          <td class="text-right">${s.psc_value!=null?fmt(s.psc_value):'—'}</td>
-
-          <td class="text-right">${s.sales_cost!=null?fmt(s.sales_cost):'—'}</td>
-
-          <td>${sourceBadge(s.sales_cost_source)}</td>
-
-        </tr>`).join('')}
+      <tbody>${page.map(s=>renderSkuRow(s)).join('')}
 
       </tbody>
-
     </table>
 
     <div class="pagination">
 
       <button onclick="skuPage=${skuPage-1};renderSkuData()" ${skuPage<=1?'disabled':''}>— Prev</button>
 
-      <span class="page-info">Page ${skuPage} of ${totalPages} (${total} rows)</span>
+      <span class="page-info">Page ${skuPage} of ${totalPages} (${totalFiltered} rows)</span>
 
       <button onclick="skuPage=${skuPage+1};renderSkuData()" ${skuPage>=totalPages?'disabled':''}>Next — /button>
 
@@ -1603,6 +2017,30 @@ async function renderSkuData() {
 
 }
 
+
+
+// ── DUPLICATE DETECTION ───────────────────────────────────────────────────────
+// Checks for duplicate Service PN + Country within the import batch.
+// Returns { duplicates: [{ key, count, rows }], warningMsg: string|null }
+
+function detectDuplicates(skus) {
+  var seen = {};
+  for (var i = 0; i < skus.length; i++) {
+    var key = (skus[i].service_pn || '') + '|' + (skus[i].country || '');
+    if (!seen[key]) seen[key] = [];
+    seen[key].push(i);
+  }
+  var dups = [];
+  for (var k in seen) {
+    if (seen[k].length > 1) dups.push({ key: k, count: seen[k].length, rows: seen[k] });
+  }
+  if (!dups.length) return { duplicates: [], warningMsg: null };
+  var parts = dups.map(function(d) { return d.key.replace('|', ' / ') + ' (' + d.count + 'x)'; });
+  return {
+    duplicates: dups,
+    warningMsg: 'Duplicate Service PN + Country found: ' + parts.join('; ') + '. Last record will overwrite.'
+  };
+}
 
 
 // ── EXCEL / CSV IMPORT ENGINE ─────────────────────────────────────────────────
@@ -1653,6 +2091,8 @@ async function doImportExcel(arrayBuffer) {
 
       }
 
+      var dupCheckXl = detectDuplicates(skus);
+      if (dupCheckXl.warningMsg) toast(dupCheckXl.warningMsg, 'info');
       const {count, errs} = await upsertSkus(skus);
 
       skusImported=count; errors.push(...errs);
@@ -1827,7 +2267,7 @@ function buildSkuRowFromDict(dict) {
 
   if (!sku.service_pn) return null;
 
-  return sku;
+  return DataEnrich.enrich(sku);
 
 }
 
@@ -2513,6 +2953,8 @@ async function renderUpliftTab() {
 
         <span class="text-sm text-muted">${enriched.length} uplift value(s) — ${filterLabel}</span>
 
+        <button class="btn btn-outline btn-sm" onclick="el('uplift-csv-import').click()" style="margin-right:4px">📥 Import Uplift CSV</button>
+        <input type="file" id="uplift-csv-import" accept=".csv" class="hidden" onchange="importUpliftCSV(event)">
         <button class="btn btn-primary btn-sm" onclick="showUpliftValueForm(null,${upliftRuleFilter!==null?upliftRuleFilter:'null'})">+ New Uplift Value</button>
 
       </div>
@@ -2868,45 +3310,56 @@ function renderFactorRates(catFactors, rfMap={}) {
   const rows=catFactors.map(f=>{
 
     const rf=rfMap[f.id]||{};
-
+    const upliftType = rf.uplift_type || 'percentage';
+    const ratioVal = rf.uplift_ratio!=null ? rf.uplift_ratio : 0;
+    const displayVal = upliftType === 'absolute' ? ratioVal.toFixed(2) : (ratioVal*100).toFixed(2);
     return `<tr>
-
       <td>${f.factor_name} ${clsBadge(f.classification)}</td>
-
       <td><input class="form-control" data-fid="${f.id}" data-field="values" value="${rf.factor_values||''}" placeholder="comma-separated match values" style="min-width:180px"></td>
-
-      <td><input class="form-control text-right" data-fid="${f.id}" data-field="ratio" value="${rf.uplift_ratio!=null?(rf.uplift_ratio*100).toFixed(2):''}" placeholder="0.00" style="width:80px" oninput="updateTotal()">%</td>
-
+      <td style="white-space:nowrap">
+        <select data-fid="${f.id}" data-field="type" style="width:42px;padding:4px 2px;border:1px solid #d1d5db;border-radius:4px;font-size:11px;margin-right:4px" onchange="onUpliftTypeChange(this);updateTotal()">
+          <option value="percentage" ${upliftType==='percentage'?'selected':''}>%</option>
+          <option value="absolute" ${upliftType==='absolute'?'selected':''}>$</option>
+        </select>
+        <input class="form-control text-right" data-fid="${f.id}" data-field="ratio" value="${displayVal}" placeholder="0.00" style="width:80px" oninput="updateTotal()">
+      </td>
     </tr>`;
-
   }).join('');
-
-  return `<table class="tbl"><thead><tr><th>Factor</th><th>Match Values</th><th>Uplift %</th></tr></thead>
-
+  return `<table class="tbl"><thead><tr><th>Factor</th><th>Match Values</th><th>Uplift</th></tr></thead>
   <tbody id="factor-rate-rows">${rows}</tbody>
-
-  <tfoot><tr class="total-uplift-row"><td colspan="2" style="text-align:right;font-size:13px">Total Uplift Ratio:</td>
-
+  <tfoot><tr class="total-uplift-row"><td colspan="2" style="text-align:right;font-size:13px">Total Uplift:</td>
   <td><span id="total-uplift-disp">0.00%</span></td></tr></tfoot></table>`;
 
 }
 
-
+function onUpliftTypeChange(sel) {
+  updateTotal();
+}
 
 function updateTotal() {
 
   const inputs=document.querySelectorAll('[data-field="ratio"]');
-
-  let total=0;
-
-  inputs.forEach(inp=>{ const v=parseFloat(inp.value); if(!isNaN(v)) total+=v; });
-
+  let totalPct=0, totalAbs=0;
+  inputs.forEach(inp=>{
+    const v=parseFloat(inp.value); if(isNaN(v)) return;
+    const fid=inp.dataset.fid;
+    const typeSel=document.querySelector(`[data-fid="${fid}"][data-field="type"]`);
+    const type=typeSel ? typeSel.value : 'percentage';
+    if (type==='absolute') totalAbs+=v;
+    else totalPct+=v;
+  });
   const d=el('total-uplift-disp');
-
-  if (d) d.textContent=total.toFixed(2)+'%';
+  if (!d) return;
+  let text = '';
+  if (totalPct>0) text += totalPct.toFixed(2)+'%';
+  if (totalAbs>0) {
+    if (text) text += ' + ';
+    text += '$'+totalAbs.toFixed(2);
+  }
+  if (!text) text = '0.00%';
+  d.textContent=text;
 
 }
-
 
 
 async function onUpliftRuleChange(ruleId) {
@@ -2971,7 +3424,10 @@ async function saveUpliftValue(ruleId) {
 
     const ratio=parseFloat(ratioInp?.value)||0;
 
-    factors.push({factor_def_id:fid, factor_values:inp.value||'', uplift_ratio:ratio/100});
+        const typeSel=document.querySelector(`[data-fid="${fid}"][data-field="type"]`);
+    const upliftType=typeSel ? typeSel.value : 'percentage';
+    const upliftRatio = upliftType==='absolute' ? ratio : ratio/100;
+    factors.push({factor_def_id:fid, factor_values:inp.value||'', uplift_ratio:upliftRatio, uplift_type:upliftType});
 
   });
 
@@ -3045,7 +3501,7 @@ async function renderCalculateTab() {
 
     <p style="margin-bottom:12px;color:#374151">
 
-      Formula: <strong>Sales Cost = PSC × (1 + Total Uplift Ratio)</strong><br>
+      Formula: <strong>Sales Cost = PSC × (1 + Σ Uplift %) + Σ $</strong><br>
 
       <span class="text-muted text-sm">Matches each SKU to a Released Uplift Value by (Type of Service + GEO). Applies factor ratios for matching values.</span>
 
@@ -3090,6 +3546,7 @@ async function runCalculation() {
     ${errors.length?`<div style="margin-top:8px">${errors.map(e=>`<div class="err-item">— ${e}</div>`).join('')}</div>`:''}`;
 
     toast(`Calculation complete: ${calculated} calculated, ${skipped} skipped`, 'success');
+    Audit.log.calcRun(calculated, skipped, currentUser, 3);
 
     await renderCalcSummary();
 
@@ -3277,7 +3734,7 @@ function calcSku(sku, ruleFactors) {
 
   const psc=sku.psc_value;
 
-  let totalRatio=0;
+  let totalRatio=0, totalAbsolute=0;
 
   const formula=[];
 
@@ -3295,17 +3752,24 @@ function calcSku(sku, ruleFactors) {
 
     if (allowed.includes(skuVal)) {
 
-      const ratio=rf.uplift_ratio||0;
+      const val=rf.uplift_ratio||0;
+      const type=rf.uplift_type||'percentage';
 
-      totalRatio+=ratio;
-
-      formula.push({factor:rf.factor_name, technical_id:rf.technical_id, sku_value:skuVal, uplift_ratio:ratio});
+      if (type==='absolute') {
+        totalAbsolute+=val;
+        formula.push({factor:rf.factor_name, technical_id:rf.technical_id, sku_value:skuVal, uplift_ratio:val, type:'absolute'});
+      } else {
+        totalRatio+=val;
+        formula.push({factor:rf.factor_name, technical_id:rf.technical_id, sku_value:skuVal, uplift_ratio:val, type:'percentage'});
+      }
 
     }
 
   }
 
-  return {salesCost:psc*(1+totalRatio), totalRatio, formula};
+  // Sales Cost = PSC × (1 + Σ %) + Σ $
+  const salesCost=psc*(1+totalRatio)+totalAbsolute;
+  return {salesCost, totalRatio, totalAbsolute, formula};
 
 }
 
@@ -3339,7 +3803,7 @@ async function renderExportTab() {
 
   <div class="card" style="border:2px solid #c4b5fd">
 
-    <div class="card-title" style="color:#E2232A">Send to Stage 4 —'GVE Validation</div>
+    <div class="card-title" style="color:#E1251B">Send to Stage 4 —'GVE Validation</div>
 
     <p style="color:#374151;margin-bottom:8px;font-size:13px">
 
@@ -3351,9 +3815,13 @@ async function renderExportTab() {
 
     <p class="text-muted text-sm" style="margin-bottom:14px">${calcTotal} SKU(s) with Sales Cost ready · ${total-calcTotal} skipped (no rule / no PSC)</p>
 
-    <button class="btn" style="background:#E2232A;color:#fff;border-color:#E2232A" onclick="exportToStage4()" ${calcTotal===0?'disabled':''}>
+    <button class="btn" style="background:#E1251B;color:#fff;border-color:#E1251B" onclick="exportToStage4()" ${calcTotal===0?'disabled':''}>
 
-      Download Stage 4 Input Excel
+      Download Stage 4 Input Excel</button>
+
+    <button class="btn" style="background:#7c3aed;color:#fff" onclick="bridgeToStage4()" ${calcTotal===0?'disabled':''}>
+
+      📤 Send to Stage 4 (Bridge)</button>
 
     </button>
 
@@ -3452,6 +3920,50 @@ async function exportExcel() {
 
 
 
+
+// ── Bridge: Send to Stage 4 ──────────────────────────────────────────────────
+
+async function bridgeToStage4() {
+  const skus = await db.service_pns.where('cycle_id').equals(currentCycleId).toArray();
+  const calcSkus = skus.filter(s => s.sales_cost != null);
+  if (!calcSkus.length) { toast('No calculated SKUs to send', 'error'); return; }
+
+  const stage4Data = calcSkus.map(s => ({
+    part_number:      s.service_pn,
+    tier:             s.service_tier || s.type_of_service || '',
+    upgrade_years:    parseInt(s.service_term) / 12 || null,
+    delivery_type:    s.service_delivery_type || '',
+    region:           s.country || s.geo || '',
+    sales_cost:       s.sales_cost,
+    base_warranty:    s.offering_type || '',
+    upgrade_description: s.sdf_short_description || '',
+    included_adp:     s.included_adp || '',
+    included_kyd:     s.included_kyd || '',
+    included_sbty:    s.included_sbty || '',
+    included_ticru:   s.included_ticru || '',
+    included_premier: s.included_premier_service || '',
+    upgrade_from_type: s.upgrade_from_type || '',
+    upgrade_from_term: s.upgrade_from_term || '',
+  }));
+
+  const cycle = await db.cycles.get(currentCycleId);
+  const result = Bridge.saveForNext(3, stage4Data, {
+    cycleName: cycle?.name || 'Unknown',
+    stage: 3,
+    fiscalYear: cycle?.fiscal_year || '',
+  });
+
+  if (result.success) {
+    toast(`Sent ${result.rowCount} SKUs to Stage 4 via Bridge`, 'success');
+    Audit.log.bridgeSend(4, result.rowCount, currentUser, 3);
+    // Open Stage 4 in new tab after a short delay
+    setTimeout(function() {
+      window.open('../stage4_browser/index.html', '_blank');
+    }, 800);
+  } else {
+    toast('Bridge error: ' + result.error, 'error');
+  }
+}
 
 async function exportToStage4() {
 
@@ -3635,7 +4147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       <h2>Failed to initialise database</h2><p>${e.message}</p>
 
-      <p style="margin-top:8px;font-size:13px;color:#6b7280">Ensure you are using a modern browser (Chrome, Edge, Firefox) and not opening the file from a network drive.</p>
+      <p style="margin-top:8px;font-size:13px;color:#6F7170">Ensure you are using a modern browser (Chrome, Edge, Firefox) and not opening the file from a network drive.</p>
 
     </div>`;
 
