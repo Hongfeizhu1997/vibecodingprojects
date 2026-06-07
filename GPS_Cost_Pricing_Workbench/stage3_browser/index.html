@@ -506,8 +506,8 @@ const SKU_COLUMNS = [
     if (v==null||v==='') return '<td>—</td>';
     return '<td>' + (String(v).match(/^\d+$/) ? v+'Y' : v) + '</td>';
   } },
-  { key: 'upgrade_from_type', label: 'From Type', def: false, render: function(s) { return '<td>' + (s.upgrade_from_type||'—') + '</td>'; } },
-  { key: 'upgrade_from_term', label: 'From Term', def: false, render: function(s) {
+  { key: 'upgrade_from_type', label: 'From Type', def: true, render: function(s) { return '<td>' + (s.upgrade_from_type||'—') + '</td>'; } },
+  { key: 'upgrade_from_term', label: 'From Term', def: true, render: function(s) {
     var v = s.upgrade_from_term;
     if (v==null||v==='') return '<td>—</td>';
     return '<td>' + (String(v).match(/^\d+$/) ? v+'Y' : v) + '</td>';
@@ -543,9 +543,24 @@ function toggleCol(key) {
   saveVisibleCols();
 }
 
+function selectAllCols(show) {
+  SKU_COLUMNS.forEach(function(c) {
+    if (c.key === '_actions') return; // always keep actions
+    if (show) addVisibleCol(c.key); else removeVisibleCol(c.key);
+  });
+  renderSkuData();
+  // Re-render the dropdown to update checkboxes
+  var dd = document.querySelector('.col-dropdown');
+  if (dd) dd.innerHTML = ''; // will be rebuilt on next toggle click
+}
+
 function renderColToggle() {
   var html = '<div class="col-toggle"><button class="btn btn-sm" onclick="this.nextElementSibling.classList.toggle(\'hidden\')">\u2699 Columns</button>';
   html += '<div class="col-dropdown hidden" style="position:absolute;background:#fff;border:1px solid #ddd;border-radius:4px;padding:8px;z-index:10;max-height:400px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.1);min-width:200px">';
+  html += '<div style="display:flex;gap:8px;padding:4px 8px;border-bottom:1px solid #e5e7eb;margin-bottom:4px">';
+  html += '<a href="#" onclick="selectAllCols(true);return false" style="font-size:11px;color:#4263C7">Select All</a>';
+  html += '<a href="#" onclick="selectAllCols(false);return false" style="font-size:11px;color:#6b7280">Deselect All</a>';
+  html += '</div>';
   SKU_COLUMNS.forEach(function(c) {
     var ch = isColVisible(c.key) ? ' checked' : '';
     html += '<label style="display:block;padding:4px 8px;cursor:pointer;white-space:nowrap;font-size:13px"><input type="checkbox"' + ch + ' onchange="toggleCol(\'' + c.key + '\');renderSkuData()"> ' + c.label + '</label>';
