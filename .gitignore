@@ -1,17 +1,37 @@
-# Compiled / built output
-GPS_Cost_Pricing_Workbench/_archive/dist/
+# === Reference materials (not source code) ===
+*.pptx
+*.pdf
+*.docx
 
-# Python
+# === Raw data files (too large for GitHub) ===
+*.csv
+*.xlsx
+*.xls
+
+# === Archive files ===
+*.zip
+*.7z
+*.tar.gz
+
+# === Build artifacts ===
+_archive/
+
+# === Python cache ===
 __pycache__/
 *.pyc
 *.pyo
-.venv/
-venv/
 
-# OS
+# === Scraper output data ===
+output/
+!output/**/*.md
+
+# === Node modules ===
+node_modules/
+
+# === IDE / editor ===
+.vscode/
+.idea/
+
+# === OS files ===
 .DS_Store
 Thumbs.db
-
-# Editor
-.vscode/settings.json
-*.swp
