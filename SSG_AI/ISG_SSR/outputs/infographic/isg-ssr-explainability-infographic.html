@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISG SSR — Model Explainability Infographic</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: #020617; min-height: 100vh; display: flex; justify-content: center;
+  padding: 2rem; color: white;
+}
+.poster {
+  width: 1080px; background: #0b1120; border-radius: 1.5rem;
+  overflow: hidden; box-shadow: 0 0 60px rgba(59,130,246,0.1);
+}
+
+/* Header */
+.banner {
+  background: linear-gradient(135deg, #11184F 0%, #4D144A 50%, #7A126B 100%);
+  padding: 2.5rem 3rem; text-align: center; position: relative; overflow: hidden;
+}
+.banner::before {
+  content: ''; position: absolute; top: -50%; left: -20%; width: 140%; height: 200%;
+  background: radial-gradient(circle at 30% 50%, rgba(225,37,27,0.15), transparent 60%);
+}
+.banner-tag {
+  display: inline-block; background: rgba(225,37,27,0.2); color: #E1251B;
+  font-size: 0.7rem; font-weight: 700; padding: 4px 14px; border-radius: 20px;
+  letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem;
+  position: relative;
+}
+.banner h1 {
+  font-size: 2.2rem; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 0.5rem;
+  position: relative;
+}
+.banner .sub {
+  font-size: 1.05rem; color: rgba(255,255,255,0.75); font-weight: 400;
+  position: relative; max-width: 700px; margin: 0 auto; line-height: 1.5;
+}
+
+/* Sections */
+.section { padding: 2rem 3rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.section:last-child { border-bottom: none; }
+.section-label {
+  font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.section-label .dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-cyan { background: #22d3ee; } .dot-amber { background: #fbbf24; }
+.dot-violet { background: #a78bfa; } .dot-rose { background: #fb7185; }
+.dot-emerald { background: #34d399; }
+
+/* Four layers grid */
+.layers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.layer-card {
+  background: rgba(15,23,42,0.85); border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.1);
+  padding: 1.5rem; text-align: center; transition: transform 0.2s;
+}
+.layer-card:hover { transform: translateY(-2px); }
+.layer-num {
+  width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; margin: 0 auto 0.75rem; font-size: 0.85rem; font-weight: 800;
+}
+.layer-num.cyan { background: rgba(34,211,238,0.2); color: #22d3ee; border: 1px solid rgba(34,211,238,0.4); }
+.layer-num.violet { background: rgba(167,139,250,0.2); color: #c4b5fd; border: 1px solid rgba(167,139,250,0.4); }
+.layer-num.amber { background: rgba(251,191,36,0.2); color: #fcd34d; border: 1px solid rgba(251,191,36,0.4); }
+.layer-num.rose { background: rgba(251,113,133,0.2); color: #fda4af; border: 1px solid rgba(251,113,133,0.4); }
+.layer-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.3rem; }
+.layer-card .method { font-size: 0.7rem; color: #94a3b8; margin-bottom: 0.75rem; font-weight: 500; }
+.layer-card .desc { font-size: 0.72rem; color: #94a3b8; line-height: 1.5; }
+.layer-card .tag {
+  display: inline-block; font-size: 0.6rem; padding: 2px 8px; border-radius: 10px;
+  margin-top: 0.75rem; font-weight: 600;
+}
+.tag-transparent { background: rgba(52,211,153,0.18); color: #6ee7b7; }
+
+/* Price section */
+.price-section { background: rgba(17,24,79,0.3); border-radius: 1rem; padding: 1.5rem 2rem;
+  border: 1px solid rgba(59,130,246,0.15); margin-top: 1.5rem; }
+.price-title {
+  font-size: 0.9rem; font-weight: 700; color: #fbbf24; margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.price-compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.5rem; align-items: center; }
+.price-box {
+  background: rgba(15,23,42,0.5); border-radius: 0.75rem; padding: 1.25rem;
+  text-align: center; border: 1px solid rgba(255,255,255,0.05);
+}
+.price-box .head { font-size: 0.75rem; font-weight: 700; margin-bottom: 0.75rem; }
+.price-box .head.bad { color: #fb7185; }
+.price-box .head.good { color: #34d399; }
+.price-box .item { font-size: 0.68rem; color: #94a3b8; margin-bottom: 0.3rem; }
+.price-arrow { color: #64748b; font-size: 2rem; font-weight: 400; }
+
+/* Formula */
+.formula-box {
+  background: rgba(0,0,0,0.3); border-radius: 0.5rem; padding: 1rem 1.5rem;
+  margin-top: 1rem; font-family: 'Courier New', monospace; font-size: 0.8rem;
+  color: #e2e8f0; line-height: 1.8; text-align: center; border: 1px solid rgba(255,255,255,0.05);
+}
+.formula-box .hl { color: #fbbf24; }
+
+/* SHAP example */
+.shap-box {
+  background: rgba(15,23,42,0.5); border-radius: 0.75rem; padding: 1.5rem;
+  border: 1px solid rgba(167,139,250,0.15); margin-top: 1rem;
+}
+.shap-title { font-size: 0.8rem; font-weight: 700; color: #a78bfa; margin-bottom: 1rem; }
+.shap-row { display: flex; align-items: center; margin-bottom: 0.3rem; font-size: 0.72rem; }
+.shap-label { width: 240px; color: #94a3b8; text-align: right; padding-right: 0.75rem; }
+.shap-bar-wrap { flex: 1; height: 18px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; display: flex; }
+.shap-bar { height: 100%; border-radius: 3px; min-width: 2px; }
+.shap-bar.pos { background: #34d399; }
+.shap-bar.neg { background: #fb7185; margin-left: auto; }
+.shap-val { width: 60px; font-size: 0.7rem; padding-left: 0.5rem; }
+.shap-val.pos { color: #34d399; }
+.shap-val.neg { color: #fb7185; }
+.shap-base { font-size: 0.7rem; color: #94a3b8; margin-bottom: 0.5rem; padding-left: 240px; }
+.shap-line { border-top: 1px dashed rgba(255,255,255,0.15); margin: 0.5rem 0 0.5rem 240px; }
+.shap-final { font-weight: 700; }
+
+/* Safety nets */
+.safety-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.safety-card {
+  background: rgba(136,19,55,0.08); border-radius: 0.75rem; padding: 1.25rem;
+  border: 1px solid rgba(251,113,133,0.12); text-align: center;
+}
+.safety-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.safety-card h4 { font-size: 0.8rem; font-weight: 700; margin-bottom: 0.4rem; }
+.safety-card p { font-size: 0.68rem; color: #94a3b8; line-height: 1.5; }
+
+/* Conclusion */
+.conclusion {
+  background: linear-gradient(135deg, rgba(17,24,79,0.4), rgba(122,18,107,0.2));
+  padding: 2rem 3rem; text-align: center;
+}
+.conclusion h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+.conclusion p { font-size: 0.8rem; color: #94a3b8; max-width: 700px; margin: 0 auto; line-height: 1.5; }
+
+.footer { padding: 1rem 3rem; text-align: center; font-size: 0.65rem; color: #475569; }
+</style>
+</head>
+<body>
+<div class="poster">
+
+<!-- BANNER -->
+<div class="banner">
+  <div class="banner-tag">Lenovo ISG · Model Explainability</div>
+  <h1>How ISG SSR Recommends Services</h1>
+  <p class="sub">Every recommendation is traceable to specific factors —<br/>historical evidence, price optimization, and business rules combined.</p>
+</div>
+
+<!-- SECTION 1: THE QUESTION -->
+<div class="section">
+  <div class="section-label"><span class="dot dot-cyan"></span> The Core Question</div>
+  <p style="font-size:1.1rem;font-weight:600;color:#e2e8f0;margin-bottom:0.3rem;">"Why was Service A recommended over Service B for this customer?"</p>
+  <p style="font-size:0.8rem;color:#64748b;">The answer is not "the AI said so" — it decomposes into four transparent layers.</p>
+</div>
+
+<!-- SECTION 2: FOUR LAYERS -->
+<div class="section">
+  <div class="section-label"><span class="dot dot-emerald"></span> Four-Layer Recommendation Logic</div>
+  <div class="layers">
+    <div class="layer-card">
+      <div class="layer-num cyan">1</div>
+      <h4>Recall</h4>
+      <div class="method">Rule-Based</div>
+      <div class="desc">"82% of similar bids chose this service."<br/>Association rules + popularity statistics — fully auditable.</div>
+      <div class="tag tag-transparent">100% Transparent</div>
+    </div>
+    <div class="layer-card">
+      <div class="layer-num violet">2</div>
+      <h4>Ranking</h4>
+      <div class="method">AI + SHAP Explainable</div>
+      <div class="desc">XGBoost scores each candidate. Every prediction decomposable via SHAP feature attribution.</div>
+      <div class="tag tag-transparent">Per-Rec Traceable</div>
+    </div>
+    <div class="layer-card">
+      <div class="layer-num amber">3</div>
+      <h4>Add-On</h4>
+      <div class="method">Statistical</div>
+      <div class="desc">"64% of customers with this warranty also added..."<br/>Co-occurrence frequency counts — reviewable.</div>
+      <div class="tag tag-transparent">100% Transparent</div>
+    </div>
+    <div class="layer-card">
+      <div class="layer-num rose">4</div>
+      <h4>Business Rules</h4>
+      <div class="method">Human-Defined</div>
+      <div class="desc">Geo restrictions, EOL filters, compliance — documented, version-controlled, changeable.</div>
+      <div class="tag tag-transparent">100% Transparent</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3: PRICE OPTIMIZATION -->
+<div class="section">
+  <div class="section-label"><span class="dot dot-amber"></span> How Price Influences Recommendations</div>
+
+  <div class="price-compare">
+    <div class="price-box">
+      <div class="head bad">Standard ML Approach</div>
+      <div class="item">Recommend most likely service</div>
+      <div class="item" style="margin-top:0.5rem;color:#fb7185;">Low-price, high-frequency services<br/>dominate the results</div>
+      <div class="item" style="margin-top:0.5rem;color:#64748b;">→ Service revenue at risk</div>
+    </div>
+    <div class="price-arrow">→</div>
+    <div class="price-box">
+      <div class="head good">ISG SSR Approach</div>
+      <div class="item">Recommend most likely service</div>
+      <div class="item" style="margin-top:0.5rem;color:#34d399;">When probabilities are close,<br/>tilt toward higher-priced option</div>
+      <div class="item" style="margin-top:0.5rem;color:#64748b;">→ Protects service attach revenue</div>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    <span class="hl">Custom Loss</span> = Accuracy Loss &nbsp;+&nbsp; <span class="hl">β</span> · Price Tilt<br/>
+    Price Tilt: penalizes low-price services when probabilities are close<br/>
+    <span class="hl">β</span> (business dial): <span class="hl">0.5 → 0.1</span> &nbsp;dynamic adaptive decay &nbsp;·&nbsp; Tunable by business owners
+  </div>
+</div>
+
+<!-- SECTION 4: SHAP EXAMPLE -->
+<div class="section">
+  <div class="section-label"><span class="dot dot-violet"></span> SHAP Explainability — Single Recommendation Decomposed</div>
+  <p style="font-size:0.75rem;color:#64748b;margin-bottom:1rem;">"Why was the 3-Year Onsite Warranty ranked for this enterprise SR650 bid?"</p>
+
+  <div class="shap-box">
+    <div class="shap-base">Base Rate &nbsp;&nbsp;&nbsp;0.45</div>
+    <div class="shap-row">
+      <span class="shap-label">Hardware = ThinkSystem SR650</span>
+      <span class="shap-bar-wrap"><span class="shap-bar pos" style="width:36%"></span></span>
+      <span class="shap-val pos">+0.18</span>
+    </div>
+    <div class="shap-row">
+      <span class="shap-label">Customer Segment = Enterprise</span>
+      <span class="shap-bar-wrap"><span class="shap-bar pos" style="width:24%"></span></span>
+      <span class="shap-val pos">+0.12</span>
+    </div>
+    <div class="shap-row">
+      <span class="shap-label">Country = USA</span>
+      <span class="shap-bar-wrap"><span class="shap-bar pos" style="width:16%"></span></span>
+      <span class="shap-val pos">+0.08</span>
+    </div>
+    <div class="shap-row">
+      <span class="shap-label">Contract = One-Time Deal</span>
+      <span class="shap-bar-wrap"><span class="shap-bar neg" style="width:10%"></span></span>
+      <span class="shap-val neg">-0.05</span>
+    </div>
+    <div class="shap-row">
+      <span class="shap-label">Price Tilt (low-price penalty)</span>
+      <span class="shap-bar-wrap"><span class="shap-bar neg" style="width:12%"></span></span>
+      <span class="shap-val neg">-0.06</span>
+    </div>
+    <div class="shap-line"></div>
+    <div class="shap-row shap-final">
+      <span class="shap-label" style="color:white;">Final Score</span>
+      <span class="shap-bar-wrap" style="background:transparent;"></span>
+      <span class="shap-val" style="color:white;font-weight:700;">0.72</span>
+    </div>
+  </div>
+
+  <p style="font-size:0.68rem;color:#64748b;margin-top:0.75rem;">
+    SHAP values are mathematically computed per prediction — not conceptual illustrations. Every recommendation receives this breakdown.
+  </p>
+</div>
+
+<!-- SECTION 5: SAFETY NETS -->
+<div class="section">
+  <div class="section-label"><span class="dot dot-rose"></span> Three Safety Nets</div>
+  <div class="safety-grid">
+    <div class="safety-card">
+      <div class="safety-icon">🔀</div>
+      <h4>GBB Branching</h4>
+      <p>Low model confidence (≤0.75) triggers conservative mode — price-sorted options only, no aggressive recommendations.</p>
+    </div>
+    <div class="safety-card">
+      <div class="safety-icon">🛡️</div>
+      <h4>Business Rule Filters</h4>
+      <p>Geo restrictions, EOL detection, compliance rules applied after ML scoring — human-defined, always enforced.</p>
+    </div>
+    <div class="safety-card">
+      <div class="safety-icon">🚦</div>
+      <h4>Deployment Gate</h4>
+      <p>New model must strictly outperform current on Accuracy + F1-Score. Fail → auto-rollback. Consecutive failures → pause.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONCLUSION -->
+<div class="conclusion">
+  <h3>Not "The AI Said So"</h3>
+  <p>
+    Every recommendation = Historical Evidence &nbsp;+&nbsp; Price Optimization &nbsp;+&nbsp; Business Rules<br/>
+    All traceable to specific factors. All auditable. No black boxes.
+  </p>
+</div>
+
+<div class="footer">Lenovo ISG · Intelligent Service Recommendation · Model Explainability · May 2026</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISG SSR — Catalog Recommendation Consumption Logic</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background:#020617; color:#fff; overflow:hidden;
+  width:100vw; height:100vh; display:flex; align-items:center; justify-content:center;
+}
+.stage {
+  position:absolute; width:100%; height:100%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  opacity:0; transition: opacity 0.5s ease;
+  pointer-events:none; padding:2rem 2.5rem;
+}
+.stage.active { opacity:1; pointer-events:auto; }
+
+.brand {
+  position:fixed; top:0; left:0; width:100%; height:3px;
+  background:linear-gradient(90deg,#E1251B,#11184F,#4D144A,#7A126B); z-index:100;
+}
+.progress-wrap {
+  position:fixed; bottom:0; left:0; width:100%; height:3px; z-index:100;
+  background:rgba(51,65,85,0.3);
+}
+.progress-fill {
+  height:100%; background:linear-gradient(90deg,#E1251B,#a78bfa);
+  transition: width 0.5s linear;
+}
+.indicator {
+  position:fixed; top:1rem; right:1.5rem; z-index:100;
+  font-size:0.7rem; color:#64748b; font-weight:700; letter-spacing:0.06em;
+}
+.nav-hint {
+  position:fixed; bottom:1.5rem; right:1.5rem; z-index:100;
+  font-size:0.62rem; color:#334155; letter-spacing:0.06em;
+}
+.reveal {
+  opacity:0; transform:translateY(12px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.reveal.in { opacity:1; transform:translateY(0); }
+
+/* STAGE 0-3 (unchanged) */
+.s0-tag { display:inline-block; background:rgba(225,37,27,0.12); color:#E1251B; font-size:0.7rem; font-weight:700; padding:4px 14px; border-radius:20px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1rem; }
+.s0-title { font-size:2.4rem; font-weight:900; text-align:center; max-width:800px; line-height:1.2; }
+.s0-title span { color:#E1251B; }
+.s0-sub { font-size:0.95rem; color:#94a3b8; margin-top:0.8rem; text-align:center; max-width:580px; line-height:1.5; }
+.sec-tag { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#E1251B; margin-bottom:0.3rem; }
+.sec-title { font-size:1.3rem; font-weight:800; color:#fff; margin-bottom:0.5rem; }
+.sec-desc { font-size:0.75rem; color:#94a3b8; max-width:750px; text-align:center; line-height:1.5; margin-bottom:1rem; }
+
+.s1-pipeline { display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin-bottom:1.2rem; }
+.s1-pipe-node { padding:0.65rem 1rem; border-radius:0.5rem; text-align:center; font-size:0.68rem; font-weight:700; line-height:1.4; }
+.s1-pipe-node.ai   { background:rgba(225,37,27,0.1);  border:1px solid rgba(225,37,27,0.3);  color:#E1251B; }
+.s1-pipe-node.cat  { background:rgba(251,191,36,0.08); border:2px solid rgba(251,191,36,0.3); color:#fbbf24; }
+.s1-pipe-node.elig { background:rgba(34,211,238,0.1);  border:1px solid rgba(34,211,238,0.25); color:#22d3ee; }
+.s1-pipe-node.dec  { background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.3); color:#a78bfa; }
+.s1-pipe-node.out  { background:rgba(52,211,153,0.1);  border:1px solid rgba(52,211,153,0.25); color:#34d399; }
+.s1-arrow { color:#475569; font-size:1.2rem; font-weight:300; }
+.s1-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:0.7rem; max-width:1000px; width:100%; }
+.s1-card { background:rgba(15,23,42,0.6); border-radius:0.6rem; padding:0.8rem; border:1px solid rgba(51,65,85,0.3); }
+.s1-card h4 { font-size:0.68rem; font-weight:700; color:#fff; margin-bottom:0.35rem; }
+.s1-card p { font-size:0.65rem; color:#94a3b8; line-height:1.5; }
+.s1-card .hl { color:#fbbf24; font-weight:600; }
+
+.s2-rules { display:grid; grid-template-columns:repeat(4,1fr); gap:0.8rem; max-width:880px; width:100%; margin-bottom:1rem; }
+.s2-rule { background:rgba(15,23,42,0.5); border-radius:0.5rem; padding:0.8rem 0.7rem; border:1px solid rgba(51,65,85,0.2); text-align:center; }
+.s2-rule .ri { font-size:1.3rem; margin-bottom:0.3rem; }
+.s2-rule .rn { font-size:0.65rem; font-weight:700; color:#cbd5e1; }
+.s2-rule .rd { font-size:0.62rem; color:#64748b; margin-top:0.15rem; }
+.s2-note { background:rgba(52,211,153,0.04); border:1px solid rgba(52,211,153,0.2); border-radius:0.5rem; padding:0.7rem 1.2rem; max-width:750px; font-size:0.68rem; color:#94a3b8; text-align:center; line-height:1.6; }
+.s2-note span { color:#34d399; font-weight:600; }
+
+.s3-gate { display:inline-block; background:rgba(167,139,250,0.08); border:2px solid rgba(167,139,250,0.3); border-radius:0.7rem; padding:0.7rem 2rem; text-align:center; margin-bottom:0.8rem; }
+.s3-gate h3 { font-size:0.78rem; font-weight:800; color:#a78bfa; }
+.s3-gate p { font-size:0.65rem; color:#94a3b8; margin-top:0.15rem; }
+.s3-split-labels { display:flex; gap:1.5rem; justify-content:center; margin-bottom:0.5rem; }
+.s3-split-labels span { font-size:0.62rem; font-weight:700; padding:2px 12px; border-radius:4px; }
+.s3-label-no { background:rgba(34,211,238,0.12); color:#22d3ee; }
+.s3-label-yes { background:rgba(52,211,153,0.12); color:#34d399; }
+.s3-branches { display:flex; gap:1.5rem; max-width:920px; width:100%; justify-content:center; align-items:stretch; }
+.s3-branch { flex:1; max-width:440px; display:flex; flex-direction:column; }
+.s3-bc { background:rgba(15,23,42,0.7); border-radius:0.6rem; padding:0.9rem; border:1px solid rgba(51,65,85,0.3); margin-bottom:0.5rem; flex:1; }
+.s3-bc.b1 { border-left:3px solid #22d3ee; }
+.s3-bc.b2 { border-left:3px solid #34d399; }
+.s3-bc h4 { font-size:0.72rem; font-weight:700; color:#fff; margin-bottom:0.45rem; }
+.s3-step { font-size:0.65rem; color:#94a3b8; line-height:1.5; padding:0.12rem 0; }
+.s3-step .num { display:inline-block; width:1.1rem; height:1.1rem; border-radius:50%; background:rgba(255,255,255,0.08); color:#64748b; font-size:0.62rem; font-weight:700; text-align:center; line-height:1.1rem; margin-right:0.3rem; }
+.s3-out-row { display:flex; gap:0.5rem; justify-content:center; width:100%; }
+.s3-out { flex:1; border-radius:0.5rem; padding:0.5rem 0.4rem; text-align:center; border:1px solid; }
+.s3-out.g  { background:rgba(34,211,238,0.06);  border-color:rgba(34,211,238,0.2); }
+.s3-out.b  { background:rgba(251,191,36,0.06);  border-color:rgba(251,191,36,0.2); }
+.s3-out.bb { background:rgba(52,211,153,0.06);  border-color:rgba(52,211,153,0.2); }
+.s3-out .ol { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.15rem; }
+.s3-out.g .ol { color:#22d3ee; }
+.s3-out.b .ol { color:#fbbf24; }
+.s3-out.bb .ol { color:#34d399; }
+.s3-out .od { font-size:0.62rem; color:#94a3b8; line-height:1.3; }
+
+/* ===== STAGE 4 ===== */
+.s4-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; max-width:1080px; width:100%; align-items:stretch; }
+.s4-ex { background:rgba(15,23,42,0.5); border:1px solid rgba(51,65,85,0.4); border-radius:0.55rem; overflow:hidden; display:flex; flex-direction:column; }
+.s4-ex-hdr { padding:0.38rem 0.7rem; font-size:0.63rem; font-weight:700; display:flex; align-items:center; gap:0.3rem; flex-shrink:0; }
+.s4-ex-hdr .ex-num { width:1.1rem; height:1.1rem; border-radius:50%; font-size:0.62rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.s4-ex-body { padding:0.45rem 0.7rem 0.55rem; flex:1; display:flex; flex-direction:column; }
+
+.ex-ctx { font-size:0.62rem; color:#94a3b8; margin-bottom:0.4rem; padding-bottom:0.35rem; border-bottom:1px solid rgba(51,65,85,0.2); }
+.ex-ctx strong { color:#cbd5e1; }
+
+/* Plans table */
+.plans-tbl { width:100%; border-collapse:collapse; margin-bottom:0.1rem; }
+.plans-tbl th {
+  font-size:0.62rem; font-weight:700; color:#475569; text-transform:uppercase;
+  letter-spacing:0.06em; text-align:left; padding:0.2rem 0.3rem;
+  border-bottom:1px solid rgba(51,65,85,0.3);
+}
+.plans-tbl th:last-child { text-align:right; }
+.plans-tbl td {
+  font-size:0.62rem; padding:0.2rem 0.3rem; border-bottom:1px solid rgba(51,65,85,0.1);
+  color:#cbd5e1; vertical-align:middle;
+}
+.plans-tbl td:last-child { text-align:right; font-weight:700; font-variant-numeric:tabular-nums; }
+.prob-hi { color:#34d399; }
+.prob-mid { color:#fbbf24; }
+.prob-lo { color:#22d3ee; }
+.plans-tbl tr.top-pick td { background:rgba(225,37,27,0.04); }
+.plans-tbl tr.top-pick td:first-child { border-left:2px solid #E1251B; }
+.plans-tbl tr.filtered td { opacity:0.4; text-decoration:line-through; text-decoration-color:rgba(251,113,133,0.3); }
+.plans-tbl tr.kept td { opacity:0.85; }
+
+/* Add-ons */
+.addons-sec { margin-top:0.3rem; padding:0.3rem 0.4rem; background:rgba(0,0,0,0.2); border-radius:0.3rem; }
+.addons-sec .addons-label { font-size:0.62rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.2rem; }
+.addon-row { display:flex; align-items:center; gap:0.3rem; padding:0.12rem 0; font-size:0.62rem; }
+.addon-row .addon-type { color:#fbbf24; font-weight:600; min-width:5.5rem; flex-shrink:0; }
+.addon-row .addon-opts { flex:1; color:#94a3b8; }
+.addon-row .addon-opts .opt { display:inline-block; margin-right:0.55rem; }
+.addon-row .addon-opts .opt.sel { color:#34d399; font-weight:600; }
+.addon-row .addon-opts .opt.alt { color:#64748b; }
+.addons-note { font-size:0.62rem; color:#475569; margin-top:0.15rem; }
+
+/* Catalog action */
+.cat-block { margin-top:0.3rem; padding:0.3rem 0.45rem; background:rgba(0,0,0,0.15); border-radius:0.3rem; font-size:0.62rem; color:#94a3b8; line-height:1.45; }
+.cat-block .ct-rem { color:#fb7185; font-weight:600; }
+.cat-block .ct-ok { color:#34d399; font-weight:600; }
+
+/* Result */
+.ex-result { margin-top:0.35rem; padding-top:0.3rem; border-top:1px solid rgba(51,65,85,0.3); }
+.ex-result .res-label { font-size:0.62rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.22rem; }
+.res-tiers { display:flex; gap:0.3rem; }
+.res-tier { flex:1; padding:0.22rem 0.25rem; border-radius:0.25rem; text-align:center; font-size:0.62rem; font-weight:600; line-height:1.3; }
+.res-tier.g  { background:rgba(34,211,238,0.12); color:#22d3ee; }
+.res-tier.b  { background:rgba(251,191,36,0.12); color:#fbbf24; }
+.res-tier.bb { background:rgba(52,211,153,0.12); color:#34d399; }
+
+.ex-lc .s4-ex-hdr { background:rgba(34,211,238,0.08); color:#22d3ee; }
+.ex-lc .ex-num { background:#22d3ee; color:#020617; }
+.ex-hc .s4-ex-hdr { background:rgba(52,211,153,0.08); color:#34d399; }
+.ex-hc .ex-num { background:#34d399; color:#020617; }
+
+.ex-sec-label { font-size:0.62rem; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.2rem; }
+
+/* Scenario 1 spacing — stretch to match Scenario 2 height */
+.ex-lc .s4-ex-body { justify-content:space-evenly; }
+.ex-lc .ex-ctx { margin-bottom:0; padding-bottom:0.35rem; }
+.ex-lc .ex-sec-label { margin-bottom:0; }
+.ex-lc .addons-note { margin-top:0; margin-bottom:0; }
+.ex-lc .cat-block { margin-top:0; }
+.ex-lc .ex-result { margin-top:0; padding-top:0.3rem; }
+</style>
+</head>
+<body>
+<div class="brand"></div>
+<div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+<div class="indicator" id="indicator">1 / 5</div>
+<div class="nav-hint">← → Navigate &nbsp;|&nbsp; Lenovo ISG · SSR</div>
+
+<!-- STAGE 0: TITLE -->
+<div class="stage active" id="s0">
+  <div class="reveal" data-delay="0"><span class="s0-tag">Lenovo ISG · Service Smart Recommendation</span></div>
+  <div class="reveal" data-delay="200"><h1 class="s0-title">How the <span>Catalog</span> Consumes AI Recommendations</h1></div>
+  <div class="reveal" data-delay="400"><p class="s0-sub">AI model output passes through catalog product logic before reaching the GBB frontend. Not every AI top pick makes it to the bid — and that's by design.</p></div>
+</div>
+
+<!-- STAGE 1: PIPELINE OVERVIEW -->
+<div class="stage" id="s1">
+  <div class="reveal" data-delay="0"><div class="sec-tag">01 · Pipeline Overview</div></div>
+  <div class="reveal" data-delay="150"><h2 class="sec-title">From AI Prediction to GBB Display</h2></div>
+  <div class="reveal" data-delay="300"><p class="sec-desc">The AI model produces N warranty plan recommendations. These pass through <strong style="color:#fbbf24;">Catalog Product Logic</strong> before surviving candidates enter the GBB decision engine.</p></div>
+  <div class="reveal" data-delay="450">
+    <div class="s1-pipeline">
+      <div class="s1-pipe-node ai">AI Model<br>Output<br><span style="font-weight:400;font-size:0.62rem;">N plans, Σprob=1</span></div>
+      <div class="s1-arrow">→</div>
+      <div class="s1-pipe-node cat">Catalog<br>Logic Filter<br><span style="font-weight:400;font-size:0.62rem;">NEW</span></div>
+      <div class="s1-arrow">→</div>
+      <div class="s1-pipe-node elig">Eligible<br>Candidates<br><span style="font-weight:400;font-size:0.62rem;">M &le; N plans</span></div>
+      <div class="s1-arrow">→</div>
+      <div class="s1-pipe-node dec">Decision<br>Gate<br><span style="font-weight:400;font-size:0.62rem;">prob &gt; 0.75?</span></div>
+      <div class="s1-arrow">→</div>
+      <div class="s1-pipe-node out">GBB<br>Display<br><span style="font-weight:400;font-size:0.62rem;">3 cards</span></div>
+    </div>
+  </div>
+  <div class="reveal" data-delay="600">
+    <div class="s1-cards">
+      <div class="s1-card"><h4>① AI Model Output</h4><p>XGBoost multi-class → <span class="hl">N plans, Σprob = 1</span>. Each plan: base warranty (Type·Term·SLA) + add-on modules (each with competing options, Σprob = 1 per module).</p></div>
+      <div class="s1-card"><h4>② Catalog Logic Filter</h4><p>Existing product rules validate each plan against <span class="hl">real-world availability</span>. Plans failing any rule are removed — regardless of AI confidence.</p></div>
+      <div class="s1-card"><h4>③ Decision Gate</h4><p>On <span class="hl">surviving</span> candidates: any plan prob &gt; 0.75? → Branch 2 (personalized add-on stacking) or Branch 1 (price-tier fallback).</p></div>
+      <div class="s1-card"><h4>④ GBB Frontend</h4><p>Exactly <span class="hl">3 warranty cards</span> (Good / Better / Best). Always deterministic — same input = same output.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- STAGE 2: CATALOG FILTER DETAIL -->
+<div class="stage" id="s2">
+  <div class="reveal" data-delay="0"><div class="sec-tag">02 · Catalog Product Logic</div></div>
+  <div class="reveal" data-delay="150"><h2 class="sec-title">Not Every AI Recommendation Survives the Catalog</h2></div>
+  <div class="reveal" data-delay="300"><p class="sec-desc">The AI model sees <strong style="color:#fff;">statistical patterns</strong> — it doesn't know regional availability, contract terms, or product lifecycle. The Catalog layer validates every recommendation against operational reality.</p></div>
+  <div class="reveal" data-delay="450">
+    <div class="s2-rules">
+      <div class="s2-rule"><div class="ri">🌍</div><div class="rn">Region Availability</div><div class="rd">Plan offered in bid's geo?</div></div>
+      <div class="s2-rule"><div class="ri">📋</div><div class="rn">Contract Constraints</div><div class="rd">Customer eligible for this tier?</div></div>
+      <div class="s2-rule"><div class="ri">🔄</div><div class="rn">Product Lifecycle</div><div class="rd">Active / sunset / EOL status</div></div>
+      <div class="s2-rule"><div class="ri">💰</div><div class="rn">Price Thresholds</div><div class="rd">Min/max price within band?</div></div>
+    </div>
+  </div>
+  <div class="reveal" data-delay="600">
+    <div class="s2-note"><span>Expected behavior:</span> AI best-pick being filtered by catalog logic is <span>not a bug</span> — it's the system correctly enforcing business guardrails. The AI recommends based on learned patterns; the catalog ensures only valid, deliverable products reach the customer.</div>
+  </div>
+</div>
+
+<!-- STAGE 3: GBB DECISION LOGIC -->
+<div class="stage" id="s3">
+  <div class="reveal" data-delay="0"><div class="sec-tag">03 · GBB Decision Logic</div></div>
+  <div class="reveal" data-delay="150"><h2 class="sec-title">After Filtering — Two Paths to Three Cards</h2></div>
+  <div class="reveal" data-delay="300"><p class="sec-desc">Once catalog filtering produces the eligible set, the system checks confidence. Both paths always produce exactly <strong style="color:#fff;">3 cards</strong>.</p></div>
+  <div class="reveal" data-delay="400">
+    <div class="s3-gate"><h3>Any eligible plan with probability &gt; 0.75 ?</h3><p>Evaluated on filtered candidates only</p></div>
+  </div>
+  <div class="reveal" data-delay="500">
+    <div class="s3-split-labels"><span class="s3-label-no">NO — Branch 1</span><span class="s3-label-yes">YES — Branch 2</span></div>
+  </div>
+  <div class="reveal" data-delay="550">
+    <div class="s3-branches">
+      <div class="s3-branch">
+        <div class="s3-bc b1">
+          <h4>Low-Confidence Mode</h4>
+          <div class="s3-step"><span class="num">1</span> Sort eligible plans by price (lowest → highest)</div>
+          <div class="s3-step"><span class="num">2</span> Assign Good / Better / Best by price tier</div>
+          <div class="s3-step"><span class="num">3</span> Base warranty only — no add-ons pre-selected</div>
+        </div>
+        <div class="s3-out-row">
+          <div class="s3-out g"><div class="ol">Good</div><div class="od">Lowest price eligible plan</div></div>
+          <div class="s3-out b"><div class="ol">Better</div><div class="od">Mid-price eligible plan</div></div>
+          <div class="s3-out bb"><div class="ol">Best</div><div class="od">Highest price eligible plan</div></div>
+        </div>
+      </div>
+      <div class="s3-branch">
+        <div class="s3-bc b2">
+          <h4>High-Confidence Mode</h4>
+          <div class="s3-step"><span class="num">1</span> Select plan with highest probability</div>
+          <div class="s3-step"><span class="num">2</span> Per add-on module: pick option with max prob</div>
+          <div class="s3-step"><span class="num">3</span> Rank module reps by probability (descending)</div>
+          <div class="s3-step"><span class="num">4</span> Build three tiers by stacking add-on modules</div>
+        </div>
+        <div class="s3-out-row">
+          <div class="s3-out g"><div class="ol">Good</div><div class="od">Base warranty only</div></div>
+          <div class="s3-out b"><div class="ol">Better</div><div class="od">Base + #1 add-on</div></div>
+          <div class="s3-out bb"><div class="ol">Best</div><div class="od">Base + #1 + #2 add-ons</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== STAGE 4: TWO SCENARIOS ====== -->
+<div class="stage" id="s4">
+  <div class="reveal" data-delay="0"><div class="sec-tag">04 · Real-World Examples</div></div>
+  <div class="reveal" data-delay="150"><h2 class="sec-title">Two Scenarios — Low vs High Confidence</h2></div>
+  <div class="reveal" data-delay="300"><p class="sec-desc">Left: all plans &lt; 0.75, one filtered by catalog → Branch 1. Right: one plan &gt; 0.75, one add-on filtered → Branch 2.</p></div>
+  <div class="reveal" data-delay="400">
+    <div class="s4-grid">
+
+      <!-- Scenario 1: Low Confidence -->
+      <div class="s4-ex ex-lc">
+        <div class="s4-ex-hdr"><div class="ex-num">1</div> Low Confidence — Branch 1</div>
+        <div class="s4-ex-body">
+          <div class="ex-ctx">ThinkSystem SR650 V3 · <strong>NA Region</strong> · Enterprise · New bid</div>
+
+          <div class="ex-sec-label">AI Output — 4 Base Plans (Σ = 1, all &lt; 0.75)</div>
+          <table class="plans-tbl">
+            <tr><th>Plan</th><th>Type</th><th>Term</th><th>SLA</th><th>Prob</th></tr>
+            <tr class="kept"><td>A</td><td>Premier</td><td>3Y</td><td>24×7 4hr</td><td class="prob-mid">0.35</td></tr>
+            <tr class="kept"><td>B</td><td>Base</td><td>3Y</td><td>NBD</td><td class="prob-mid">0.28</td></tr>
+            <tr class="filtered"><td>C</td><td>Premier</td><td>5Y</td><td>24×7 4hr</td><td class="prob-lo">0.22</td></tr>
+            <tr class="kept"><td>D</td><td>Base</td><td>1Y</td><td>NBD</td><td class="prob-lo">0.15</td></tr>
+          </table>
+          <div class="addons-note">All plans &lt; 0.75 → no add-ons generated.</div>
+
+          <div class="cat-block">
+            <span class="ct-rem">✕ Plan C REMOVED</span> — 5Y term not offered for this product line<br>
+            <span class="ct-ok">✓ Plans A, B, D survive</span> — 3 plans eligible
+          </div>
+
+          <div class="ex-result">
+            <div class="res-label">→ Branch 1 · max prob 0.35 &lt; 0.75, sort by price</div>
+            <div class="res-tiers">
+              <div class="res-tier g">Good<br>1Y Base · NBD</div>
+              <div class="res-tier b">Better<br>3Y Base · NBD</div>
+              <div class="res-tier bb">Best<br>3Y Premier · 4hr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scenario 2: High Confidence -->
+      <div class="s4-ex ex-hc">
+        <div class="s4-ex-hdr"><div class="ex-num">2</div> High Confidence — Branch 2</div>
+        <div class="s4-ex-body">
+          <div class="ex-ctx">ThinkAgile MX · <strong>AP Region</strong> · Existing customer · Renewal</div>
+
+          <div class="ex-sec-label">AI Output — 3 Base Plans (Σ = 1)</div>
+          <table class="plans-tbl">
+            <tr><th>Plan</th><th>Type</th><th>Term</th><th>SLA</th><th>Prob</th></tr>
+            <tr class="top-pick"><td style="color:#E1251B;font-weight:700;">A</td><td>Premier</td><td>5Y</td><td>24×7 4hr</td><td class="prob-hi">0.78</td></tr>
+            <tr><td>B</td><td>Premier</td><td>3Y</td><td>24×7 4hr</td><td class="prob-lo">0.14</td></tr>
+            <tr><td>C</td><td>Base</td><td>3Y</td><td>NBD</td><td class="prob-lo">0.08</td></tr>
+          </table>
+
+          <div class="addons-sec">
+            <div class="addons-label">Plan A Add-ons (Σ = 1 per module, ranked by prob)</div>
+            <div class="addon-row"><div class="addon-type">Installation</div><div class="addon-opts"><span class="opt sel">Biz Hours ✓ 0.90</span><span class="opt alt">Off Shift 0.10</span></div></div>
+            <div class="addon-row"><div class="addon-type">CO₂ Offset</div><div class="addon-opts"><span class="opt sel" style="color:#64748b;text-decoration:line-through;">Yes 0.88</span><span class="opt alt">No 0.12</span></div></div>
+            <div class="addon-row"><div class="addon-type">KYD</div><div class="addon-opts"><span class="opt sel">3Y Keep Drive ✓ 0.72</span><span class="opt alt">5Y 0.28</span></div></div>
+          </div>
+
+          <div class="cat-block">
+            <span class="ct-ok">✓ Plan A survives</span> — Premier 5Y available in AP<br>
+            <span class="ct-rem">✕ CO₂ Offset REMOVED</span> — not offered in AP region<br>
+            <span class="ct-ok">✓ Installation + KYD OK</span> — 2 add-ons survive
+          </div>
+
+          <div class="ex-result">
+            <div class="res-label">→ Branch 2 · prob 0.78 &gt; 0.75, KYD replaces CO₂</div>
+            <div class="res-tiers">
+              <div class="res-tier g">Good<br>5Y Premier NBD</div>
+              <div class="res-tier b">Better<br>5Y Premier NBD<br>+ Biz Hrs Install</div>
+              <div class="res-tier bb">Best<br>5Y Premier NBD<br>+ Install + KYD</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+var stages = ['s0','s1','s2','s3','s4'];
+var TOTAL = stages.length;
+var current = 0;
+
+function showStage(i) {
+  document.querySelectorAll('.stage').forEach(function(s) { s.classList.remove('active'); });
+  var el = document.getElementById(stages[i]);
+  if (!el) return;
+  el.classList.add('active');
+  document.getElementById('indicator').textContent = (i+1) + ' / ' + TOTAL;
+  document.getElementById('progress-fill').style.width = ((i+1)/TOTAL*100) + '%';
+  current = i;
+  var reveals = el.querySelectorAll('.reveal');
+  reveals.forEach(function(r) { r.classList.remove('in'); });
+  reveals.forEach(function(r) {
+    var delay = parseInt(r.dataset.delay) || 0;
+    setTimeout(function() { r.classList.add('in'); }, delay);
+  });
+}
+
+function nextStage() { if (current < TOTAL-1) showStage(current+1); }
+function prevStage() { if (current > 0) showStage(current-1); }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') { e.preventDefault(); nextStage(); }
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); prevStage(); }
+});
+
+showStage(0);
+</script>
+</body>
+</html>

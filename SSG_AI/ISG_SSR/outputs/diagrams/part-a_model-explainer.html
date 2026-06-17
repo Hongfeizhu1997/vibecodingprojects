@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISG SSR — Beyond LLMs: The Model Behind the Recommendations</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background:#020617; color:#fff; overflow:hidden;
+  width:100vw; height:100vh; display:flex; align-items:center; justify-content:center;
+}
+.stage {
+  position:absolute; width:100%; height:100%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  opacity:0; transition: opacity 0.5s ease;
+  pointer-events:none; padding:3rem;
+}
+.stage.active { opacity:1; pointer-events:auto; }
+
+.brand {
+  position:fixed; top:0; left:0; width:100%; height:3px;
+  background:linear-gradient(90deg,#E1251B,#11184F,#4D144A,#7A126B); z-index:100;
+}
+
+/* Progress bar */
+.progress-wrap {
+  position:fixed; bottom:0; left:0; width:100%; height:3px; z-index:100;
+  background:rgba(51,65,85,0.3);
+}
+.progress-fill {
+  height:100%; background:linear-gradient(90deg,#E1251B,#a78bfa);
+  transition: width 0.5s linear;
+}
+
+/* Indicator */
+.indicator {
+  position:fixed; top:1rem; right:1.5rem; z-index:100;
+  font-size:0.7rem; color:#64748b; font-weight:700; letter-spacing:0.06em;
+}
+
+/* Nav hint */
+.nav-hint {
+  position:fixed; bottom:1.5rem; right:1.5rem; z-index:100;
+  font-size:0.6rem; color:#334155; letter-spacing:0.06em;
+}
+
+/* Reveal animation */
+.reveal {
+  opacity:0; transform:translateY(18px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal.in { opacity:1; transform:translateY(0); }
+
+/* ===== STAGE 0: TITLE ===== */
+.s0-tag { display:inline-block; background:rgba(225,37,27,0.12); color:#E1251B; font-size:0.7rem; font-weight:700; padding:4px 14px; border-radius:20px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1.2rem; }
+.s0-title { font-size:2.6rem; font-weight:900; text-align:center; max-width:850px; line-height:1.2; }
+.s0-title span { color:#E1251B; }
+.s0-sub { font-size:1rem; color:#94a3b8; margin-top:1rem; text-align:center; max-width:550px; line-height:1.5; }
+
+/* ===== COMPARISON TABLES (Stage 1, 3) ===== */
+.cmp-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:0;
+  border-radius:0.8rem; overflow:hidden; border:1px solid rgba(51,65,85,0.3);
+  max-width:900px; width:100%;
+}
+.cmp-hdr {
+  padding:0.6rem 1rem; border-bottom:1px solid rgba(51,65,85,0.3);
+  font-size:0.65rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase;
+}
+.cmp-hdr-l { background:rgba(225,37,27,0.08); color:#E1251B; }
+.cmp-hdr-r { background:rgba(167,139,250,0.06); color:#a78bfa; border-left:1px solid rgba(51,65,85,0.3); }
+.cmp-hdr span { font-weight:400; color:#64748b; text-transform:none; }
+
+.cmp-row {
+  padding:0.7rem 1rem; border-bottom:1px solid rgba(51,65,85,0.1);
+  font-size:0.7rem; line-height:1.5;
+}
+.cmp-row-r { border-left:1px solid rgba(51,65,85,0.3); }
+.cmp-row .clabel { font-size:0.6rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.2rem; }
+.cmp-row .cval { color:#e2e8f0; }
+.good { color:#34d399; }
+.bad { color:#fb7185; }
+
+/* ===== APP GRID (Stage 2) ===== */
+.app-row {
+  display:flex; gap:0.7rem; max-width:900px; width:100%;
+  flex-wrap:wrap; justify-content:center;
+}
+.app-card {
+  background:rgba(15,23,42,0.8); border:1px solid rgba(51,65,85,0.4);
+  border-radius:0.6rem; padding:0.8rem 0.6rem; text-align:center;
+  width:100px;
+}
+.app-card .ai { font-size:1.2rem; margin-bottom:0.3rem; }
+.app-card .an { font-size:0.65rem; font-weight:700; color:#e2e8f0; }
+.app-card .ad { font-size:0.55rem; color:#64748b; margin-top:0.15rem; }
+
+/* ===== ZOOM TABLE (Stage 3) ===== */
+.zoom-table {
+  max-width:850px; width:100%; border-collapse:collapse; font-size:0.7rem;
+}
+.zoom-table th {
+  text-align:left; padding:0.5rem 0.8rem; font-size:0.6rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.08em; color:#64748b;
+  border-bottom:1px solid rgba(51,65,85,0.4);
+}
+.zoom-table th:nth-child(2) { color:#E1251B; }
+.zoom-table td {
+  padding:0.45rem 0.8rem; border-bottom:1px solid rgba(51,65,85,0.15);
+  color:#94a3b8; font-size:0.66rem; line-height:1.4;
+}
+.zoom-table td:first-child { font-weight:600; color:#cbd5e1; }
+.zoom-table td:nth-child(2) { color:#34d399; font-weight:600; }
+
+/* ===== TREE (Stage 4) ===== */
+.tree-row {
+  display:flex; align-items:center; justify-content:center; gap:1rem;
+  flex-wrap:wrap;
+}
+.tree-explanation {
+  display:flex; gap:1.2rem; max-width:850px; width:100%; margin-top:1.5rem;
+}
+.tree-step {
+  flex:1; display:flex; gap:0.6rem; align-items:flex-start;
+  padding:0.8rem; background:rgba(15,23,42,0.6); border-radius:0.6rem;
+  border:1px solid rgba(51,65,85,0.3);
+}
+.tree-step .num {
+  width:1.3rem; height:1.3rem; border-radius:50%; background:#E1251B;
+  color:#fff; font-size:0.65rem; font-weight:800; display:flex;
+  align-items:center; justify-content:center; flex-shrink:0;
+}
+.tree-step h4 { font-size:0.7rem; font-weight:700; color:#fff; margin-bottom:0.15rem; }
+.tree-step p { font-size:0.63rem; color:#94a3b8; line-height:1.4; }
+
+/* ===== PIPELINE (Stage 5) ===== */
+.pipe-row {
+  display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; justify-content:center;
+}
+.pipe-node {
+  padding:0.7rem 0.9rem; border-radius:0.5rem; text-align:center;
+  font-size:0.65rem; font-weight:700;
+}
+.pipe-node.inp {
+  background:rgba(34,211,238,0.12); border:1px solid rgba(34,211,238,0.25); color:#22d3ee;
+}
+.pipe-node.xgb {
+  background:rgba(225,37,27,0.12); border:1px solid rgba(225,37,27,0.3); color:#E1251B;
+  font-size:0.8rem; padding:0.8rem 1.2rem;
+}
+.pipe-node.out {
+  background:rgba(52,211,153,0.12); border:1px solid rgba(52,211,153,0.25); color:#34d399;
+}
+.pipe-arr { color:#475569; font-size:1rem; }
+
+.pipe-cards {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem;
+  max-width:850px; width:100%; margin-top:1.5rem;
+}
+.pipe-card {
+  background:rgba(15,23,42,0.6); border-radius:0.6rem; padding:0.8rem;
+  border:1px solid rgba(51,65,85,0.3);
+}
+.pipe-card h4 { font-size:0.65rem; font-weight:700; color:#fff; margin-bottom:0.3rem; }
+.pipe-card p { font-size:0.6rem; color:#94a3b8; line-height:1.4; }
+
+/* ===== BIZ IMPACT (Stage 6) ===== */
+.biz-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:0;
+  border-radius:0.8rem; overflow:hidden; border:1px solid rgba(51,65,85,0.3);
+  max-width:900px; width:100%;
+}
+.biz-cell {
+  padding:0.7rem 1rem; border-bottom:1px solid rgba(51,65,85,0.1);
+}
+.biz-cell-r { border-left:1px solid rgba(51,65,85,0.3); }
+.biz-hdr-l { background:rgba(52,211,153,0.08); padding:0.6rem 1rem; border-bottom:1px solid rgba(51,65,85,0.3); font-size:0.65rem; font-weight:800; color:#34d399; text-transform:uppercase; letter-spacing:0.06em; }
+.biz-hdr-r { background:rgba(251,113,133,0.06); padding:0.6rem 1rem; border-bottom:1px solid rgba(51,65,85,0.3); border-left:1px solid rgba(51,65,85,0.3); font-size:0.65rem; font-weight:800; color:#fb7185; text-transform:uppercase; letter-spacing:0.06em; }
+.biz-cell .btitle { font-size:0.68rem; font-weight:700; color:#fff; margin-bottom:0.2rem; }
+.biz-cell .bdesc { font-size:0.62rem; color:#94a3b8; line-height:1.4; }
+
+/* ===== STAGE 7: CLOSING ===== */
+.s7-box {
+  background:linear-gradient(135deg, rgba(52,211,153,0.05), rgba(17,24,79,0.05));
+  border:1px solid rgba(34,211,153,0.2); border-radius:0.8rem; padding:1.5rem;
+  max-width:750px; text-align:center;
+}
+.s7-box h3 { font-size:1rem; font-weight:800; color:#fff; margin-bottom:0.6rem; }
+.s7-box p { font-size:0.78rem; color:#cbd5e1; line-height:1.6; }
+
+/* Section label */
+.scene-label {
+  font-size:0.6rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.12em; color:#E1251B; margin-bottom:0.5rem; text-align:center;
+}
+
+@media (max-width:768px) {
+  .cmp-grid, .biz-grid { grid-template-columns:1fr; }
+  .cmp-row-r, .biz-cell-r { border-left:none; }
+  .tree-explanation { flex-direction:column; }
+  .pipe-cards { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="brand"></div>
+<div class="progress-wrap"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+<div class="indicator" id="indicator">1 / 8</div>
+<div class="nav-hint">← → to navigate &nbsp; Space to pause</div>
+
+<!-- ====== STAGE 0: TITLE ====== -->
+<div class="stage active" id="s0">
+  <div class="reveal s0-tag" data-delay="200">Lenovo ISG · Service Smart Recommendation</div>
+  <div class="reveal s0-title" data-delay="500">Beyond <span>LLMs</span><br>The Model Behind ISG SSR</div>
+  <div class="reveal s0-sub" data-delay="1000">What business leaders need to understand about the specialized model powering intelligent service recommendations — and why it's the right tool for the job.</div>
+</div>
+
+<!-- ====== STAGE 1: AI TOOLBOX ====== -->
+<div class="stage" id="s1">
+  <div class="reveal scene-label" data-delay="100">01 · Context</div>
+  <div class="reveal" data-delay="300" style="font-size:1.3rem; font-weight:800; margin-bottom:1rem; text-align:center;">Not Everything Needs an LLM</div>
+  <div class="reveal" data-delay="500" style="font-size:0.75rem; color:#94a3b8; margin-bottom:1.5rem; text-align:center;">Traditional ML already powers proven business applications at scale</div>
+
+  <div class="reveal app-row" data-delay="700">
+    <div class="app-card"><div class="ai">📉</div><div class="an">Churn</div><div class="ad">At-risk accounts</div></div>
+    <div class="app-card"><div class="ai">🎯</div><div class="an">Lead Scoring</div><div class="ad">Pipeline priority</div></div>
+    <div class="app-card"><div class="ai">🛡️</div><div class="an">Fraud</div><div class="ad">Real-time alerts</div></div>
+    <div class="app-card"><div class="ai">📊</div><div class="an">Forecasting</div><div class="ad">Inventory needs</div></div>
+    <div class="app-card" style="border-color:rgba(225,37,27,0.4);"><div class="ai">🎁</div><div class="an" style="color:#E1251B;">Recommend</div><div class="ad">Next best offer</div></div>
+    <div class="app-card"><div class="ai">💲</div><div class="an">Pricing</div><div class="ad">Price elasticity</div></div>
+    <div class="app-card"><div class="ai">👥</div><div class="an">Segmentation</div><div class="ad">Behavior clusters</div></div>
+    <div class="app-card"><div class="ai">💳</div><div class="an">Credit Score</div><div class="ad">Underwriting</div></div>
+  </div>
+
+  <div class="reveal" data-delay="1200" style="font-size:0.68rem; color:#64748b; margin-top:1.5rem; text-align:center; max-width:600px;">
+    Recommendation has historically delivered the <strong style="color:#e2e8f0;">highest ROI</strong> of any enterprise ML use case.
+  </div>
+</div>
+
+<!-- ====== STAGE 2: LLMs vs ML ====== -->
+<div class="stage" id="s2">
+  <div class="reveal scene-label" data-delay="100">02 · Decision Framework</div>
+  <div class="reveal" data-delay="300" style="font-size:1.3rem; font-weight:800; margin-bottom:1.2rem; text-align:center;">LLMs vs Traditional ML</div>
+
+  <div class="reveal cmp-grid" data-delay="500">
+    <div class="cmp-hdr cmp-hdr-l">Traditional ML <span>(XGBoost, etc.)</span></div>
+    <div class="cmp-hdr cmp-hdr-r">Large Language Models <span>(GPT, Claude)</span></div>
+
+    <div class="cmp-row"><div class="clabel">Business Applications</div><div class="cval">Churn prediction · Lead scoring · Fraud detection · <strong style="color:#E1251B;">Recommendation</strong> · Pricing optimization · Credit scoring</div></div>
+    <div class="cmp-row cmp-row-r"><div class="clabel">Business Applications</div><div class="cval">Chatbots · Email & report generation · Contract analysis · Document summarization</div></div>
+
+    <div class="cmp-row"><div class="clabel">Speed & Cost at Scale</div><div class="cval good">Milliseconds on CPU. Near-zero marginal cost.</div></div>
+    <div class="cmp-row cmp-row-r"><div class="clabel">Speed & Cost at Scale</div><div class="cval bad">Seconds on GPU. Costs scale with volume.</div></div>
+
+    <div class="cmp-row"><div class="clabel">Output Consistency</div><div class="cval good">Deterministic — critical for audit and compliance</div></div>
+    <div class="cmp-row cmp-row-r"><div class="clabel">Output Consistency</div><div class="cval bad">Variable — same question, different answers</div></div>
+
+    <div class="cmp-row" style="border-bottom:none;"><div class="clabel">Transparency</div><div class="cval good">Fully traceable — you can show exactly why</div></div>
+    <div class="cmp-row cmp-row-r" style="border-bottom:none;"><div class="clabel">Transparency</div><div class="cval bad">Black box — explanations may not reflect reality</div></div>
+  </div>
+</div>
+
+<!-- ====== STAGE 3: WHY XGBOOST ====== -->
+<div class="stage" id="s3">
+  <div class="reveal scene-label" data-delay="100">03 · Why XGBoost</div>
+  <div class="reveal" data-delay="300" style="font-size:1.3rem; font-weight:800; margin-bottom:0.3rem; text-align:center;">Why XGBoost for <span style="color:#E1251B;">Service Recommendation</span></div>
+  <div class="reveal" data-delay="500" style="font-size:0.7rem; color:#94a3b8; margin-bottom:1.2rem; text-align:center;">Five requirements that made the choice clear</div>
+
+  <div class="reveal" data-delay="700">
+    <table class="zoom-table">
+      <thead><tr><th>SSR Requirement</th><th>XGBoost</th><th>Business Context</th></tr></thead>
+      <tbody>
+        <tr><td>Handle 300+ bid fields</td><td>Native tabular data</td><td>Contract, geo, hardware, warranty, price — all structured</td></tr>
+        <tr><td>Score 56 candidates instantly</td><td>&lt; 1 ms total</td><td>Must respond during live bid workflow — no batching</td></tr>
+        <tr><td>Protect service revenue</td><td>Price-aware loss fn</td><td>Prevents cheap services from dominating rankings</td></tr>
+        <tr><td>Auditable output</td><td>Deterministic + SHAP</td><td>Every recommendation reproducible and defensible</td></tr>
+        <tr><td>Work with incomplete data</td><td>Native missing-value</td><td>Real CRM data has gaps — no manual cleanup needed</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ====== STAGE 4: HOW IT WORKS ====== -->
+<div class="stage" id="s4">
+  <div class="reveal scene-label" data-delay="100">04 · How It Works</div>
+  <div class="reveal" data-delay="300" style="font-size:1.3rem; font-weight:800; margin-bottom:0.3rem; text-align:center;">What XGBoost Actually Is</div>
+  <div class="reveal" data-delay="500" style="font-size:0.7rem; color:#94a3b8; margin-bottom:1rem; text-align:center;">An ensemble of decision trees — hundreds of simple yes/no questions, combined</div>
+
+  <div class="reveal tree-row" data-delay="700">
+    <!-- Detailed tree (left) -->
+    <div style="text-align:center; margin-right:1rem;">
+      <svg width="220" height="185" viewBox="0 0 220 185">
+        <rect x="55" y="5" width="110" height="34" rx="6" fill="rgba(225,37,27,0.15)" stroke="#E1251B" stroke-width="1.5"/>
+        <text x="110" y="26" text-anchor="middle" fill="#E1251B" font-size="10" font-weight="700">Warranty ≥ 3yr ?</text>
+        <line x1="70" y1="39" x2="30" y2="80" stroke="#475569" stroke-width="1.2"/>
+        <line x1="150" y1="39" x2="190" y2="80" stroke="#475569" stroke-width="1.2"/>
+        <text x="48" y="63" text-anchor="middle" fill="#22d3ee" font-size="9" font-weight="600">No</text>
+        <text x="172" y="63" text-anchor="middle" fill="#34d399" font-size="9" font-weight="600">Yes</text>
+        <rect x="5" y="80" width="50" height="30" rx="5" fill="rgba(34,211,238,0.08)" stroke="#22d3ee" stroke-width="1.2"/>
+        <text x="30" y="94" text-anchor="middle" fill="#22d3ee" font-size="8" font-weight="600">Country</text>
+        <text x="30" y="104" text-anchor="middle" fill="#94a3b8" font-size="7">= NA?</text>
+        <rect x="165" y="80" width="50" height="30" rx="5" fill="rgba(52,211,153,0.08)" stroke="#34d399" stroke-width="1.2"/>
+        <text x="190" y="94" text-anchor="middle" fill="#34d399" font-size="8" font-weight="600">Contract</text>
+        <text x="190" y="104" text-anchor="middle" fill="#94a3b8" font-size="7">≥ Premier?</text>
+        <line x1="30" y1="110" x2="18" y2="140" stroke="#475569" stroke-width="1"/>
+        <line x1="30" y1="110" x2="42" y2="140" stroke="#475569" stroke-width="1"/>
+        <rect x="2" y="140" width="32" height="26" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.8"/>
+        <text x="18" y="157" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">.23</text>
+        <rect x="34" y="140" width="32" height="26" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.8"/>
+        <text x="50" y="157" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">.45</text>
+        <line x1="190" y1="110" x2="178" y2="140" stroke="#475569" stroke-width="1"/>
+        <line x1="190" y1="110" x2="202" y2="140" stroke="#475569" stroke-width="1"/>
+        <rect x="163" y="140" width="30" height="26" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.8"/>
+        <text x="178" y="157" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">.72</text>
+        <rect x="193" y="140" width="30" height="26" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.8"/>
+        <text x="208" y="157" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">.91</text>
+      </svg>
+      <div class="reveal" data-delay="300" style="font-size:0.6rem; color:#64748b; margin-top:0.3rem; font-weight:600;">One Decision Tree (example)</div>
+    </div>
+
+    <!-- Ensemble column (right) -->
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.3rem;">
+      <span style="font-size:0.6rem; color:#64748b; font-weight:600; letter-spacing:0.08em; margin-bottom:0.2rem;">ENSEMBLE: ~100–500 TREES</span>
+      <div style="display:flex; align-items:center; gap:0.2rem;">
+        <svg width="80" height="115" viewBox="0 0 80 115">
+          <rect x="15" y="5" width="48" height="26" rx="5" fill="rgba(34,211,238,0.1)" stroke="#22d3ee" stroke-width="1"/>
+          <text x="39" y="22" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">Tree #2</text>
+          <line x1="28" y1="31" x2="18" y2="58" stroke="#475569" stroke-width="1"/>
+          <line x1="50" y1="31" x2="60" y2="58" stroke="#475569" stroke-width="1"/>
+          <rect x="3" y="58" width="30" height="20" rx="4" fill="rgba(15,23,42,0.6)" stroke="#475569" stroke-width="0.8"/>
+          <rect x="47" y="58" width="30" height="20" rx="4" fill="rgba(15,23,42,0.6)" stroke="#475569" stroke-width="0.8"/>
+          <line x1="18" y1="78" x2="18" y2="93" stroke="#475569" stroke-width="0.8"/>
+          <line x1="62" y1="78" x2="62" y2="93" stroke="#475569" stroke-width="0.8"/>
+          <rect x="3" y="93" width="30" height="20" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.6"/>
+          <rect x="47" y="93" width="30" height="20" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.6"/>
+        </svg>
+        <span style="color:#475569; font-size:1rem;">×</span>
+        <svg width="80" height="115" viewBox="0 0 80 115">
+          <rect x="15" y="5" width="48" height="26" rx="5" fill="rgba(124,58,237,0.08)" stroke="#a78bfa" stroke-width="1"/>
+          <text x="39" y="22" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">Tree #3</text>
+          <line x1="28" y1="31" x2="18" y2="58" stroke="#475569" stroke-width="1"/>
+          <line x1="50" y1="31" x2="60" y2="58" stroke="#475569" stroke-width="1"/>
+          <rect x="3" y="58" width="30" height="20" rx="4" fill="rgba(15,23,42,0.6)" stroke="#475569" stroke-width="0.8"/>
+          <rect x="47" y="58" width="30" height="20" rx="4" fill="rgba(15,23,42,0.6)" stroke="#475569" stroke-width="0.8"/>
+          <line x1="18" y1="78" x2="18" y2="93" stroke="#475569" stroke-width="0.8"/>
+          <line x1="62" y1="78" x2="62" y2="93" stroke="#475569" stroke-width="0.8"/>
+          <rect x="3" y="93" width="30" height="20" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.6"/>
+          <rect x="47" y="93" width="30" height="20" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.6"/>
+        </svg>
+        <span style="color:#475569; font-size:1.3rem; margin:0 0.1rem;">…</span>
+        <svg width="80" height="115" viewBox="0 0 80 115">
+          <rect x="15" y="5" width="48" height="26" rx="5" fill="rgba(15,23,42,0.6)" stroke="#475569" stroke-width="1"/>
+          <text x="39" y="22" text-anchor="middle" fill="#94a3b8" font-size="7" font-weight="600">Tree N</text>
+          <line x1="28" y1="31" x2="18" y2="58" stroke="#475569" stroke-width="1"/>
+          <line x1="50" y1="31" x2="60" y2="58" stroke="#475569" stroke-width="1"/>
+          <rect x="3" y="58" width="30" height="20" rx="4" fill="rgba(15,23,42,0.6)" stroke="#475569" stroke-width="0.8"/>
+          <rect x="47" y="58" width="30" height="20" rx="4" fill="rgba(15,23,42,0.6)" stroke="#475569" stroke-width="0.8"/>
+          <line x1="18" y1="78" x2="18" y2="93" stroke="#475569" stroke-width="0.8"/>
+          <line x1="62" y1="78" x2="62" y2="93" stroke="#475569" stroke-width="0.8"/>
+          <rect x="3" y="93" width="30" height="20" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.6"/>
+          <rect x="47" y="93" width="30" height="20" rx="4" fill="rgba(15,23,42,0.8)" stroke="#475569" stroke-width="0.6"/>
+        </svg>
+      </div>
+      <div style="font-size:0.55rem; color:#64748b; margin-top:0.2rem;">Each tree learns different patterns</div>
+    </div>
+  </div>  <div class="reveal tree-explanation" data-delay="1000">
+    <div class="tree-step">
+      <div class="num">1</div><div><h4>Each tree asks simple questions</h4><p>"Warranty ≥ 3yr?" → "Country = NA?" → "Contract ≥ Premier?" Each answer narrows the path.</p></div>
+    </div>
+    <div class="tree-step">
+      <div class="num">2</div><div><h4>Trees learn from mistakes</h4><p>Each new tree focuses on the errors of previous ones — "gradient boosting." Sequentially improving.</p></div>
+    </div>
+    <div class="tree-step">
+      <div class="num">3</div><div><h4>The ensemble votes</h4><p>All 500 trees contribute a score. Summed and transformed into a probability across all 56 services.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== STAGE 5: PIPELINE ====== -->
+<div class="stage" id="s5">
+  <div class="reveal scene-label" data-delay="100">05 · In Context</div>
+  <div class="reveal" data-delay="300" style="font-size:1.3rem; font-weight:800; margin-bottom:0.3rem; text-align:center;">XGBoost Is <span style="color:#E1251B;">One Stage</span> in the Pipeline</div>
+  <div class="reveal" data-delay="500" style="font-size:0.7rem; color:#94a3b8; margin-bottom:1.2rem; text-align:center;">Data flows through six stages — XGBoost handles the core ranking</div>
+
+  <div class="reveal pipe-row" data-delay="700">
+    <div class="pipe-node inp">300+<br>Features</div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-node inp">Feature<br>Engineering</div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-node inp">Candidate<br>Recall</div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-node xgb">XGBoost<br><small>Ranking</small></div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-node out">Business<br>Rules</div>
+    <div class="pipe-arr">→</div>
+    <div class="pipe-node out">GBB<br>Display</div>
+  </div>
+
+  <div class="reveal pipe-cards" data-delay="1000">
+    <div class="pipe-card"><h4>Before</h4><p>300+ bid fields refined to ~50 features. Sparse categories embedded into vectors. New customers routed to fallback engine.</p></div>
+    <div class="pipe-card" style="border-color:rgba(225,37,27,0.25);"><h4 style="color:#E1251B;">XGBoost</h4><p>Receives ~50 features. Outputs probability for each of 31–56 services. Custom loss balances accuracy with revenue protection.</p></div>
+    <div class="pipe-card"><h4>After</h4><p>Business rules filter results. Add-ons via association rules. Final output in Good / Better / Best tiers + LLM rationale.</p></div>
+  </div>
+</div>
+
+<!-- ====== STAGE 6: BUSINESS IMPACT ====== -->
+<div class="stage" id="s6">
+  <div class="reveal scene-label" data-delay="100">06 · The Scorecard</div>
+  <div class="reveal" data-delay="300" style="font-size:1.3rem; font-weight:800; margin-bottom:0.3rem; text-align:center;">What This Means for Service Recommendation</div>
+  <div class="reveal" data-delay="500" style="font-size:0.7rem; color:#94a3b8; margin-bottom:1rem; text-align:center;">Strengths that drive value — and constraints to manage</div>
+
+  <div class="reveal biz-grid" data-delay="700">
+    <div class="biz-hdr-l">✓ Business Strengths</div>
+    <div class="biz-hdr-r">✗ Business Constraints</div>
+
+    <div class="biz-cell"><div style="display:flex;gap:0.5rem;"><span>💰</span><div><div class="btitle">Revenue Protection</div><div class="bdesc"><span class="good">Price-aware ranking prevents margin erosion</span> from cheap, high-volume services.</div></div></div></div>
+    <div class="biz-cell biz-cell-r"><div style="display:flex;gap:0.5rem;"><span>🔄</span><div><div class="btitle">Monthly Refresh</div><div class="bdesc"><span class="bad">New products or price changes take up to 30 days</span> to reflect in recommendations.</div></div></div></div>
+
+    <div class="biz-cell"><div style="display:flex;gap:0.5rem;"><span>⚡</span><div><div class="btitle">Real-Time at Scale</div><div class="bdesc"><span class="good">56 candidates scored in &lt;1ms on CPU.</span> Every bid, instantly. No GPU cost.</div></div></div></div>
+    <div class="biz-cell biz-cell-r"><div style="display:flex;gap:0.5rem;"><span>🧊</span><div><div class="btitle">Cold-Start Gaps</div><div class="bdesc"><span class="bad">New customers/products fall back to basic rules</span> — no learned patterns available.</div></div></div></div>
+
+    <div class="biz-cell"><div style="display:flex;gap:0.5rem;"><span>🔒</span><div><div class="btitle">Auditable</div><div class="bdesc"><span class="good">Same input = same output. Every recommendation</span> reproducible for compliance.</div></div></div></div>
+    <div class="biz-cell biz-cell-r"><div style="display:flex;gap:0.5rem;"><span>📊</span><div><div class="btitle">Data Quality Dependent</div><div class="bdesc"><span class="bad">Incomplete or stale CRM data directly degrades</span> recommendation relevance.</div></div></div></div>
+
+    <div class="biz-cell" style="border-bottom:none;"><div style="display:flex;gap:0.5rem;"><span>🔍</span><div><div class="btitle">Transparent</div><div class="bdesc"><span class="good">SHAP shows exactly which factors drove each result.</span> Sales can explain "why" to customers.</div></div></div></div>
+    <div class="biz-cell biz-cell-r" style="border-bottom:none;"><div style="display:flex;gap:0.5rem;"><span>🗣️</span><div><div class="btitle">Narrative Needs LLM</div><div class="bdesc"><span class="bad">XGBoost outputs probabilities, not reasons.</span> LLM added downstream for sales narrative.</div></div></div></div>
+  </div>
+</div>
+
+<!-- ====== STAGE 7: CLOSING ====== -->
+<div class="stage" id="s7">
+  <div class="reveal s7-box" data-delay="300">
+    <h3>💡 The Big Picture</h3>
+    <p>
+      ISG SSR uses <strong style="color:#34d399;">XGBoost for what XGBoost does best</strong> — ranking structured transaction data with speed, accuracy, and full auditability — 
+      and an <strong style="color:#a78bfa;">LLM for what LLMs do best</strong> — generating natural-language rationale for sales teams. 
+      Neither replaces the other. The engineering value is in orchestrating them into a single, seamless pipeline.
+    </p>
+  </div>
+  <div class="reveal" data-delay="1200" style="font-size:0.65rem; color:#475569; margin-top:1.5rem;">Lenovo ISG · Service Smart Recommendation · Internal Reference · June 2026</div>
+</div>
+
+<script>
+const stages = ['s0','s1','s2','s3','s4','s5','s6','s7'];
+const TOTAL = 8;
+let current = 0;
+let paused = false;
+let timer = null;
+
+const DURATIONS = [4000, 8000, 7000, 8000, 9500, 8000, 9500, 7000];
+let cumDurs = [0];
+for(let i=0;i<DURATIONS.length;i++) cumDurs.push(cumDurs[i]+DURATIONS[i]);
+const TOTAL_MS = cumDurs[TOTAL];
+
+function showStage(i) {
+  document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+  let el = document.getElementById(stages[i]);
+  el.classList.add('active');
+  document.getElementById('indicator').textContent = (i+1)+' / 8';
+  current = i;
+  
+  let reveals = el.querySelectorAll('.reveal');
+  reveals.forEach(r => { r.classList.remove('in'); });
+  
+  reveals.forEach(r => {
+    let delay = parseInt(r.dataset.delay) || 0;
+    setTimeout(() => { r.classList.add('in'); }, delay);
+  });
+}
+
+function updateProgress() {
+  let elapsed = cumDurs[current] + (Date.now() - stageStart);
+  let pct = Math.min(100, (elapsed/TOTAL_MS)*100);
+  document.getElementById('prog').style.width = pct+'%';
+}
+
+let stageStart = Date.now();
+
+function nextStage() {
+  if (current < TOTAL-1) {
+    stageStart = Date.now();
+    showStage(current+1);
+    scheduleNext();
+  }
+}
+
+function prevStage() {
+  if (current > 0) {
+    stageStart = Date.now();
+    showStage(current-1);
+    scheduleNext();
+  }
+}
+
+function scheduleNext() {
+  if (timer) clearTimeout(timer);
+  if (paused) return;
+  if (current < TOTAL-1) {
+    timer = setTimeout(nextStage, DURATIONS[current]);
+  }
+}
+
+setInterval(() => { if(!paused) updateProgress(); }, 100);
+
+document.addEventListener('keydown',e => {
+  if (e.key === ' ') { e.preventDefault(); paused=!paused; if(!paused){stageStart=Date.now();scheduleNext();} }
+  if (e.key === 'ArrowRight') { e.preventDefault(); paused=true; nextStage(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); paused=true; prevStage(); }
+});
+
+showStage(0);
+stageStart = Date.now();
+scheduleNext();
+</script>
+</body>
+</html>

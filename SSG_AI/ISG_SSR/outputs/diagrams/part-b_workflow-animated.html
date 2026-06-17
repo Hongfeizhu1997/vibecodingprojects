@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISG SSR — How Recommendations Are Made</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background:#020617; color:#fff; overflow:hidden;
+  width:100vw; height:100vh; display:flex; align-items:center; justify-content:center;
+}
+.stage {
+  position:absolute; width:100%; height:100%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  opacity:0; transition: opacity 0.6s ease;
+  pointer-events:none; padding:3rem;
+}
+.stage.active { opacity:1; pointer-events:auto; }
+
+.brand {
+  position:fixed; top:0; left:0; width:100%; height:3px;
+  background:linear-gradient(90deg,#E1251B,#11184F,#4D144A,#7A126B); z-index:100;
+}
+
+/* Scene title */
+.scene-title {
+  font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em;
+  color:#64748b; margin-bottom:1.5rem; text-align:center;
+}
+
+/* ANIMATION HELPERS */
+.reveal {
+  opacity:0; transform:translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.reveal.in { opacity:1; transform:translateY(0); }
+.reveal.pop { transform:scale(0.8); }
+.reveal.pop.in { transform:scale(1); }
+
+/* Stage 0: Title */
+.s0-title { font-size:3rem; font-weight:900; text-align:center; max-width:850px; line-height:1.2; }
+.s0-sub { font-size:1.1rem; color:#94a3b8; margin-top:1.2rem; text-align:center; max-width:600px; line-height:1.5; }
+.s0-tag { display:inline-block; background:rgba(225,37,27,0.12); color:#E1251B; font-size:0.7rem; font-weight:700; padding:4px 14px; border-radius:20px; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:1.5rem; }
+
+/* Stage 1: 4 Layers */
+.layers-row { display:flex; gap:1.2rem; max-width:1050px; width:100%; }
+.layer-card {
+  flex:1; background:rgba(15,23,42,0.8); border-radius:0.9rem; padding:1.3rem;
+  text-align:center; border:1px solid rgba(255,255,255,0.1);
+}
+.layer-num {
+  width:32px; height:32px; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; margin:0 auto 0.6rem; font-weight:800; font-size:0.85rem;
+}
+.ln-c { background:rgba(34,211,238,0.2); color:#22d3ee; border:1px solid rgba(34,211,238,0.4); }
+.ln-v { background:rgba(167,139,250,0.2); color:#c4b5fd; border:1px solid rgba(167,139,250,0.4); }
+.ln-a { background:rgba(251,191,36,0.2); color:#fcd34d; border:1px solid rgba(251,191,36,0.4); }
+.ln-r { background:rgba(251,113,133,0.2); color:#fda4af; border:1px solid rgba(251,113,133,0.4); }
+.layer-card h4 { font-size:0.9rem; font-weight:700; margin-bottom:0.2rem; }
+.layer-card .met { font-size:0.65rem; color:#94a3b8; margin-bottom:0.5rem; }
+.layer-card .desc { font-size:0.72rem; color:#94a3b8; line-height:1.4; }
+.layer-tag { display:inline-block; font-size:0.63rem; padding:3px 10px; border-radius:10px; background:rgba(52,211,153,0.18); color:#6ee7b7; margin-top:0.5rem; font-weight:600; }
+
+/* Stage 2: Price */
+.price-row { display:flex; align-items:center; gap:1.5rem; max-width:950px; }
+.price-card {
+  flex:1; background:rgba(15,23,42,0.7); border-radius:0.9rem; padding:1.5rem;
+  text-align:center; border:1px solid rgba(255,255,255,0.1);
+}
+.price-card.bad { border-color:rgba(251,113,133,0.3); }
+.price-card.good { border-color:rgba(52,211,153,0.3); }
+.price-card h3 { font-size:1rem; font-weight:700; margin-bottom:0.8rem; }
+.price-card.bad h3 { color:#fb7185; }
+.price-card.good h3 { color:#34d399; }
+.price-card .desc { color:#94a3b8; font-size:0.75rem; line-height:1.6; }
+.price-card .highlight { margin-top:0.6rem; font-size:0.72rem; }
+.price-arrow { font-size:2rem; color:#64748b; }
+.price-formula {
+  margin-top:1.5rem; background:rgba(0,0,0,0.4); border-radius:0.5rem; padding:1rem 1.8rem;
+  font-family:'Courier New',monospace; font-size:0.8rem; color:#e2e8f0;
+  text-align:center; border:1px solid rgba(255,255,255,0.1); max-width:750px;
+}
+.price-formula .y { color:#fbbf24; font-weight:700; }
+
+/* Stage 3: Waterfall SHAP */
+.wf-wrap { max-width:700px; width:100%; }
+.wf-bar-row {
+  height:12px; margin:0.6rem 0 0.3rem;
+  position:relative; 
+  background:linear-gradient(90deg, rgba(239,68,68,0.15) 0%, rgba(255,255,255,0.06) 50%, rgba(34,197,94,0.15) 100%);
+  border-radius:6px; overflow:visible;
+}
+.wf-bar-row::after {
+  content:''; position:absolute; top:0; bottom:0; left:50%; width:1px;
+  background:rgba(251,191,36,0.5); z-index:1;
+}
+.wf-baseline-marker {
+  position:absolute; top:-6px; bottom:-6px; left:50%; width:1px;
+  background:rgba(251,191,36,0.5); z-index:1; transform:translateX(-0.5px);
+}
+.wf-center-marker {
+  position:absolute; left:50%; transform:translateX(-50%);
+  font-size:0.7rem; color:#fbbf24; font-weight:700; z-index:2;
+  background:#020617; padding:2px 8px; border-radius:3px;
+  border:1px solid rgba(251,191,36,0.3);
+}
+.wf-cursor {
+  position:absolute; top:-4px; bottom:-4px; width:3px; background:#fff; border-radius:3px;
+  left:50%; transition:left 0.5s ease; z-index:3; box-shadow:0 0 10px rgba(255,255,255,0.3);
+}
+
+.wf-legend { }
+.wf-step {
+  display:flex; align-items:center; padding:0.2rem 0.5rem; font-size:0.7rem;
+  border-radius:4px; transition:background 0.3s ease;
+}
+.wf-step.active { 
+  background:rgba(255,255,255,0.06); 
+}
+.wf-step.focus {
+  background:rgba(251,191,36,0.08); border-left:2px solid #fbbf24;
+  animation: wf-pulse 0.6s ease;
+}
+@keyframes wf-pulse {
+  0% { background:rgba(251,191,36,0.2); }
+  100% { background:rgba(251,191,36,0.08); }
+}
+.wf-dot { width:10px; height:10px; border-radius:50%; margin-right:0.6rem; flex-shrink:0; }
+.wf-dot.pos { background:#22c55e; }
+.wf-dot.neg { background:#ef4444; }
+.wf-name { flex:1; color:#cbd5e1; }
+.wf-impact { font-weight:700; font-family:'Courier New',monospace; font-size:0.75rem; margin-left:0.5rem; }
+.wf-impact.pos { color:#22c55e; }
+.wf-impact.neg { color:#ef4444; }
+.wf-btn {
+  background:rgba(251,191,36,0.12); color:#fbbf24; border:1px solid rgba(251,191,36,0.3);
+  padding:0.5rem 1.5rem; border-radius:6px; font-size:0.75rem; font-weight:600;
+  cursor:pointer; transition:background 0.2s;
+}
+.wf-btn:hover { background:rgba(251,191,36,0.2); }
+.wf-btn.done { background:rgba(52,211,153,0.12); color:#34d399; border-color:rgba(52,211,153,0.3); }
+/* Stage 3.5: Ranked Output */
+.ranked-list { }
+.ranked-header {
+  display:flex; align-items:center; padding:0.3rem 0.8rem;
+  font-size:0.63rem; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;
+  border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:0.3rem;
+}
+.ranked-row {
+  display:flex; align-items:center; padding:0.25rem 0.8rem; font-size:0.70rem;
+  border-radius:4px; margin-bottom:0.15rem;
+}
+.ranked-row:nth-child(odd) { background:rgba(255,255,255,0.02); }
+.ranked-pos { width:30px; font-weight:700; }
+.ranked-name { flex:1; color:#cbd5e1; }
+.ranked-bar-wrap { width:130px; height:10px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden; margin:0 0.8rem; }
+.ranked-bar { display:block; height:100%; border-radius:5px; }
+.ranked-val { width:45px; text-align:right; font-family:'Courier New',monospace; font-size:0.72rem; color:#94a3b8; font-weight:600; }
+
+/* Stage 4: Safety */
+.safety-row { display:flex; gap:1.2rem; max-width:950px; }
+.safe-card {
+  flex:1; background:rgba(136,19,55,0.12); border-radius:0.9rem; padding:1.3rem;
+  text-align:center; border:1px solid rgba(251,113,133,0.2);
+}
+.safe-icon { font-size:1.6rem; margin-bottom:0.5rem; }
+.safe-card h4 { font-size:0.85rem; font-weight:700; margin-bottom:0.3rem; }
+.safe-card p { font-size:0.72rem; color:#94a3b8; line-height:1.5; }
+
+/* Stage 5: LLM Explanation */
+.llm-row { display:flex; gap:1.5rem; max-width:1050px; width:100%; }
+.llm-col { flex:1; }
+.llm-col-header {
+  font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;
+  text-align:center; margin-bottom:0.8rem; padding:0.4rem 0;
+  border-radius:6px;
+}
+.llm-col-header.internal { background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.2); }
+.llm-col-header.customer { background:rgba(52,211,153,0.1); color:#34d399; border:1px solid rgba(52,211,153,0.2); }
+.llm-card {
+  background:rgba(15,23,42,0.7); border-radius:0.6rem; padding:0.9rem;
+  border:1px solid rgba(255,255,255,0.08); margin-bottom:0.6rem;
+}
+.llm-card .label {
+  font-size:0.63rem; color:#64748b; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.3rem;
+}
+.llm-card .text {
+  font-size:0.65rem; color:#94a3b8; line-height:1.5;
+}
+.llm-arrow {
+  display:flex; align-items:center; justify-content:center; padding:0.3rem 0;
+  font-size:1.2rem; color:#475569;
+}
+.llm-tag {
+  display:inline-block; font-size:0.62rem; padding:3px 10px; border-radius:8px; margin-right:0.3rem;
+  font-weight:600;
+}
+.llm-tag.data { background:rgba(56,189,248,0.12); color:#38bdf8; }
+.llm-tag.qual { background:rgba(52,211,153,0.12); color:#34d399; }
+.llm-tag.filter { background:rgba(251,191,36,0.12); color:#fbbf24; }
+.llm-guard {
+  background:rgba(15,23,42,0.5); border:1px solid rgba(255,255,255,0.06); border-radius:6px;
+  padding:0.8rem 1.2rem; font-size:0.65rem; color:#94a3b8; text-align:center; flex:1; max-width:280px;
+}
+
+/* Stage 6: Conclusion */
+.c5-title { font-size:2.2rem; font-weight:900; text-align:center; }
+.c5-quote { font-size:1.3rem; color:#e2e8f0; text-align:center; margin-top:1.2rem; line-height:1.5; max-width:750px; }
+.c5-line { color:#64748b; font-size:0.9rem; margin-top:1.5rem; text-align:center; }
+.c5-line span { color:#fbbf24; }
+
+/* Progress */
+.progress-wrap {
+  position:fixed; bottom:0; left:0; width:100%; height:3px; background:rgba(255,255,255,0.04); z-index:100;
+}
+.progress-bar { height:100%; background:linear-gradient(90deg,#22d3ee,#a78bfa,#fbbf24); transition:width 0.3s linear; }
+.scene-indicator {
+  position:fixed; bottom:10px; right:1.5rem; font-size:0.68rem; color:#475569; z-index:100;
+}
+.controls {
+  position:fixed; bottom:10px; left:1.5rem; font-size:0.63rem; color:#334155; z-index:100;
+}
+</style>
+</head>
+<body>
+<div class="brand"></div>
+
+<!-- S0: TITLE -->
+<div class="stage active" id="s0">
+  <div class="scene-title">Lenovo ISG · Service Smart Recommendation</div>
+  <div class="reveal" data-delay="200"><div class="s0-title">How ISG SSR Decides<br/>What to Recommend</div></div>
+  <div class="reveal" data-delay="800"><div class="s0-sub">Every bid triggers a transparent, 4-layer decision process.<br/>Not a black box — every recommendation is traceable.</div></div>
+</div>
+
+<!-- S1: FOUR LAYERS -->
+<div class="stage" id="s1">
+  <div class="scene-title">The 4-Layer Recommendation Engine</div>
+  <div class="layers-row">
+    <div class="layer-card reveal pop" data-delay="200">
+      <div class="layer-num ln-c">1</div><h4>Recall</h4><div class="met">Rule-Based</div>
+      <div class="desc">Historical patterns<br/>Association rules + popularity</div>
+      <div class="layer-tag">100% Auditable</div>
+    </div>
+    <div class="layer-card reveal pop" data-delay="450">
+      <div class="layer-num ln-v">2</div><h4>Ranking</h4><div class="met">AI + SHAP Explainable</div>
+      <div class="desc">XGBoost scores each candidate<br/>Decomposable per prediction</div>
+      <div class="layer-tag">Per-Rec Traceable</div>
+    </div>
+    <div class="layer-card reveal pop" data-delay="700">
+      <div class="layer-num ln-a">3</div><h4>Add-On</h4><div class="met">Statistical</div>
+      <div class="desc">Warranty-Addon co-occurrence<br/>Frequency counts, reviewable</div>
+      <div class="layer-tag">100% Auditable</div>
+    </div>
+    <div class="layer-card reveal pop" data-delay="950">
+      <div class="layer-num ln-r">4</div><h4>Business Rules</h4><div class="met">Human-Defined</div>
+      <div class="desc">Geo · EOL · Compliance<br/>Version-controlled, mutable</div>
+      <div class="layer-tag">100% Auditable</div>
+    </div>
+  </div>
+</div>
+
+<!-- S2: PRICE -->
+<div class="stage" id="s2">
+  <div class="scene-title">Key Differentiator — Price-Aware Optimization</div>
+  <div class="price-row">
+    <div class="price-card bad reveal" data-delay="200">
+      <h3>Standard ML Approach</h3>
+      <div class="desc">Recommend the most statistically likely service</div>
+      <div class="highlight" style="color:#fb7185;">Low-price, high-frequency services dominate rankings</div>
+      <div class="highlight" style="color:#64748b;">→ Service attach revenue at risk</div>
+    </div>
+    <div class="price-arrow reveal" data-delay="600">→</div>
+    <div class="price-card good reveal" data-delay="800">
+      <h3>ISG SSR Approach</h3>
+      <div class="desc">Recommend the most likely service</div>
+      <div class="highlight" style="color:#34d399;">When probabilities are close — tilt toward the higher-priced option</div>
+      <div class="highlight" style="color:#64748b;">→ Protects service attach revenue</div>
+    </div>
+  </div>
+  <div class="price-formula reveal" data-delay="1500">
+    <span class="y">Custom Loss</span> = Cross-Entropy + <span class="y">β</span> · Price Tilt<br/>
+    Price Tilt: penalizes low-price services when probabilities are close<br/>
+    <span class="y">β</span>: <span class="y">0.5 → 0.1</span> adaptive decay &nbsp;·&nbsp; Tunable business dial
+  </div>
+</div>
+
+<!-- S3: SHAP -->
+<div class="stage" id="s3">
+  <div class="scene-title">Explainability — Step Through Each Feature's Impact</div>
+  <div class="reveal" data-delay="200" style="font-size:0.75rem;color:#94a3b8;margin-bottom:1rem;">
+    "Why was 3-Year Onsite ranked for this enterprise SR650 bid?"
+  </div>
+
+  <!-- Waterfall chart -->
+  <div class="wf-wrap">
+    <!-- Score display -->
+    <div style="display:flex;justify-content:center;align-items:center;gap:3rem;margin-bottom:0.6rem;">
+      <div style="text-align:center;">
+        <div style="font-size:0.63rem;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Baseline</div>
+        <div style="font-size:1.1rem;font-weight:800;color:#fbbf24;font-family:'Courier New',monospace;">0.45</div>
+      </div>
+      <div class="reveal" data-delay="300" style="text-align:center;">
+        <div style="font-size:0.63rem;color:#64748b;text-transform:uppercase;letter-spacing:0.08em;">Current Score</div>
+        <div style="font-size:1.4rem;font-weight:900;color:#fff;font-family:'Courier New',monospace;" id="wf-score-big">0.45</div>
+      </div>
+    </div>
+
+    <!-- Probability bar -->
+    <div class="wf-bar-row">
+      <!-- Baseline marker -->
+      <div class="wf-baseline-marker"></div>
+      <!-- Cursor -->
+      <div class="wf-cursor" id="wf-cursor"></div>
+    </div>
+
+    <!-- Axis -->
+    <div style="display:flex;justify-content:space-between;font-size:0.63rem;color:#64748b;padding:0 4px;margin-top:2px;">
+      <span>0.00</span><span>0.25</span><span>0.50</span><span>0.75</span><span>1.00</span>
+    </div>
+
+    <!-- Feature legend -->
+    <div class="wf-legend" style="margin-top:1.2rem;">
+      <div class="wf-step" id="ws1" data-step="1">
+        <span class="wf-dot pos"></span>
+        <span class="wf-name">Hardware = ThinkSystem SR650</span>
+        <span class="wf-impact pos">+0.18</span>
+      </div>
+      <div class="wf-step" id="ws2" data-step="2">
+        <span class="wf-dot pos"></span>
+        <span class="wf-name">Customer Segment = Enterprise</span>
+        <span class="wf-impact pos">+0.12</span>
+      </div>
+      <div class="wf-step" id="ws3" data-step="3">
+        <span class="wf-dot pos"></span>
+        <span class="wf-name">Country = USA</span>
+        <span class="wf-impact pos">+0.08</span>
+      </div>
+      <div class="wf-step" id="ws4" data-step="4">
+        <span class="wf-dot neg"></span>
+        <span class="wf-name">Contract = One-Time Deal</span>
+        <span class="wf-impact neg">-0.05</span>
+      </div>
+      <div class="wf-step" id="ws5" data-step="5">
+        <span class="wf-dot neg"></span>
+        <span class="wf-name">Price Tilt (low-price penalty)</span>
+        <span class="wf-impact neg">-0.06</span>
+      </div>
+    </div>
+
+    <!-- Button -->
+    <div style="text-align:center;margin-top:1rem;">
+      <button id="wf-next" class="wf-btn" onclick="waterfallNext()">Next Step →</button>
+      <div id="wf-desc" style="font-size:0.65rem;color:#64748b;margin-top:0.4rem;min-height:1rem;"></div>
+    </div>
+  </div>
+
+  <div class="reveal" data-delay="400" style="font-size:0.62rem;color:#475569;margin-top:0.8rem;">
+    Space to pause auto-play | Click "Next Step" to walk through manually
+  </div>
+</div>
+<!-- S3.5: RANKED OUTPUT -->
+<div class="stage" id="s3b">
+  <div class="scene-title">This Process Runs for Every Candidate — Then Produces a Ranked List</div>
+
+  <div class="reveal" data-delay="300">
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:1.2rem;">
+      <div style="background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.25);border-radius:6px;padding:0.4rem 0.8rem;font-size:0.65rem;color:#c4b5fd;">
+        K Candidates<br/><b style="font-size:0.85rem;">31–56</b><br/><span style="color:#64748b;">per Geo</span>
+      </div>
+      <span style="color:#475569;">×</span>
+      <div style="background:rgba(34,211,238,0.12);border:1px solid rgba(34,211,238,0.25);border-radius:6px;padding:0.4rem 0.8rem;font-size:0.65rem;color:#22d3ee;">
+        SHAP Breakdown<br/><b style="font-size:0.85rem;">Per Service</b><br/><span style="color:#64748b;">traceable</span>
+      </div>
+      <span style="color:#475569;">=</span>
+      <div style="background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:6px;padding:0.4rem 0.8rem;font-size:0.65rem;color:#34d399;">
+        Ranked Output<br/><b style="font-size:0.85rem;">Top-N List</b><br/><span style="color:#64748b;">to downstream</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ranked list visualization -->
+  <div class="ranked-list" style="max-width:600px;width:100%;">
+    <div class="ranked-header reveal" data-delay="800">
+      <span style="width:30px;">#</span>
+      <span style="flex:1;">Service</span>
+      <span style="width:70px;text-align:right;">Score</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="1100" style="--w:0.88;">
+      <span class="ranked-pos" style="color:#fbbf24;">1</span>
+      <span class="ranked-name">3-Year Onsite Warranty</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#22c55e;width:88%;"></span></span>
+      <span class="ranked-val">0.88</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="1400" style="--w:0.72;">
+      <span class="ranked-pos" style="color:#94a3b8;">2</span>
+      <span class="ranked-name">3-Year Onsite + 4-Hour</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#22c55e;width:72%;"></span></span>
+      <span class="ranked-val">0.72</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="1700" style="--w:0.61;">
+      <span class="ranked-pos" style="color:#94a3b8;">3</span>
+      <span class="ranked-name">3-Year Onsite + Premium</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#fbbf24;width:61%;"></span></span>
+      <span class="ranked-val">0.61</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="2000" style="--w:0.45;">
+      <span class="ranked-pos" style="color:#94a3b8;">4</span>
+      <span class="ranked-name">1-Year Onsite Warranty</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#94a3b8;width:45%;"></span></span>
+      <span class="ranked-val">0.45</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="2300" style="--w:0.28;">
+      <span class="ranked-pos" style="color:#64748b;">5</span>
+      <span class="ranked-name">1-Year Depot Warranty</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#64748b;width:28%;"></span></span>
+      <span class="ranked-val">0.28</span>
+    </div>
+    <div style="text-align:center;color:#475569;font-size:0.62rem;margin-top:0.5rem;" class="reveal" data-delay="2600">
+      ... remaining K candidates ranked below</div>
+  </div>
+
+  <div class="reveal" data-delay="2900" style="font-size:0.68rem;color:#94a3b8;margin-top:1rem;text-align:center;max-width:550px;">
+    This ranked list feeds into Business Rules for filtering, then GBB Presentation for the sales team.
+  </div>
+</div>
+
+
+<!-- S4: SAFETY -->
+<div class="stage" id="s4">
+  <div class="scene-title">Three Layers of Safety</div>
+  <div class="safety-row">
+    <div class="safe-card reveal pop" data-delay="200">
+      <div class="safe-icon">🔀</div>
+      <h4>GBB Branching</h4>
+      <p>Low confidence (≤0.75):<br/>conservative mode —<br/>price-sorted only, no aggressive push</p>
+    </div>
+    <div class="safe-card reveal pop" data-delay="500">
+      <div class="safe-icon">🛡️</div>
+      <h4>Business Rule Filters</h4>
+      <p>Geo, EOL, compliance<br/>applied after ML scoring<br/>always enforced</p>
+    </div>
+    <div class="safe-card reveal pop" data-delay="800">
+      <div class="safe-icon">🚦</div>
+      <h4>Auto Deployment Gate</h4>
+      <p>New model must > old<br/>on Accuracy + F1-Score<br/>Fail → rollback. 3x fail → pause.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S5: LLM EXPLANATION -->
+<div class="stage" id="s5">
+  <div class="scene-title">LLM Translates Numerical SHAP into Business-Language Explanations</div>
+
+  <div class="reveal" data-delay="300" style="max-width:900px;width:100%;">
+    <!-- Pipeline: SHAP → LLM → Explanation -->
+    <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:2rem;">
+      <!-- Step 1: SHAP Data -->
+      <div class="reveal" data-delay="400" style="flex:1;background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.2);border-radius:0.7rem;padding:1.4rem 1.2rem;text-align:center;">
+        <div style="font-size:0.68rem;color:#22d3ee;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:0.7rem;">XGBoost + SHAP</div>
+        <div style="font-size:0.72rem;color:#94a3b8;line-height:1.8;">
+          SR650 <span class="llm-tag data">+0.18</span><br/>
+          Enterprise <span class="llm-tag data">+0.12</span><br/>
+          USA <span class="llm-tag data">+0.08</span><br/>
+          One-Time <span class="llm-tag filter">−0.05</span>
+        </div>
+        <div style="font-size:0.62rem;color:#475569;margin-top:0.6rem;">structured JSON</div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="reveal" data-delay="800" style="font-size:1.6rem;color:#475569;flex-shrink:0;">→</div>
+
+      <!-- Step 2: LLM Processing -->
+      <div class="reveal" data-delay="900" style="flex:1.3;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;padding:1.4rem 1.2rem;text-align:center;">
+        <div style="font-size:0.68rem;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:0.7rem;">LLM + Mapping Table</div>
+        <div style="font-size:0.7rem;color:#94a3b8;line-height:1.6;">
+          <div style="margin-bottom:0.4rem;">feature → business language</div>
+          <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
+            <span style="background:rgba(34,211,238,0.12);color:#22d3ee;padding:2px 10px;border-radius:4px;font-size:0.62rem;">positive → keep</span>
+            <span style="background:rgba(251,191,36,0.12);color:#fbbf24;padding:2px 10px;border-radius:4px;font-size:0.62rem;">negative → filter</span>
+          </div>
+        </div>
+        <div style="font-size:0.62rem;color:#475569;margin-top:0.6rem;">prompt + structured context</div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="reveal" data-delay="1300" style="font-size:1.6rem;color:#475569;flex-shrink:0;">→</div>
+
+      <!-- Step 3: Output -->
+      <div class="reveal" data-delay="1400" style="flex:1.6;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2);border-radius:0.7rem;padding:1.4rem 1.2rem;text-align:left;">
+        <div style="font-size:0.68rem;color:#34d399;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-bottom:0.7rem;text-align:center;">Natural Language</div>
+        <div style="font-size:0.7rem;color:#cbd5e1;line-height:1.7;">
+          SR650 server typically paired with Premier coverage — <b style="color:#38bdf8;">82% adoption rate</b> in similar bids. Enterprise customers average <b style="color:#38bdf8;">1.4σ above SMB</b> tier preference. US market Premier rate <b style="color:#38bdf8;">67% vs global 52%</b>.
+        </div>
+        <div style="font-size:0.62rem;color:#475569;margin-top:0.6rem;text-align:center;">data-rich, traceable, auditable</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safety rails -->
+  <div class="reveal" data-delay="1800" style="display:flex;gap:1.5rem;justify-content:center;max-width:900px;width:100%;">
+    <div class="llm-guard">
+      <div style="font-size:1.2rem;margin-bottom:0.4rem;">📋</div>
+      <b style="color:#38bdf8;font-size:0.72rem;">Predefined Mapping</b><br/>
+      <span style="font-size:0.65rem;">LLM never guesses feature meaning —<br/>every term comes from an approved table</span>
+    </div>
+    <div class="llm-guard">
+      <div style="font-size:1.2rem;margin-bottom:0.4rem;">🔍</div>
+      <b style="color:#34d399;font-size:0.72rem;">Output Validation</b><br/>
+      <span style="font-size:0.65rem;">post-generation scan for hallucinated<br/>numbers, features, or technical terms</span>
+    </div>
+    <div class="llm-guard">
+      <div style="font-size:1.2rem;margin-bottom:0.4rem;">🚫</div>
+      <b style="color:#fbbf24;font-size:0.72rem;">Explanation-Only</b><br/>
+      <span style="font-size:0.65rem;">LLM never changes the recommendation —<br/>XGBoost owns the decision</span>
+    </div>
+  </div>
+
+  <div class="reveal" data-delay="2200" style="font-size:0.65rem;color:#475569;margin-top:1.2rem;text-align:center;">
+    Degrades gracefully → if LLM unavailable, falls back to rule-based templates
+  </div>
+</div>
+
+<!-- S6: CONCLUSION -->
+<div class="stage" id="s6">
+  <div class="scene-title"></div>
+  <div class="reveal" data-delay="300">
+    <div class="c5-title">Not "The AI Said So"</div>
+  </div>
+  <div class="reveal" data-delay="900">
+    <div class="c5-quote">Every recommendation =<br/>Historical Evidence + Price Optimization + Business Rules</div>
+  </div>
+  <div class="reveal" data-delay="1800">
+    <div class="c5-line">All <span>traceable</span> to specific factors. All <span>auditable</span>. No black boxes.</div>
+  </div>
+</div>
+
+<div class="progress-wrap"><div class="progress-bar" id="prog"></div></div>
+<div class="scene-indicator" id="indicator">1 / 8</div>
+<div class="controls">Space: pause · ← → : skip</div>
+
+<script>
+const stages = ['s0','s1','s2','s3','s3b','s4','s5','s6'];
+const TOTAL = 8;
+let current = 0;
+let paused = false;
+let timer = null;
+
+// Total ~45s — tight, no dead air
+const DURATIONS = [4500, 7000, 7000, 8000, 6500, 6000, 7000, 5500];
+let cumDurs = [0];
+for(let i=0;i<DURATIONS.length;i++) cumDurs.push(cumDurs[i]+DURATIONS[i]);
+const TOTAL_MS = cumDurs[TOTAL];
+
+function showStage(i) {
+  // Hide all
+  document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+  let el = document.getElementById(stages[i]);
+  el.classList.add('active');
+  document.getElementById('indicator').textContent = (i+1)+' / 8';
+  current = i;
+  
+  // Reset and trigger all reveals in this stage
+  let reveals = el.querySelectorAll('.reveal');
+  reveals.forEach(r => { r.classList.remove('in'); });
+  
+
+  
+  reveals.forEach(r => {
+    let delay = parseInt(r.dataset.delay) || 0;
+    setTimeout(() => {
+      r.classList.add('in');
+      // Trigger waterfall animation for stage 3
+      if (i === 3) { waterfallReset(); }
+      
+    }, delay);
+  });
+
+
+}
+
+function updateProgress() {
+  let elapsed = cumDurs[current] + (Date.now() - stageStart);
+  let pct = Math.min(100, (elapsed/TOTAL_MS)*100);
+  document.getElementById('prog').style.width = pct+'%';
+}
+
+let stageStart = Date.now();
+
+function nextStage() {
+  if (current < TOTAL-1) {
+    stageStart = Date.now();
+    showStage(current+1);
+    scheduleNext();
+  }
+}
+
+function prevStage() {
+  if (current > 0) {
+    stageStart = Date.now();
+    showStage(current-1);
+    scheduleNext();
+  }
+}
+
+
+// Interactive waterfall state
+let wfStep = 0;
+const wfTotal = 5;
+const wfValues = [
+  { pos:0.18, neg:0, score:0.63, desc:'Hardware match adds +0.18 — this service is designed for SR650' },
+  { pos:0.30, neg:0, score:0.75, desc:'Enterprise customers typically choose this tier (+0.12)' },
+  { pos:0.38, neg:0, score:0.83, desc:'US market standard practice adds +0.08' },
+  { pos:0.38, neg:0.05, score:0.78, desc:'One-time deal (not subscription) reduces confidence (-0.05)' },
+  { pos:0.38, neg:0.11, score:0.72, desc:'Price tilt corrects for low-price bias (-0.06) → Final: 0.72' },
+];
+
+function updateWaterfall(step) {
+  let v = step === 0 ? {pos:0, neg:0, score:0.45} : wfValues[step-1];
+  let pct = 10 + (v.score / 1.0) * 80; // map 0-1 to 10%-90%
+  
+  document.getElementById('wf-cursor').style.left = pct + '%';
+  let bigScore = document.getElementById('wf-score-big');
+  if (bigScore) bigScore.textContent = v.score.toFixed(2);
+  
+  // Highlight active step
+  for (let i=1; i<=wfTotal; i++) {
+    let el = document.getElementById('ws'+i);
+    if (el) {
+      el.classList.remove('active','focus');
+      if (i === step) el.classList.add('focus');
+      if (i < step) el.classList.add('active');
+    }
+  }
+  
+  // Update button
+  let btn = document.getElementById('wf-next');
+  let desc = document.getElementById('wf-desc');
+  if (step === 0) {
+    btn.textContent = 'Start →';
+    btn.classList.remove('done');
+    desc.textContent = 'Click to see how each feature shifts the score';
+  } else if (step < wfTotal) {
+    btn.textContent = 'Next Step →';
+    btn.classList.remove('done');
+    desc.textContent = wfValues[step-1].desc;
+  } else {
+    btn.textContent = '✓ Final Score: 0.72';
+    btn.classList.add('done');
+    desc.textContent = 'Every contribution traced. Not a black box.';
+  }
+}
+
+function waterfallNext() {
+  if (wfStep < wfTotal) {
+    wfStep++;
+    updateWaterfall(wfStep);
+  }
+}
+
+function waterfallReset() {
+  wfStep = 0;
+  updateWaterfall(0);
+}
+
+function scheduleNext() {
+  if (timer) clearTimeout(timer);
+  if (paused) return;
+  if (current < TOTAL-1) {
+    timer = setTimeout(nextStage, DURATIONS[current]);
+  }
+}
+
+setInterval(() => { if(!paused) updateProgress(); }, 100);
+
+document.addEventListener('keydown',e => {
+  if (e.key === ' ') { e.preventDefault(); paused=!paused; if(!paused){stageStart=Date.now();scheduleNext();} }
+  if (e.key === 'ArrowRight') { e.preventDefault(); paused=true; nextStage(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); paused=true; prevStage(); }
+});
+
+// Start
+showStage(0);
+stageStart = Date.now();
+scheduleNext();
+</script>
+</body>
+</html>
