@@ -1,0 +1,39 @@
+# TopSecret - xlbbbs.com 爬虫配置
+
+cities:
+  beijing:
+    name: 北京
+    fid: 2
+  tianjin:
+    name: 天津
+    fid: 63
+  shanghai:
+    name: 上海
+    fid: 176
+  sichuan:
+    name: 四川
+    fid: 276
+
+# 爬取参数
+scraper:
+  base_url: "https://xlbbbs.com"
+  modes:
+    - name: 热帖
+      path: "forum.php?mod=forumdisplay&fid={fid}&filter=heat&orderby=heats"
+    - name: 最新
+      path: "forum.php?mod=forumdisplay&fid={fid}"
+  max_pages: 4           # 每个城市每种模式最大爬取页数
+  timeout: 15            # 请求超时(秒)
+  max_age_days: 120      # 只保留N天内的帖子
+  min_views: 3000        # 最低浏览量（过滤水帖）
+
+# 实体合并参数
+merger:
+  title_similarity: 0.7   # 标题相似度阈值
+  address_match: exact    # 地址匹配方式: exact | fuzzy
+
+# 输出
+output:
+  dir: output
+  json_per_city: true
+  weekly_digest: true

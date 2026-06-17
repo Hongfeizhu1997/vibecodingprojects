@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>SSR Financial KPI Report — Phase 2</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#222;font-size:14px}
+.navbar{background:#1a237e;color:#fff;padding:12px 24px;display:flex;align-items:center;gap:16px;
+        position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.35);flex-wrap:wrap}
+.navbar .brand{font-weight:700;font-size:15px}
+.navbar a{color:#bbdefb;text-decoration:none;padding:4px 10px;border-radius:4px;font-size:12px}
+.navbar a:hover{background:rgba(255,255,255,.15);color:#fff}
+.page{max-width:1320px;margin:0 auto;padding:20px 24px}
+.section{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:24px;overflow:hidden}
+.sec-hdr{background:#1a237e;color:#fff;padding:13px 20px}
+.sec-hdr h2{font-size:17px;font-weight:600}
+.sec-body{padding:18px 20px}
+.sub{margin-bottom:22px}.sub:last-child{margin-bottom:0}
+.sub h3{font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #42a5f5;padding-left:10px}
+.insight{background:#e3f2fd;border-left:4px solid #1976d2;padding:9px 13px;border-radius:4px;font-size:13px;color:#0d47a1;margin-bottom:10px;line-height:1.5}
+.warn{background:#fff3e0;border-left:4px solid #f57c00;padding:9px 13px;border-radius:4px;font-size:13px;color:#bf360c;margin-bottom:10px;line-height:1.5}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#37474f;color:#fff;padding:7px 10px;text-align:left;font-weight:600;white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.num{text-align:right;font-family:'Courier New',monospace;white-space:nowrap}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi-card{background:#f5f7ff;border:1px solid #e8eaf6;border-radius:8px;padding:14px}
+.kpi-card .geo-tag{display:inline-block;background:#1a237e;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;margin-bottom:6px}
+.kpi-card .label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px}
+.kpi-card .big{font-size:22px;font-weight:700;margin:3px 0}
+.kpi-card .sub{font-size:11px;color:#888;line-height:1.4}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.hl-pos{color:#2e7d32;font-weight:600}
+.hl-neg{color:#c62828;font-weight:600}
+</style>
+</head><body>
+<nav class="navbar"><span class="brand">SSR Financial KPI Report — Phase 2</span><a href="#did">Q3 DiD</a><a href="#decomp">Q4 Decomposition</a><a href="#trends">$/HW & Pen Trends</a><a href="#asp">ASP Pass-Through</a><a href="#acv">Contract Values</a><span style="margin-left:auto;font-size:11px;color:#90caf9">2026-05-20 03:39</span></nav>
+<div class="page">
+<div class="section"><div class="sec-hdr"><h2>Executive Summary</h2></div><div class="sec-body">
+<p class="insight">Financial KPI analysis covering FY24/25 (pre-project baseline) through FY25/26 (project period). Source: ESS Smart Recommendation Performance_Q4 analysis.xlsx. All figures in USD.</p>
+<div class="kpi-grid">
+<div class="kpi-card"><div class="label">Q3 EMEA DiD</div><div class="big" style="color:#2e7d32">$9,009,507</div><div class="sub">DiD method: EMEA vs NA+AP+LA control group
+EMEA Q3 HW Qty: 1,942,451</div></div>
+<div class="kpi-card"><div class="label">Q4 WW Estimated</div><div class="big" style="color:#2e7d32">$4,592,892</div><div class="sub">50% ASP pass-through assumption
+Excludes interaction effects</div></div>
+<div class="kpi-card"><div class="label">Q3+Q4 Combined</div><div class="big" style="color:#2e7d32">$13,602,399</div><div class="sub">Conservative estimate
+DiD for Q3 + decomposition for Q4</div></div>
+<div class="kpi-card"><div class="label">EMEA Peak ACV</div><div class="big" style="color:#2e7d32">$822</div><div class="sub">Q4 FY25/26 Average Contract Value
+FY24 Q4: $714 → FY25 Q4: $822</div></div>
+</div></div></div>
+<div class="section" id="did"><div class="sec-hdr"><h2>Q3 FY25/26 — Difference-in-Differences Analysis</h2></div><div class="sec-body">
+<p class="insight">Q3 is the ideal DiD window: EMEA had full-quarter project exposure (launched Sep 28). NA/AP/LA launched Nov 28 — contract-to-revenue lag means <strong>zero</strong> Q3 revenue impact for these GEOs. NA's +$14.11/HW Q3 surge is confirmed as organic market growth (W10 EOS cycle), making it a valid control.</p>
+<table><tr><th>Group</th><th>GEOs</th><th class="num">FY24 Q3 $/HW</th><th class="num">FY25 Q3 $/HW</th><th class="num">Δ $/HW</th></tr>
+<tr><td><strong>Treatment</strong></td><td>EMEA</td><td class="num">$41.51</td><td class="num">$46.83</td><td class="num hl-pos">+$5.32</td></tr>
+<tr><td><strong>Control</strong></td><td>NA+AP+LA</td><td class="num">$36.29</td><td class="num">$36.96</td><td class="num">+$0.68</td></tr>
+<tr style="background:#e8f5e9;font-weight:700"><td colspan="3">DiD Effect (Treatment Δ − Control Δ)</td><td class="num" style="color:#1b5e20;font-size:16px">+$4.64/HW</td><td></td></tr>
+<tr style="background:#e8f5e9"><td colspan="3">× EMEA Q3 HW Quantity (1,942,451)</td><td class="num" style="color:#1b5e20;font-size:16px;font-weight:700">$9,009,507</td><td></td></tr>
+</table>
+<p class="warn" style="margin-top:12px">This estimate is <strong>~50% higher</strong> than the handover's ~$6M for EMEA Q3. The difference: the handover applied a 45-55% subjective attribution rate on top of the DiD gap. DiD methodology already controls for organic growth — applying an additional attribution rate is double-counting the organic adjustment.</p>
+</div></div>
+<div class="section" id="decomp"><div class="sec-hdr"><h2>Q4 FY25/26 — Revenue Decomposition by GEO</h2></div><div class="sec-body">
+<p class="insight">Q4 is harder to isolate because all GEOs had project exposure (varying maturity). Decomposition uses 50% ASP-to-service pass-through as a conservative organic baseline.</p>
+<table><tr><th>GEO</th><th class="num">HW Qty YoY</th><th class="num">$/HW FY24</th><th class="num">$/HW FY25</th><th class="num">Volume Effect</th><th class="num">ASP Organic</th><th class="num">Project $/HW</th><th class="num">Project Revenue</th></tr>
+<tr><td><strong>AP</strong></td><td class="num">+5.5%</td><td class="num">$33.61</td><td class="num">$37.36</td><td class="num">$2,088,139</td><td class="num">$2,465,841</td><td class="num" style="color:#2e7d32">$+1.67</td><td class="num" style="color:#2e7d32;font-weight:700">$1,976,171</td></tr>
+<tr><td><strong>EMEA</strong></td><td class="num">+27.8%</td><td class="num">$43.18</td><td class="num">$48.28</td><td class="num">$19,184,950</td><td class="num">$6,722,140</td><td class="num" style="color:#2e7d32">$+1.81</td><td class="num" style="color:#2e7d32;font-weight:700">$3,707,399</td></tr>
+<tr><td><strong>LA</strong></td><td class="num">+25.1%</td><td class="num">$24.52</td><td class="num">$24.80</td><td class="num">$1,556,187</td><td class="num">$-27,176</td><td class="num" style="color:#2e7d32">$+0.37</td><td class="num" style="color:#2e7d32;font-weight:700">$115,635</td></tr>
+<tr><td><strong>NA</strong></td><td class="num">+22.1%</td><td class="num">$51.90</td><td class="num">$51.07</td><td class="num">$12,189,480</td><td class="num">$137,855</td><td class="num" style="color:#c62828">$-0.93</td><td class="num" style="color:#c62828;font-weight:700">$-1,206,313</td></tr>
+<tr style="background:#e8f5e9;font-weight:700"><td colspan="6">Total Q4 Estimated Project Contribution</td><td></td><td class="num" style="font-size:15px;color:#1b5e20">$4,592,892</td></tr>
+</table>
+<p class="warn" style="margin-top:12px">NA shows negative project contribution in Q4 because $/HW declined (-$0.82) while HW ASP was flat (+0.4%). This likely reflects the "cold start" effect — NA's model was uncalibrated in its first revenue quarter. Also possible: the 50% ASP pass-through understates organic growth for NA (which showed massive organic Q3 gains).</p>
+</div></div>
+<div class="section" id="trends"><div class="sec-hdr"><h2>$/HW & Penetration Rate Trends (All 8 Quarters)</h2></div><div class="sec-body">
+<div class="sub"><h3>AP</h3>
+<table><tr><th>Quarter</th><th class="num">Service Revenue</th><th class="num">HW Qty</th><th class="num">$/HW</th><th class="num">Pen Rate</th><th class="num">HW ASP</th></tr>
+<tr><td>5Q1</td><td class="num">$25,950,509</td><td class="num">736,982</td><td class="num">$35.21</td><td class="num">4.95%</td><td class="num">$712</td></tr>
+<tr><td>5Q2</td><td class="num">$36,767,844</td><td class="num">923,379</td><td class="num">$39.82</td><td class="num">5.29%</td><td class="num">$753</td></tr>
+<tr><td>5Q3</td><td class="num">$42,528,184</td><td class="num">1,108,755</td><td class="num">$38.36</td><td class="num">5.39%</td><td class="num">$712</td></tr>
+<tr><td>5Q4</td><td class="num">$37,750,979</td><td class="num">1,123,053</td><td class="num">$33.61</td><td class="num">5.02%</td><td class="num">$669</td></tr>
+<tr><td>6Q1</td><td class="num">$40,888,574</td><td class="num">1,497,484</td><td class="num">$27.30</td><td class="num">4.42%</td><td class="num">$618</td></tr>
+<tr><td>6Q2</td><td class="num">$44,188,558</td><td class="num">1,690,788</td><td class="num">$26.13</td><td class="num">4.43%</td><td class="num">$589</td></tr>
+<tr><td>6Q3</td><td class="num">$42,220,257</td><td class="num">1,422,407</td><td class="num">$29.68</td><td class="num">4.87%</td><td class="num">$610</td></tr>
+<tr><td>6Q4</td><td class="num">$44,281,129</td><td class="num">1,185,173</td><td class="num">$37.36</td><td class="num">4.97%</td><td class="num">$752</td></tr>
+</table></div>
+<div class="sub"><h3>EMEA</h3>
+<table><tr><th>Quarter</th><th class="num">Service Revenue</th><th class="num">HW Qty</th><th class="num">$/HW</th><th class="num">Pen Rate</th><th class="num">HW ASP</th></tr>
+<tr><td>5Q1</td><td class="num">$57,698,829</td><td class="num">1,471,316</td><td class="num">$39.22</td><td class="num">6.09%</td><td class="num">$644</td></tr>
+<tr><td>5Q2</td><td class="num">$61,784,718</td><td class="num">1,437,377</td><td class="num">$42.98</td><td class="num">5.90%</td><td class="num">$728</td></tr>
+<tr><td>5Q3</td><td class="num">$68,292,970</td><td class="num">1,645,205</td><td class="num">$41.51</td><td class="num">5.62%</td><td class="num">$738</td></tr>
+<tr><td>5Q4</td><td class="num">$69,052,782</td><td class="num">1,599,358</td><td class="num">$43.18</td><td class="num">6.05%</td><td class="num">$714</td></tr>
+<tr><td>6Q1</td><td class="num">$73,387,623</td><td class="num">1,587,949</td><td class="num">$46.22</td><td class="num">6.38%</td><td class="num">$724</td></tr>
+<tr><td>6Q2</td><td class="num">$75,615,590</td><td class="num">1,699,157</td><td class="num">$44.50</td><td class="num">6.79%</td><td class="num">$655</td></tr>
+<tr><td>6Q3</td><td class="num">$90,957,859</td><td class="num">1,942,451</td><td class="num">$46.83</td><td class="num">6.20%</td><td class="num">$756</td></tr>
+<tr><td>6Q4</td><td class="num">$98,667,272</td><td class="num">2,043,708</td><td class="num">$48.28</td><td class="num">5.87%</td><td class="num">$822</td></tr>
+</table></div>
+<div class="sub"><h3>LA</h3>
+<table><tr><th>Quarter</th><th class="num">Service Revenue</th><th class="num">HW Qty</th><th class="num">$/HW</th><th class="num">Pen Rate</th><th class="num">HW ASP</th></tr>
+<tr><td>5Q1</td><td class="num">$5,982,902</td><td class="num">290,334</td><td class="num">$20.61</td><td class="num">3.59%</td><td class="num">$574</td></tr>
+<tr><td>5Q2</td><td class="num">$6,248,640</td><td class="num">344,322</td><td class="num">$18.15</td><td class="num">3.29%</td><td class="num">$552</td></tr>
+<tr><td>5Q3</td><td class="num">$6,711,749</td><td class="num">363,477</td><td class="num">$18.47</td><td class="num">3.34%</td><td class="num">$553</td></tr>
+<tr><td>5Q4</td><td class="num">$6,194,983</td><td class="num">252,678</td><td class="num">$24.52</td><td class="num">3.59%</td><td class="num">$684</td></tr>
+<tr><td>6Q1</td><td class="num">$9,213,195</td><td class="num">249,646</td><td class="num">$36.91</td><td class="num">5.25%</td><td class="num">$703</td></tr>
+<tr><td>6Q2</td><td class="num">$7,417,645</td><td class="num">358,714</td><td class="num">$20.68</td><td class="num">3.41%</td><td class="num">$607</td></tr>
+<tr><td>6Q3</td><td class="num">$9,838,623</td><td class="num">472,660</td><td class="num">$20.82</td><td class="num">3.25%</td><td class="num">$640</td></tr>
+<tr><td>6Q4</td><td class="num">$7,839,629</td><td class="num">316,151</td><td class="num">$24.80</td><td class="num">3.65%</td><td class="num">$679</td></tr>
+</table></div>
+<div class="sub"><h3>NA</h3>
+<table><tr><th>Quarter</th><th class="num">Service Revenue</th><th class="num">HW Qty</th><th class="num">$/HW</th><th class="num">Pen Rate</th><th class="num">HW ASP</th></tr>
+<tr><td>5Q1</td><td class="num">$46,913,592</td><td class="num">1,289,372</td><td class="num">$36.38</td><td class="num">4.93%</td><td class="num">$738</td></tr>
+<tr><td>5Q2</td><td class="num">$37,720,249</td><td class="num">1,002,930</td><td class="num">$37.61</td><td class="num">4.74%</td><td class="num">$794</td></tr>
+<tr><td>5Q3</td><td class="num">$39,310,854</td><td class="num">968,182</td><td class="num">$40.60</td><td class="num">4.63%</td><td class="num">$878</td></tr>
+<tr><td>5Q4</td><td class="num">$55,047,222</td><td class="num">1,060,700</td><td class="num">$51.90</td><td class="num">5.85%</td><td class="num">$887</td></tr>
+<tr><td>6Q1</td><td class="num">$52,390,761</td><td class="num">1,191,124</td><td class="num">$43.98</td><td class="num">5.12%</td><td class="num">$859</td></tr>
+<tr><td>6Q2</td><td class="num">$51,235,487</td><td class="num">934,610</td><td class="num">$54.82</td><td class="num">6.15%</td><td class="num">$892</td></tr>
+<tr><td>6Q3</td><td class="num">$55,455,089</td><td class="num">1,013,628</td><td class="num">$54.71</td><td class="num">6.02%</td><td class="num">$908</td></tr>
+<tr><td>6Q4</td><td class="num">$66,168,244</td><td class="num">1,295,578</td><td class="num">$51.07</td><td class="num">5.73%</td><td class="num">$891</td></tr>
+</table></div>
+</div></div>
+<div class="section" id="asp"><div class="sec-hdr"><h2>ASP-to-$/HW Pass-Through Calibration</h2></div><div class="sec-body">
+<p class="insight">The handover assumed a fixed 75% pass-through rate from HW ASP changes to service prices. Actual data shows the relationship is highly variable — from -3.9x to +10x. The SSR project itself breaks this relationship by driving $/HW growth independent of hardware prices.</p>
+<table><tr><th>GEO</th><th>Quarter</th><th class="num">ASP YoY</th><th class="num">$/HW YoY</th><th class="num">Pass-Through Ratio</th><th>Interpretation</th></tr>
+<tr><td>AP</td><td>Q1</td><td class="num">-13.2%</td><td class="num">-22.5%</td><td class="num" style="font-weight:700">+1.70x</td><td style="font-size:12px;color:#2e7d32">Project effect dominant</td></tr>
+<tr><td>AP</td><td>Q2</td><td class="num">-21.7%</td><td class="num">-34.4%</td><td class="num" style="font-weight:700">+1.58x</td><td style="font-size:12px;color:#2e7d32">Project effect dominant</td></tr>
+<tr><td>AP</td><td>Q3</td><td class="num">-14.3%</td><td class="num">-22.6%</td><td class="num" style="font-weight:700">+1.58x</td><td style="font-size:12px;color:#2e7d32">Project effect dominant</td></tr>
+<tr><td>AP</td><td>Q4</td><td class="num">+12.4%</td><td class="num">+11.1%</td><td class="num" style="font-weight:700">+0.90x</td><td style="font-size:12px;color:#666">Mixed</td></tr>
+<tr><td>EMEA</td><td>Q1</td><td class="num">+12.5%</td><td class="num">+17.8%</td><td class="num" style="font-weight:700">+1.42x</td><td style="font-size:12px;color:#666">Mixed</td></tr>
+<tr><td>EMEA</td><td>Q2</td><td class="num">-10.0%</td><td class="num">+3.5%</td><td class="num" style="font-weight:700">-0.35x</td><td style="font-size:12px;color:#666">Organic ASP-driven</td></tr>
+<tr><td>EMEA</td><td>Q3</td><td class="num">+2.3%</td><td class="num">+12.8%</td><td class="num" style="font-weight:700">+5.46x</td><td style="font-size:12px;color:#2e7d32">Project effect dominant</td></tr>
+<tr><td>EMEA</td><td>Q4</td><td class="num">+15.2%</td><td class="num">+11.8%</td><td class="num" style="font-weight:700">+0.78x</td><td style="font-size:12px;color:#666">Organic ASP-driven</td></tr>
+<tr><td>LA</td><td>Q1</td><td class="num">+22.5%</td><td class="num">+79.1%</td><td class="num" style="font-weight:700">+3.52x</td><td style="font-size:12px;color:#2e7d32">Project effect dominant</td></tr>
+<tr><td>LA</td><td>Q2</td><td class="num">+9.9%</td><td class="num">+13.9%</td><td class="num" style="font-weight:700">+1.40x</td><td style="font-size:12px;color:#666">Mixed</td></tr>
+<tr><td>LA</td><td>Q3</td><td class="num">+15.7%</td><td class="num">+12.7%</td><td class="num" style="font-weight:700">+0.81x</td><td style="font-size:12px;color:#666">Mixed</td></tr>
+<tr><td>LA</td><td>Q4</td><td class="num">-0.7%</td><td class="num">+1.1%</td><td class="num" style="font-weight:700">-1.63x</td><td style="font-size:12px;color:#2e7d32">Project effect dominant</td></tr>
+<tr><td>NA</td><td>Q1</td><td class="num">+16.3%</td><td class="num">+20.9%</td><td class="num" style="font-weight:700">+1.28x</td><td style="font-size:12px;color:#666">Mixed</td></tr>
+<tr><td>NA</td><td>Q2</td><td class="num">+12.3%</td><td class="num">+45.8%</td><td class="num" style="font-weight:700">+3.73x</td><td style="font-size:12px;color:#2e7d32">Project effect dominant</td></tr>
+<tr><td>NA</td><td>Q3</td><td class="num">+3.5%</td><td class="num">+34.7%</td><td class="num" style="font-weight:700">+10.01x</td><td style="font-size:12px;color:#2e7d32">Project effect dominant</td></tr>
+</table>
+<p class="warn" style="margin-top:12px"><strong>Key insight:</strong> In quarters where $/HW change far exceeds ASP change (ratio > 1.5x), the excess is project-driven. EMEA Q3 (5.46x) and NA Q3 (10.01x — organic, W10 EOS) are the clearest signals. The 75% fixed assumption in the handover is <strong>not supported</strong> by the data.</p>
+</div></div>
+<div class="section" id="acv"><div class="sec-hdr"><h2>Average Contract Value — Quality-over-Quantity Evidence</h2></div><div class="sec-body">
+<p class="insight">ACV = $/HW ÷ Penetration Rate. Rising ACV with stable/declining penetration confirms the engine is prioritizing higher-value service recommendations over broad but shallow coverage.</p>
+<table><tr><th>GEO</th><th class="num">FY24 Q4 ACV</th><th class="num">FY25 Q4 ACV</th><th class="num">Change</th><th class="num">FY24 Q4 Pen</th><th class="num">FY25 Q4 Pen</th></tr>
+<tr><td><strong>AP</strong></td><td class="num">$669</td><td class="num">$752</td><td class="num hl-pos">+12%</td><td class="num">5.02%</td><td class="num">4.97%</td></tr>
+<tr><td><strong>EMEA</strong></td><td class="num">$714</td><td class="num">$822</td><td class="num hl-pos">+15%</td><td class="num">6.05%</td><td class="num">5.87%</td></tr>
+<tr><td><strong>LA</strong></td><td class="num">$684</td><td class="num">$679</td><td class="num hl-pos">+-1%</td><td class="num">3.59%</td><td class="num">3.65%</td></tr>
+<tr><td><strong>NA</strong></td><td class="num">$887</td><td class="num">$891</td><td class="num hl-pos">+0%</td><td class="num">5.85%</td><td class="num">5.73%</td></tr>
+</table>
+<p style="margin-top:12px;font-size:13px;color:#555">EMEA ACV rose from $714 to $822 (+15%) while penetration declined from 6.05% to 5.87%. This is the <strong>intended trajectory</strong>: the engine matures from broad coverage (Q2 peak pen 6.79%) toward quality recommendations (Q4 peak ACV $822).</p>
+</div></div>
+</div></body></html>

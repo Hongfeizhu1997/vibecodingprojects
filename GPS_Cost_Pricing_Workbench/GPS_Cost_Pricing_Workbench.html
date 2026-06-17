@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GPS Cost Pricing Workbench</title>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ── RESET & BASE ── */
 *{box-sizing:border-box;margin:0;padding:0}
 body{
-  font-family:'Helvetica Neue','Lato',Arial,sans-serif;
+  font-family:'Montserrat','Helvetica Neue',Arial,sans-serif;
   min-height:100vh;
-  background:#000;
+  background:#11184F;
   color:#fff;
   display:flex;
   flex-direction:column;
@@ -23,11 +23,12 @@ body{
   display:flex;
   align-items:center;
   padding:0 40px;
-  border-bottom:1px solid rgba(255,255,255,.1);
+  border-bottom:1px solid rgba(255,255,255,.08);
   position:sticky;
   top:0;
   z-index:100;
-  background:#000;
+  background:rgba(17,24,79,.95);
+  backdrop-filter:blur(12px);
 }
 .nav-logo{
   font-size:22px;
@@ -35,59 +36,70 @@ body{
   color:#fff;
   letter-spacing:-.3px;
 }
-.nav-logo span{color:#E2232A}
+.nav-logo span{color:#E1251B}
 .nav-division{
   margin-left:24px;
   padding-left:24px;
-  border-left:1px solid rgba(255,255,255,.2);
+  border-left:1px solid rgba(255,255,255,.15);
   font-size:13px;
   font-weight:400;
-  color:#6F7170;
+  color:#ABA8B1;
   letter-spacing:.3px;
 }
 
 /* ── HERO ── */
 .hero{
-  padding:80px 40px 72px;
+  padding:90px 40px 80px;
   max-width:1200px;
   margin:0 auto;
   width:100%;
+  position:relative;
+}
+.hero::after{
+  content:'';
+  position:absolute;
+  top:0;right:0;
+  width:50%;
+  height:100%;
+  background:radial-gradient(ellipse at 70% 50%, rgba(225,37,27,.08) 0%, transparent 70%);
+  pointer-events:none;
 }
 .hero-eyebrow{
   font-size:12px;
-  font-weight:500;
-  letter-spacing:1.5px;
+  font-weight:600;
+  letter-spacing:2px;
   text-transform:uppercase;
-  color:#E2232A;
-  margin-bottom:16px;
+  color:#E1251B;
+  margin-bottom:20px;
 }
 .hero h1{
-  font-size:48px;
+  font-size:52px;
   font-weight:300;
-  line-height:.95;
-  letter-spacing:-.3px;
+  line-height:1.05;
+  letter-spacing:-.5px;
   color:#fff;
-  margin-bottom:16px;
+  margin-bottom:20px;
 }
 .hero-rule{
   width:80px;
   height:4px;
-  background:#E2232A;
-  margin:16px 0 20px;
+  background:#E1251B;
+  margin:20px 0 24px;
+  border-radius:2px;
 }
 .hero-sub{
-  font-size:18px;
+  font-size:17px;
   font-weight:300;
-  line-height:1.55;
-  color:#6F7170;
-  max-width:560px;
+  line-height:1.6;
+  color:#ABA8B1;
+  max-width:580px;
 }
 
 /* ── CARDS SECTION ── */
 .cards-section{
   flex:1;
-  background:#fff;
-  padding:64px 40px 80px;
+  background:#F4F4F4;
+  padding:72px 40px 88px;
 }
 .cards-inner{
   max-width:1200px;
@@ -95,128 +107,142 @@ body{
 }
 .section-label{
   font-size:12px;
-  font-weight:500;
-  letter-spacing:1.5px;
+  font-weight:600;
+  letter-spacing:2px;
   text-transform:uppercase;
-  color:#E2232A;
-  margin-bottom:32px;
+  color:#E1251B;
+  margin-bottom:36px;
 }
 .cards-row{
   display:flex;
-  gap:24px;
+  gap:20px;
   justify-content:center;
-  margin-bottom:24px;
+  margin-bottom:20px;
 }
 .cards-row:last-child{margin-bottom:0}
 .cards-row .card{flex:1;min-width:260px}
 .cards-row.row-2 .card{max-width:380px}
 .cards-row.row-3 .card{max-width:340px}
+
 /* ── CARD ── */
 .card{
   flex:0 0 calc(33.333% - 16px);
   min-width:260px;
   max-width:380px;
   background:#fff;
-  border:1px solid #D9D8D6;
-  border-radius:4px;
-  padding:28px 24px 24px;
+  border:1px solid #E6E2E4;
+  border-radius:6px;
+  padding:32px 28px 28px;
   text-decoration:none;
   display:block;
-  transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
   position:relative;
+  overflow:hidden;
 }
 .card:hover{
-  border-color:#E2232A;
-  box-shadow:0 4px 16px rgba(226,35,42,.12);
-  transform:translateY(-2px);
+  border-color:#E1251B;
+  box-shadow:0 6px 20px rgba(225,37,27,.1);
+  transform:translateY(-3px);
 }
 .card-soon{
   cursor:not-allowed;
-  opacity:.45;
+  opacity:.5;
 }
 .card-soon:hover{
-  border-color:#D9D8D6;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  border-color:#E6E2E4;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
   transform:none;
 }
 
-/* Card top accent line */
+/* Card top accent */
 .card::before{
   content:'';
   position:absolute;
   top:0;left:0;right:0;
   height:3px;
-  background:#D9D8D6;
-  border-radius:4px 4px 0 0;
-  transition:background .15s ease;
+  background:#E6E2E4;
+  transition:background .2s ease;
 }
-.card:not(.card-soon):hover::before{
-  background:#E2232A;
-}
-.card-active::before{
-  background:#E2232A;
-}
+.card:not(.card-soon):hover::before{background:#E1251B}
+.card-active::before{background:#E1251B}
 
 .card-stage{
   font-size:11px;
-  font-weight:500;
+  font-weight:600;
   letter-spacing:1.5px;
   text-transform:uppercase;
-  color:#E2232A;
-  margin-bottom:10px;
-}
-.card-soon .card-stage{
-  color:#C4BEB6;
-}
-.card-icon{
-  font-size:32px;
+  color:#E1251B;
   margin-bottom:12px;
+}
+.card-soon .card-stage{color:#ABA8B1}
+.card-icon{
+  font-size:34px;
+  margin-bottom:14px;
   display:block;
 }
 .card-title{
   font-size:18px;
-  font-weight:500;
-  color:#1A1A1A;
-  margin-bottom:8px;
+  font-weight:600;
+  color:#1E0013;
+  margin-bottom:10px;
   line-height:1.2;
 }
 .card-desc{
   font-size:13px;
   font-weight:400;
   color:#6F7170;
-  line-height:1.6;
-  margin-bottom:16px;
+  line-height:1.65;
+  margin-bottom:18px;
 }
 .card-tag{
   display:inline-block;
-  padding:3px 10px;
-  border-radius:2px;
+  padding:4px 12px;
+  border-radius:3px;
   font-size:11px;
-  font-weight:500;
-  letter-spacing:.5px;
+  font-weight:600;
+  letter-spacing:.3px;
   background:#FAECEB;
-  color:#E2232A;
+  color:#E1251B;
 }
 .card-soon .card-tag{
-  background:#f3f4f6;
-  color:#C4BEB6;
+  background:#EAEEF5;
+  color:#ABA8B1;
 }
 .coming-soon-badge{
   display:inline-block;
-  padding:3px 10px;
-  border-radius:2px;
+  padding:4px 12px;
+  border-radius:3px;
   font-size:11px;
-  font-weight:500;
-  letter-spacing:.5px;
-  background:#f3f4f6;
-  color:#C4BEB6;
+  font-weight:600;
+  letter-spacing:.3px;
+  background:#EAEEF5;
+  color:#ABA8B1;
 }
+
+/* ── PIPELINE FLOW ── */
+.pipeline{
+  text-align:center;
+  margin-bottom:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.pipeline-step{
+  width:12px;height:12px;
+  border-radius:50%;
+  background:#E6E2E4;
+}
+.pipeline-step.active{background:#E1251B;width:14px;height:14px}
+.pipeline-step.built{background:#4263C7}
+.pipeline-arrow{color:#ABA8B1;font-size:16px;margin:0 2px}
 
 /* ── FOOTER ── */
 .footer{
-  background:#000;
-  border-top:1px solid rgba(255,255,255,.08);
+  background:#0D133A;
+  border-top:1px solid rgba(255,255,255,.06);
   padding:28px 40px;
 }
 .footer-inner{
@@ -233,10 +259,7 @@ body{
   font-weight:400;
   color:#6F7170;
 }
-.footer-left span{
-  color:#C4BEB6;
-  margin:0 8px;
-}
+.footer-left span{color:#ABA8B1;margin:0 8px}
 .footer-right{
   font-size:12px;
   color:#6F7170;
@@ -246,8 +269,8 @@ body{
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
   .nav{padding:0 24px}
-  .hero{padding:48px 24px 48px}
-  .hero h1{font-size:36px}
+  .hero{padding:56px 24px 48px}
+  .hero h1{font-size:38px}
   .cards-section{padding:48px 24px 64px}
   .footer{padding:24px}
   .footer-inner{flex-direction:column;align-items:flex-start}
@@ -263,21 +286,36 @@ body{
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-logo">GPS<span>·</span>Pricing</div>
-  <div class="nav-division">Global Product Support &mdash; Service Pricing Workbench</div>
+  <div class="nav-division">Global Product Support — Service Pricing Workbench</div>
 </nav>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-eyebrow">Lenovo · SSGCDTO</div>
-  <h1>GPS Cost Pricing<br>Workbench</h1>
+  <div class="hero-eyebrow">Lenovo · SSGCDTO · GPS</div>
+  <h1>Service Cost Pricing<br>Workbench</h1>
   <div class="hero-rule"></div>
-  <p class="hero-sub">An end-to-end offline service pricing tool. From standard cost ingestion through forward adjustment, sales cost calculation, validation, and final list price derivation.</p>
+  <p class="hero-sub">An end-to-end offline service pricing tool for the GPS division. Six stages from standard cost through forward adjustment, sales cost calculation, GVE validation, and final list price derivation.</p>
 </div>
 
 <!-- CARDS -->
 <div class="cards-section">
   <div class="cards-inner">
     <div class="section-label">Pricing Pipeline — Select a Stage</div>
+
+    <!-- Pipeline indicator -->
+    <div class="pipeline">
+      <span class="pipeline-step" style="background:#E6E2E4" title="Stage 1 — Coming Soon"></span>
+      <span class="pipeline-arrow">→</span>
+      <span class="pipeline-step" style="background:#E6E2E4" title="Stage 2 — Coming Soon"></span>
+      <span class="pipeline-arrow">→</span>
+      <span class="pipeline-step built" title="Stage 3 — Live"></span>
+      <span class="pipeline-arrow">→</span>
+      <span class="pipeline-step built" title="Stage 4 — Live"></span>
+      <span class="pipeline-arrow">→</span>
+      <span class="pipeline-step built" title="Stage 5 — Live"></span>
+      <span class="pipeline-arrow">→</span>
+      <span class="pipeline-step built" title="Stage 6 — Live"></span>
+    </div>
 
     <!-- Row 1: Stages 1–3 -->
     <div class="cards-row row-3">
@@ -293,7 +331,7 @@ body{
       <div class="card card-soon">
         <span class="card-icon">⚙️</span>
         <div class="card-stage">Stage 2</div>
-        <div class="card-title">Forward Adjustment (PSC)</div>
+        <div class="card-title">Forward Adjustment</div>
         <div class="card-desc">Derive Projected Service Cost from Standard Cost using failure, parts, labor, and mix adjustment factors.</div>
         <span class="coming-soon-badge">Coming Soon</span>
       </div>
@@ -301,9 +339,9 @@ body{
       <a class="card card-active" href="stage3_browser/index.html">
         <span class="card-icon">🧮</span>
         <div class="card-stage">Stage 3</div>
-        <div class="card-title">Sales Cost Calculator</div>
-        <div class="card-desc">Import SKU data, configure uplift catalogs and rules, calculate Sales Cost from PSC using dimension-driven uplift ratios.</div>
-        <span class="card-tag">Sales Cost = PSC × (1 + Uplift)</span>
+        <div class="card-title">Sales Cost Calculation</div>
+        <div class="card-desc">Import SKU data, configure uplift rules, calculate Sales Cost = PSC × (1 + Σ%) + Σ$ using dimension-driven uplift values.</div>
+        <span class="card-tag">Data Enrich · Uplift · Calc</span>
       </a>
 
     </div>
@@ -314,24 +352,24 @@ body{
       <a class="card card-active" href="stage4_browser/index.html">
         <span class="card-icon">🔬</span>
         <div class="card-stage">Stage 4</div>
-        <div class="card-title">GVE Validation Engine</div>
-        <div class="card-desc">Validate sales cost matrix across 4 layers: Monotonicity, Ratio Bands, Cross-Geo Consistency, and Year-over-Year Drift. Compute B2C/B2B list prices.</div>
-        <span class="card-tag">4-Layer GVE · B2C · B2B Floor</span>
+        <div class="card-title">GVE Validation</div>
+        <div class="card-desc">Validate the sales cost matrix across 4 layers: Monotonicity, Ratio Bands, Cross-Geo Consistency, and YoY Drift. Includes rule-based cross-check.</div>
+        <span class="card-tag">4-Layer GVE · CrossCheck · Presets</span>
       </a>
 
       <a class="card card-active" href="stage5_browser/index.html">
         <span class="card-icon">💲</span>
         <div class="card-stage">Stage 5</div>
-        <div class="card-title">List Price Calculator</div>
-        <div class="card-desc">Derive Channel Price and List Price from Sales Cost and PFV market benchmark. Supports C→L and L→C models, add-on adders, TopSeller discount, and geo-group pricing.</div>
+        <div class="card-title">List Price Derivation</div>
+        <div class="card-desc">Derive Channel Price and List Price from Sales Cost and PFV market benchmarks. C→L / L→C models, add-ons, TopSeller discount, GP% analysis.</div>
         <span class="card-tag">C-Price · List Price · GP%</span>
       </a>
 
       <a class="card card-active" href="stage6_browser/index.html">
         <span class="card-icon">📊</span>
         <div class="card-stage">Stage 6</div>
-        <div class="card-title">Price Gradient Validation</div>
-        <div class="card-desc">Validate final list prices across 3 gradient layers: Monotonicity, Ratio Bands, and Cross-Geo Deviation — ensuring price integrity after PFV adjustment.</div>
+        <div class="card-title">Price Gradient Check</div>
+        <div class="card-desc">Validate final list prices across 3 gradient layers: Monotonicity, Ratio Bands, Cross-Geo Deviation — ensuring price integrity after PFV adjustment.</div>
         <span class="card-tag">L1 Mono · L2 Ratio · L3 Cross-Geo</span>
       </a>
 
@@ -347,11 +385,11 @@ body{
       <span>·</span>
       Browser Edition
       <span>·</span>
-      No installation required
+      Offline-First
       <span>·</span>
-      Open in Chrome or Edge
+      Lenovo Brand
     </div>
-    <div class="footer-right">© 2026 HongfeiZhu · SSGCDTO · Lenovo. All rights reserved.</div>
+    <div class="footer-right">&copy; 2026 HongfeiZhu · SSGCDTO · Lenovo. All rights reserved.</div>
   </div>
 </footer>
 

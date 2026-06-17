@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSG Enablement Agent — Overview [animated]</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #020617; color: #e2e8f0;
+  min-height: 100vh; padding: 2.5rem;
+}
+.container { max-width: 1100px; margin: 0 auto; }
+
+/* Bento Grid */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto auto auto;
+  gap: 1rem;
+}
+.cell {
+  background: rgba(15,23,42,0.8);
+  border: 1px solid rgba(148,163,184,0.1);
+  border-radius: 12px; padding: 1.3rem;
+  position: relative; overflow: hidden;
+}
+.cell::before {
+  content: ''; position: absolute; top:0; left:0; right:0;
+  height: 3px; border-radius: 12px 12px 0 0;
+}
+.cell.cyan::before { background: #22d3ee; }
+.cell.green::before { background: #34d399; }
+.cell.violet::before { background: #a78bfa; }
+.cell.amber::before { background: #fbbf24; }
+
+/* Hero */
+.hero { grid-column: 1 / 3; grid-row: 1; padding: 2rem; }
+.hero h1 {
+  font-size: 2.2rem; font-weight: 900; line-height: 1.15;
+  background: linear-gradient(135deg, #fff, #38bdf8, #a78bfa, #4ade80);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero .tagline { font-size: 0.9rem; color: #94a3b8; margin-top:0.5rem; }
+.hero .desc { font-size: 0.78rem; color: #94a3b8; margin-top:1rem; line-height:1.6; max-width: 450px; }
+
+/* Stats row */
+.stats { grid-column: 3 / 5; grid-row: 1;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.stat-card {
+  background: rgba(15,23,42,0.6); border-radius: 10px;
+  padding: 1rem; text-align: center;
+  border: 1px solid rgba(148,163,184,0.08);
+}
+.stat-card .num {
+  font-size: 2rem; font-weight: 900;
+  background: linear-gradient(180deg, #fff, #38bdf8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-card .lbl { font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.15rem; }
+
+/* Architecture */
+.arch { grid-column: 1 / 4; grid-row: 2; }
+.arch h2 { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.8rem; }
+.arch-layers { display: flex; flex-direction: column; gap: 0.35rem; }
+.arch-row {
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.arch-label {
+  font-size: 0.63rem; color: #64748b; text-transform: uppercase;
+  letter-spacing: 0.06em; width: 85px; text-align: right; flex-shrink: 0;
+}
+.arch-nodes { display: flex; gap: 0.35rem; flex: 1; }
+.anode {
+  padding: 0.3rem 0.6rem; border-radius: 5px;
+  font-size: 0.62rem; font-weight: 600; text-align: center; flex: 1;
+}
+.anode.cyan { background: rgba(34,211,238,0.08); border: 1px solid rgba(34,211,238,0.2); color: #22d3ee; }
+.anode.violet { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); color: #a78bfa; }
+.anode.green { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.2); color: #34d399; }
+.anode.rose { background: rgba(251,113,133,0.08); border: 1px solid rgba(251,113,133,0.2); color: #fb7185; }
+.anode.amber { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); color: #fbbf24; }
+.anode.slate { background: rgba(148,163,184,0.06); border: 1px solid rgba(148,163,184,0.12); color: #94a3b8; }
+
+/* Chat */
+.chat { grid-column: 4; grid-row: 2 / 4; }
+.chat h2 { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.8rem; }
+.chat-bubble {
+  padding: 0.6rem 0.8rem; border-radius: 10px; margin-bottom: 0.5rem;
+  font-size: 0.65rem; line-height: 1.5;
+}
+.chat-bubble.user { background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.15); color: #cbd5e1; margin-left: 1rem; }
+.chat-bubble.agent { background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.12); color: #cbd5e1; margin-right: 1rem; }
+.chat-bubble .who { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.2rem; }
+.chat .who.user { color: #38bdf8; } .chat .who.agent { color: #34d399; }
+.chat-sys { text-align: center; font-size: 0.62rem; color: #64748b; padding: 0.3rem; font-style: italic; }
+
+/* Agents */
+.agents { grid-column: 1 / 3; grid-row: 3; }
+.agents h2 { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.8rem; }
+.agent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.agent-card {
+  background: rgba(15,23,42,0.6); border-radius: 8px; padding: 0.7rem;
+  border: 1px solid rgba(52,211,153,0.12); text-align: center;
+}
+.agent-card .name { font-size: 0.72rem; font-weight: 700; color: #34d399; }
+.agent-card .role { font-size: 0.58rem; color: #64748b; margin-top: 0.2rem; }
+
+/* Rollout */
+.rollout { grid-column: 3 / 4; grid-row: 3; }
+.rollout h2 { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.8rem; }
+.wave { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.wave .dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.wave .w1 { background: #34d399; } .wave .w2 { background: #fbbf24; }
+.wave .w3 { background: #fb7185; } .wave .w4 { background: #a78bfa; }
+.wave .info { font-size: 0.6rem; color: #94a3b8; line-height: 1.4; }
+.wave .info b { color: #e2e8f0; font-size: 0.65rem; }
+
+/* Footer */
+.footer { text-align: center; margin-top: 2rem; font-size: 0.6rem; color: #475569; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="bento">
+
+  <!-- HERO -->
+  <div class="cell hero">
+    <h1>SSG Enablement<br>Agent</h1>
+    <div class="tagline">AI-Powered Service PN Operations</div>
+    <div class="desc">
+      An AI teammate for the Lenovo SSG GPS team. Four specialized sub-agents handle PN creation, cost calculation, competitive pricing, and knowledge retrieval — with human approval gates for financial operations.
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card"><div class="num">6</div><div class="lbl">Roles</div></div>
+    <div class="stat-card"><div class="num">13</div><div class="lbl">Scenarios</div></div>
+    <div class="stat-card"><div class="num">5</div><div class="lbl">Systems</div></div>
+    <div class="stat-card"><div class="num">4</div><div class="lbl">Waves</div></div>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="cell arch cyan">
+    <h2>6-Layer Architecture</h2>
+    <div class="arch-layers">
+      <div class="arch-row">
+        <span class="arch-label">Channel</span>
+        <span class="arch-nodes"><span class="anode cyan">Teams</span><span class="anode cyan">Web</span><span class="anode cyan">Embedded</span></span>
+      </div>
+      <div class="arch-row">
+        <span class="arch-label">Workspace</span>
+        <span class="arch-nodes"><span class="anode violet">PN Enable</span><span class="anode violet">SSG Enable</span><span class="anode violet">Pricing</span><span class="anode violet">Finance</span></span>
+      </div>
+      <div class="arch-row">
+        <span class="arch-label">Agents</span>
+        <span class="arch-nodes"><span class="anode cyan" style="flex:1.5">Master Agent ↓</span><span class="anode green">PN</span><span class="anode green">Cost</span><span class="anode green">Price</span><span class="anode green">Knowl.</span></span>
+      </div>
+      <div class="arch-row">
+        <span class="arch-label">Safety</span>
+        <span class="arch-nodes"><span class="anode green">Auto</span><span class="anode rose">Approval</span><span class="anode slate">Audit</span></span>
+      </div>
+      <div class="arch-row">
+        <span class="arch-label">Systems</span>
+        <span class="arch-nodes"><span class="anode amber">ICP</span><span class="anode amber">SPEP</span><span class="anode amber">SCFE</span><span class="anode amber">CPM</span><span class="anode amber">Concord</span></span>
+      </div>
+      <div class="arch-row">
+        <span class="arch-label">Foundation</span>
+        <span class="arch-nodes"><span class="anode violet">Hybrid AI Platform</span><span class="anode amber">Agent Engine</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="cell chat">
+    <h2>How It Works</h2>
+    <div class="chat-bubble user">
+      <div class="who user">Sarah · GPS PM</div>
+      New SR670 V4 needs Tier-3 PN coverage. Check what we have.
+    </div>
+    <div class="chat-bubble agent">
+      <div class="who agent">Agent</div>
+      <b>PN-88421</b> matches — same tier, same warranty base. Recommend extend (1 approval) vs. create new (2 weeks).
+    </div>
+    <div class="chat-sys">⏱ John Chen approves — 3 hrs later</div>
+    <div class="chat-bubble agent">
+      <div class="who agent">Agent</div>
+      Approved. Submitted to SPEP.<br><b>ETA: 3 business days</b> (down from ~8).
+    </div>
+    <div class="chat-bubble user">
+      <div class="who user">Sarah</div>
+      Great. And list price for NA market?
+    </div>
+    <div class="chat-bubble agent">
+      <div class="who agent">Agent</div>
+      PFV benchmark @ $2,490. 15% GP target → <b>$2,847</b>. Draft ready for review.
+    </div>
+  </div>
+
+  <!-- SAFETY -->
+  <div class="cell agents green" style="grid-column:1/3;grid-row:3;">
+    <h2>Safety: Read Freely, Write with Permission</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+      <div style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.12);border-radius:8px;padding:0.7rem;">
+        <div style="font-size:0.72rem;font-weight:700;color:#34d399;margin-bottom:0.4rem;">AUTO · Agent Executes</div>
+        <div style="font-size:0.63rem;color:#94a3b8;line-height:1.5;">
+          Data queries &amp; PN lookups<br>
+          Duplicate checks<br>
+          Report generation<br>
+          PFV research (read-only)<br>
+          Booking Impact alerts
+        </div>
+      </div>
+      <div style="background:rgba(251,113,133,0.06);border:1px solid rgba(251,113,133,0.12);border-radius:8px;padding:0.7rem;">
+        <div style="font-size:0.72rem;font-weight:700;color:#fb7185;margin-bottom:0.4rem;">APPROVAL · Human Reviews</div>
+        <div style="font-size:0.63rem;color:#94a3b8;line-height:1.5;">
+          Cost write to SCFE<br>
+          Sales cost write to CPM<br>
+          List/Channel price publish<br>
+          Bulk PN closure<br>
+          New portfolio creation
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:0.5rem;font-size:0.63rem;color:#64748b;">
+      Agent drafts → Approval Queue → Human decides → Execute → Audit Log
+    </div>
+  </div>
+
+  <!-- ROLLOUT -->
+  <div class="cell rollout">
+    <h2>4-Wave Rollout</h2>
+    <div class="wave"><span class="dot w1"></span><span class="info"><b>Wave 1</b> · Smart Lookups<br>Read-only · Low Risk</span></div>
+    <div class="wave"><span class="dot w2"></span><span class="info"><b>Wave 2</b> · PN Operations<br>Approval-gated · Medium</span></div>
+    <div class="wave"><span class="dot w3"></span><span class="info"><b>Wave 3</b> · Pricing & Cost<br>Financial writes · Med-High</span></div>
+    <div class="wave"><span class="dot w4"></span><span class="info"><b>Wave 4</b> · Scale & Optimize<br>Cross-role · Low Risk</span></div>
+  </div>
+
+</div>
+
+<div class="footer">SSG Enablement Agent · Overview V1 · June 2026 · Lenovo SSG GPS</div>
+
+</div>
+</body>
+</html>

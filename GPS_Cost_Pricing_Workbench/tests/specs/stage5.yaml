@@ -1,0 +1,51 @@
+# Stage 5 — List Price Derivation — Test Spec
+
+name: "Stage 5 — List Price Derivation"
+description: "Validates PFV import, pricing model (C→L / L→C), GP calculation, and Bridge."
+
+- section: "Syntax"
+  type: syntax
+  - case: "JS syntax is valid"
+    check: syntax
+
+- section: "Core Functions"
+  type: static
+  - case: "PFV calculation exists"
+    check: regex_exists
+    expect: "base_pfv|addon_pfv|PFV"
+  - case: "GP% formula exists"
+    check: regex_exists
+    expect: "GP%|gp_percent|gross_profit"
+  - case: "Loads Stage Bridge"
+    check: import_exists
+    file: "../shared/stage-bridge.js"
+  - case: "Loads UI components"
+    check: import_exists
+    file: "../shared/ui-components.js"
+
+- section: "Sample Data"
+  type: data
+  - case: "PFV input file has standard columns"
+    check: csv_has_columns
+    file: "sample_data/Stage5_PFV_Input.csv"
+    expect: "service_tier,country,offering_type,base_pfv"
+  - case: "PFV input has minimum 30 rows"
+    check: csv_min_rows
+    file: "sample_data/Stage5_PFV_Input.csv"
+    expect: "30"
+  - case: "SKU input file has minimum 50 rows"
+    check: csv_min_rows
+    file: "sample_data/Stage5_SKU_Input.csv"
+    expect: "50"
+
+- section: "Bridge Communication"
+  type: bridge
+  - case: "Stage 4→5 bridge key format"
+    check: save_load_keys
+    args: "4"
+
+- section: "D: Export Results (Vladimir)"
+  type: static
+  - case: "exportStage5Results function"
+    check: function_exists
+    fn: "exportStage5Results"

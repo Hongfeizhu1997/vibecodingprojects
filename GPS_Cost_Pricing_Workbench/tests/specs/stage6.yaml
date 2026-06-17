@@ -1,0 +1,50 @@
+# Stage 6 — Price Gradient Validation — Test Spec
+
+name: "Stage 6 — Price Gradient Validation"
+description: "Validates L1-L3 gradient validation on list_price_calc, reusing GVE engine."
+
+- section: "Syntax"
+  type: syntax
+  - case: "JS syntax is valid"
+    check: syntax
+
+- section: "Core Functions"
+  type: static
+  - case: "GVE engine loaded"
+    check: import_exists
+    file: "../shared/gve-engine.js"
+  - case: "Loads Stage Bridge"
+    check: import_exists
+    file: "../shared/stage-bridge.js"
+  - case: "Loads UI components"
+    check: import_exists
+    file: "../shared/ui-components.js"
+  - case: "List price validation field"
+    check: string_exists
+    expect: "list_price_calc"
+  - case: "No L4 (YoY) in standalone mode"
+    check: regex_exists
+    expect: "L1|L2|L3"
+
+- section: "Sample Data"
+  type: data
+  - case: "Standalone input has list_price_calc column"
+    check: csv_has_columns
+    file: "sample_data/Stage6_Standalone_Input.csv"
+    expect: "part_number,tier,upgrade_years,delivery_type,region,list_price_calc"
+  - case: "Standalone input has minimum 50 rows"
+    check: csv_min_rows
+    file: "sample_data/Stage6_Standalone_Input.csv"
+    expect: "50"
+
+- section: "Bridge Communication"
+  type: bridge
+  - case: "Stage 5→6 bridge key format"
+    check: save_load_keys
+    args: "5"
+
+- section: "D: Export Results (Vladimir)"
+  type: static
+  - case: "exportStage6Results function"
+    check: function_exists
+    fn: "exportStage6Results"

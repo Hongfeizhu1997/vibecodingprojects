@@ -1,0 +1,96 @@
+I need you to validate a value analysis for an AI recommendation project (Service Smart Recommendation) 
+using raw transactional data. The analysis made several claims I want you to independently verify 
+from the data itself — do not assume any of the figures are correct.
+
+## Data I'm Providing
+
+I will give you one or more of the following files. Inspect them first and tell me what 
+columns and structure you see before doing any calculations:
+
+- Service booking transactions (contract-level or order-level records)
+- Hardware shipment data (unit-level or aggregate)
+- Recommendation engine logs (if available — accepted/rejected recommendations per transaction)
+- Country/market mapping file (if markets are coded)
+
+## What I Need You To Verify
+
+Work through each of the following checks. Show your workings and flag any discrepancy 
+with the stated figures.
+
+### 1. Revenue Aggregation
+- Aggregate service booking revenue by EMEA region, by fiscal quarter
+- Fiscal year: Q1 = Apr–Jun, Q2 = Jul–Sep, Q3 = Oct–Dec, Q4 = Jan–Mar
+- Verify these stated totals:
+  - FY24/25: Q1 $55.5M, Q2 $59.3M, Q3 $65.1M, Q4 $65.4M
+  - FY25/26: Q1 $70.0M, Q2 $72.5M, Q3 $87.3M
+- Break out pilot countries (DK10, ES10, FR10) separately and verify:
+  - FY25/26 Q3: DK10 $10.17M, ES10 $4.04M, FR10 $9.07M
+
+### 2. Hardware Volume & Service $/HW
+- Aggregate hardware unit shipments by quarter
+- Verify stated HW quantities (e.g. Q3 FY25/26 = 1,942,451 units)
+- Compute service revenue divided by HW units for each quarter
+- Verify the $/HW series: Q3 FY24/25 = $40, Q3 FY25/26 = $45
+- Flag if actual $/HW differs from stated by more than $1
+
+### 3. Penetration Rate
+- Compute penetration rate = (number of HW units with at least one service attached) 
+  divided by (total HW units shipped), per quarter
+- Verify stated EMEA penetration rates:
+  - FY25/26: Q1 6.2%, Q2 6.6%, Q3 6.1%
+- Also compute per pilot country for FY25/26 Q2 and Q3:
+  - DK10: 9.1% → 10.4%, ES10: 4.1% → 3.8%, FR10: 7.1% → 6.9%
+
+### 4. Contract-to-Revenue Lag Verification
+- Using transaction dates, determine the typical gap between contract/order date 
+  and revenue recognition date
+- Check whether the 1–2 month lag assumption is consistent with the data
+- If booking date and revenue date are both present, compute the distribution 
+  of lag in days and report median, p25, p75
+
+### 5. Project Launch Cutoff Validation
+- Identify transactions flagged as AI-recommended vs. non-recommended 
+  (look for a recommendation_flag, source, or engine_version column)
+- Confirm the first AI-recommended transaction date aligns with:
+  - DK10/ES10/FR10: on or after August 15, FY25/26 (i.e. 2025-08-15)
+  - Rest of EMEA: on or after September 28, 2025
+- Report the actual first-recommendation date per country
+
+### 6. Incremental Contribution (Difference-in-Differences)
+- For pilot countries, compare average revenue per HW unit in the 4 quarters 
+  before launch vs. the quarters after launch
+- For non-pilot EMEA, do the same as a control group
+- Compute the DiD estimate: (pilot post - pilot pre) minus (non-pilot post - non-pilot pre)
+- Compare your DiD result against the stated $4.1M–$6.7M Q3 contribution range
+
+### 7. $/HW Organic Baseline Check
+- Fit a simple year-over-year growth trend to $/HW using FY24/25 data only
+- Project what FY25/26 Q3 $/HW would have been without the project
+- Compute: actual $45 minus organic projection, multiply by Q3 HW volume
+- Compare to stated $5.8M triangulation estimate
+
+### 8. Average Contract Value
+- Compute average contract value = total service revenue divided by number of 
+  service-attached units, per quarter
+- Verify the stated series peaks at $738 in Q3 FY25/26
+- Confirm Q2 FY25/26 was $652 (lower despite higher penetration rate)
+
+## Output Format
+
+For each check above, produce:
+1. The verified figure from the data
+2. The stated figure from the analysis
+3. Match / Discrepancy / Cannot verify (with reason)
+4. Any data quality issues found (nulls, duplicates, currency mismatches, etc.)
+
+At the end, produce a summary table of all 8 checks with a pass/fail/flag status, 
+and a one-paragraph conclusion on whether the overall $5.5–6.5M Q3 contribution 
+estimate is supported, overstated, or understated by the raw data.
+
+## Notes
+- All revenue should be in USD. If source data is in local currency, apply the 
+  exchange rates present in the data or flag if rates are missing.
+- Fiscal year starts April 1. Make sure your quarter assignments use this, 
+  not the calendar year.
+- If a column's meaning is ambiguous, ask me before assuming.
+- Do not delete or modify source files. Write all outputs to a /validation_output/ folder.

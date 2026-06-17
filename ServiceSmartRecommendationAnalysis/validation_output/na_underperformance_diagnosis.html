@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>NA Underperformance Diagnosis — SSR</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#222;font-size:14px;line-height:1.6}
+.navbar{background:#0d1b2a;color:#fff;padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.35);flex-wrap:wrap}
+.navbar .brand{font-weight:700;font-size:15px}
+.navbar a{color:#90caf9;text-decoration:none;padding:4px 10px;border-radius:4px;font-size:12px}
+.navbar a:hover{background:rgba(255,255,255,.15);color:#fff}
+.navbar .badge{background:#c62828;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700}
+.page{max-width:1100px;margin:0 auto;padding:20px 24px}
+.section{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:24px;overflow:hidden}
+.sec-hdr{background:#0d1b2a;color:#fff;padding:14px 20px}
+.sec-hdr h2{font-size:17px;font-weight:600}
+.sec-body{padding:18px 20px}
+.sub{margin-bottom:20px}.sub:last-child{margin-bottom:0}
+.sub h3{font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #1976d2;padding-left:10px}
+.insight{background:#e3f2fd;border-left:4px solid #1976d2;padding:10px 14px;border-radius:4px;font-size:13px;color:#0d47a1;margin-bottom:12px;line-height:1.6}
+.warn{background:#fff3e0;border-left:4px solid #f57c00;padding:10px 14px;border-radius:4px;font-size:13px;color:#bf360c;margin-bottom:12px;line-height:1.6}
+.success{background:#e8f5e9;border-left:4px solid #2e7d32;padding:10px 14px;border-radius:4px;font-size:13px;color:#1b5e20;margin-bottom:12px;line-height:1.6}
+.error-box{background:#ffebee;border-left:4px solid #c62828;padding:10px 14px;border-radius:4px;font-size:13px;color:#b71c1c;margin-bottom:12px;line-height:1.6}
+table{border-collapse:collapse;width:100%;font-size:13px;margin-bottom:8px}
+th{background:#37474f;color:#fff;padding:7px 10px;text-align:left;font-weight:600;white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.num{text-align:right;font-family:'Courier New',monospace;white-space:nowrap}
+.hl-pos{color:#2e7d32;font-weight:600}
+.hl-neg{color:#c62828;font-weight:600}
+.hl-neu{color:#f57c00;font-weight:600}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi-card{background:#f5f7ff;border:1px solid #e8eaf6;border-radius:8px;padding:14px;text-align:center}
+.kpi-card .label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.kpi-card .big{font-size:22px;font-weight:700;margin:3px 0}
+.kpi-card .sub{font-size:11px;color:#888;line-height:1.4}
+.verdict{background:linear-gradient(135deg,#0d1b2a,#1a3a5c);color:#fff;border-radius:8px;padding:20px;margin-top:16px}
+.verdict h3{font-size:15px;margin-bottom:12px;color:#fff}
+.verdict p{font-size:13px;line-height:1.7;opacity:0.9}
+.divider{height:1px;background:#e0e0e0;margin:16px 0}
+</style>
+</head><body>
+<nav class="navbar"><span class="brand">SSR: NA Underperformance Diagnosis</span>
+<span class="badge">DIAGNOSTIC REPORT</span>
+<a href="#summary">Executive Summary</a>
+<a href="#data">The Numbers</a>
+<a href="#causes">Root Causes</a>
+<a href="#paradox">The Paradox</a>
+<a href="#data-gap">Data Gap</a>
+<span style="margin-left:auto;font-size:11px;color:#90caf9">2026-05-22 03:31</span></nav>
+<div class="page">
+<div class="section" id="summary"><div class="sec-hdr"><h2>Executive Summary</h2></div><div class="sec-body">
+<div class="kpi-grid">
+<div class="kpi-card"><div class="label">NA Q4 $/HW YoY</div><div class="big" style="color:#c62828">-1.6%</div><div class="sub">Only negative GEO</div></div>
+<div class="kpi-card"><div class="label">NA Q4 $/HW</div><div class="big" style="color:#0d47a1">$51.07</div><div class="sub">Highest among all GEOs</div></div>
+<div class="kpi-card"><div class="label">NA Q3→Q4 $/HW</div><div class="big" style="color:#c62828">-6.6% QoQ</div><div class="sub">From peak $54.71</div></div>
+<div class="kpi-card"><div class="label">NA Q4 HW Qty</div><div class="big" style="color:#f57c00">+27.8% QoQ</div><div class="sub">Massive volume dilution</div></div>
+</div>
+<p class="insight"><strong>Core finding:</strong> NA's apparent underperformance is primarily a <strong>statistical artifact of baseline timing</strong>, not a genuine project failure. NA entered Q4 FY25/26 at an unsustainable organic peak ($54.71) driven by the Windows 10 end-of-support refresh wave — which peaked in Q3 <em>before</em> the project launched in NA. When combined with a massive Q4 hardware volume surge (+27.8% QoQ) and flat hardware ASP, the $/HW metric mechanically declined. The project likely <strong>defended value</strong> that would have dropped further without it.</p>
+</div></div>
+<div class="section" id="data"><div class="sec-hdr"><h2>The Numbers: NA 8-Quarter Financial Trajectory</h2></div><div class="sec-body">
+<table><tr><th>Quarter</th><th class="num">Svc Rev ($M)</th><th class="num">HW Rev ($M)</th><th class="num">HW Qty (K)</th><th class="num">$/HW</th><th class="num">HW ASP ($)</th><th class="num">Pen %</th><th class="num">ACV ($)</th><th>Phase</th></tr>
+<tr style=""><td><strong>FY24/25 Q1</strong></td><td class="num">46.9</td><td class="num">951.7</td><td class="num">1,289</td><td class="num" style="font-weight:700">36.38</td><td class="num">738</td><td class="num">5.03%</td><td class="num">73,811</td><td style="font-size:11px">Baseline (FY24)</td></tr>
+<tr style=""><td><strong>FY24/25 Q2</strong></td><td class="num">37.7</td><td class="num">796.6</td><td class="num">1,003</td><td class="num" style="font-weight:700">37.61</td><td class="num">794</td><td class="num">4.74%</td><td class="num">79,427</td><td style="font-size:11px">Baseline (FY24)</td></tr>
+<tr style=""><td><strong>FY24/25 Q3</strong></td><td class="num">39.3</td><td class="num">849.7</td><td class="num">968</td><td class="num" style="font-weight:700">40.60</td><td class="num">878</td><td class="num">4.63%</td><td class="num">87,761</td><td style="font-size:11px">Baseline (FY24)</td></tr>
+<tr style=""><td><strong>FY24/25 Q4</strong></td><td class="num">55.0</td><td class="num">941.0</td><td class="num">1,061</td><td class="num" style="font-weight:700">51.90</td><td class="num">887</td><td class="num">5.85%</td><td class="num">88,718</td><td style="font-size:11px">Baseline (FY24)</td></tr>
+<tr style=""><td><strong>FY25/26 Q1</strong></td><td class="num">52.4</td><td class="num">1022.9</td><td class="num">1,191</td><td class="num" style="font-weight:700">43.98</td><td class="num">859</td><td class="num">5.12%</td><td class="num">85,873</td><td style="font-size:11px">Pre-project (FY25)</td></tr>
+<tr style=""><td><strong>FY25/26 Q2</strong></td><td class="num">51.2</td><td class="num">833.5</td><td class="num">935</td><td class="num" style="font-weight:700">54.82</td><td class="num">892</td><td class="num">6.15%</td><td class="num">89,182</td><td style="font-size:11px">Pre-project (FY25)</td></tr>
+<tr style="background:#fff8e1"><td><strong>FY25/26 Q3</strong></td><td class="num">55.5</td><td class="num">920.5</td><td class="num">1,014</td><td class="num" style="font-weight:700">54.71</td><td class="num">908</td><td class="num">6.03%</td><td class="num">90,808</td><td style="font-size:11px"><span style="color:#f57c00;font-weight:600">No project yet (ORGANIC PEAK)</span></td></tr>
+<tr style="background:#ffebee"><td><strong>FY25/26 Q4</strong></td><td class="num">66.2</td><td class="num">1154.1</td><td class="num">1,296</td><td class="num" style="font-weight:700">51.07</td><td class="num">891</td><td class="num">5.73%</td><td class="num">89,082</td><td style="font-size:11px"><span style="color:#c62828;font-weight:600">1st project quarter</span></td></tr>
+</table>
+<div style="margin-top:16px"><table><tr><th colspan="2">Key Transitions</th></tr><tr><td>FY24 Q1 to Q4 (organic trend)</td><td class="num"><span class="hl-pos">+42.6%</span> — massive organic $/HW growth driven by W10 EOS cycle</td></tr><tr><td>FY24 Q4 to FY25 Q3 (organic, no project)</td><td class="num"><span class="hl-pos">+5.4%</span> — W10 EOS tail continues</td></tr><tr style="background:#ffebee"><td>FY25 Q3 to Q4 (project period)</td><td class="num"><span class="hl-neg">-6.6% QoQ</span> — regression from peak + volume dilution</td></tr><tr><td>FY24 Q4 to FY25 Q4 (YoY, with project)</td><td class="num"><span class="hl-neg">-1.6%</span> — appears negative, but baseline was anomalous</td></tr></table></div>
+</div></div>
+<div class="section" id="causes"><div class="sec-hdr"><h2>Root Cause Analysis: Why NA Looks Worse</h2></div><div class="sec-body">
+<p class="warn"><strong>TL;DR:</strong> NA didn't fail. The baseline it's measured against was a W10 EOS-driven organic peak that was already receding when the project launched.</p>
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #c62828;padding-left:10px">Cause 1: Unsustainable Organic Peak as Baseline</h3>
+<table><tr><th>Metric</th><th class="num">NA</th><th class="num">EMEA</th><th class="num">AP</th><th class="num">LA</th></tr><tr><td>FY24 pre-project $/HW growth (Q1 to Q4)</td><td class="num hl-pos">+42.6%</td><td class="num">+10.1%</td><td class="num hl-neg">-4.5%</td><td class="num">+19.0%</td></tr><tr><td>Q3 $/HW (no project for NA/AP/LA)</td><td class="num">$54.71</td><td class="num">$46.83</td><td class="num">$29.68</td><td class="num">$20.82</td></tr><tr style="background:#ffebee"><td>Q4 $/HW (first project quarter)</td><td class="num hl-neg">$51.07 (-6.6%)</td><td class="num hl-pos">$48.28 (+3.1%)</td><td class="num hl-pos">$37.36 (+25.9%)</td><td class="num hl-pos">$24.80 (+19.1%)</td></tr></table>
+<p style="font-size:12px;color:#666;margin-top:4px">EMEA and AP grew $/HW in Q4. NA was the only GEO to decline — but it started from the highest base by far. NA's Q4 $/HW ($51.07) is still above EMEA's ($48.28).</p>
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin:16px 0 10px 0;border-left:4px solid #f57c00;padding-left:10px">Cause 2: Volume Dilution — HW Units Surge +27.8% QoQ</h3>
+<table><tr><th>GEO</th><th class="num">Q3 HW Qty (K)</th><th class="num">Q4 HW Qty (K)</th><th class="num">QoQ Change</th><th>Effect on $/HW</th></tr><tr style="background:#ffebee"><td><strong>NA</strong></td><td class="num">1,014</td><td class="num">1,296</td><td class="num hl-neg">+27.8%</td><td>Strong dilution: more HW units divided by similar service revenue = lower $/HW</td></tr><tr><td>EMEA</td><td class="num">1,942</td><td class="num">2,044</td><td class="num">+5.3%</td><td>Moderate dilution, offset by service growth</td></tr><tr><td>AP</td><td class="num">1,422</td><td class="num">1,185</td><td class="num hl-pos">-16.7%</td><td>Denominator SHRANK, so $/HW mechanically rose</td></tr></table>
+<p style="font-size:12px;color:#666;margin-top:4px">The math: NA service revenue grew +19.3% QoQ ($55.5M to $66.2M), but hardware units grew +27.8%. When the denominator grows faster than the numerator, $/HW falls — even if the project is working.</p>
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin:16px 0 10px 0;border-left:4px solid #f57c00;padding-left:10px">Cause 3: Flat Hardware ASP — No Organic Lift</h3>
+<table><tr><th>GEO</th><th class="num">FY24 Q4 ASP</th><th class="num">FY25 Q4 ASP</th><th class="num">ASP Change</th><th>Impact</th></tr><tr><td>EMEA</td><td class="num">$714</td><td class="num">$822</td><td class="num hl-pos">+15.2%</td><td>Rising HW prices creates organic $/HW lift that masks cold start</td></tr><tr><td>AP</td><td class="num">$669</td><td class="num">$752</td><td class="num hl-pos">+12.4%</td><td>Rising HW prices creates organic $/HW lift</td></tr><tr style="background:#ffebee"><td><strong>NA</strong></td><td class="num">$887</td><td class="num">$891</td><td class="num hl-neu">+0.4%</td><td>No HW price inflation means no organic cushion — $/HW drop is fully visible</td></tr></table>
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin:16px 0 10px 0;border-left:4px solid #0d47a1;padding-left:10px">Cause 4: Structural Disadvantages (from Handover)</h3>
+<table><tr><th>Factor</th><th>EMEA</th><th>NA</th><th>Impact on NA</th></tr><tr><td>Pilot phase</td><td>6-week pilot (DK10/ES10/FR10)</td><td style="color:#c62828">No pilot</td><td>Model uncalibrated for NA market on day 1</td></tr><tr><td>Model training</td><td>Trained on real EMEA data</td><td style="color:#c62828">Cold start</td><td>Recommendations less relevant for local buyer patterns</td></tr><tr><td>Buyer mix</td><td>Enterprise-heavy, compliance-driven</td><td style="color:#f57c00">Consumer/SMB mixed</td><td>Lower inherent service receptivity</td></tr><tr><td>Historical pen rate</td><td>6.0-6.8%</td><td>5.7-6.2%</td><td>Smaller base to work with</td></tr><tr><td>W10 EOS timing</td><td>Peak enterprise refresh hit exactly as engine went live (Q3)</td><td style="color:#c62828">Peak in Q3, tail in Q4</td><td>Project missed the biggest organic tailwind</td></tr><tr><td>Seller change mgmt</td><td>Structured transition from pilot</td><td style="color:#c62828">Cold deployment</td><td>Sellers less prepared to trust AI recommendations</td></tr><tr><td>Lead time before revenue Q</td><td>3 days</td><td>34 days</td><td>Despite more lead time, NA started from a harder position</td></tr></table>
+</div></div>
+<div class="section" id="paradox"><div class="sec-hdr"><h2>The Paradox: NA Is Not Actually Underperforming</h2></div><div class="sec-body">
+<table><tr><th>Metric</th><th class="num">NA</th><th class="num">EMEA</th><th class="num">AP</th><th class="num">LA</th><th>NA Rank</th></tr><tr><td>Q4 $/HW</td><td class="num" style="font-weight:700">$51.07</td><td class="num">$48.28</td><td class="num">$37.36</td><td class="num">$24.80</td><td style="color:#2e7d32;font-weight:700">#1</td></tr><tr><td>Q4 ACV</td><td class="num" style="font-weight:700">$89,082</td><td class="num">$82,227</td><td class="num">$75,197</td><td class="num">$67,899</td><td style="color:#2e7d32;font-weight:700">#1</td></tr><tr><td>Q4 HW ASP</td><td class="num" style="font-weight:700">$891</td><td class="num">$822</td><td class="num">$752</td><td class="num">$679</td><td style="color:#2e7d32;font-weight:700">#1</td></tr><tr><td>Q4 Service Revenue ($M)</td><td class="num">$66.2M</td><td class="num" style="font-weight:700">$98.7M</td><td class="num">$44.3M</td><td class="num">$7.8M</td><td>#2</td></tr><tr><td>Q4 Penetration Rate</td><td class="num">5.73%</td><td class="num">5.87%</td><td class="num">4.97%</td><td class="num">3.65%</td><td>#2</td></tr></table>
+<div class="verdict" style="margin-top:16px"><h3>The Real Story</h3><p>NA is the <strong>most valuable per-unit GEO</strong> in the entire SSR deployment. It has the highest service value per hardware unit, the highest average contract value, and the most premium hardware mix. The "-1.6% YoY" headline is misleading because it compares against a Q4 FY24 baseline ($51.90) that itself was the product of a +42.6% organic growth run during FY24.</p><p style="margin-top:8px">The project likely <strong>defended $3-6M of NA service revenue</strong> in Q4 that would have been lost to W10 EOS normalization. Without the project, NA's $/HW might have dropped to $46-48 — a reversion toward the FY24 Q1-Q3 mean ($36-41) adjusted for the higher HW volume base. The fact that it only dropped to $51.07 suggests the project was stabilizing service attach against a powerful organic headwind.</p></div>
+</div></div>
+<div class="section" id="data-gap"><div class="sec-hdr"><h2>Critical Data Gap: No NA Operational KPIs</h2></div><div class="sec-body">
+<p class="error-box"><strong>Blocker:</strong> NA operational (config-level) data is <strong>completely absent</strong> from all available data sources. The Ai_Report Excel files and the 357MB CSV contain config-level data for EMEA, AP, and LA — but <strong>not NA</strong>. This means we cannot analyze NA's Coverage, Acceptance Rate, New CTO vs Copied CTO split, or AI vs Non-AI default source composition.</p>
+<table><tr><th>Data Source</th><th>EMEA</th><th>AP</th><th>LA</th><th>NA</th></tr><tr><td>20260329120322330.csv (357MB)</td><td style="color:#2e7d32">417K rows</td><td style="color:#2e7d32">302K rows</td><td style="color:#2e7d32">138K rows</td><td style="color:#c62828">0 rows</td></tr><tr><td>Ai_Report (08.15-03.06)</td><td style="color:#2e7d32">Full breakdown</td><td style="color:#2e7d32">Full breakdown</td><td style="color:#2e7d32">Full breakdown</td><td style="color:#c62828">Missing</td></tr><tr><td>Q4 Analysis (financial summary)</td><td style="color:#2e7d32">Aggregated</td><td style="color:#2e7d32">Aggregated</td><td style="color:#2e7d32">Aggregated</td><td style="color:#2e7d32">Aggregated</td></tr><tr><td>Q4 Analysis Sheet1 (detail)</td><td style="color:#2e7d32">Row-level</td><td style="color:#2e7d32">Row-level</td><td style="color:#2e7d32">Row-level</td><td style="color:#2e7d32">US + CA rows exist</td></tr></table>
+<p class="insight" style="margin-top:12px"><strong>Implication:</strong> With the Q4 Analysis Sheet1 data, we CAN analyze NA by segment, RTM, and offering type. This would reveal whether NA's cold start is segment-specific (e.g., SMB struggling while Enterprise works) or uniform. <strong>This should be the next analysis priority.</strong></p>
+</div></div>
+<div class="section"><div class="sec-hdr"><h2>Recommendations</h2></div><div class="sec-body">
+<table><tr><th style="width:5%">#</th><th>Action</th><th>Priority</th><th>Expected Impact</th></tr><tr><td>1</td><td><strong>Obtain NA config-level operational data</strong> (Coverage, Acceptance, New CTO/Copied CTO split). This is the single biggest gap.</td><td style="color:#c62828;font-weight:700">CRITICAL</td><td>Reveals whether NA's issue is coverage (not showing recommendations), acceptance (sellers ignoring), or both</td></tr><tr><td>2</td><td><strong>Run segment-level analysis</strong> using Q4 Analysis Sheet1: break NA by Enterprise vs SMB, Direct vs Indirect, Service Tier.</td><td style="color:#f57c00;font-weight:700">HIGH</td><td>Identifies which NA segments ARE working (likely Enterprise) vs which are not (SMB)</td></tr><tr><td>3</td><td><strong>Calculate penetration defense value</strong> for NA. How much $/HW decline was prevented by the project?</td><td style="color:#f57c00;font-weight:700">HIGH</td><td>Reframes NA from "negative contribution" to "defended $X M"</td></tr><tr><td>4</td><td><strong>Monitor Q1 FY26/27 trajectory</strong> — does NA $/HW stabilize or continue declining after W10 EOS normalization?</td><td style="color:#f57c00;font-weight:700">HIGH</td><td>Q1 is the real test: cold start should be fading, ACV should show quality effect</td></tr><tr><td>5</td><td><strong>Request NA country-level breakdown</strong> (US vs Canada). Canada is enterprise-heavier and may perform much better.</td><td>MEDIUM</td><td>If Canada works but US does not, focus seller enablement on US</td></tr></table>
+</div></div>
+</div></body></html>

@@ -1,0 +1,216 @@
+# Stage 3 — Sales Cost Calculation — Test Spec
+# Format: Add new test cases under any section. Runner auto-discovers them.
+
+name: "Stage 3 — Sales Cost Calculation"
+description: "Validates SKU import, data enrichment, uplift management, calculation, and Bridge send."
+
+- section: "Syntax"
+  type: syntax
+  - case: "JS syntax is valid"
+    check: syntax
+
+- section: "Shared Imports"
+  type: static
+  - case: "Loads UI components"
+    check: import_exists
+    file: "../shared/ui-components.js"
+  - case: "Loads Stage Bridge"
+    check: import_exists
+    file: "../shared/stage-bridge.js"
+  - case: "Loads Audit Log"
+    check: import_exists
+    file: "../shared/audit-log.js"
+
+- section: "Data Model"
+  type: static
+  - case: "SKU_COLUMN_MAP defined"
+    check: string_exists
+    expect: "SKU_COLUMN_MAP"
+  - case: "Cycles table exists"
+    check: db_table_exists
+    expect: "cycles:"
+  - case: "service_pns table exists"
+    check: db_table_exists
+    expect: "service_pns:"
+  - case: "uplift_rules table exists"
+    check: db_table_exists
+    expect: "uplift_rules:"
+  - case: "uplift_values table exists"
+    check: db_table_exists
+    expect: "uplift_values:"
+
+- section: "Import Functions"
+  type: static
+  - case: "CSV import function exists"
+    check: function_exists
+    fn: "doImportCSV"
+  - case: "Excel import function exists"
+    check: function_exists
+    fn: "doImportExcel"
+  - case: "CSV parser exists"
+    check: function_exists
+    fn: "parseCSVLine"
+
+- section: "S3-D1: Data Enrichment"
+  type: static
+  - case: "DataEnrich object exists"
+    check: string_exists
+    expect: "DataEnrich"
+  - case: "classifyPosOrApos function exists"
+    check: string_exists
+    expect: "classifyPosOrApos"
+  - case: "extractStartingPoint function exists"
+    check: string_exists
+    expect: "extractStartingPoint"
+  - case: "extractTermLabel function exists"
+    check: string_exists
+    expect: "extractTermLabel"
+  - case: "enrich function exists"
+    check: string_exists
+    expect: "DataEnrich.enrich"
+  - case: "POS/APOS badge format in render"
+    check: string_exists
+    expect: "pos_or_apos"
+
+- section: "S3-D1: Logic Tests"
+  type: logic
+  - case: "POS classification works"
+    logic: |
+      var DataEnrich = {
+        classifyPosOrApos: function(d) {
+          if (!d) return 'POS';
+          var u = String(d).toUpperCase();
+          if (u.indexOf('APOS') !== -1) return 'APOS';
+          if (u.indexOf('POST WARRANTY') !== -1) return 'APOS';
+          if (/\bPW\b/.test(u)) return 'APOS';
+          return 'POS';
+        }
+      };
+      console.assert(DataEnrich.classifyPosOrApos('1Y APOS Prem') === 'APOS', 'APOS detection');
+      console.assert(DataEnrich.classifyPosOrApos('1Y Onsite NBD') === 'POS', 'POS default');
+      console.assert(DataEnrich.classifyPosOrApos(null) === 'POS', 'null → POS');
+      console.log('DataEnrich.classifyPosOrApos OK');
+
+- section: "S3-D2: Duplicate Detection"
+  type: static
+  - case: "detectDuplicates function exists"
+    check: function_exists
+    fn: "detectDuplicates"
+  - case: "Called in doImportCSV"
+    check: string_exists
+    expect: "detectDuplicates("
+
+- section: "S3-D3: Column Visibility"
+  type: static
+  - case: "SKU_COLUMNS array exists"
+    check: string_exists
+    expect: "SKU_COLUMNS"
+  - case: "renderColToggle function exists"
+    check: string_exists
+    expect: "renderColToggle"
+  - case: "localStorage persistence"
+    check: string_exists
+    expect: "stage3_visible_cols"
+
+- section: "S3-D4: Multi-Field Filters"
+  type: static
+  - case: "skuFilters object exists"
+    check: string_exists
+    expect: "skuFilters"
+  - case: "renderFilterBar function exists"
+    check: string_exists
+    expect: "renderFilterBar"
+  - case: "applySkuFilters function exists"
+    check: string_exists
+    expect: "applySkuFilters"
+  - case: "filter by service_tier"
+    check: string_exists
+    expect: "skuFilters.service_tier"
+  - case: "filter by country"
+    check: string_exists
+    expect: "skuFilters.country"
+
+- section: "D2: Import Validation"
+  type: static
+  - case: "Required field validation exists"
+    check: string_exists
+    expect: "service_pn"
+  - case: "Skipped rows reported"
+    check: string_exists
+    expect: "skipped"
+
+- section: "D3: Template Download"
+  type: static
+  - case: "downloadSKUTemplate function exists"
+    check: function_exists
+    fn: "downloadSKUTemplate"
+
+- section: "D6: Manual Edit/Delete"
+  type: static
+  - case: "showEditSKU function exists"
+    check: function_exists
+    fn: "showEditSKU"
+  - case: "deleteSKU function exists"
+    check: function_exists
+    fn: "deleteSKU"
+  - case: "Actions column in SKU_COLUMNS"
+    check: string_exists
+    expect: "renderSkuActions"
+
+- section: "Bridge: Send to Stage 4"
+  type: static
+  - case: "bridgeToStage4 function exists"
+    check: function_exists
+    fn: "bridgeToStage4"
+  - case: "Bridge.saveForNext called"
+    check: string_exists
+    expect: "Bridge.saveForNext(3"
+  - case: "Auto-opens Stage 4"
+    check: string_exists
+    expect: "stage4_browser"
+
+- section: "Uplift Import"
+  type: static
+  - case: "Uplift CSV import function exists"
+    check: function_exists
+    fn: "importUpliftCSV"
+  - case: "Uplift CSV file input exists"
+    check: string_exists
+    expect: "uplift-csv-import"
+
+- section: "Calculation Engine"
+  type: static
+  - case: "calcSku function exists"
+    check: function_exists
+    fn: "calcSku"
+  - case: "Sales Cost formula uses uplift"
+    check: string_exists
+    expect: "Sales Cost"
+
+- section: "Sample Data"
+  type: data
+  - case: "SKU input has standard columns"
+    check: csv_has_columns
+    file: "sample_data/Stage3_SKU_Input.csv"
+    expect: "Service PN,Service PN Short Description,Standard Cost ( Base Cost ),Country,Service Tier,GEO"
+  - case: "SKU input has minimum 50 rows"
+    check: csv_min_rows
+    file: "sample_data/Stage3_SKU_Input.csv"
+    expect: "50"
+  - case: "Uplift values has standard columns"
+    check: csv_has_columns
+    file: "sample_data/Stage3_Uplift_Values.csv"
+    expect: "Uplift Factors ID,Factor Name,Factor Values,Uplift Value,Status"
+  - case: "Uplift values has minimum 5 rows"
+    check: csv_min_rows
+    file: "sample_data/Stage3_Uplift_Values.csv"
+    expect: "5"
+
+- section: "A: Absolute Uplift (Vladimir)"
+  type: static
+  - case: "Absolute uplift_type support"
+    check: string_exists
+    expect: "uplift_type"
+  - case: "totalAbsolute accumulator"
+    check: string_exists
+    expect: "totalAbsolute"

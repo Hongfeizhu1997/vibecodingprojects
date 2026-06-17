@@ -1,0 +1,728 @@
+{
+  "passed": 96,
+  "failed": 7,
+  "skipped": 0,
+  "cases": [
+    {
+      "stage": "stage3",
+      "type": "syntax",
+      "name": "JS syntax is valid\"",
+      "status": "PASS",
+      "detail": "JS syntax valid"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Loads UI components\"",
+      "status": "PASS",
+      "detail": "imports ../shared/ui-components.js"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Loads Stage Bridge\"",
+      "status": "PASS",
+      "detail": "imports ../shared/stage-bridge.js"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Loads Audit Log\"",
+      "status": "PASS",
+      "detail": "imports ../shared/audit-log.js"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "SKU_COLUMN_MAP defined\"",
+      "status": "PASS",
+      "detail": "'SKU_COLUMN_MAP' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Cycles table exists\"",
+      "status": "PASS",
+      "detail": "DB table cycles:"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "service_pns table exists\"",
+      "status": "PASS",
+      "detail": "DB table service_pns:"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "uplift_rules table exists\"",
+      "status": "PASS",
+      "detail": "DB table uplift_rules:"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "uplift_values table exists\"",
+      "status": "PASS",
+      "detail": "DB table uplift_values:"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "CSV import function exists\"",
+      "status": "PASS",
+      "detail": "function doImportCSV found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Excel import function exists\"",
+      "status": "PASS",
+      "detail": "function doImportExcel found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "CSV parser exists\"",
+      "status": "PASS",
+      "detail": "function parseCSVLine found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "DataEnrich object exists\"",
+      "status": "PASS",
+      "detail": "'DataEnrich' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "classifyPosOrApos function exists\"",
+      "status": "PASS",
+      "detail": "'classifyPosOrApos' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "extractStartingPoint function exists\"",
+      "status": "PASS",
+      "detail": "'extractStartingPoint' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "extractTermLabel function exists\"",
+      "status": "PASS",
+      "detail": "'extractTermLabel' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "enrich function exists\"",
+      "status": "PASS",
+      "detail": "'DataEnrich.enrich' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "POS/APOS badge format in render\"",
+      "status": "PASS",
+      "detail": "'pos_or_apos' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "logic",
+      "name": "POS classification works\"",
+      "status": "PASS",
+      "detail": "DataEnrich.classifyPosOrApos OK"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "detectDuplicates function exists\"",
+      "status": "PASS",
+      "detail": "function detectDuplicates found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Called in doImportCSV\"",
+      "status": "FAIL",
+      "detail": "'detectDuplicates(validSkus)' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "SKU_COLUMNS array exists\"",
+      "status": "PASS",
+      "detail": "'SKU_COLUMNS' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "renderColToggle function exists\"",
+      "status": "PASS",
+      "detail": "'renderColToggle' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "localStorage persistence\"",
+      "status": "PASS",
+      "detail": "'stage3_visible_cols' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "skuFilters object exists\"",
+      "status": "PASS",
+      "detail": "'skuFilters' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "renderFilterBar function exists\"",
+      "status": "PASS",
+      "detail": "'renderFilterBar' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "applySkuFilters function exists\"",
+      "status": "PASS",
+      "detail": "'applySkuFilters' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "filter by service_tier\"",
+      "status": "PASS",
+      "detail": "'skuFilters.service_tier' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "filter by country\"",
+      "status": "PASS",
+      "detail": "'skuFilters.country' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Required field validation exists\"",
+      "status": "FAIL",
+      "detail": "'requiredFields' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Skipped rows reported\"",
+      "status": "FAIL",
+      "detail": "'skippedRows' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "downloadSKUTemplate function exists\"",
+      "status": "PASS",
+      "detail": "function downloadSKUTemplate found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "showEditSKU function exists\"",
+      "status": "PASS",
+      "detail": "function showEditSKU found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "deleteSKU function exists\"",
+      "status": "PASS",
+      "detail": "function deleteSKU found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Actions column in SKU_COLUMNS\"",
+      "status": "PASS",
+      "detail": "'renderSkuActions' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "bridgeToStage4 function exists\"",
+      "status": "PASS",
+      "detail": "function bridgeToStage4 found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Bridge.saveForNext called\"",
+      "status": "PASS",
+      "detail": "'Bridge.saveForNext(3' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Auto-opens Stage 4\"",
+      "status": "PASS",
+      "detail": "'stage4_browser' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Uplift CSV import function exists\"",
+      "status": "PASS",
+      "detail": "function importUpliftCSV found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Uplift CSV file input exists\"",
+      "status": "PASS",
+      "detail": "'uplift-csv-import' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "calcSku function exists\"",
+      "status": "PASS",
+      "detail": "function calcSku found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Sales Cost formula uses uplift\"",
+      "status": "PASS",
+      "detail": "'Sales Cost' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "data",
+      "name": "SKU input has standard columns\"",
+      "status": "PASS",
+      "detail": "all 6 columns present in sample_data/Stage3_SKU_Input.csv"
+    },
+    {
+      "stage": "stage3",
+      "type": "data",
+      "name": "SKU input has minimum 50 rows\"",
+      "status": "PASS",
+      "detail": "60 rows (>= 50) in sample_data/Stage3_SKU_Input.csv"
+    },
+    {
+      "stage": "stage3",
+      "type": "data",
+      "name": "Uplift values has standard columns\"",
+      "status": "PASS",
+      "detail": "all 5 columns present in sample_data/Stage3_Uplift_Values.csv"
+    },
+    {
+      "stage": "stage3",
+      "type": "data",
+      "name": "Uplift values has minimum 5 rows\"",
+      "status": "PASS",
+      "detail": "7 rows (>= 5) in sample_data/Stage3_Uplift_Values.csv"
+    },
+    {
+      "stage": "stage4",
+      "type": "syntax",
+      "name": "JS syntax is valid\"",
+      "status": "PASS",
+      "detail": "JS syntax valid"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Loads GVE engine\"",
+      "status": "PASS",
+      "detail": "imports ../shared/gve-engine.js"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Loads Stage Bridge\"",
+      "status": "PASS",
+      "detail": "imports ../shared/stage-bridge.js"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Loads Audit Log\"",
+      "status": "PASS",
+      "detail": "imports ../shared/audit-log.js"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Loads UI components\"",
+      "status": "PASS",
+      "detail": "imports ../shared/ui-components.js"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "createCycle function exists\"",
+      "status": "PASS",
+      "detail": "function createCycle found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Cycles DB table exists\"",
+      "status": "PASS",
+      "detail": "DB table cycles:"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "importFromStage3Bridge exists\"",
+      "status": "PASS",
+      "detail": "function importFromStage3Bridge found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "hasBridgeData exists\"",
+      "status": "PASS",
+      "detail": "function hasBridgeData found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Bridge import card on dashboard\"",
+      "status": "PASS",
+      "detail": "'Data Available from Stage 3' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Bridge card in import tab\"",
+      "status": "PASS",
+      "detail": "'bridge-import-card' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "loadPresets function exists\"",
+      "status": "PASS",
+      "detail": "function loadPresets found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "getActivePreset function exists\"",
+      "status": "PASS",
+      "detail": "function getActivePreset found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "getPresetThresholds function exists\"",
+      "status": "PASS",
+      "detail": "function getPresetThresholds found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "onPresetChange function exists\"",
+      "status": "PASS",
+      "detail": "function onPresetChange found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "showPresetManager function exists\"",
+      "status": "PASS",
+      "detail": "function showPresetManager found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "localStorage persistence\"",
+      "status": "PASS",
+      "detail": "'stage4_gve_presets' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "CrossCheck object exists\"",
+      "status": "PASS",
+      "detail": "'CrossCheck' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "executeRule function exists\"",
+      "status": "PASS",
+      "detail": "'CrossCheck.executeRule' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "executeAll function exists\"",
+      "status": "PASS",
+      "detail": "'CrossCheck.executeAll' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "loadCCRules function exists\"",
+      "status": "PASS",
+      "detail": "function loadCCRules found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Tier TP rule has real priorities\"",
+      "status": "PASS",
+      "detail": "'CC_TIER_TP' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Tier TC DT rule exists\"",
+      "status": "PASS",
+      "detail": "'CC_TIER_TC_DT' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Tier TC AIO rule exists\"",
+      "status": "PASS",
+      "detail": "'CC_TIER_TC_AIO' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Term rule exists\"",
+      "status": "PASS",
+      "detail": "'CC_TERM' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "findMissing function exists\"",
+      "status": "PASS",
+      "detail": "'CrossCheck.findMissing' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "buildGroupedSummary function exists\"",
+      "status": "PASS",
+      "detail": "'CrossCheck.buildGroupedSummary' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "buildDrilldown function exists\"",
+      "status": "PASS",
+      "detail": "'CrossCheck.buildDrilldown' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "showCCRuleDesigner function exists\"",
+      "status": "PASS",
+      "detail": "function showCCRuleDesigner found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "showCCRuleManager function exists\"",
+      "status": "PASS",
+      "detail": "function showCCRuleManager found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "saveCCRule function exists\"",
+      "status": "PASS",
+      "detail": "function saveCCRule found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "executeAllWithGeo function exists\"",
+      "status": "PASS",
+      "detail": "'CrossCheck.executeAllWithGeo' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "exportGVEResults function exists\"",
+      "status": "PASS",
+      "detail": "function exportGVEResults found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "exportCCResults function exists\"",
+      "status": "PASS",
+      "detail": "function exportCCResults found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Stats cards exist on dashboard\"",
+      "status": "FAIL",
+      "detail": "'Total Cycles' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Submitted count card\"",
+      "status": "PASS",
+      "detail": "'Submitted' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "logic",
+      "name": "Term monotonicity (1Y < 3Y)\"",
+      "status": "PASS",
+      "detail": "OK"
+    },
+    {
+      "stage": "stage4",
+      "type": "data",
+      "name": "Stage 4 input file exists\"",
+      "status": "PASS",
+      "detail": "60 rows (>= 50) in sample_data/Stage4_Input.csv"
+    },
+    {
+      "stage": "stage4",
+      "type": "bridge",
+      "name": "Stage 3\u21924 bridge key format\"",
+      "status": "FAIL",
+      "detail": "bridge key format missing: gps_bridge_stage3_to_4"
+    },
+    {
+      "stage": "stage5",
+      "type": "syntax",
+      "name": "JS syntax is valid\"",
+      "status": "PASS",
+      "detail": "JS syntax valid"
+    },
+    {
+      "stage": "stage5",
+      "type": "static",
+      "name": "PFV calculation exists\"",
+      "status": "PASS",
+      "detail": "pattern 'base_pfv|addon_pfv|PFV' found"
+    },
+    {
+      "stage": "stage5",
+      "type": "static",
+      "name": "GP% formula exists\"",
+      "status": "PASS",
+      "detail": "pattern 'GP%|gp_percent|gross_profit' found"
+    },
+    {
+      "stage": "stage5",
+      "type": "static",
+      "name": "Loads Stage Bridge\"",
+      "status": "PASS",
+      "detail": "imports ../shared/stage-bridge.js"
+    },
+    {
+      "stage": "stage5",
+      "type": "static",
+      "name": "Loads UI components\"",
+      "status": "PASS",
+      "detail": "imports ../shared/ui-components.js"
+    },
+    {
+      "stage": "stage5",
+      "type": "data",
+      "name": "PFV input file has standard columns\"",
+      "status": "PASS",
+      "detail": "all 4 columns present in sample_data/Stage5_PFV_Input.csv"
+    },
+    {
+      "stage": "stage5",
+      "type": "data",
+      "name": "PFV input has minimum 30 rows\"",
+      "status": "PASS",
+      "detail": "42 rows (>= 30) in sample_data/Stage5_PFV_Input.csv"
+    },
+    {
+      "stage": "stage5",
+      "type": "data",
+      "name": "SKU input file has minimum 50 rows\"",
+      "status": "PASS",
+      "detail": "60 rows (>= 50) in sample_data/Stage5_SKU_Input.csv"
+    },
+    {
+      "stage": "stage5",
+      "type": "bridge",
+      "name": "Stage 4\u21925 bridge key format\"",
+      "status": "FAIL",
+      "detail": "bridge key format missing: gps_bridge_stage4_to_5"
+    },
+    {
+      "stage": "stage6",
+      "type": "syntax",
+      "name": "JS syntax is valid\"",
+      "status": "PASS",
+      "detail": "JS syntax valid"
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "GVE engine loaded\"",
+      "status": "PASS",
+      "detail": "imports ../shared/gve-engine.js"
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "Loads Stage Bridge\"",
+      "status": "PASS",
+      "detail": "imports ../shared/stage-bridge.js"
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "Loads UI components\"",
+      "status": "PASS",
+      "detail": "imports ../shared/ui-components.js"
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "List price validation field\"",
+      "status": "PASS",
+      "detail": "'list_price_calc' found"
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "No L4 (YoY) in standalone mode\"",
+      "status": "PASS",
+      "detail": "pattern 'L1|L2|L3' found"
+    },
+    {
+      "stage": "stage6",
+      "type": "data",
+      "name": "Standalone input has list_price_calc column\"",
+      "status": "PASS",
+      "detail": "all 6 columns present in sample_data/Stage6_Standalone_Input.csv"
+    },
+    {
+      "stage": "stage6",
+      "type": "data",
+      "name": "Standalone input has minimum 50 rows\"",
+      "status": "PASS",
+      "detail": "60 rows (>= 50) in sample_data/Stage6_Standalone_Input.csv"
+    },
+    {
+      "stage": "stage6",
+      "type": "bridge",
+      "name": "Stage 5\u21926 bridge key format\"",
+      "status": "FAIL",
+      "detail": "bridge key format missing: gps_bridge_stage5_to_6"
+    }
+  ]
+}

@@ -1,15 +1,15 @@
 """
 GPS Cost Pricing Workbench — Sample Data Generator
-Generates a single consistent dataset for demoing Stages 3 → 4 → 5 → 6.
+Generates a single consistent dataset for demoing Stages 3 -> 4 -> 5 -> 6.
 
 All files share the same 60 SKUs: 5 tiers × 4 regions × 3 terms, Onsite delivery.
 
 Output files (all in this folder):
-  Stage3_SKU_Input.csv        → import into Stage 3
-  Stage4_Input.xlsx           → import into Stage 4  (Stage 3 "Send to Stage 4" output)
-  Stage5_SKU_Input.csv        → import into Stage 5  (SKU data with sales_cost)
-  Stage5_PFV_Input.csv        → import into Stage 5  (PFV benchmark)
-  Stage6_Standalone_Input.csv → import into Stage 6  (list prices, for independent demo)
+  Stage3_SKU_Input.csv        -> import into Stage 3
+  Stage4_Input.xlsx           -> import into Stage 4  (Stage 3 "Send to Stage 4" output)
+  Stage5_SKU_Input.csv        -> import into Stage 5  (SKU data with sales_cost)
+  Stage5_PFV_Input.csv        -> import into Stage 5  (PFV benchmark)
+  Stage6_Standalone_Input.csv -> import into Stage 6  (list prices, for independent demo)
 """
 
 import csv, math, os
@@ -47,7 +47,7 @@ TERMS = [
 
 DELIVERY    = 'Onsite'
 UPLIFT_PCT  = 0.20     # Stage 3 uplift: 20%
-GP_PCT      = 0.30     # Stage 5 GP%: 30%  →  List Price = Sales Cost / (1 - 0.30)
+GP_PCT      = 0.30     # Stage 5 GP%: 30%  ->  List Price = Sales Cost / (1 - 0.30)
 PFV_FACTOR  = 1.55     # PFV = Sales Cost(DE) × 1.55 per tier/term
 
 # OH IDs for Stage 3
@@ -385,3 +385,105 @@ print()
 print('PFV values (DE reference):')
 for tn, yrs in sorted(pfv_map.keys(), key=lambda x:(x[0], x[1])):
     print(f'  {tn} {yrs}yr: {pfv_map[(tn, yrs)]}')
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FILE 6: Stage3_Uplift_Rules.csv — Sample uplift rules for the 19-factor system
+# Import this into Stage 3 -> Uplift tab -> "Import Uplift Values"
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def generate_uplift_rules():
+    """
+    Generate sample uplift values that use the 19-factor matching system.
+    
+    Stage 3 formula: Sales Cost = PSC × (1 + Σ uplift_ratios)
+    Matching: SKU's (type_of_service, geo) -> Uplift Value -> match factors by field values
+    
+    Two uplift values:
+      - Support Services / EMEA: ~20% uplift (contingency + overhead)
+      - Support Services / NA:   ~15% uplift
+    """
+    
+    # Factor definitions (must match Stage 3's FACTOR_DEFINITIONS)
+    factors = [
+        # (technical_id, factor_name, factor_values, uplift_ratio, value_geo, value_tos)
+        # EMEA uplift value: Support Services / EMEA
+        ('TYPESRV',    'Type of Service',       'Support Services',  0.08, 'EMEA', 'Support Services'),
+        ('SUBTYPESRV', 'Sub-Type of Service',   'Hardware Support',  0.04, 'EMEA', 'Support Services'),
+        ('GEO',        'GEO',                   'EMEA',             0.03, 'EMEA', 'Support Services'),
+        ('SDTYPE',     'Service Delivery Type', 'Onsite',           0.03, 'EMEA', 'Support Services'),
+        ('SRVTERM',    'Service Term',          '12,36,60',         0.02, 'EMEA', 'Support Services'),
+        
+        # NA uplift value: Support Services / NA
+        ('TYPESRV',    'Type of Service',       'Support Services',  0.06, 'NA', 'Support Services'),
+        ('SUBTYPESRV', 'Sub-Type of Service',   'Hardware Support',  0.03, 'NA', 'Support Services'),
+        ('GEO',        'GEO',                   'NA',               0.02, 'NA', 'Support Services'),
+        ('SDTYPE',     'Service Delivery Type', 'Onsite',           0.03, 'NA', 'Support Services'),
+        ('SRVTERM',    'Service Term',          '12,36,60',         0.01, 'NA', 'Support Services'),
+    ]
+    
+    # Write uplift values file
+    path = os.path.join(OUT, 'Stage3_Uplift_Values.csv')
+    with open(path, 'w', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(['value_id', 'type_of_service', 'geo', 'status',
+                     'technical_id', 'factor_name', 'factor_values', 'uplift_ratio'])
+        for i, (tid, fname, fvals, ratio, geo, tos) in enumerate(factors):
+            vid = f'UV-{i+1:03d}'
+            w.writerow([vid, tos, geo, 'Released', tid, fname, fvals, ratio])
+    
+    print(f'  Stage3_Uplift_Values.csv — {len(factors)} factor rules across 2 uplift values')
+    
+    # Also generate a CSV that can be imported directly into Stage 3 via Import Uplift Values
+    # Format: value_id, type_of_service, geo, status, factor_technical_id, factor_values, uplift_ratio
+    return path
+
+generate_uplift_rules()
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FILE 7: Stage5_PFV_Input.csv — PFV benchmark for Stage 5 List Price
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def generate_pfv():
+    """
+    PFV (Price Floor Value) benchmark: used by Stage 5 to compute list prices.
+    Columns: tier, term_years, delivery_type, geo, base, adp, kyd, sbty, ticru, priority
+    """
+    path = os.path.join(OUT, 'Stage5_PFV_Input.csv')
+    with open(path, 'w', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(['tier', 'term_years', 'delivery_type', 'geo', 'base', 'adp', 'kyd', 'sbty', 'ticru', 'priority'])
+        for tc, tn, _, _, base in TIERS:
+            for yrs, tfac, _ in TERMS:
+                # PFV ≈ Sales Cost × 1.55 per the existing logic
+                sc_de = base * 1.000 * tfac * (1 + UPLIFT_PCT)
+                pfv_base = r(sc_de * PFV_FACTOR)
+                w.writerow([tn, yrs, 'Onsite', 'EMEA', pfv_base, 10, 5, 5, 5, 15])
+                # NA PFV slightly different
+                sc_na = base * 0.930 * tfac * (1 + 0.15)  # NA uplift 15%
+                pfv_na = r(sc_na * PFV_FACTOR)
+                w.writerow([tn, yrs, 'Onsite', 'NA', pfv_na, 8, 4, 4, 4, 12])
+    
+    print(f'  Stage5_PFV_Input.csv — {len(TIERS) * len(TERMS) * 2} rows')
+
+generate_pfv()
+
+print("\n=== All sample data files generated ===")
+print("  Stage3_SKU_Input.csv        — SKU data with PSC for Stage 3")
+print("  Stage3_Uplift_Values.csv    — Sample uplift rules (19-factor system)")
+print("  Stage4_Input.xlsx           — Stage 3 export format for Stage 4")
+print("  Stage5_SKU_Input.csv        — SKU data with sales_cost for Stage 5")
+print("  Stage5_PFV_Input.csv        — PFV benchmark for Stage 5")
+print("  Stage6_Standalone_Input.csv  — List prices for Stage 6")
+print()
+print("Demo workflow:")
+print("  1. Open stage3_browser/index.html -> New Cycle -> Import Stage3_SKU_Input.csv")
+print("  2. Uplift tab -> Import Stage3_Uplift_Values.csv")
+print("  3. Calculate tab -> Run Calculation")
+print("  4. Export tab -> Send to Stage 4 (Bridge)")
+print("  5. Open stage4_browser/index.html -> Create cycle -> Import from Stage 3")
+print("  6. Run GVE -> Send to Stage 5 (Bridge)")
+print("  7. Open stage5_browser/index.html -> Import from Stage 4")
+print("  8. Import Stage5_PFV_Input.csv (PFV tab) -> Run Calculation")
+print("  9. Send to Stage 6 (Bridge)")
+print(" 10. Open stage6_browser/index.html -> Import from Stage 5 -> Run Validation")

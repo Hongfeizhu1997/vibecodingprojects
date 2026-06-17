@@ -19,20 +19,20 @@ Stage 2 — Forward Adjustment
 
 Stage 3 — Sales Cost Calculation  [AVAILABLE]
   Calculates Sales Cost from PSC using the formula:
-    Sales Cost = PSC × (1 + R_contingency) × (1 + R_overhead)
+    Sales Cost = PSC × (1 + Σ uplift_ratios) — additive sum of all matching factor uplift ratios
   Supports product categories: ThinkPad, IdeaPad, Legion, Commercial
   Supports service types: 1yr Base, 3yr Base, 5yr Base, 3yr ADP, Premier 3yr
   Supports geographies: NA, EMEA, APJ, China
-  Folder: stage3_sales_cost/
+  Folder: stage3_browser/
 
 Stage 4 — GVE Validation
   Gradient Validation Engine: checks Sales Costs and List Prices against
   monotonicity, ratio band, cross-geo, and year-over-year rules.
-  Folder: stage4_gve_validation/
+  Folder: stage4_browser/
 
 Stage 5 — List Price Derivation
   Derives List Prices from Sales Costs using channel markup rules.
-  Folder: stage5_list_price/
+  Folder: stage5_browser/
 
 STANDALONE USAGE
 ----------------
@@ -82,3 +82,13 @@ GPS_Pricing_Workbench/
 │       ├── login.html
 │       ├── dashboard.html
 │       └── cycle.html
+
+
+ADDITIONAL NOTES (May 2026 Review)
+----------------------------------
+- Stage 1 (Standard Cost Import) and Stage 2 (Forward Adjustment) are not yet
+  implemented. Stage 3 starts with PSC values already present in input data.
+- Stage 5 requires external PFV (Price Floor Value) benchmark data. A dedicated
+  PFV module may be added in a future iteration.
+- All stages now run as pure browser applications (HTML + IndexedDB).
+- Stages communicate through a shared localStorage bridge ('shared/stage-bridge.js').

@@ -1,0 +1,58 @@
+SERVICE SMART RECOMMENDATION — ACCEPTANCE & COVERAGE ANALYSIS
+Source: 20260329120322330.csv
+
+DEFINITIONS
+  AI recommended   : defaultfrom = 'AI'
+  Service selected : selectedfrom is not empty (any service attached)
+  AI default kept  : selectedfrom contains 'Default' (not 'Non-Default')
+                     i.e. rep kept the AI pre-filled recommendation
+  Config level     : each line_item row = 1 observation
+  Contract level   : each unique contract_number = 1 observation
+                     contract flagged 'AI' if ANY line item had AI rec
+                     contract flagged 'accepted' if ANY line item accepted
+
+============================================================
+  EMEA ONLY
+============================================================
+Metric                                       Config   Contract
+------------------------------------------------------------
+Total observations                          416,756     69,537
+
+  — AI COVERAGE —
+  AI-recommended                             18,982      7,173
+  AI coverage rate                             4.6%      10.3%
+
+  — SERVICE ATTACHMENT (any service selected) —
+  AI rows: service selected                   9,315      3,916
+  AI attachment rate                          49.1%      54.6%
+  Lift (AI vs Non-AI)                        +46.8pp     +49.9pp
+  Non-AI attachment rate                       2.2%       4.7%
+  Lift (AI vs Non-AI)                                         
+
+  — AI DEFAULT ACCEPTANCE (rep kept AI's exact pick) —
+  AI default kept                             4,566      1,942
+  vs. attachment rate (gap)                  +25.0pp     +27.5pp
+  vs. attachment rate (gap)                                   
+
+============================================================
+  GLOBAL (all geos)
+============================================================
+Metric                                       Config   Contract
+------------------------------------------------------------
+Total observations                         1,000,000    303,920
+
+  — AI COVERAGE —
+  AI-recommended                             59,994     29,281
+  AI coverage rate                             6.0%       9.6%
+
+  — SERVICE ATTACHMENT (any service selected) —
+  AI rows: service selected                  30,655     15,202
+  AI attachment rate                          51.1%      51.9%
+  Lift (AI vs Non-AI)                        +48.9pp     +48.8pp
+  Non-AI attachment rate                       2.2%       3.1%
+  Lift (AI vs Non-AI)                                         
+
+  — AI DEFAULT ACCEPTANCE (rep kept AI's exact pick) —
+  AI default kept                            15,372      7,682
+  vs. attachment rate (gap)                  +25.5pp     +25.7pp
+  vs. attachment rate (gap)                                   

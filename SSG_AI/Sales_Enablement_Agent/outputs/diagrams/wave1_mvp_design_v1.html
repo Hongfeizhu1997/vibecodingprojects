@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wave 1 MVP — Knowledge Agent + Teams Bot [static]</title>
+<style>
+  :root {
+    --bg: #020617; --card: rgba(15,23,42,0.9); --border: rgba(148,163,184,0.10);
+    --text: #e2e8f0; --dim: #94a3b8; --accent: #38bdf8; --red: #f87171;
+    --green: #4ade80; --amber: #fbbf24; --purple: #a78bfa;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+  .brand{position:fixed;top:0;left:0;right:0;z-index:100;height:3px;background:linear-gradient(90deg,var(--accent),var(--purple),var(--green),var(--amber))}
+  .container{max-width:980px;margin:0 auto;padding:4rem 2rem 6rem}
+
+  h1{font-size:1.6rem;font-weight:800;color:#fff;border-left:5px solid var(--accent);padding-left:1rem;margin:0 0 .3rem;line-height:1.3}
+  .meta{font-size:.68rem;color:var(--dim);margin:0 0 1.8rem 1.3rem;display:flex;gap:1rem}
+  .meta span{background:rgba(148,163,184,.08);padding:.15rem .6rem;border-radius:4px}
+
+  h2{font-size:1.05rem;font-weight:700;color:var(--accent);margin:2.4rem 0 .8rem;padding-bottom:.35rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem}
+  h2 .num{font-size:.68rem;color:var(--dim);background:rgba(148,163,184,.08);padding:.1rem .45rem;border-radius:4px;font-weight:600}
+  h3{font-size:.75rem;font-weight:700;color:var(--dim);margin:1.2rem 0 .5rem;text-transform:uppercase;letter-spacing:.05em}
+  p{margin:.4rem 0;font-size:.7rem;color:var(--dim);line-height:1.6}
+  p strong{color:var(--text)}
+  hr{border:none;border-top:1px solid var(--border);margin:1.6rem 0}
+
+  .callout{font-size:.72rem;line-height:1.7;padding:1rem 1.2rem;margin:.8rem 0;border-radius:10px}
+  .callout-info{background:rgba(56,189,248,.03);border:1px solid rgba(56,189,248,.10)}
+  .callout-info strong{color:#fff}
+  .callout-warn{background:rgba(251,191,36,.03);border-left:3px solid rgba(251,191,36,.3);border-radius:0 10px 10px 0;color:var(--dim)}
+  .callout-warn strong{color:var(--amber)}
+
+  table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.68rem}
+  th{text-align:left;font-size:.63rem;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;padding:.5rem .8rem;border-bottom:2px solid rgba(148,163,184,.08)}
+  td{padding:.55rem .8rem;border-bottom:1px solid rgba(148,163,184,.05);color:var(--dim)}
+  td:first-child{color:var(--text);font-weight:600;white-space:nowrap}
+  td .tag{display:inline-block;font-size:.62rem;padding:.1rem .45rem;border-radius:3px;font-weight:700}
+  .tag-auto{background:rgba(74,222,128,.10);color:var(--green)}
+  .tag-approval{background:rgba(251,191,36,.10);color:var(--amber)}
+  .tag-risk-high{background:rgba(248,113,113,.10);color:var(--red)}
+  .tag-risk-mid{background:rgba(251,191,36,.10);color:var(--amber)}
+  .tag-risk-low{background:rgba(74,222,128,.10);color:var(--green)}
+  .tag-p0{background:rgba(248,113,113,.08);color:var(--red)}
+  .tag-p1{background:rgba(251,191,36,.08);color:var(--amber)}
+
+  .flow{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin:.8rem 0;font-family:'SF Mono','Cascadia Code',monospace;font-size:.65rem;color:var(--dim);line-height:1.9;white-space:pre;overflow-x:auto}
+  .flow .hl{color:var(--accent)}
+  .flow .hl2{color:var(--green)}
+  .flow .hl3{color:var(--amber)}
+  .flow .hl4{color:var(--purple)}
+
+  .chat-box{margin:.8rem 0;border-radius:10px;overflow:hidden;background:#0a0f1a;border:1px solid rgba(148,163,184,.07)}
+  .chat-box .chat-hdr{background:rgba(15,23,42,.9);padding:.75rem .9rem;border-bottom:1px solid rgba(148,163,184,.10);font-size:.65rem;color:var(--dim);display:flex;align-items:center;gap:.6rem}
+  .chat-box .chat-hdr .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+  .chat-turn{display:flex;gap:.6rem;padding:.75rem .9rem;align-items:flex-start}
+  .chat-turn.agent{background:rgba(148,163,184,.015)}
+  .chat-av{width:24px;height:24px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800}
+  .chat-av.user{background:rgba(56,189,248,.14);color:var(--accent)}
+  .chat-av.agent{background:rgba(74,222,128,.10);color:var(--green)}
+  .chat-body{flex:1;min-width:0}
+  .chat-body .who{font-size:.62rem;font-weight:700;margin-bottom:.15rem;text-transform:uppercase;letter-spacing:.04em}
+  .chat-turn.chat-user .who{color:var(--accent)}
+  .chat-turn.agent .who{color:var(--green)}
+  .chat-body .msg{font-size:.66rem;line-height:1.5;color:#d1d5db}
+  .chat-body .card-inline{background:rgba(15,23,42,.7);border:1px solid rgba(148,163,184,.08);border-radius:6px;padding:.6rem .8rem;margin:.25rem 0;font-size:.64rem}
+  .chat-body .card-inline .row{display:flex;justify-content:space-between;margin:.1rem 0}
+  .chat-body .card-inline .lbl{color:var(--dim)}
+  .chat-body .card-inline .val{color:var(--text);font-weight:600}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:.8rem 0}
+  .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.6rem;margin:.8rem 0}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.2rem}
+  .card .card-num{font-size:1.5rem;font-weight:800;color:var(--accent)}
+  .card .card-label{font-size:.65rem;color:var(--dim);margin-top:.1rem;text-transform:uppercase;letter-spacing:.04em}
+  .card .card-title{font-size:.7rem;font-weight:700;color:var(--text);margin-bottom:.3rem}
+  .card .card-desc{font-size:.65rem;color:var(--dim);line-height:1.5}
+  .card .card-row{display:flex;align-items:center;gap:.5rem;margin:.25rem 0;font-size:.65rem;color:var(--dim)}
+
+  .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+  .kpi-card{background:rgba(56,189,248,.02);border:1px solid rgba(56,189,248,.08);border-radius:8px;padding:.8rem 1rem}
+  .kpi-card .kpi-title{font-size:.66rem;font-weight:700;color:var(--text);margin-bottom:.15rem}
+  .kpi-card .kpi-value{font-size:.85rem;font-weight:800;color:var(--accent)}
+  .kpi-card .kpi-method{font-size:.62rem;color:var(--dim);margin-top:.1rem}
+
+  .timeline{display:flex;gap:0;margin:1rem 0}
+  .tl-week{flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.8rem;font-size:.62rem}
+  .tl-week .tl-label{font-weight:700;color:var(--accent);margin-bottom:.3rem}
+  .tl-week .tl-item{color:var(--dim);margin:.15rem 0;padding-left:.6rem;border-left:2px solid rgba(148,163,184,.1)}
+
+  .scope-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:.8rem 0}
+  .scope-in{background:rgba(74,222,128,.02);border:1px solid rgba(74,222,128,.10);border-radius:10px;padding:1rem}
+  .scope-out{background:rgba(248,113,113,.02);border:1px solid rgba(248,113,113,.08);border-radius:10px;padding:1rem}
+  .scope-in h3{color:var(--green);margin:0 0 .5rem}
+  .scope-out h3{color:var(--red);margin:0 0 .5rem}
+  .scope-in li,.scope-out li{font-size:.65rem;color:var(--dim);margin:.2rem 0;padding-left:.2rem;list-style-position:inside}
+
+  .compare-table td:first-child{color:var(--text);font-weight:600;width:200px}
+  .compare-table td:last-child{color:var(--accent)}
+  .compare-table tr.sep td{border-top:2px solid rgba(148,163,184,.06)}
+</style>
+</head>
+<body>
+
+<div class="brand"></div>
+
+<div class="container">
+
+<!-- ========== HEADER ========== -->
+<h1>Wave 1 MVP — Detailed Design</h1>
+<div class="meta">
+  <span>Knowledge Agent + Teams Bot</span>
+  <span>v1 · 2026-06-17</span>
+  <span>SSG Sales Enablement Agent</span>
+</div>
+
+<div class="callout callout-info">
+  <strong>One-liner:</strong> Validate real-world value of AI-assisted data queries and impact analysis for the SSG GPS team — with minimal technical risk. Three read-only scenarios, zero destructive risk, 6–8 weeks to launch.
+</div>
+
+<div class="grid4">
+  <div class="card"><div class="card-num">3</div><div class="card-label">MVP Scenarios</div></div>
+  <div class="card"><div class="card-num">1</div><div class="card-label">Sub-Agent</div></div>
+  <div class="card"><div class="card-num">5</div><div class="card-label">Systems Integrated</div></div>
+  <div class="card"><div class="card-num">6-8 wk</div><div class="card-label">Time to Launch</div></div>
+</div>
+
+<!-- ========== §1 SCOPE ========== -->
+<h2><span class="num">§1</span>Scope Definition</h2>
+
+<div class="scope-grid">
+<div class="scope-in">
+<h3>In Scope</h3>
+<ul>
+  <li>#1 ODT attribute change impact analysis + Booking Impact</li>
+  <li>#4 MT Announcement auto-capture</li>
+  <li>#12 PN master data query (ad-hoc reports)</li>
+  <li>Teams Bot conversational interface</li>
+  <li>RAG knowledge base (PN workflows / rules / approvals)</li>
+  <li>Approval notifications (notify only — no execution)</li>
+</ul>
+</div>
+<div class="scope-out">
+<h3>Out of Scope</h3>
+<ul>
+  <li>#2 Auto-generate POR / #3 Duplicate PN check</li>
+  <li>#5 PN lifecycle management</li>
+  <li>Web Persona Workspace</li>
+  <li>System write operations (Cost / Price)</li>
+  <li>Cost Agent / Price Agent / Lifecycle Agent</li>
+  <li>Approval workflow execution</li>
+</ul>
+</div>
+</div>
+
+<div class="callout callout-warn">
+  <strong>Why Knowledge Agent first?</strong> All 3 scenarios are read-only → zero destructive risk. Immediate value (team does these daily). Validates API / RAG / Teams Bot feasibility. Builds business trust before Waves 2–4.
+</div>
+
+<!-- ========== §2 SCENARIO #1 ========== -->
+<h2><span class="num">§2</span>Scenario #1: ODT Attribute Change Impact Analysis</h2>
+
+<div class="grid2">
+  <div class="card">
+    <div class="card-title">Trigger</div>
+    <div class="card-desc">Natural language in Teams:<br><code style="background:rgba(56,189,248,.08);color:var(--accent);padding:.1rem .3rem;border-radius:3px;font-size:.63rem">@Agent ODT change PN-XXXXX Warranty 1Y→3Y, analyze impact</code></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Capability</div>
+    <div class="card-desc">ODT API → attribute lookup → Booking association query → AI impact analysis & risk rating → structured report</div>
+  </div>
+</div>
+
+<h3>End-to-End Flow</h3>
+<div class="flow">
+┌─────────────────────────────────────────────────────────────┐
+│ <span class="hl">Step 1: Master Agent Intent Recognition</span>                    │
+│ Identifies: Knowledge Agent · ODT Change Analysis            │
+│ Extracts: PN=XXXXX, Change Type=Warranty Term, 1Y→3Y        │
+├─────────────────────────────────────────────────────────────┤
+│ <span class="hl">Step 2: ODT API Query</span>                  <span class="tag tag-auto">AUTO</span>                    │
+│ Calls ODT API → fetches PN current attributes & history     │
+│ Returns: Service Tier, Warranty, Region, Pricing etc.        │
+├─────────────────────────────────────────────────────────────┤
+│ <span class="hl">Step 3: Booking Association Query</span>     <span class="tag tag-auto">AUTO</span>                    │
+│ Queries Concord / Booking DB                                  │
+│ Filters: contains PN-XXXXX AND Status=Open                   │
+│ Returns: Booking ID, Customer, Qty, Amount, Status, Geo     │
+├─────────────────────────────────────────────────────────────┤
+│ <span class="hl">Step 4: AI Impact Analysis & Risk Rating</span> <span class="tag tag-auto">AUTO</span>                    │
+│ Change type → impact dimension mapping (cost/pricing/compliance) │
+│ Booking amount aggregation → impact range estimate            │
+│ Risk rating: Low / Medium / High (rule engine)               │
+├─────────────────────────────────────────────────────────────┤
+│ <span class="hl">Step 5: Response to User</span>                                        │
+│ Structured report: affected bookings · amount · top customers · actions  │
+└─────────────────────────────────────────────────────────────┘
+</div>
+
+<h3>Data Dependencies</h3>
+<table>
+  <tr><th>Data</th><th>Source</th><th>Method</th><th>Status</th></tr>
+  <tr><td>PN Attributes</td><td>ODT</td><td>API / DB direct</td><td><span class="tag tag-risk-high">API TBD</span></td></tr>
+  <tr><td>Booking Data</td><td>Concord / Internal DB</td><td>API / SQL</td><td><span class="tag tag-risk-high">TBD</span></td></tr>
+  <tr><td>Risk Mapping Rules</td><td>Business knowledge base</td><td>RAG (domain docs)</td><td><span class="tag tag-risk-mid">To curate</span></td></tr>
+  <tr><td>Customer Anonymization</td><td>Internal systems</td><td>Real-time masking</td><td><span class="tag tag-risk-mid">Policy TBD</span></td></tr>
+</table>
+
+<div class="callout callout-warn">
+  <strong>Risk alert:</strong> ODT and Concord API availability is the blocker for Scenario #1. If systems don't expose callable APIs, fallback: "user manually inputs change details → Agent does analysis and report only."
+</div>
+
+<!-- ========== §3 SCENARIO #4 ========== -->
+<h2><span class="num">§3</span>Scenario #4: MT Announcement Auto-Capture</h2>
+
+<div class="grid2">
+  <div class="card">
+    <div class="card-title">Dual Trigger</div>
+    <div class="card-desc">
+      <strong>Mode A — Scheduled Polling:</strong> Every 4 hours, auto-scan ICP for new MT Announcements<br>
+      <strong>Mode B — Manual Trigger:</strong> Teams "@Agent check recent MT Announcements"
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Capability</div>
+    <div class="card-desc">ICP/Email → raw announcement fetch → LLM structured extraction → dedup & store → Teams auto-push notification</div>
+  </div>
+</div>
+
+<h3>End-to-End Flow</h3>
+<div class="flow">
+┌─────────────────────────────────────────────────────────────┐
+│ <span class="hl">Step 1: Fetch Raw Announcement</span>       <span class="tag tag-auto">AUTO</span>                    │
+│ Scheduled: ICP API query for new Announcements               │
+│ Or manual: user "@Agent" triggers                            │
+├─────────────────────────────────────────────────────────────┤
+│ <span class="hl">Step 2: LLM Structured Extraction</span>     <span class="tag tag-auto">AUTO</span>                    │
+│ Input: raw announcement text / JSON                          │
+│ Output: MT Model | Announce Date | Target Price |            │
+│         Service Tier | Sub-Tier | Warranty | Geo | Source   │
+├─────────────────────────────────────────────────────────────┤
+│ <span class="hl">Step 3: Dedup & Store</span>                <span class="tag tag-auto">AUTO</span>                    │
+│ Unique key: MT Model + Announce Date                         │
+│ Write to MT Announcement database table                      │
+├─────────────────────────────────────────────────────────────┤
+│ <span class="hl">Step 4: Teams Auto-Push</span>              <span class="tag tag-auto">AUTO</span>                    │
+│ Notify → GPS PM / Pricing Team channels                      │
+│ Card: MT Model · Target Price · Service Tier · Region       │
+└─────────────────────────────────────────────────────────────┘
+</div>
+
+<h3>Scheduled Task Parameters</h3>
+<table>
+  <tr><th>Parameter</th><th>Value</th></tr>
+  <tr><td>Polling Frequency</td><td>Every 4 hours (business days)</td></tr>
+  <tr><td>Sources</td><td>ICP API, designated mailbox</td></tr>
+  <tr><td>Dedup Strategy</td><td>MT Model + Announce Date (composite key)</td></tr>
+  <tr><td>Push Targets</td><td>GPS PM channel, Pricing Team channel</td></tr>
+  <tr><td>Data Retention</td><td>6 months history</td></tr>
+</table>
+
+<!-- ========== §4 SCENARIO #12 ========== -->
+<h2><span class="num">§4</span>Scenario #12: PN Master Data Query</h2>
+
+<div class="callout callout-info">
+  <strong>Core value:</strong> Single natural-language query → cross-system aggregation (ICP/SPEP/CPM/Concord) → one card response. Replaces the current "toggle between 4 systems" manual workflow.
+</div>
+
+<h3>Supported Query Types</h3>
+<table>
+  <tr><th>Type</th><th>Example</th><th>Systems</th><th>Target Latency</th></tr>
+  <tr><td>PN Attributes</td><td>"What's PN-XXXXX's Service Tier and Warranty?"</td><td>ICP, ODT</td><td>&lt; 3s</td></tr>
+  <tr><td>Sales Cost</td><td>"PN-XXXXX's latest Sales Cost?"</td><td>CPM</td><td>&lt; 3s</td></tr>
+  <tr><td>Booking Assoc.</td><td>"Any open bookings for PN-XXXXX?"</td><td>Concord</td><td>&lt; 3s</td></tr>
+  <tr><td>Lifecycle Status</td><td>"Is PN-XXXXX on the closure candidate list?"</td><td>SPEP + rules</td><td>&lt; 5s</td></tr>
+  <tr><td>Multi-System</td><td>"AP Premium Tier PNs with Sales Cost &lt; $500"</td><td>Multi-system JOIN</td><td>&lt; 15s</td></tr>
+  <tr><td>Report Query</td><td>"Top 10 Booking customers, grouped by PN"</td><td>Booking + PN</td><td>&lt; 30s</td></tr>
+</table>
+
+<h3>Sample Conversation</h3>
+<div class="chat-box">
+<div class="chat-hdr"><div class="dot"></div> Teams · SSG GPS PM Channel</div>
+
+<div class="chat-turn chat-user">
+  <div class="chat-av user">U</div>
+  <div class="chat-body">
+    <div class="who">GPS PM</div>
+    <div class="msg">@Agent PN-XXXXX's Sales Cost and Booking status</div>
+  </div>
+</div>
+
+<div class="chat-turn agent">
+  <div class="chat-av agent">A</div>
+  <div class="chat-body">
+    <div class="who">Agent <span style="font-weight:400;color:var(--dim)">· querying…</span></div>
+    <div class="msg">
+      <div class="card-inline">
+        <div style="font-size:.66rem;font-weight:700;color:var(--text);margin-bottom:.4rem">📋 PN-XXXXX</div>
+        <div class="row"><span class="lbl">Service Tier</span><span class="val">Premium</span></div>
+        <div class="row"><span class="lbl">Warranty</span><span class="val">3Y On-site</span></div>
+        <div style="margin:.4rem 0;border-top:1px solid rgba(148,163,184,.06)"></div>
+        <div style="font-size:.66rem;font-weight:700;color:var(--text);margin-bottom:.2rem">💰 Sales Cost</div>
+        <div class="row"><span class="lbl">Current</span><span class="val" style="color:var(--accent)">$1,250</span></div>
+        <div class="row"><span class="lbl">Previous</span><span class="val">$1,180</span></div>
+        <div class="row"><span class="lbl">Change</span><span class="val" style="color:var(--amber)">+5.9%</span></div>
+        <div style="margin:.4rem 0;border-top:1px solid rgba(148,163,184,.06)"></div>
+        <div style="font-size:.66rem;font-weight:700;color:var(--text);margin-bottom:.2rem">📦 Booking Summary</div>
+        <div class="row"><span class="lbl">Active</span><span class="val">45 bookings</span></div>
+        <div class="row"><span class="lbl">Total Amount</span><span class="val" style="color:var(--accent)">$18.3M</span></div>
+        <div class="row"><span class="lbl">Top Customer</span><span class="val">Customer A (12 / $5.2M)</span></div>
+      </div>
+      <div style="margin-top:.5rem;font-size:.62rem;color:var(--dim)">
+        🔗 <span style="color:var(--accent);cursor:pointer">View in SPEP</span> &nbsp;·&nbsp; 🔗 <span style="color:var(--accent);cursor:pointer">View in CPM</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ========== §5 TEAMS BOT ========== -->
+<h2><span class="num">§5</span>Teams Bot Interaction Design</h2>
+
+<h3>Three Interaction Modes</h3>
+<div class="grid3">
+  <div class="card">
+    <div class="card-title" style="color:var(--accent)">@Mention Q&A</div>
+    <div class="card-desc">User @Agent sends query → Agent returns result. Supports single queries and follow-up clarification.</div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:var(--green)">Push Notifications</div>
+    <div class="card-desc">MT Announcement auto-pushed to GPS PM / Pricing Team channels with card-style summaries.</div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:var(--amber)">Approval Notifications</div>
+    <div class="card-desc">ODT change analysis complete → DM relevant stakeholders. Wave 1: notify only, no execution.</div>
+  </div>
+</div>
+
+<h3>Natural Language Commands (no /prefix)</h3>
+<table>
+  <tr><th>Intent</th><th>Trigger Examples</th><th>Scenario</th></tr>
+  <tr><td>ODT Impact Analysis</td><td>"ODT change PN-XXXXX" / "Analyze PN-XXXXX booking impact"</td><td>#1</td></tr>
+  <tr><td>MT Announcements</td><td>"Recent MT announcements" / "Check new MT Announcements"</td><td>#4</td></tr>
+  <tr><td>PN Query</td><td>"PN-XXXXX Sales Cost" / "Look up PN-XXXXX"</td><td>#12</td></tr>
+  <tr><td>Multi-System Query</td><td>"AP Premium Tier PN list"</td><td>#12</td></tr>
+  <tr><td>Help</td><td>"What can you do?" / "help"</td><td>General</td></tr>
+</table>
+
+<h3>Error Handling & Degradation</h3>
+<table>
+  <tr><th>Situation</th><th>Response</th></tr>
+  <tr><td>System API unavailable</td><td>"CPM is currently unavailable. Please retry later or [check manually in CPM]"</td></tr>
+  <tr><td>Query timeout</td><td>"Query exceeded 15 seconds — partial results returned. Full report will be generated in background and sent to you."</td></tr>
+  <tr><td>No results</td><td>"No data found for PN-XXXXX. Please verify the PN number."</td></tr>
+  <tr><td>Insufficient permissions</td><td>"You don't have access to this Booking data. Contact [Geo Lead] for access."</td></tr>
+  <tr><td>Ambiguous query</td><td>"Which info do you need for PN-XXXXX? Sales Cost / Booking / Attributes?"</td></tr>
+</table>
+
+<!-- ========== §6 TECH ARCH ========== -->
+<h2><span class="num">§6</span>Technical Architecture (Wave 1)</h2>
+
+<div class="flow" style="font-size:.63rem">
+┌───────────────────────────────────────────────────────────┐
+│          <span class="hl">CHANNEL: Teams Bot Only</span>                              │
+│  User @Agent sends query ←→ Agent returns result            │
+├───────────────────────────────────────────────────────────┤
+│          <span class="hl4">MASTER AGENT (DeerFlow / Vetraflow)</span>                 │
+│  Intent recognition → Sub-query decomposition → Aggregation │
+├───────────────────────────────────────────────────────────┤
+│          <span class="hl2">KNOWLEDGE AGENT (sole Sub-Agent)</span>                      │
+│  ┌──────────────┬──────────────┬──────────────┐            │
+│  │ #1 ODT       │ #4 MT        │ #12 PN       │            │
+│  │ Analyzer     │ Monitor      │ Query        │            │
+│  └──────┬───────┴──────┬───────┴──────┬───────┘            │
+├─────────┴──────────────┴──────────────┴────────────────────┤
+│          <span class="hl3">INTEGRATION (MCP / Toolcall)</span>                        │
+│   ICP  │  ODT  │  Concord  │  CPM  │  SPEP                 │
+│  (MT)  │(Attr) │ (Booking) │(Cost) │(PN)                   │
+├───────────────────────────────────────────────────────────┤
+│          <span class="hl">RAG KNOWLEDGE BASE</span>                                 │
+│  PN workflows · Service Tier rules · Approval matrices      │
+│  MT field definitions · Risk mapping · Anonymization rules  │
+├───────────────────────────────────────────────────────────┤
+│          <span class="hl4">INFRASTRUCTURE</span>                                      │
+│  DeerFlow (Vetraflow) + Lenovo Hybrid AI Platform          │
+└───────────────────────────────────────────────────────────┘
+</div>
+
+<h3>Wave 1 vs. Full Architecture Delta</h3>
+<table class="compare-table">
+  <tr><th>Layer</th><th>Full Architecture V1</th><th>Wave 1 MVP</th><th>Rationale</th></tr>
+  <tr><td>Channel</td><td>Teams + Web + Embedded</td><td>Teams Only</td><td>Fastest to launch</td></tr>
+  <tr><td>Persona Workspace</td><td>4 Workspaces</td><td>None (Teams replaces)</td><td>No complex UI needed</td></tr>
+  <tr><td>Sub-Agents</td><td>5</td><td>1 (Knowledge)</td><td>Query-only scope</td></tr>
+  <tr><td>Safety</td><td>Auto + Approval gates</td><td>Auto Only</td><td>Read-only = no approvals</td></tr>
+  <tr><td>Integration</td><td>6 systems</td><td>5 (no SCFE)</td><td>Cost calc not in W1</td></tr>
+</table>
+
+<h3>RAG Knowledge Base (P0 First)</h3>
+<table>
+  <tr><th>Domain</th><th>Content</th><th>Priority</th></tr>
+  <tr><td>ODT Attribute Definitions</td><td>Per-attribute meaning, impact dimensions</td><td><span class="tag tag-p0">P0</span></td></tr>
+  <tr><td>Service Tier System</td><td>Tier definitions, classification rules</td><td><span class="tag tag-p0">P0</span></td></tr>
+  <tr><td>PN Lifecycle Rules</td><td>Create / Extend / End-of-Life criteria</td><td><span class="tag tag-p0">P0</span></td></tr>
+  <tr><td>MT Announcement Fields</td><td>Fields included, format specification</td><td><span class="tag tag-p0">P0</span></td></tr>
+  <tr><td>Booking Anonymization Rules</td><td>Which fields must not be shown</td><td><span class="tag tag-p0">P0</span></td></tr>
+  <tr><td>Approval Rules</td><td>Which operations require which level</td><td><span class="tag tag-p1">P1</span></td></tr>
+  <tr><td>Risk Mapping Table</td><td>Change type → risk level</td><td><span class="tag tag-p1">P1</span></td></tr>
+</table>
+
+<!-- ========== §7 KPIs ========== -->
+<h2><span class="num">§7</span>Success Metrics (KPIs)</h2>
+
+<div class="kpi-row">
+  <div class="kpi-card">
+    <div class="kpi-title">Adoption Rate</div>
+    <div class="kpi-value">≥ 30%</div>
+    <div class="kpi-method">Target users ≥ 1 session/week</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-title">Query Success Rate</div>
+    <div class="kpi-value">≥ 85%</div>
+    <div class="kpi-method">Valid result within target latency</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-title">MT Capture Rate</div>
+    <div class="kpi-value">≥ 95%</div>
+    <div class="kpi-method">ICP announcements auto-captured</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-title">NPS / Satisfaction</div>
+    <div class="kpi-value">≥ 7/10</div>
+    <div class="kpi-method">Post-MVP user survey</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-title">Time Saved</div>
+    <div class="kpi-value">3–5 min</div>
+    <div class="kpi-method">Per query vs. manual cross-system</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-title">Data Coverage</div>
+    <div class="kpi-value">≥ 60%</div>
+    <div class="kpi-method">PNs with full attribute lookup</div>
+  </div>
+</div>
+
+<div class="callout callout-warn" style="margin-top:1rem">
+  <strong>Non-KPIs</strong> (avoid premature optimization): sub-2s latency · 100% query coverage · 100% NLU accuracy
+</div>
+
+<!-- ========== §8 RISKS ========== -->
+<h2><span class="num">§8</span>Critical Assumptions & Risks</h2>
+
+<h3>Assumptions to Validate Before MVP</h3>
+<table>
+  <tr><th>#</th><th>Assumption</th><th>Risk</th></tr>
+  <tr><td>H1</td><td>ICP / ODT / CPM / Concord expose callable APIs</td><td><span class="tag tag-risk-high">High</span> — no API = no automated queries</td></tr>
+  <tr><td>H2</td><td>Teams Bot integratable via DeerFlow IM Gateway</td><td><span class="tag tag-risk-mid">Medium</span> — may need additional approval</td></tr>
+  <tr><td>H3</td><td>PN workflows/rules exist as written docs for RAG</td><td><span class="tag tag-risk-mid">Medium</span> — tribal knowledge limits RAG</td></tr>
+  <tr><td>H4</td><td>Lenovo Hybrid AI Platform is deployment-ready</td><td><span class="tag tag-risk-mid">Medium</span></td></tr>
+  <tr><td>H5</td><td>Booking data can be anonymized for LLM context</td><td><span class="tag tag-risk-high">High</span> — SaaS LLM security concern</td></tr>
+</table>
+
+<h3>Known Risks & Mitigations</h3>
+<table>
+  <tr><th>Risk</th><th>Mitigation</th></tr>
+  <tr><td>System API high latency → query timeout</td><td>Show "querying" state + timeout fallback with partial results</td></tr>
+  <tr><td>SaaS LLM data security → compliance risk</td><td>Minimize data passed + anonymize + evaluate private deployment</td></tr>
+  <tr><td>NLU inaccuracy → wrong queries</td><td>Tolerate clarification follow-ups + echo key fields for confirmation</td></tr>
+  <tr><td>Low knowledge base quality → poor RAG</td><td>Manually curate core rules first, expand incrementally</td></tr>
+</table>
+
+<!-- ========== §9 MILESTONES ========== -->
+<h2><span class="num">§9</span>Milestones (8 Weeks)</h2>
+
+<div class="timeline">
+  <div class="tl-week">
+    <div class="tl-label">Week 1-2</div>
+    <div style="font-size:.62rem;font-weight:700;color:var(--amber);margin-bottom:.4rem">Assumption Validation</div>
+    <div class="tl-item">Confirm system APIs (H1) 🚨</div>
+    <div class="tl-item">Confirm Teams integration (H2)</div>
+    <div class="tl-item">Collect KB materials (H3)</div>
+    <div class="tl-item">Confirm data security (H5)</div>
+  </div>
+  <div class="tl-week">
+    <div class="tl-label">Week 3-4</div>
+    <div style="font-size:.62rem;font-weight:700;color:var(--accent);margin-bottom:.4rem">Core Development</div>
+    <div class="tl-item">RAG knowledge base build</div>
+    <div class="tl-item">3 scenario Skill definitions</div>
+    <div class="tl-item">5 system MCP Tools</div>
+    <div class="tl-item">Master Agent Prompt design</div>
+  </div>
+  <div class="tl-week">
+    <div class="tl-label">Week 5-6</div>
+    <div style="font-size:.62rem;font-weight:700;color:var(--purple);margin-bottom:.4rem">Internal Testing</div>
+    <div class="tl-item">Teams test channel deploy</div>
+    <div class="tl-item">3 internal test users</div>
+    <div class="tl-item">Feedback → iterate</div>
+    <div class="tl-item">Prep production env</div>
+  </div>
+  <div class="tl-week">
+    <div class="tl-label">Week 7-8</div>
+    <div style="font-size:.62rem;font-weight:700;color:var(--green);margin-bottom:.4rem">Launch</div>
+    <div class="tl-item">Production channel launch</div>
+    <div class="tl-item">KPI instrumentation</div>
+    <div class="tl-item">2-week retrospective</div>
+    <div class="tl-item">→ Wave 2 decision</div>
+  </div>
+</div>
+
+<!-- ========== §10 TRACE ========== -->
+<h2><span class="num">§10</span>Traceability to Architecture V1</h2>
+<table>
+  <tr><th>Architecture V1 Design</th><th>Wave 1 MVP</th></tr>
+  <tr><td>5 Sub-Agents</td><td>1 (Knowledge Agent)</td></tr>
+  <tr><td>13 Scenarios</td><td>3 (#1, #4, #12)</td></tr>
+  <tr><td>6 Personas</td><td>2 primary (GPS PM + Pricing)</td></tr>
+  <tr><td>6 Systems</td><td>5 (ICP / ODT / Concord / CPM / SPEP)</td></tr>
+  <tr><td>3 Channels</td><td>1 (Teams Bot)</td></tr>
+  <tr><td>Auto + Approval gates</td><td>Auto Only</td></tr>
+  <tr><td>4 Persona Workspaces</td><td>0 (Teams chat replaces)</td></tr>
+  <tr><td>Full Memory System</td><td>Short-term + Domain</td></tr>
+</table>
+
+<hr>
+<p style="text-align:center;color:var(--dim);font-size:.62rem;margin-top:3rem">
+  SSG Sales Enablement Agent · Wave 1 MVP · v1 · 2026-06-17 · Confidential
+</p>
+
+</div><!-- /container -->
+</body>
+</html>

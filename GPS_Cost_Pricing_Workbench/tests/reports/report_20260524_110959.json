@@ -1,0 +1,728 @@
+{
+  "passed": 20,
+  "failed": 83,
+  "skipped": 0,
+  "cases": [
+    {
+      "stage": "stage3",
+      "type": "syntax",
+      "name": "JS syntax is valid\"",
+      "status": "PASS",
+      "detail": "JS syntax valid"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Loads UI components\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/ui-components.js\""
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Loads Stage Bridge\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/stage-bridge.js\""
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Loads Audit Log\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/audit-log.js\""
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "SKU_COLUMN_MAP defined\"",
+      "status": "FAIL",
+      "detail": "'\"SKU_COLUMN_MAP\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Cycles table exists\"",
+      "status": "FAIL",
+      "detail": "DB table \"cycles:\" NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "service_pns table exists\"",
+      "status": "FAIL",
+      "detail": "DB table \"service_pns:\" NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "uplift_rules table exists\"",
+      "status": "FAIL",
+      "detail": "DB table \"uplift_rules:\" NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "uplift_values table exists\"",
+      "status": "FAIL",
+      "detail": "DB table \"uplift_values:\" NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "CSV import function exists\"",
+      "status": "FAIL",
+      "detail": "function \"doImportCSV\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Excel import function exists\"",
+      "status": "FAIL",
+      "detail": "function \"doImportExcel\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "CSV parser exists\"",
+      "status": "FAIL",
+      "detail": "function \"parseCSVLine\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "DataEnrich object exists\"",
+      "status": "FAIL",
+      "detail": "'\"DataEnrich\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "classifyPosOrApos function exists\"",
+      "status": "FAIL",
+      "detail": "'\"classifyPosOrApos\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "extractStartingPoint function exists\"",
+      "status": "FAIL",
+      "detail": "'\"extractStartingPoint\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "extractTermLabel function exists\"",
+      "status": "FAIL",
+      "detail": "'\"extractTermLabel\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "enrich function exists\"",
+      "status": "FAIL",
+      "detail": "'\"DataEnrich.enrich\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "POS/APOS badge format in render\"",
+      "status": "FAIL",
+      "detail": "'\"pos_or_apos\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "logic",
+      "name": "POS classification works\"",
+      "status": "FAIL",
+      "detail": "[eval]:3\n|\n^\n\nSyntaxError: Unexpected token '|'\n    at makeContextifyScript (node:internal/vm:185:14)\n    at node:internal/process/execution:107:22\n    at [eval]-wrapper:6:24\n    at runScript (node:in"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "detectDuplicates function exists\"",
+      "status": "FAIL",
+      "detail": "function \"detectDuplicates\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Called in doImportCSV\"",
+      "status": "FAIL",
+      "detail": "'\"detectDuplicates(validSkus)\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "SKU_COLUMNS array exists\"",
+      "status": "FAIL",
+      "detail": "'\"SKU_COLUMNS\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "renderColToggle function exists\"",
+      "status": "FAIL",
+      "detail": "'\"renderColToggle\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "localStorage persistence\"",
+      "status": "FAIL",
+      "detail": "'\"stage3_visible_cols\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "skuFilters object exists\"",
+      "status": "FAIL",
+      "detail": "'\"skuFilters\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "renderFilterBar function exists\"",
+      "status": "FAIL",
+      "detail": "'\"renderFilterBar\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "applySkuFilters function exists\"",
+      "status": "FAIL",
+      "detail": "'\"applySkuFilters\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "filter by service_tier\"",
+      "status": "FAIL",
+      "detail": "'\"skuFilters.service_tier\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "filter by country\"",
+      "status": "FAIL",
+      "detail": "'\"skuFilters.country\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Required field validation exists\"",
+      "status": "FAIL",
+      "detail": "'\"requiredFields\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Skipped rows reported\"",
+      "status": "FAIL",
+      "detail": "'\"skippedRows\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "downloadSKUTemplate function exists\"",
+      "status": "FAIL",
+      "detail": "function \"downloadSKUTemplate\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "showEditSKU function exists\"",
+      "status": "FAIL",
+      "detail": "function \"showEditSKU\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "deleteSKU function exists\"",
+      "status": "FAIL",
+      "detail": "function \"deleteSKU\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Actions column in SKU_COLUMNS\"",
+      "status": "FAIL",
+      "detail": "'\"renderSkuActions\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "bridgeToStage4 function exists\"",
+      "status": "FAIL",
+      "detail": "function \"bridgeToStage4\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Bridge.saveForNext called\"",
+      "status": "FAIL",
+      "detail": "'\"Bridge.saveForNext(3\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Auto-opens Stage 4\"",
+      "status": "FAIL",
+      "detail": "'\"stage4_browser\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Uplift CSV import function exists\"",
+      "status": "FAIL",
+      "detail": "function \"importUpliftCSV\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Uplift CSV file input exists\"",
+      "status": "PASS",
+      "detail": "'\"uplift-csv-import\"' found"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "calcSku function exists\"",
+      "status": "FAIL",
+      "detail": "function \"calcSku\" NOT found in index.html"
+    },
+    {
+      "stage": "stage3",
+      "type": "static",
+      "name": "Sales Cost formula uses uplift\"",
+      "status": "FAIL",
+      "detail": "'\"Sales Cost\"' NOT found"
+    },
+    {
+      "stage": "stage3",
+      "type": "data",
+      "name": "SKU input has standard columns\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage3_SKU_Input.csv\""
+    },
+    {
+      "stage": "stage3",
+      "type": "data",
+      "name": "SKU input has minimum 50 rows\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage3_SKU_Input.csv\""
+    },
+    {
+      "stage": "stage3",
+      "type": "data",
+      "name": "Uplift values has standard columns\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage3_Uplift_Values.csv\""
+    },
+    {
+      "stage": "stage3",
+      "type": "data",
+      "name": "Uplift values has minimum 5 rows\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage3_Uplift_Values.csv\""
+    },
+    {
+      "stage": "stage4",
+      "type": "syntax",
+      "name": "JS syntax is valid\"",
+      "status": "PASS",
+      "detail": "JS syntax valid"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Loads GVE engine\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/gve-engine.js\""
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Loads Stage Bridge\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/stage-bridge.js\""
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Loads Audit Log\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/audit-log.js\""
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Loads UI components\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/ui-components.js\""
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "createCycle function exists\"",
+      "status": "FAIL",
+      "detail": "function \"createCycle\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Cycles DB table exists\"",
+      "status": "FAIL",
+      "detail": "DB table \"cycles:\" NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "importFromStage3Bridge exists\"",
+      "status": "FAIL",
+      "detail": "function \"importFromStage3Bridge\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "hasBridgeData exists\"",
+      "status": "FAIL",
+      "detail": "function \"hasBridgeData\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Bridge import card on dashboard\"",
+      "status": "FAIL",
+      "detail": "'\"Data Available from Stage 3\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Bridge card in import tab\"",
+      "status": "PASS",
+      "detail": "'\"bridge-import-card\"' found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "loadPresets function exists\"",
+      "status": "FAIL",
+      "detail": "function \"loadPresets\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "getActivePreset function exists\"",
+      "status": "FAIL",
+      "detail": "function \"getActivePreset\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "getPresetThresholds function exists\"",
+      "status": "FAIL",
+      "detail": "function \"getPresetThresholds\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "onPresetChange function exists\"",
+      "status": "FAIL",
+      "detail": "function \"onPresetChange\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "showPresetManager function exists\"",
+      "status": "FAIL",
+      "detail": "function \"showPresetManager\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "localStorage persistence\"",
+      "status": "FAIL",
+      "detail": "'\"stage4_gve_presets\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "CrossCheck object exists\"",
+      "status": "FAIL",
+      "detail": "'\"CrossCheck\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "executeRule function exists\"",
+      "status": "FAIL",
+      "detail": "'\"CrossCheck.executeRule\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "executeAll function exists\"",
+      "status": "FAIL",
+      "detail": "'\"CrossCheck.executeAll\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "loadCCRules function exists\"",
+      "status": "FAIL",
+      "detail": "function \"loadCCRules\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Tier TP rule has real priorities\"",
+      "status": "FAIL",
+      "detail": "'\"CC_TIER_TP\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Tier TC DT rule exists\"",
+      "status": "FAIL",
+      "detail": "'\"CC_TIER_TC_DT\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Tier TC AIO rule exists\"",
+      "status": "FAIL",
+      "detail": "'\"CC_TIER_TC_AIO\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Term rule exists\"",
+      "status": "FAIL",
+      "detail": "'\"CC_TERM\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "findMissing function exists\"",
+      "status": "FAIL",
+      "detail": "'\"CrossCheck.findMissing\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "buildGroupedSummary function exists\"",
+      "status": "FAIL",
+      "detail": "'\"CrossCheck.buildGroupedSummary\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "buildDrilldown function exists\"",
+      "status": "FAIL",
+      "detail": "'\"CrossCheck.buildDrilldown\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "showCCRuleDesigner function exists\"",
+      "status": "FAIL",
+      "detail": "function \"showCCRuleDesigner\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "showCCRuleManager function exists\"",
+      "status": "FAIL",
+      "detail": "function \"showCCRuleManager\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "saveCCRule function exists\"",
+      "status": "FAIL",
+      "detail": "function \"saveCCRule\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "executeAllWithGeo function exists\"",
+      "status": "FAIL",
+      "detail": "'\"CrossCheck.executeAllWithGeo\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "exportGVEResults function exists\"",
+      "status": "FAIL",
+      "detail": "function \"exportGVEResults\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "exportCCResults function exists\"",
+      "status": "FAIL",
+      "detail": "function \"exportCCResults\" NOT found in index.html"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Stats cards exist on dashboard\"",
+      "status": "FAIL",
+      "detail": "'\"Total Cycles\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "static",
+      "name": "Submitted count card\"",
+      "status": "FAIL",
+      "detail": "'\"Submitted\"' NOT found"
+    },
+    {
+      "stage": "stage4",
+      "type": "logic",
+      "name": "Term monotonicity (1Y < 3Y)\"",
+      "status": "FAIL",
+      "detail": "[eval]:3\n|\n^\n\nSyntaxError: Unexpected token '|'\n    at makeContextifyScript (node:internal/vm:185:14)\n    at node:internal/process/execution:107:22\n    at [eval]-wrapper:6:24\n    at runScript (node:in"
+    },
+    {
+      "stage": "stage4",
+      "type": "data",
+      "name": "Stage 4 input file exists\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage4_Input.csv\""
+    },
+    {
+      "stage": "stage4",
+      "type": "bridge",
+      "name": "Stage 3\u21924 bridge key format\"",
+      "status": "FAIL",
+      "detail": "invalid literal for int() with base 10: '\"3\"'"
+    },
+    {
+      "stage": "stage5",
+      "type": "syntax",
+      "name": "JS syntax is valid\"",
+      "status": "PASS",
+      "detail": "JS syntax valid"
+    },
+    {
+      "stage": "stage5",
+      "type": "static",
+      "name": "PFV calculation exists\"",
+      "status": "PASS",
+      "detail": "pattern '\"base_pfv|addon_pfv|PFV\"' found"
+    },
+    {
+      "stage": "stage5",
+      "type": "static",
+      "name": "GP% formula exists\"",
+      "status": "FAIL",
+      "detail": "pattern '\"GP%|gp_percent|gross_profit\"' NOT found"
+    },
+    {
+      "stage": "stage5",
+      "type": "static",
+      "name": "Loads Stage Bridge\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/stage-bridge.js\""
+    },
+    {
+      "stage": "stage5",
+      "type": "static",
+      "name": "Loads UI components\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/ui-components.js\""
+    },
+    {
+      "stage": "stage5",
+      "type": "data",
+      "name": "PFV input file has standard columns\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage5_PFV_Input.csv\""
+    },
+    {
+      "stage": "stage5",
+      "type": "data",
+      "name": "PFV input has minimum 30 rows\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage5_PFV_Input.csv\""
+    },
+    {
+      "stage": "stage5",
+      "type": "data",
+      "name": "SKU input file has minimum 50 rows\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage5_SKU_Input.csv\""
+    },
+    {
+      "stage": "stage5",
+      "type": "bridge",
+      "name": "Stage 4\u21925 bridge key format\"",
+      "status": "FAIL",
+      "detail": "invalid literal for int() with base 10: '\"4\"'"
+    },
+    {
+      "stage": "stage6",
+      "type": "syntax",
+      "name": "JS syntax is valid\"",
+      "status": "PASS",
+      "detail": "JS syntax valid"
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "GVE engine loaded\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/gve-engine.js\""
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "Loads Stage Bridge\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/stage-bridge.js\""
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "Loads UI components\"",
+      "status": "PASS",
+      "detail": "imports \"../shared/ui-components.js\""
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "List price validation field\"",
+      "status": "FAIL",
+      "detail": "'\"list_price_calc\"' NOT found"
+    },
+    {
+      "stage": "stage6",
+      "type": "static",
+      "name": "No L4 (YoY) in standalone mode\"",
+      "status": "PASS",
+      "detail": "pattern '\"L1|L2|L3\"' found"
+    },
+    {
+      "stage": "stage6",
+      "type": "data",
+      "name": "Standalone input has list_price_calc column\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage6_Standalone_Input.csv\""
+    },
+    {
+      "stage": "stage6",
+      "type": "data",
+      "name": "Standalone input has minimum 50 rows\"",
+      "status": "FAIL",
+      "detail": "file not found: \"sample_data/Stage6_Standalone_Input.csv\""
+    },
+    {
+      "stage": "stage6",
+      "type": "bridge",
+      "name": "Stage 5\u21926 bridge key format\"",
+      "status": "FAIL",
+      "detail": "invalid literal for int() with base 10: '\"5\"'"
+    }
+  ]
+}

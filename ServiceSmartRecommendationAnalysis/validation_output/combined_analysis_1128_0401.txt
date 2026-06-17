@@ -1,0 +1,230 @@
+SERVICE SMART RECOMMENDATION — COMBINED ANALYSIS
+Period  : 2025-11-28  to  2026-04-01
+Sources : Ai_Report_20250815~20260306.xlsx  (rows up to 2026-03-16)
+          Ai_Report_2026-04-01(3.17-4.01).xlsx  (rows 2026-03-17 to 2026-04-01)
+Total rows in scope : 251,395
+Geo breakdown       : {'EMEA': np.int64(66238), 'NA': np.int64(51238), 'AP': np.int64(113519), 'LA': np.int64(20400)}
+
+================================================================================
+  GEO: WW
+================================================================================
+
+  Config from all   (n = 251,395)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config              251,395         —
+  Defaults                  245,747     97.8%
+  Default and sold          192,120     76.4%
+  Accepted                  121,008     49.2%
+  Changed                    71,112     28.9%
+  No default                  5,648         —
+  No default sold             1,843     32.6%
+
+
+  Config from new + copied   (n = 189,016)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config              189,016         —
+  Defaults                  184,588     97.7%
+  Default and sold          141,511     74.9%
+  Accepted                   84,397     45.7%
+  Changed                    57,114     30.9%
+  No default                  4,428         —
+  No default sold             1,711     38.6%
+
+
+  Config from new   (n = 112,692)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config              112,692         —
+  Defaults                  109,404     97.1%
+  Default and sold           81,869     72.6%
+  Accepted                   35,399     32.4%
+  Changed                    46,470     42.5%
+  No default                  3,288         —
+  No default sold             1,640     49.9%
+
+================================================================================
+  GEO: AP
+================================================================================
+
+  Config from all   (n = 113,519)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config              113,519         —
+  Defaults                  111,374     98.1%
+  Default and sold           87,680     77.2%
+  Accepted                   52,024     46.7%
+  Changed                    35,656     32.0%
+  No default                  2,145         —
+  No default sold               578     26.9%
+
+
+  Config from new + copied   (n = 83,388)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               83,388         —
+  Defaults                   81,718     98.0%
+  Default and sold           62,692     75.2%
+  Accepted                   34,734     42.5%
+  Changed                    27,958     34.2%
+  No default                  1,670         —
+  No default sold               546     32.7%
+
+
+  Config from new   (n = 50,887)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               50,887         —
+  Defaults                   49,593     97.5%
+  Default and sold           37,955     74.6%
+  Accepted                   14,847     29.9%
+  Changed                    23,108     46.6%
+  No default                  1,294         —
+  No default sold               516     39.9%
+
+================================================================================
+  GEO: EMEA
+================================================================================
+
+  Config from all   (n = 66,238)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               66,238         —
+  Defaults                   64,486     97.4%
+  Default and sold           49,486     74.7%
+  Accepted                   33,251     51.6%
+  Changed                    16,235     25.2%
+  No default                  1,752         —
+  No default sold               455     26.0%
+
+
+  Config from new + copied   (n = 54,632)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               54,632         —
+  Defaults                   53,043     97.1%
+  Default and sold           39,522     72.3%
+  Accepted                   25,142     47.4%
+  Changed                    14,380     27.1%
+  No default                  1,589         —
+  No default sold               440     27.7%
+
+
+  Config from new   (n = 29,909)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               29,909         —
+  Defaults                   28,786     96.2%
+  Default and sold           20,374     68.1%
+  Accepted                    9,185     31.9%
+  Changed                    11,189     38.9%
+  No default                  1,123         —
+  No default sold               418     37.2%
+
+================================================================================
+  GEO: LA
+================================================================================
+
+  Config from all   (n = 20,400)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               20,400         —
+  Defaults                   19,855     97.3%
+  Default and sold           15,310     75.0%
+  Accepted                    9,263     46.7%
+  Changed                     6,047     30.5%
+  No default                    545         —
+  No default sold                66     12.1%
+
+
+  Config from new + copied   (n = 13,657)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               13,657         —
+  Defaults                   13,544     99.2%
+  Default and sold           11,332     83.0%
+  Accepted                    6,729     49.7%
+  Changed                     4,603     34.0%
+  No default                    113         —
+  No default sold                55     48.7%
+
+
+  Config from new   (n = 7,937)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config                7,937         —
+  Defaults                    7,855     99.0%
+  Default and sold            6,591     83.0%
+  Accepted                    2,857     36.4%
+  Changed                     3,734     47.5%
+  No default                     82         —
+  No default sold                54     65.9%
+
+================================================================================
+  GEO: NA
+================================================================================
+
+  Config from all   (n = 51,238)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               51,238         —
+  Defaults                   50,032     97.6%
+  Default and sold           39,644     77.4%
+  Accepted                   26,470     52.9%
+  Changed                    13,174     26.3%
+  No default                  1,206         —
+  No default sold               744     61.7%
+
+
+  Config from new + copied   (n = 37,339)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               37,339         —
+  Defaults                   36,283     97.2%
+  Default and sold           27,965     74.9%
+  Accepted                   17,792     49.0%
+  Changed                    10,173     28.0%
+  No default                  1,056         —
+  No default sold               670     63.4%
+
+
+  Config from new   (n = 23,959)
+--------------------------------------------------------------------------------
+  Metric                      Count      Rate
+  --------------------------------------------
+  Total Config               23,959         —
+  Defaults                   23,170     96.7%
+  Default and sold           16,949     70.7%
+  Accepted                    8,510     36.7%
+  Changed                     8,439     36.4%
+  No default                    789         —
+  No default sold               652     82.6%
+
+================================================================================
+  RATE DEFINITIONS
+================================================================================
+  Defaults%         = Defaults / Total Config
+  Default and sold% = Default and sold / Total Config
+  Accepted%         = Accepted / Defaults
+  Changed%          = Changed  / Defaults
+  No default sold%  = No default sold / No default
+
+  Accepted  : system showed a default recommendation AND customer kept it
+              (selectedServicePn1 == defaultServicePn1)
+  Changed   : system showed a default recommendation AND customer picked
+              a different service (sold but not the exact default PN)

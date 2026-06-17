@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SSR Operational KPI Report — Phase 1</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#222;font-size:14px}
+.navbar{background:#1a237e;color:#fff;padding:12px 24px;display:flex;align-items:center;
+        gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.35);flex-wrap:wrap}
+.navbar .brand{font-weight:700;font-size:15px}
+.navbar a{color:#bbdefb;text-decoration:none;padding:4px 10px;border-radius:4px;font-size:12px}
+.navbar a:hover{background:rgba(255,255,255,.15);color:#fff}
+.page{max-width:1320px;margin:0 auto;padding:20px 24px}
+.section{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:24px;overflow:hidden}
+.sec-hdr{background:#1a237e;color:#fff;padding:13px 20px}
+.sec-hdr h2{font-size:17px;font-weight:600}
+.sec-body{padding:18px 20px}
+.sub{margin-bottom:22px}.sub:last-child{margin-bottom:0}
+.sub h3{font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #42a5f5;padding-left:10px}
+.sub h4{font-size:13px;font-weight:600;color:#555;margin:14px 0 8px}
+.insight{background:#e3f2fd;border-left:4px solid #1976d2;padding:9px 13px;border-radius:4px;font-size:13px;color:#0d47a1;margin-bottom:10px;line-height:1.5}
+.warn{background:#fff3e0;border-left:4px solid #f57c00;padding:9px 13px;border-radius:4px;font-size:13px;color:#bf360c;margin-bottom:10px;line-height:1.5}
+.critical{background:#ffebee;border-left:4px solid #c62828;padding:9px 13px;border-radius:4px;font-size:13px;color:#b71c1c;margin-bottom:10px;line-height:1.5}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:#37474f;color:#fff;padding:7px 10px;text-align:left;font-weight:600;white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.num{text-align:right;font-family:'Courier New',monospace;white-space:nowrap}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.kpi-card{background:#f5f7ff;border:1px solid #e8eaf6;border-radius:8px;padding:14px}
+.kpi-card .geo-tag{display:inline-block;background:#1a237e;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;margin-bottom:6px}
+.kpi-card .label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px}
+.kpi-card .big{font-size:24px;font-weight:700;margin:3px 0}
+.kpi-card .sub{font-size:11px;color:#888;line-height:1.4}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.legend{display:flex;gap:10px;font-size:11px;margin-bottom:8px;align-items:center}
+.legend span{padding:2px 8px;border-radius:10px;color:#fff;font-weight:600}
+.tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600}
+.tag-new{background:#e3f2fd;color:#1565c0}
+.tag-copied{background:#e8f5e9;color:#2e7d32}
+.tag-mtm{background:#fff3e0;color:#e65100}
+.trend-up{color:#2e7d32}
+.trend-down{color:#c62828}
+</style>
+
+</head>
+<body>
+<nav class="navbar"><span class="brand">SSR Operational KPI Report</span><a href="#summary">Executive Summary</a><a href="#EMEA">EMEA</a><a href="#AP">AP</a><a href="#LA">LA</a><a href="#NA">NA</a><span style="margin-left:auto;font-size:11px;color:#90caf9">Data: 2025-08-16 to 2026-04-01 | Generated: 2026-05-20 03:14</span></nav>
+<div class="page">
+<div class="section" id="summary"><div class="sec-hdr"><h2>Executive Summary — Cross-GEO Comparison (from go-live)</h2></div><div class="sec-body">
+<p class="insight">Each GEO filtered from its go-live date: EMEA Sep 28, NA/AP/LA Nov 28, 2025. Period covers launch through fiscal year-end Mar 31, 2026.</p>
+<div class="kpi-grid">
+<div class="kpi-card"><div class="geo-tag">EMEA</div><div class="label">Acceptance Rate</div><div class="big" style="color:#f57f17">54.4%</div><div class="sub">110,900 configs | 94.4% coverage</div><div class="sub">Attach: 73.6% | Change: 23.6% | Att.Fail: 22.0%</div></div>
+<div class="kpi-card"><div class="geo-tag">AP</div><div class="label">Acceptance Rate</div><div class="big" style="color:#f57f17">46.7%</div><div class="sub">114,259 configs | 98.1% coverage</div><div class="sub">Attach: 77.2% | Change: 32.1% | Att.Fail: 21.3%</div></div>
+<div class="kpi-card"><div class="geo-tag">LA</div><div class="label">Acceptance Rate</div><div class="big" style="color:#f57f17">46.6%</div><div class="sub">20,426 configs | 97.3% coverage</div><div class="sub">Attach: 75.1% | Change: 30.5% | Att.Fail: 22.9%</div></div>
+<div class="kpi-card"><div class="geo-tag">NA</div><div class="label">Acceptance Rate</div><div class="big" style="color:#f57f17">52.9%</div><div class="sub">51,336 configs | 97.7% coverage</div><div class="sub">Attach: 77.4% | Change: 26.4% | Att.Fail: 20.7%</div></div>
+</div>
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #42a5f5;padding-left:10px">Cross-GEO KPI Comparison</h3><div class="legend">
+<span style="background:#2e7d32">Good</span>
+<span style="background:#f57f17">Moderate</span>
+<span style="background:#c62828">Needs attention</span>
+</div>
+<table><tr><th>GEO</th><th>From</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">AI Cov</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Influence</th><th class="num">Att.Fail</th></tr>
+<tr><td><strong>EMEA</strong></td><td class="num">2025-09-28</td><td class="num">110,900</td><td class="num" style="background:#f57f17;color:#fff">94.4%</td><td class="num">49.5%</td><td class="num" style="">73.6%</td><td class="num" style="background:#f57f17;color:#fff">54.4%</td><td class="num" style="background:#f57f17;color:#fff">23.6%</td><td class="num">78.0%</td><td class="num" style="background:#f57f17;color:#fff">22.0%</td></tr>
+<tr><td><strong>AP</strong></td><td class="num">2025-11-28</td><td class="num">114,259</td><td class="num" style="background:#2e7d32;color:#fff">98.1%</td><td class="num">56.1%</td><td class="num" style="">77.2%</td><td class="num" style="background:#f57f17;color:#fff">46.7%</td><td class="num" style="background:#f57f17;color:#fff">32.1%</td><td class="num">78.7%</td><td class="num" style="background:#f57f17;color:#fff">21.3%</td></tr>
+<tr><td><strong>LA</strong></td><td class="num">2025-11-28</td><td class="num">20,426</td><td class="num" style="background:#2e7d32;color:#fff">97.3%</td><td class="num">59.1%</td><td class="num" style="">75.1%</td><td class="num" style="background:#f57f17;color:#fff">46.6%</td><td class="num" style="background:#f57f17;color:#fff">30.5%</td><td class="num">77.1%</td><td class="num" style="background:#f57f17;color:#fff">22.9%</td></tr>
+<tr><td><strong>NA</strong></td><td class="num">2025-11-28</td><td class="num">51,336</td><td class="num" style="background:#2e7d32;color:#fff">97.7%</td><td class="num">55.2%</td><td class="num" style="">77.4%</td><td class="num" style="background:#f57f17;color:#fff">52.9%</td><td class="num" style="background:#f57f17;color:#fff">26.4%</td><td class="num">79.3%</td><td class="num" style="background:#f57f17;color:#fff">20.7%</td></tr>
+</table>
+<div style="margin-top:20px"><h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #c62828;padding-left:10px">&#9888; Critical Finding: New CTO vs Copied CTO Acceptance Gap</h3>
+<p class="critical">New CTO configurations (seller starts from scratch) show dramatically lower acceptance rates than Copied CTO (seller copies existing config). This is the single largest lever for improving overall acceptance.</p>
+<table><tr><th>GEO</th><th class="num">New CTO Configs</th><th class="num">New CTO Acc</th><th class="num">Copied CTO Configs</th><th class="num">Copied CTO Acc</th><th class="num">Gap</th></tr>
+<tr><td><strong>EMEA</strong></td><td class="num">47,038</td><td class="num" style="background:#c62828;color:#fff">28.5%</td><td class="num">42,960</td><td class="num" style="background:#2e7d32;color:#fff">70.8%</td><td class="num" style="color:#c62828;font-weight:700">42pp</td></tr>
+<tr><td><strong>AP</strong></td><td class="num">51,211</td><td class="num" style="background:#c62828;color:#fff">29.9%</td><td class="num">32,701</td><td class="num" style="background:#2e7d32;color:#fff">61.8%</td><td class="num" style="color:#c62828;font-weight:700">32pp</td></tr>
+<tr><td><strong>LA</strong></td><td class="num">7,946</td><td class="num" style="background:#c62828;color:#fff">36.4%</td><td class="num">5,727</td><td class="num" style="background:#2e7d32;color:#fff">68.1%</td><td class="num" style="color:#c62828;font-weight:700">32pp</td></tr>
+<tr><td><strong>NA</strong></td><td class="num">23,982</td><td class="num" style="background:#c62828;color:#fff">36.7%</td><td class="num">13,447</td><td class="num" style="background:#2e7d32;color:#fff">70.7%</td><td class="num" style="color:#c62828;font-weight:700">34pp</td></tr>
+</table></div>
+<div style="margin-top:16px"><h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #f57c00;padding-left:10px">&#9888; Acceptance Rate Declining Across All GEOs</h3>
+<p class="warn">All four GEOs show acceptance rates declining 8-18pp from their peak months (typically the first full month after go-live). This pattern is consistent and warrants investigation — possible causes: new-country dilution, seller fatigue, or model drift.</p>
+<table><tr><th>GEO</th><th>Peak Month</th><th class="num">Peak Acc</th><th>Latest Month</th><th class="num">Latest Acc</th><th class="num">Decline</th></tr>
+<tr><td><strong>EMEA</strong></td><td>2025-10</td><td class="num">59.3%</td><td>2026-03</td><td class="num">50.0%</td><td class="num" style="color:#c62828;font-weight:700">-9.3pp</td></tr>
+<tr><td><strong>AP</strong></td><td>2025-11</td><td class="num">58.3%</td><td>2026-04</td><td class="num">43.0%</td><td class="num" style="color:#c62828;font-weight:700">-15.3pp</td></tr>
+<tr><td><strong>LA</strong></td><td>2025-12</td><td class="num">60.2%</td><td>2026-03</td><td class="num">41.7%</td><td class="num" style="color:#c62828;font-weight:700">-18.5pp</td></tr>
+<tr><td><strong>NA</strong></td><td>2025-12</td><td class="num">64.0%</td><td>2026-03</td><td class="num">50.6%</td><td class="num" style="color:#c62828;font-weight:700">-13.4pp</td></tr>
+</table></div>
+</div></div>
+<div class="section" id="EMEA"><div class="sec-hdr"><h2>EMEA — Operational KPI Detail</h2></div><div class="sec-body">
+<div class="sub"><h3>A. KPI Dashboard (n=110,900)</h3><div class="legend">
+<span style="background:#2e7d32">Good</span>
+<span style="background:#f57f17">Moderate</span>
+<span style="background:#c62828">Needs attention</span>
+</div>
+<table><tr><th>Metric</th><th class="num">Count</th><th class="num">Rate</th></tr>
+<tr><td>Total Configs</td><td class="num">110,900</td><td class="num">—</td></tr>
+<tr><td>Default Coverage</td><td class="num">104,679</td><td class="num" style="background:#f57f17;color:#fff">94.4%</td></tr>
+<tr><td>AI Coverage (defaultFrom=AI)</td><td class="num">54,927</td><td class="num" style="">49.5%</td></tr>
+<tr><td>Service Attach Rate</td><td class="num">81,619</td><td class="num" style="">73.6%</td></tr>
+<tr><td>Acceptance Rate (exact match)</td><td class="num">56,967</td><td class="num" style="background:#f57f17;color:#fff">54.4%</td></tr>
+<tr><td>Change Rate (overrode default)</td><td class="num">24,652</td><td class="num" style="background:#f57f17;color:#fff">23.6%</td></tr>
+<tr><td>Influence Rate (accepted+changed)</td><td class="num">81,619</td><td class="num" style="">78.0%</td></tr>
+<tr><td>Attachment Failure (shown, not sold)</td><td class="num">23,060</td><td class="num" style="background:#f57f17;color:#fff">22.0%</td></tr>
+<tr><td>No Default (no recommendation)</td><td class="num">6,221</td><td class="num" style="background:#c62828;color:#fff">5.6%</td></tr>
+</table></div>
+<div class="sub"><h3>B. KPI by Config Origin</h3>
+<p class="insight">New CTO = rep started from scratch. Copied CTO = rep copied existing config. MTM = pre-configured model. Acceptance gap between new and copied is the primary improvement lever.</p>
+<table><tr><th>Origin</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th></tr>
+<tr><td><span class="tag tag-new">New CTO</span></td><td class="num">47,038</td><td class="num" style="background:#f57f17;color:#fff">90.9%</td><td class="num" style="">64.2%</td><td class="num" style="background:#c62828;color:#fff">28.5%</td><td class="num" style="background:#c62828;color:#fff">42.1%</td><td class="num" style="background:#c62828;color:#fff">29.4%</td></tr>
+<tr><td><span class="tag tag-copied">Copied CTO</span></td><td class="num">42,960</td><td class="num" style="background:#2e7d32;color:#fff">96.8%</td><td class="num" style="">78.5%</td><td class="num" style="background:#2e7d32;color:#fff">70.8%</td><td class="num" style="background:#2e7d32;color:#fff">10.3%</td><td class="num" style="background:#f57f17;color:#fff">18.9%</td></tr>
+<tr><td><span class="tag tag-mtm">MTM</span></td><td class="num">20,902</td><td class="num" style="background:#2e7d32;color:#fff">97.2%</td><td class="num" style="">84.8%</td><td class="num" style="background:#2e7d32;color:#fff">75.5%</td><td class="num" style="background:#2e7d32;color:#fff">11.7%</td><td class="num" style="background:#2e7d32;color:#fff">12.8%</td></tr>
+</table></div>
+<div class="sub"><h3>C. AI vs Non-AI Default Acceptance</h3>
+<p class="insight">AI-sourced defaults (Core Recommendation Layer output) have lower acceptance but higher change activity. Non-AI defaults (rules/legacy) show very high acceptance.</p>
+<table><tr><th>Default Source</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th></tr>
+<tr><td><strong>AI</strong></td><td class="num">54,927</td><td class="num" style="background:#2e7d32;color:#fff">100.0%</td><td class="num" style="">59.0%</td><td class="num" style="background:#c62828;color:#fff">26.4%</td><td class="num" style="background:#f57f17;color:#fff">32.6%</td><td class="num" style="background:#c62828;color:#fff">41.0%</td></tr>
+<tr><td><strong>Non-AI</strong></td><td class="num">55,973</td><td class="num" style="background:#c62828;color:#fff">88.9%</td><td class="num" style="">87.9%</td><td class="num" style="background:#2e7d32;color:#fff">85.3%</td><td class="num" style="background:#2e7d32;color:#fff">13.6%</td><td class="num" style="background:#2e7d32;color:#fff">1.1%</td></tr>
+</table></div>
+<div class="sub"><h3>D. Country Drill-Down (Top 15 by Volume)</h3>
+<table><tr><th>Country</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th><th class="num">AI Cov</th></tr>
+<tr><td><strong>(Unknown)</strong></td><td class="num">56,542</td><td class="num" style="background:#f57f17;color:#fff">90.8%</td><td class="num" style="background:#2e7d32;color:#fff">58.2%</td><td class="num" style="background:#f57f17;color:#fff">20.9%</td><td class="num" style="background:#f57f17;color:#fff">20.9%</td><td class="num">44.2%</td></tr>
+<tr><td><strong>GB</strong></td><td class="num">6,578</td><td class="num" style="background:#2e7d32;color:#fff">98.8%</td><td class="num" style="background:#2e7d32;color:#fff">60.6%</td><td class="num" style="background:#f57f17;color:#fff">31.4%</td><td class="num" style="background:#2e7d32;color:#fff">8.0%</td><td class="num">34.1%</td></tr>
+<tr><td><strong>FR</strong></td><td class="num">6,551</td><td class="num" style="background:#2e7d32;color:#fff">98.4%</td><td class="num" style="background:#2e7d32;color:#fff">62.6%</td><td class="num" style="background:#f57f17;color:#fff">24.6%</td><td class="num" style="background:#2e7d32;color:#fff">12.7%</td><td class="num">43.4%</td></tr>
+<tr><td><strong>DE</strong></td><td class="num">5,953</td><td class="num" style="background:#2e7d32;color:#fff">97.7%</td><td class="num" style="background:#f57f17;color:#fff">54.8%</td><td class="num" style="background:#f57f17;color:#fff">26.4%</td><td class="num" style="background:#f57f17;color:#fff">18.8%</td><td class="num">40.0%</td></tr>
+<tr><td><strong>AE</strong></td><td class="num">2,565</td><td class="num" style="background:#2e7d32;color:#fff">97.3%</td><td class="num" style="background:#c62828;color:#fff">41.7%</td><td class="num" style="background:#2e7d32;color:#fff">17.9%</td><td class="num" style="background:#c62828;color:#fff">40.4%</td><td class="num">69.6%</td></tr>
+<tr><td><strong>IT</strong></td><td class="num">1,816</td><td class="num" style="background:#2e7d32;color:#fff">98.7%</td><td class="num" style="background:#c62828;color:#fff">41.2%</td><td class="num" style="background:#f57f17;color:#fff">26.8%</td><td class="num" style="background:#c62828;color:#fff">32.0%</td><td class="num">51.1%</td></tr>
+<tr><td><strong>CH</strong></td><td class="num">1,795</td><td class="num" style="background:#2e7d32;color:#fff">97.8%</td><td class="num" style="background:#2e7d32;color:#fff">57.6%</td><td class="num" style="background:#f57f17;color:#fff">25.0%</td><td class="num" style="background:#f57f17;color:#fff">17.4%</td><td class="num">47.5%</td></tr>
+<tr><td><strong>DK</strong></td><td class="num">1,695</td><td class="num" style="background:#2e7d32;color:#fff">98.3%</td><td class="num" style="background:#2e7d32;color:#fff">57.0%</td><td class="num" style="background:#c62828;color:#fff">39.3%</td><td class="num" style="background:#2e7d32;color:#fff">3.7%</td><td class="num">31.5%</td></tr>
+<tr><td><strong>TR</strong></td><td class="num">1,597</td><td class="num" style="background:#2e7d32;color:#fff">98.6%</td><td class="num" style="background:#c62828;color:#fff">39.0%</td><td class="num" style="background:#f57f17;color:#fff">27.3%</td><td class="num" style="background:#c62828;color:#fff">33.7%</td><td class="num">69.3%</td></tr>
+<tr><td><strong>ES</strong></td><td class="num">1,468</td><td class="num" style="background:#2e7d32;color:#fff">97.4%</td><td class="num" style="background:#c62828;color:#fff">40.4%</td><td class="num" style="background:#f57f17;color:#fff">26.0%</td><td class="num" style="background:#c62828;color:#fff">33.6%</td><td class="num">59.7%</td></tr>
+<tr><td><strong>SA</strong></td><td class="num">1,431</td><td class="num" style="background:#2e7d32;color:#fff">98.0%</td><td class="num" style="background:#f57f17;color:#fff">46.0%</td><td class="num" style="background:#f57f17;color:#fff">24.2%</td><td class="num" style="background:#c62828;color:#fff">29.7%</td><td class="num">63.3%</td></tr>
+<tr><td><strong>SE</strong></td><td class="num">1,403</td><td class="num" style="background:#2e7d32;color:#fff">99.4%</td><td class="num" style="background:#f57f17;color:#fff">50.4%</td><td class="num" style="background:#f57f17;color:#fff">31.1%</td><td class="num" style="background:#f57f17;color:#fff">18.6%</td><td class="num">50.9%</td></tr>
+<tr><td><strong>ZA</strong></td><td class="num">1,317</td><td class="num" style="background:#2e7d32;color:#fff">98.4%</td><td class="num" style="background:#2e7d32;color:#fff">58.6%</td><td class="num" style="background:#f57f17;color:#fff">29.9%</td><td class="num" style="background:#2e7d32;color:#fff">11.5%</td><td class="num">62.4%</td></tr>
+<tr><td><strong>NL</strong></td><td class="num">1,259</td><td class="num" style="background:#2e7d32;color:#fff">97.1%</td><td class="num" style="background:#f57f17;color:#fff">52.7%</td><td class="num" style="background:#f57f17;color:#fff">26.8%</td><td class="num" style="background:#f57f17;color:#fff">20.4%</td><td class="num">49.3%</td></tr>
+<tr><td><strong>KZ</strong></td><td class="num">1,127</td><td class="num" style="background:#2e7d32;color:#fff">98.9%</td><td class="num" style="background:#2e7d32;color:#fff">61.8%</td><td class="num" style="background:#f57f17;color:#fff">23.6%</td><td class="num" style="background:#2e7d32;color:#fff">14.6%</td><td class="num">74.4%</td></tr>
+</table></div>
+<div class="sub"><h3>E. Monthly Trend</h3>
+<table><tr><th>Month</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">AI Cov</th><th class="num">Att.Fail</th></tr>
+<tr><td><strong>2025-09</strong></td><td class="num">2,639</td><td class="num" style="background:#f57f17;color:#fff">90.9%</td><td class="num" style="">73.0%</td><td class="num" style="background:#2e7d32;color:#fff">58.0%</td><td class="num" style="background:#f57f17;color:#fff">22.3%</td><td class="num">41.8%</td><td class="num" style="background:#f57f17;color:#fff">19.7%</td></tr>
+<tr><td><strong>2025-10</strong></td><td class="num">23,511</td><td class="num" style="background:#f57f17;color:#fff">91.0%</td><td class="num" style="">73.2%</td><td class="num" style="background:#2e7d32;color:#fff">59.3%</td><td class="num" style="background:#f57f17;color:#fff">21.2%</td><td class="num">42.7%</td><td class="num" style="background:#f57f17;color:#fff">19.6%</td></tr>
+<tr><td><strong>2025-11</strong></td><td class="num">18,683</td><td class="num" style="background:#c62828;color:#fff">88.6%</td><td class="num" style="">70.1%</td><td class="num" style="background:#2e7d32;color:#fff">58.7%</td><td class="num" style="background:#f57f17;color:#fff">20.4%</td><td class="num">40.4%</td><td class="num" style="background:#f57f17;color:#fff">20.9%</td></tr>
+<tr><td><strong>2025-12</strong></td><td class="num">13,404</td><td class="num" style="background:#f57f17;color:#fff">94.7%</td><td class="num" style="">73.3%</td><td class="num" style="background:#2e7d32;color:#fff">58.0%</td><td class="num" style="background:#2e7d32;color:#fff">19.4%</td><td class="num">50.5%</td><td class="num" style="background:#f57f17;color:#fff">22.6%</td></tr>
+<tr><td><strong>2026-01</strong></td><td class="num">16,338</td><td class="num" style="background:#2e7d32;color:#fff">98.1%</td><td class="num" style="">75.0%</td><td class="num" style="background:#f57f17;color:#fff">51.6%</td><td class="num" style="background:#f57f17;color:#fff">24.9%</td><td class="num">55.4%</td><td class="num" style="background:#f57f17;color:#fff">23.5%</td></tr>
+<tr><td><strong>2026-02</strong></td><td class="num">18,135</td><td class="num" style="background:#2e7d32;color:#fff">97.9%</td><td class="num" style="">75.2%</td><td class="num" style="background:#f57f17;color:#fff">48.6%</td><td class="num" style="background:#f57f17;color:#fff">28.2%</td><td class="num">54.9%</td><td class="num" style="background:#f57f17;color:#fff">23.2%</td></tr>
+<tr><td><strong>2026-03</strong></td><td class="num">18,190</td><td class="num" style="background:#2e7d32;color:#fff">98.2%</td><td class="num" style="">75.2%</td><td class="num" style="background:#f57f17;color:#fff">50.0%</td><td class="num" style="background:#f57f17;color:#fff">26.6%</td><td class="num">57.4%</td><td class="num" style="background:#f57f17;color:#fff">23.5%</td></tr>
+</table></div>
+</div></div>
+<div class="section" id="AP"><div class="sec-hdr"><h2>AP — Operational KPI Detail</h2></div><div class="sec-body">
+<div class="sub"><h3>A. KPI Dashboard (n=114,259)</h3><div class="legend">
+<span style="background:#2e7d32">Good</span>
+<span style="background:#f57f17">Moderate</span>
+<span style="background:#c62828">Needs attention</span>
+</div>
+<table><tr><th>Metric</th><th class="num">Count</th><th class="num">Rate</th></tr>
+<tr><td>Total Configs</td><td class="num">114,259</td><td class="num">—</td></tr>
+<tr><td>Default Coverage</td><td class="num">112,111</td><td class="num" style="background:#2e7d32;color:#fff">98.1%</td></tr>
+<tr><td>AI Coverage (defaultFrom=AI)</td><td class="num">64,089</td><td class="num" style="">56.1%</td></tr>
+<tr><td>Service Attach Rate</td><td class="num">88,258</td><td class="num" style="">77.2%</td></tr>
+<tr><td>Acceptance Rate (exact match)</td><td class="num">52,312</td><td class="num" style="background:#f57f17;color:#fff">46.7%</td></tr>
+<tr><td>Change Rate (overrode default)</td><td class="num">35,946</td><td class="num" style="background:#f57f17;color:#fff">32.1%</td></tr>
+<tr><td>Influence Rate (accepted+changed)</td><td class="num">88,258</td><td class="num" style="">78.7%</td></tr>
+<tr><td>Attachment Failure (shown, not sold)</td><td class="num">23,853</td><td class="num" style="background:#f57f17;color:#fff">21.3%</td></tr>
+<tr><td>No Default (no recommendation)</td><td class="num">2,148</td><td class="num" style="background:#c62828;color:#fff">1.9%</td></tr>
+</table></div>
+<div class="sub"><h3>B. KPI by Config Origin</h3>
+<p class="insight">New CTO = rep started from scratch. Copied CTO = rep copied existing config. MTM = pre-configured model. Acceptance gap between new and copied is the primary improvement lever.</p>
+<table><tr><th>Origin</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th></tr>
+<tr><td><span class="tag tag-new">New CTO</span></td><td class="num">51,211</td><td class="num" style="background:#2e7d32;color:#fff">97.5%</td><td class="num" style="">74.6%</td><td class="num" style="background:#c62828;color:#fff">29.9%</td><td class="num" style="background:#c62828;color:#fff">46.6%</td><td class="num" style="background:#f57f17;color:#fff">23.5%</td></tr>
+<tr><td><span class="tag tag-copied">Copied CTO</span></td><td class="num">32,701</td><td class="num" style="background:#2e7d32;color:#fff">98.9%</td><td class="num" style="">76.1%</td><td class="num" style="background:#2e7d32;color:#fff">61.8%</td><td class="num" style="background:#2e7d32;color:#fff">15.2%</td><td class="num" style="background:#f57f17;color:#fff">23.0%</td></tr>
+<tr><td><span class="tag tag-mtm">MTM</span></td><td class="num">30,347</td><td class="num" style="background:#2e7d32;color:#fff">98.4%</td><td class="num" style="">83.0%</td><td class="num" style="background:#2e7d32;color:#fff">58.3%</td><td class="num" style="background:#f57f17;color:#fff">26.0%</td><td class="num" style="background:#f57f17;color:#fff">15.7%</td></tr>
+</table></div>
+<div class="sub"><h3>C. AI vs Non-AI Default Acceptance</h3>
+<p class="insight">AI-sourced defaults (Core Recommendation Layer output) have lower acceptance but higher change activity. Non-AI defaults (rules/legacy) show very high acceptance.</p>
+<table><tr><th>Default Source</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th></tr>
+<tr><td><strong>AI</strong></td><td class="num">64,089</td><td class="num" style="background:#2e7d32;color:#fff">100.0%</td><td class="num" style="">64.8%</td><td class="num" style="background:#c62828;color:#fff">28.8%</td><td class="num" style="background:#c62828;color:#fff">36.0%</td><td class="num" style="background:#c62828;color:#fff">35.2%</td></tr>
+<tr><td><strong>Non-AI</strong></td><td class="num">50,170</td><td class="num" style="background:#2e7d32;color:#fff">95.7%</td><td class="num" style="">93.2%</td><td class="num" style="background:#2e7d32;color:#fff">70.5%</td><td class="num" style="background:#f57f17;color:#fff">26.8%</td><td class="num" style="background:#2e7d32;color:#fff">2.7%</td></tr>
+</table></div>
+<div class="sub"><h3>D. Country Drill-Down (Top 15 by Volume)</h3>
+<table><tr><th>Country</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th><th class="num">AI Cov</th></tr>
+<tr><td><strong>JP</strong></td><td class="num">33,665</td><td class="num" style="background:#2e7d32;color:#fff">98.8%</td><td class="num" style="background:#f57f17;color:#fff">45.9%</td><td class="num" style="background:#f57f17;color:#fff">33.7%</td><td class="num" style="background:#f57f17;color:#fff">20.4%</td><td class="num">51.0%</td></tr>
+<tr><td><strong>(Unknown)</strong></td><td class="num">24,492</td><td class="num" style="background:#2e7d32;color:#fff">95.3%</td><td class="num" style="background:#2e7d32;color:#fff">55.3%</td><td class="num" style="background:#f57f17;color:#fff">24.4%</td><td class="num" style="background:#f57f17;color:#fff">20.3%</td><td class="num">55.5%</td></tr>
+<tr><td><strong>IN</strong></td><td class="num">10,696</td><td class="num" style="background:#2e7d32;color:#fff">99.4%</td><td class="num" style="background:#f57f17;color:#fff">51.4%</td><td class="num" style="background:#c62828;color:#fff">37.2%</td><td class="num" style="background:#2e7d32;color:#fff">11.4%</td><td class="num">57.2%</td></tr>
+<tr><td><strong>HK</strong></td><td class="num">7,863</td><td class="num" style="background:#2e7d32;color:#fff">99.1%</td><td class="num" style="background:#2e7d32;color:#fff">56.0%</td><td class="num" style="background:#c62828;color:#fff">36.1%</td><td class="num" style="background:#2e7d32;color:#fff">8.0%</td><td class="num">35.5%</td></tr>
+<tr><td><strong>SG</strong></td><td class="num">6,547</td><td class="num" style="background:#2e7d32;color:#fff">99.1%</td><td class="num" style="background:#c62828;color:#fff">43.9%</td><td class="num" style="background:#c62828;color:#fff">41.4%</td><td class="num" style="background:#2e7d32;color:#fff">14.8%</td><td class="num">45.3%</td></tr>
+<tr><td><strong>TH</strong></td><td class="num">5,192</td><td class="num" style="background:#2e7d32;color:#fff">97.9%</td><td class="num" style="background:#c62828;color:#fff">23.7%</td><td class="num" style="background:#f57f17;color:#fff">29.4%</td><td class="num" style="background:#c62828;color:#fff">47.0%</td><td class="num">83.3%</td></tr>
+<tr><td><strong>PH</strong></td><td class="num">4,806</td><td class="num" style="background:#2e7d32;color:#fff">99.7%</td><td class="num" style="background:#c62828;color:#fff">44.4%</td><td class="num" style="background:#c62828;color:#fff">38.1%</td><td class="num" style="background:#f57f17;color:#fff">17.5%</td><td class="num">44.6%</td></tr>
+<tr><td><strong>MY</strong></td><td class="num">4,702</td><td class="num" style="background:#2e7d32;color:#fff">99.4%</td><td class="num" style="background:#f57f17;color:#fff">48.6%</td><td class="num" style="background:#c62828;color:#fff">45.4%</td><td class="num" style="background:#2e7d32;color:#fff">6.0%</td><td class="num">53.2%</td></tr>
+<tr><td><strong>KR</strong></td><td class="num">4,299</td><td class="num" style="background:#2e7d32;color:#fff">98.1%</td><td class="num" style="background:#c62828;color:#fff">39.7%</td><td class="num" style="background:#f57f17;color:#fff">23.3%</td><td class="num" style="background:#c62828;color:#fff">37.0%</td><td class="num">81.4%</td></tr>
+<tr><td><strong>ID</strong></td><td class="num">3,151</td><td class="num" style="background:#2e7d32;color:#fff">99.4%</td><td class="num" style="background:#c62828;color:#fff">32.8%</td><td class="num" style="background:#f57f17;color:#fff">30.9%</td><td class="num" style="background:#c62828;color:#fff">36.2%</td><td class="num">81.1%</td></tr>
+<tr><td><strong>AU</strong></td><td class="num">3,146</td><td class="num" style="background:#2e7d32;color:#fff">99.1%</td><td class="num" style="background:#f57f17;color:#fff">49.3%</td><td class="num" style="background:#f57f17;color:#fff">32.3%</td><td class="num" style="background:#f57f17;color:#fff">18.4%</td><td class="num">56.8%</td></tr>
+<tr><td><strong>VN</strong></td><td class="num">1,825</td><td class="num" style="background:#2e7d32;color:#fff">98.3%</td><td class="num" style="background:#c62828;color:#fff">11.3%</td><td class="num" style="background:#2e7d32;color:#fff">18.1%</td><td class="num" style="background:#c62828;color:#fff">70.7%</td><td class="num">89.4%</td></tr>
+<tr><td><strong>TW</strong></td><td class="num">1,715</td><td class="num" style="background:#2e7d32;color:#fff">99.5%</td><td class="num" style="background:#c62828;color:#fff">38.6%</td><td class="num" style="background:#f57f17;color:#fff">23.8%</td><td class="num" style="background:#c62828;color:#fff">37.6%</td><td class="num">79.5%</td></tr>
+<tr><td><strong>NZ</strong></td><td class="num">911</td><td class="num" style="background:#2e7d32;color:#fff">99.6%</td><td class="num" style="background:#c62828;color:#fff">41.5%</td><td class="num" style="background:#f57f17;color:#fff">29.0%</td><td class="num" style="background:#c62828;color:#fff">29.5%</td><td class="num">62.9%</td></tr>
+<tr><td><strong>KH</strong></td><td class="num">615</td><td class="num" style="background:#2e7d32;color:#fff">98.0%</td><td class="num" style="background:#c62828;color:#fff">22.1%</td><td class="num" style="background:#f57f17;color:#fff">23.4%</td><td class="num" style="background:#c62828;color:#fff">54.6%</td><td class="num">86.7%</td></tr>
+</table></div>
+<div class="sub"><h3>E. Monthly Trend</h3>
+<table><tr><th>Month</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">AI Cov</th><th class="num">Att.Fail</th></tr>
+<tr><td><strong>2025-11</strong></td><td class="num">134</td><td class="num" style="background:#2e7d32;color:#fff">98.5%</td><td class="num" style="">77.6%</td><td class="num" style="background:#2e7d32;color:#fff">58.3%</td><td class="num" style="background:#f57f17;color:#fff">20.5%</td><td class="num">44.0%</td><td class="num" style="background:#f57f17;color:#fff">21.2%</td></tr>
+<tr><td><strong>2025-12</strong></td><td class="num">25,635</td><td class="num" style="background:#2e7d32;color:#fff">95.4%</td><td class="num" style="">76.3%</td><td class="num" style="background:#2e7d32;color:#fff">55.5%</td><td class="num" style="background:#f57f17;color:#fff">24.5%</td><td class="num">55.7%</td><td class="num" style="background:#f57f17;color:#fff">20.0%</td></tr>
+<tr><td><strong>2026-01</strong></td><td class="num">31,325</td><td class="num" style="background:#2e7d32;color:#fff">98.8%</td><td class="num" style="">78.1%</td><td class="num" style="background:#f57f17;color:#fff">46.9%</td><td class="num" style="background:#f57f17;color:#fff">32.2%</td><td class="num">57.2%</td><td class="num" style="background:#f57f17;color:#fff">21.0%</td></tr>
+<tr><td><strong>2026-02</strong></td><td class="num">26,682</td><td class="num" style="background:#2e7d32;color:#fff">99.1%</td><td class="num" style="">76.8%</td><td class="num" style="background:#c62828;color:#fff">41.0%</td><td class="num" style="background:#c62828;color:#fff">36.5%</td><td class="num">56.0%</td><td class="num" style="background:#f57f17;color:#fff">22.5%</td></tr>
+<tr><td><strong>2026-03</strong></td><td class="num">30,149</td><td class="num" style="background:#2e7d32;color:#fff">98.8%</td><td class="num" style="">77.6%</td><td class="num" style="background:#c62828;color:#fff">44.2%</td><td class="num" style="background:#f57f17;color:#fff">34.3%</td><td class="num">55.4%</td><td class="num" style="background:#f57f17;color:#fff">21.5%</td></tr>
+<tr><td><strong>2026-04</strong></td><td class="num">334</td><td class="num" style="background:#2e7d32;color:#fff">98.8%</td><td class="num" style="">76.9%</td><td class="num" style="background:#c62828;color:#fff">43.0%</td><td class="num" style="background:#f57f17;color:#fff">34.8%</td><td class="num">52.7%</td><td class="num" style="background:#f57f17;color:#fff">22.1%</td></tr>
+</table></div>
+</div></div>
+<div class="section" id="LA"><div class="sec-hdr"><h2>LA — Operational KPI Detail</h2></div><div class="sec-body">
+<div class="sub"><h3>A. KPI Dashboard (n=20,426)</h3><div class="legend">
+<span style="background:#2e7d32">Good</span>
+<span style="background:#f57f17">Moderate</span>
+<span style="background:#c62828">Needs attention</span>
+</div>
+<table><tr><th>Metric</th><th class="num">Count</th><th class="num">Rate</th></tr>
+<tr><td>Total Configs</td><td class="num">20,426</td><td class="num">—</td></tr>
+<tr><td>Default Coverage</td><td class="num">19,881</td><td class="num" style="background:#2e7d32;color:#fff">97.3%</td></tr>
+<tr><td>AI Coverage (defaultFrom=AI)</td><td class="num">12,078</td><td class="num" style="">59.1%</td></tr>
+<tr><td>Service Attach Rate</td><td class="num">15,333</td><td class="num" style="">75.1%</td></tr>
+<tr><td>Acceptance Rate (exact match)</td><td class="num">9,274</td><td class="num" style="background:#f57f17;color:#fff">46.6%</td></tr>
+<tr><td>Change Rate (overrode default)</td><td class="num">6,059</td><td class="num" style="background:#f57f17;color:#fff">30.5%</td></tr>
+<tr><td>Influence Rate (accepted+changed)</td><td class="num">15,333</td><td class="num" style="">77.1%</td></tr>
+<tr><td>Attachment Failure (shown, not sold)</td><td class="num">4,548</td><td class="num" style="background:#f57f17;color:#fff">22.9%</td></tr>
+<tr><td>No Default (no recommendation)</td><td class="num">545</td><td class="num" style="background:#c62828;color:#fff">2.7%</td></tr>
+</table></div>
+<div class="sub"><h3>B. KPI by Config Origin</h3>
+<p class="insight">New CTO = rep started from scratch. Copied CTO = rep copied existing config. MTM = pre-configured model. Acceptance gap between new and copied is the primary improvement lever.</p>
+<table><tr><th>Origin</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th></tr>
+<tr><td><span class="tag tag-new">New CTO</span></td><td class="num">7,946</td><td class="num" style="background:#2e7d32;color:#fff">99.0%</td><td class="num" style="">83.1%</td><td class="num" style="background:#c62828;color:#fff">36.4%</td><td class="num" style="background:#c62828;color:#fff">47.5%</td><td class="num" style="background:#f57f17;color:#fff">16.1%</td></tr>
+<tr><td><span class="tag tag-copied">Copied CTO</span></td><td class="num">5,727</td><td class="num" style="background:#2e7d32;color:#fff">99.5%</td><td class="num" style="">82.9%</td><td class="num" style="background:#2e7d32;color:#fff">68.1%</td><td class="num" style="background:#2e7d32;color:#fff">15.3%</td><td class="num" style="background:#f57f17;color:#fff">16.6%</td></tr>
+<tr><td><span class="tag tag-mtm">MTM</span></td><td class="num">6,753</td><td class="num" style="background:#f57f17;color:#fff">93.6%</td><td class="num" style="">59.0%</td><td class="num" style="background:#c62828;color:#fff">40.1%</td><td class="num" style="background:#f57f17;color:#fff">22.9%</td><td class="num" style="background:#c62828;color:#fff">37.0%</td></tr>
+</table></div>
+<div class="sub"><h3>C. AI vs Non-AI Default Acceptance</h3>
+<p class="insight">AI-sourced defaults (Core Recommendation Layer output) have lower acceptance but higher change activity. Non-AI defaults (rules/legacy) show very high acceptance.</p>
+<table><tr><th>Default Source</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th></tr>
+<tr><td><strong>AI</strong></td><td class="num">12,078</td><td class="num" style="background:#2e7d32;color:#fff">100.0%</td><td class="num" style="">65.6%</td><td class="num" style="background:#c62828;color:#fff">31.1%</td><td class="num" style="background:#f57f17;color:#fff">34.5%</td><td class="num" style="background:#c62828;color:#fff">34.4%</td></tr>
+<tr><td><strong>Non-AI</strong></td><td class="num">8,348</td><td class="num" style="background:#f57f17;color:#fff">93.5%</td><td class="num" style="">88.8%</td><td class="num" style="background:#2e7d32;color:#fff">70.7%</td><td class="num" style="background:#f57f17;color:#fff">24.3%</td><td class="num" style="background:#2e7d32;color:#fff">5.0%</td></tr>
+</table></div>
+<div class="sub"><h3>D. Country Drill-Down (Top 15 by Volume)</h3>
+<table><tr><th>Country</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th><th class="num">AI Cov</th></tr>
+<tr><td><strong>MX</strong></td><td class="num">4,928</td><td class="num" style="background:#2e7d32;color:#fff">99.7%</td><td class="num" style="background:#f57f17;color:#fff">52.4%</td><td class="num" style="background:#c62828;color:#fff">43.2%</td><td class="num" style="background:#2e7d32;color:#fff">4.4%</td><td class="num">50.6%</td></tr>
+<tr><td><strong>BR</strong></td><td class="num">3,980</td><td class="num" style="background:#2e7d32;color:#fff">96.1%</td><td class="num" style="background:#c62828;color:#fff">18.0%</td><td class="num" style="background:#2e7d32;color:#fff">13.6%</td><td class="num" style="background:#c62828;color:#fff">68.4%</td><td class="num">74.2%</td></tr>
+<tr><td><strong>(Unknown)</strong></td><td class="num">3,701</td><td class="num" style="background:#f57f17;color:#fff">91.6%</td><td class="num" style="background:#2e7d32;color:#fff">60.8%</td><td class="num" style="background:#f57f17;color:#fff">22.0%</td><td class="num" style="background:#f57f17;color:#fff">17.2%</td><td class="num">47.6%</td></tr>
+<tr><td><strong>CO</strong></td><td class="num">2,045</td><td class="num" style="background:#2e7d32;color:#fff">99.7%</td><td class="num" style="background:#2e7d32;color:#fff">59.3%</td><td class="num" style="background:#c62828;color:#fff">35.9%</td><td class="num" style="background:#2e7d32;color:#fff">4.8%</td><td class="num">59.4%</td></tr>
+<tr><td><strong>PE</strong></td><td class="num">1,867</td><td class="num" style="background:#2e7d32;color:#fff">99.6%</td><td class="num" style="background:#f57f17;color:#fff">53.0%</td><td class="num" style="background:#c62828;color:#fff">40.4%</td><td class="num" style="background:#2e7d32;color:#fff">6.6%</td><td class="num">53.7%</td></tr>
+<tr><td><strong>PA</strong></td><td class="num">1,383</td><td class="num" style="background:#2e7d32;color:#fff">99.1%</td><td class="num" style="background:#f57f17;color:#fff">45.2%</td><td class="num" style="background:#f57f17;color:#fff">33.4%</td><td class="num" style="background:#f57f17;color:#fff">21.5%</td><td class="num">72.2%</td></tr>
+<tr><td><strong>CL</strong></td><td class="num">1,141</td><td class="num" style="background:#2e7d32;color:#fff">99.6%</td><td class="num" style="background:#f57f17;color:#fff">52.1%</td><td class="num" style="background:#c62828;color:#fff">38.6%</td><td class="num" style="background:#2e7d32;color:#fff">9.2%</td><td class="num">59.9%</td></tr>
+<tr><td><strong>AR</strong></td><td class="num">705</td><td class="num" style="background:#2e7d32;color:#fff">98.6%</td><td class="num" style="background:#f57f17;color:#fff">48.8%</td><td class="num" style="background:#f57f17;color:#fff">30.6%</td><td class="num" style="background:#f57f17;color:#fff">20.6%</td><td class="num">70.4%</td></tr>
+<tr><td><strong>EC</strong></td><td class="num">461</td><td class="num" style="background:#2e7d32;color:#fff">96.5%</td><td class="num" style="background:#c62828;color:#fff">28.5%</td><td class="num" style="background:#2e7d32;color:#fff">5.4%</td><td class="num" style="background:#c62828;color:#fff">66.1%</td><td class="num">72.7%</td></tr>
+<tr><td><strong>UY</strong></td><td class="num">71</td><td class="num" style="background:#2e7d32;color:#fff">100.0%</td><td class="num" style="background:#2e7d32;color:#fff">56.3%</td><td class="num" style="background:#f57f17;color:#fff">28.2%</td><td class="num" style="background:#f57f17;color:#fff">15.5%</td><td class="num">47.9%</td></tr>
+<tr><td><strong>VE</strong></td><td class="num">49</td><td class="num" style="background:#2e7d32;color:#fff">98.0%</td><td class="num" style="background:#c62828;color:#fff">16.7%</td><td class="num" style="background:#2e7d32;color:#fff">18.8%</td><td class="num" style="background:#c62828;color:#fff">64.6%</td><td class="num">73.5%</td></tr>
+<tr><td><strong>BO</strong></td><td class="num">45</td><td class="num" style="background:#2e7d32;color:#fff">100.0%</td><td class="num" style="background:#c62828;color:#fff">31.1%</td><td class="num" style="background:#c62828;color:#fff">35.6%</td><td class="num" style="background:#c62828;color:#fff">33.3%</td><td class="num">64.4%</td></tr>
+<tr><td><strong>US</strong></td><td class="num">38</td><td class="num" style="background:#2e7d32;color:#fff">100.0%</td><td class="num" style="background:#c62828;color:#fff">36.8%</td><td class="num" style="background:#2e7d32;color:#fff">18.4%</td><td class="num" style="background:#c62828;color:#fff">44.7%</td><td class="num">78.9%</td></tr>
+<tr><td><strong>PY</strong></td><td class="num">12</td><td class="num" style="background:#2e7d32;color:#fff">100.0%</td><td class="num" style="background:#f57f17;color:#fff">50.0%</td><td class="num" style="background:#f57f17;color:#fff">25.0%</td><td class="num" style="background:#f57f17;color:#fff">25.0%</td><td class="num">91.7%</td></tr>
+</table></div>
+<div class="sub"><h3>E. Monthly Trend</h3>
+<table><tr><th>Month</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">AI Cov</th><th class="num">Att.Fail</th></tr>
+<tr><td><strong>2025-11</strong></td><td class="num">16</td><td class="num" style="background:#c62828;color:#fff">87.5%</td><td class="num" style="">81.2%</td><td class="num" style="background:#2e7d32;color:#fff">78.6%</td><td class="num" style="background:#2e7d32;color:#fff">14.3%</td><td class="num">37.5%</td><td class="num" style="background:#2e7d32;color:#fff">7.1%</td></tr>
+<tr><td><strong>2025-12</strong></td><td class="num">4,049</td><td class="num" style="background:#f57f17;color:#fff">91.6%</td><td class="num" style="">75.1%</td><td class="num" style="background:#2e7d32;color:#fff">60.2%</td><td class="num" style="background:#f57f17;color:#fff">21.7%</td><td class="num">48.4%</td><td class="num" style="background:#f57f17;color:#fff">18.0%</td></tr>
+<tr><td><strong>2026-01</strong></td><td class="num">5,151</td><td class="num" style="background:#2e7d32;color:#fff">97.1%</td><td class="num" style="">74.5%</td><td class="num" style="background:#f57f17;color:#fff">47.6%</td><td class="num" style="background:#f57f17;color:#fff">29.1%</td><td class="num">59.8%</td><td class="num" style="background:#f57f17;color:#fff">23.3%</td></tr>
+<tr><td><strong>2026-02</strong></td><td class="num">5,395</td><td class="num" style="background:#2e7d32;color:#fff">99.2%</td><td class="num" style="">75.8%</td><td class="num" style="background:#c62828;color:#fff">41.7%</td><td class="num" style="background:#f57f17;color:#fff">34.7%</td><td class="num">61.2%</td><td class="num" style="background:#f57f17;color:#fff">23.7%</td></tr>
+<tr><td><strong>2026-03</strong></td><td class="num">5,809</td><td class="num" style="background:#2e7d32;color:#fff">99.8%</td><td class="num" style="">74.9%</td><td class="num" style="background:#c62828;color:#fff">41.7%</td><td class="num" style="background:#f57f17;color:#fff">33.4%</td><td class="num">64.2%</td><td class="num" style="background:#f57f17;color:#fff">24.9%</td></tr>
+</table></div>
+</div></div>
+<div class="section" id="NA"><div class="sec-hdr"><h2>NA — Operational KPI Detail</h2></div><div class="sec-body">
+<div class="sub"><h3>A. KPI Dashboard (n=51,336)</h3><div class="legend">
+<span style="background:#2e7d32">Good</span>
+<span style="background:#f57f17">Moderate</span>
+<span style="background:#c62828">Needs attention</span>
+</div>
+<table><tr><th>Metric</th><th class="num">Count</th><th class="num">Rate</th></tr>
+<tr><td>Total Configs</td><td class="num">51,336</td><td class="num">—</td></tr>
+<tr><td>Default Coverage</td><td class="num">50,130</td><td class="num" style="background:#2e7d32;color:#fff">97.7%</td></tr>
+<tr><td>AI Coverage (defaultFrom=AI)</td><td class="num">28,346</td><td class="num" style="">55.2%</td></tr>
+<tr><td>Service Attach Rate</td><td class="num">39,742</td><td class="num" style="">77.4%</td></tr>
+<tr><td>Acceptance Rate (exact match)</td><td class="num">26,527</td><td class="num" style="background:#f57f17;color:#fff">52.9%</td></tr>
+<tr><td>Change Rate (overrode default)</td><td class="num">13,215</td><td class="num" style="background:#f57f17;color:#fff">26.4%</td></tr>
+<tr><td>Influence Rate (accepted+changed)</td><td class="num">39,742</td><td class="num" style="">79.3%</td></tr>
+<tr><td>Attachment Failure (shown, not sold)</td><td class="num">10,388</td><td class="num" style="background:#f57f17;color:#fff">20.7%</td></tr>
+<tr><td>No Default (no recommendation)</td><td class="num">1,206</td><td class="num" style="background:#c62828;color:#fff">2.3%</td></tr>
+</table></div>
+<div class="sub"><h3>B. KPI by Config Origin</h3>
+<p class="insight">New CTO = rep started from scratch. Copied CTO = rep copied existing config. MTM = pre-configured model. Acceptance gap between new and copied is the primary improvement lever.</p>
+<table><tr><th>Origin</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th></tr>
+<tr><td><span class="tag tag-new">New CTO</span></td><td class="num">23,982</td><td class="num" style="background:#2e7d32;color:#fff">96.7%</td><td class="num" style="">70.8%</td><td class="num" style="background:#c62828;color:#fff">36.7%</td><td class="num" style="background:#c62828;color:#fff">36.4%</td><td class="num" style="background:#c62828;color:#fff">26.8%</td></tr>
+<tr><td><span class="tag tag-copied">Copied CTO</span></td><td class="num">13,447</td><td class="num" style="background:#2e7d32;color:#fff">98.0%</td><td class="num" style="">82.4%</td><td class="num" style="background:#2e7d32;color:#fff">70.7%</td><td class="num" style="background:#2e7d32;color:#fff">13.4%</td><td class="num" style="background:#f57f17;color:#fff">15.9%</td></tr>
+<tr><td><span class="tag tag-mtm">MTM</span></td><td class="num">13,907</td><td class="num" style="background:#2e7d32;color:#fff">98.9%</td><td class="num" style="">84.0%</td><td class="num" style="background:#2e7d32;color:#fff">63.1%</td><td class="num" style="background:#f57f17;color:#fff">21.8%</td><td class="num" style="background:#f57f17;color:#fff">15.0%</td></tr>
+</table></div>
+<div class="sub"><h3>C. AI vs Non-AI Default Acceptance</h3>
+<p class="insight">AI-sourced defaults (Core Recommendation Layer output) have lower acceptance but higher change activity. Non-AI defaults (rules/legacy) show very high acceptance.</p>
+<table><tr><th>Default Source</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th></tr>
+<tr><td><strong>AI</strong></td><td class="num">28,346</td><td class="num" style="background:#2e7d32;color:#fff">100.0%</td><td class="num" style="">64.7%</td><td class="num" style="background:#c62828;color:#fff">34.2%</td><td class="num" style="background:#f57f17;color:#fff">30.5%</td><td class="num" style="background:#c62828;color:#fff">35.3%</td></tr>
+<tr><td><strong>Non-AI</strong></td><td class="num">22,990</td><td class="num" style="background:#f57f17;color:#fff">94.8%</td><td class="num" style="">93.1%</td><td class="num" style="background:#2e7d32;color:#fff">77.3%</td><td class="num" style="background:#f57f17;color:#fff">21.0%</td><td class="num" style="background:#2e7d32;color:#fff">1.7%</td></tr>
+</table></div>
+<div class="sub"><h3>D. Country Drill-Down (Top 15 by Volume)</h3>
+<table><tr><th>Country</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th><th class="num">AI Cov</th></tr>
+<tr><td><strong>US</strong></td><td class="num">36,736</td><td class="num" style="background:#2e7d32;color:#fff">98.7%</td><td class="num" style="background:#f57f17;color:#fff">50.5%</td><td class="num" style="background:#f57f17;color:#fff">26.4%</td><td class="num" style="background:#f57f17;color:#fff">23.1%</td><td class="num">59.1%</td></tr>
+<tr><td><strong>CA</strong></td><td class="num">7,440</td><td class="num" style="background:#2e7d32;color:#fff">96.3%</td><td class="num" style="background:#2e7d32;color:#fff">56.0%</td><td class="num" style="background:#f57f17;color:#fff">33.5%</td><td class="num" style="background:#2e7d32;color:#fff">10.4%</td><td class="num">42.1%</td></tr>
+<tr><td><strong>(Unknown)</strong></td><td class="num">7,160</td><td class="num" style="background:#f57f17;color:#fff">93.8%</td><td class="num" style="background:#2e7d32;color:#fff">62.7%</td><td class="num" style="background:#2e7d32;color:#fff">18.7%</td><td class="num" style="background:#f57f17;color:#fff">18.6%</td><td class="num">49.1%</td></tr>
+</table></div>
+<div class="sub"><h3>E. Monthly Trend</h3>
+<table><tr><th>Month</th><th class="num">Configs</th><th class="num">Coverage</th><th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th><th class="num">AI Cov</th><th class="num">Att.Fail</th></tr>
+<tr><td><strong>2025-11</strong></td><td class="num">19</td><td class="num" style="background:#c62828;color:#fff">84.2%</td><td class="num" style="">84.2%</td><td class="num" style="background:#2e7d32;color:#fff">87.5%</td><td class="num" style="background:#2e7d32;color:#fff">12.5%</td><td class="num">21.1%</td><td class="num" style="background:#2e7d32;color:#fff">0.0%</td></tr>
+<tr><td><strong>2025-12</strong></td><td class="num">7,706</td><td class="num" style="background:#f57f17;color:#fff">94.1%</td><td class="num" style="">77.4%</td><td class="num" style="background:#2e7d32;color:#fff">64.0%</td><td class="num" style="background:#2e7d32;color:#fff">18.3%</td><td class="num">47.5%</td><td class="num" style="background:#f57f17;color:#fff">17.7%</td></tr>
+<tr><td><strong>2026-01</strong></td><td class="num">13,476</td><td class="num" style="background:#2e7d32;color:#fff">98.0%</td><td class="num" style="">77.7%</td><td class="num" style="background:#f57f17;color:#fff">54.0%</td><td class="num" style="background:#f57f17;color:#fff">25.3%</td><td class="num">59.1%</td><td class="num" style="background:#f57f17;color:#fff">20.7%</td></tr>
+<tr><td><strong>2026-02</strong></td><td class="num">14,549</td><td class="num" style="background:#2e7d32;color:#fff">97.5%</td><td class="num" style="">76.8%</td><td class="num" style="background:#f57f17;color:#fff">48.8%</td><td class="num" style="background:#f57f17;color:#fff">29.9%</td><td class="num">53.0%</td><td class="num" style="background:#f57f17;color:#fff">21.3%</td></tr>
+<tr><td><strong>2026-03</strong></td><td class="num">15,568</td><td class="num" style="background:#2e7d32;color:#fff">99.3%</td><td class="num" style="">77.8%</td><td class="num" style="background:#f57f17;color:#fff">50.6%</td><td class="num" style="background:#f57f17;color:#fff">27.7%</td><td class="num">57.7%</td><td class="num" style="background:#f57f17;color:#fff">21.7%</td></tr>
+<tr><td><strong>2026-04</strong></td><td class="num">18</td><td class="num" style="background:#f57f17;color:#fff">94.4%</td><td class="num" style="">88.9%</td><td class="num" style="background:#c62828;color:#fff">41.2%</td><td class="num" style="background:#c62828;color:#fff">52.9%</td><td class="num">44.4%</td><td class="num" style="background:#2e7d32;color:#fff">5.9%</td></tr>
+</table></div>
+</div></div>
+</div>
+</body>
+</html>

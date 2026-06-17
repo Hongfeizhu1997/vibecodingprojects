@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Bridge Test</title></head><body>
+<h2>Bridge Diagnostic</h2>
+<script src="../shared/stage-bridge.js"></script>
+<script>
+var out = document.createElement('pre');
+document.body.appendChild(out);
+
+function log(msg) { out.textContent += msg + '\n'; }
+
+log('Bridge object: ' + (typeof Bridge));
+log('Bridge keys: ' + Object.keys(Bridge || {}).join(', '));
+
+if (typeof Bridge !== 'undefined') {
+  log('\n=== Checking for Stage 3 data ===');
+  log('hasDataFrom(3): ' + Bridge.hasDataFrom(3));
+  log('listAll(): ' + JSON.stringify(Bridge.listAll()));
+  
+  if (Bridge.hasDataFrom(3)) {
+    var data = Bridge.loadFromStage(3);
+    log('rowCount: ' + data.rowCount);
+    log('fromStage: ' + data.fromStage);
+    log('timestamp: ' + data.timestamp);
+    if (data.data && data.data.length) {
+      log('First row: ' + JSON.stringify(data.data[0]));
+      log('Total rows: ' + data.data.length);
+    }
+  }
+}
+</script></body></html>

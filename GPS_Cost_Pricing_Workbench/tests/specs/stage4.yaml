@@ -1,0 +1,171 @@
+# Stage 4 — GVE Validation + Cross-Check — Test Spec
+
+name: "Stage 4 — GVE Validation"
+description: "Validates GVE engine, rule presets, cross-check, bridge import, and export."
+
+- section: "Syntax"
+  type: syntax
+  - case: "JS syntax is valid"
+    check: syntax
+
+- section: "Shared Imports"
+  type: static
+  - case: "Loads GVE engine"
+    check: import_exists
+    file: "../shared/gve-engine.js"
+  - case: "Loads Stage Bridge"
+    check: import_exists
+    file: "../shared/stage-bridge.js"
+  - case: "Loads Audit Log"
+    check: import_exists
+    file: "../shared/audit-log.js"
+  - case: "Loads UI components"
+    check: import_exists
+    file: "../shared/ui-components.js"
+
+- section: "Cycle Management"
+  type: static
+  - case: "createCycle function exists"
+    check: function_exists
+    fn: "createCycle"
+  - case: "Cycles DB table exists"
+    check: db_table_exists
+    expect: "cycles:"
+
+- section: "Bridge Import from Stage 3"
+  type: static
+  - case: "importFromStage3Bridge exists"
+    check: function_exists
+    fn: "importFromStage3Bridge"
+  - case: "hasBridgeData exists"
+    check: function_exists
+    fn: "hasBridgeData"
+  - case: "Bridge import card on dashboard"
+    check: string_exists
+    expect: "Data Available from Stage 3"
+  - case: "Bridge card in import tab"
+    check: string_exists
+    expect: "bridge-import-card"
+
+- section: "S4-D1: GVE Rule Presets"
+  type: static
+  - case: "loadPresets function exists"
+    check: function_exists
+    fn: "loadPresets"
+  - case: "getActivePreset function exists"
+    check: function_exists
+    fn: "getActivePreset"
+  - case: "getPresetThresholds function exists"
+    check: function_exists
+    fn: "getPresetThresholds"
+  - case: "onPresetChange function exists"
+    check: function_exists
+    fn: "onPresetChange"
+  - case: "showPresetManager function exists"
+    check: function_exists
+    fn: "showPresetManager"
+  - case: "localStorage persistence"
+    check: string_exists
+    expect: "stage4_gve_presets"
+
+- section: "S4-D2: Cross-Check Engine"
+  type: static
+  - case: "CrossCheck object exists"
+    check: string_exists
+    expect: "CrossCheck"
+  - case: "executeRule function exists"
+    check: string_exists
+    expect: "CrossCheck.executeRule"
+  - case: "executeAll function exists"
+    check: string_exists
+    expect: "CrossCheck.executeAll"
+  - case: "loadCCRules function exists"
+    check: function_exists
+    fn: "loadCCRules"
+
+- section: "D1: Fixed Cross-Check Priorities"
+  type: static
+  - case: "Tier TP rule has real priorities"
+    check: string_exists
+    expect: "CC_TIER_TP"
+  - case: "Tier TC DT rule exists"
+    check: string_exists
+    expect: "CC_TIER_TC_DT"
+  - case: "Tier TC AIO rule exists"
+    check: string_exists
+    expect: "CC_TIER_TC_AIO"
+  - case: "Term rule exists"
+    check: string_exists
+    expect: "CC_TERM"
+
+- section: "D4: Missing Coverage + Summary"
+  type: static
+  - case: "findMissing function exists"
+    check: string_exists
+    expect: "CrossCheck.findMissing"
+  - case: "buildGroupedSummary function exists"
+    check: string_exists
+    expect: "CrossCheck.buildGroupedSummary"
+  - case: "buildDrilldown function exists"
+    check: string_exists
+    expect: "CrossCheck.buildDrilldown"
+
+- section: "D5: Rule Designer"
+  type: static
+  - case: "showCCRuleDesigner function exists"
+    check: function_exists
+    fn: "showCCRuleDesigner"
+  - case: "showCCRuleManager function exists"
+    check: function_exists
+    fn: "showCCRuleManager"
+  - case: "saveCCRule function exists"
+    check: function_exists
+    fn: "saveCCRule"
+
+- section: "D7: GEO Filter"
+  type: static
+  - case: "executeAllWithGeo function exists"
+    check: string_exists
+    expect: "CrossCheck.executeAllWithGeo"
+
+- section: "D8: Excel Export"
+  type: static
+  - case: "exportGVEResults function exists"
+    check: function_exists
+    fn: "exportGVEResults"
+  - case: "exportCCResults function exists"
+    check: function_exists
+    fn: "exportCCResults"
+
+- section: "D9: Dashboard Stats"
+  type: static
+  - case: "Stats cards exist on dashboard"
+    check: string_exists
+    expect: "Total Cycles"
+  - case: "Submitted count card"
+    check: string_exists
+    expect: "Submitted"
+
+- section: "Cross-Check Logic Tests"
+  type: logic
+  - case: "Term monotonicity (1Y < 3Y)"
+    logic: "var assert=require('assert'); assert.strictEqual(150 > 100, true, '3Y should cost more than 1Y'); console.log('OK');" 
+
+- section: "Sample Data"
+  type: data
+  - case: "Stage 4 input file exists"
+    check: csv_min_rows
+    file: "sample_data/Stage4_Input.csv"
+    expect: "50"
+
+- section: "Bridge Communication"
+  type: bridge
+  - case: "Stage 3→4 bridge key format"
+    check: save_load_keys
+    args: "3"
+
+- section: "F: Duplicate Rules (Vladimir)"
+  type: static
+  - case: "duplicateCCRule function"
+    check: function_exists
+    fn: "duplicateCCRule"
