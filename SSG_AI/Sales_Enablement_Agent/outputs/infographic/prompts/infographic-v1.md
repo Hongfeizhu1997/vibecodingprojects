@@ -75,7 +75,7 @@ Generate the infographic based on the content below:
 **Architecture Layers (top to bottom)**:
 1. CHANNEL: Teams Bot · Web Dashboard · Embedded Widget
 2. WORKSPACE: PN Enable · SSG Enablement · Pricing · Finance
-3. AGENTS: Master Agent → PN Agent · Cost Agent · Price Agent · Knowledge Agent
+3. AGENTS: Master Agent → PN Agent · Cost Agent · Price Agent · Lifecycle Agent + RAG Pipeline (shared)
 4. SAFETY: Auto Execute (queries, checks) | Approval Gate (cost, price writes) | Audit Log
 5. SYSTEMS: ICP · SPEP · SCFE · CPM · Concord (ODT)
 6. FOUNDATION: Lenovo Hybrid AI Platform + Agent Orchestration Engine
@@ -91,7 +91,7 @@ Generate the infographic based on the content below:
 - AUDIT: Every operation logged and traceable
 
 **Rollout**:
-- Wave 1 (4-6 wk): Smart Lookups — Knowledge Agent, Teams + Web, read-only, LOW RISK
+- Wave 1 (4-6 wk): Smart Lookups — RAG Pipeline + Teams Bot, read-only, LOW RISK
 - Wave 2 (6-8 wk): PN Operations — PN Agent, embedded in SPEP, approval-gated, MEDIUM RISK
 - Wave 3 (8-10 wk): Pricing & Cost — Cost + Price Agents, full workspace, financial writes, MED-HIGH RISK
 - Wave 4 (ongoing): Scale & Optimize — all agents, onboarding, cross-role, LOW RISK
@@ -104,7 +104,7 @@ Generate the infographic based on the content below:
 - "AI-Powered Service PN Operations"
 - "6 Roles" / "13 Scenarios" / "5 Systems" / "4 Waves"
 - "Channel" / "Workspace" / "Agents" / "Safety" / "Systems" / "Foundation"
-- "PN Agent" / "Cost Agent" / "Price Agent" / "Knowledge Agent"
+- "PN Agent" / "Cost Agent" / "Price Agent" / "Lifecycle Agent" / "RAG Pipeline"
 - "Master Agent"
 - "Auto Execute" / "Approval Gate" / "Audit Log"
 - "Wave 1: Lookups" / "Wave 2: Operations" / "Wave 3: Pricing" / "Wave 4: Optimize"

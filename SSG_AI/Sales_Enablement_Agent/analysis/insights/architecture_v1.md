@@ -60,13 +60,19 @@ SSG Enablement Agent 直接以 Harness Engineering 为起点构建，核心理�
 │  │         意图识别 · 任务拆解 · 审批路由 · 结果汇总      │   │
 │  └───┬─────────┬─────────┬─────────┬──────────┬────────┘   │
 │      │         │         │         │          │             │
-│  ┌───┴──┐ ┌───┴──┐ ┌───┴──┐ ┌───┴───┐ ┌───┴────┐        │
-│  │PN    │ │Cost  │ │Price │ │Life-  │ │Know-   │        │
-│  │Agent │ │Agent │ │Agent │ │cycle  │ │ledge   │        │
-│  │      │ │      │ │      │ │Agent  │ │Agent   │        │
-│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬────┘ └──┬─────┘        │
-│     │        │        │        │          │              │
-├─────┴────────┴────────┴────────┴──────────┴──────────────┤
+│  ┌───┴──┐ ┌───┴──┐ ┌───┴──┐ ┌───┴───┐                     │
+│  │PN    │ │Cost  │ │Price │ │Life-  │                     │
+│  │Agent │ │Agent │ │Agent │ │cycle  │                     │
+│  │      │ │      │ │      │ │Agent  │                     │
+│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬────┘                     │
+│     │        │        │        │                           │
+├─────┴────────┴────────┴────────┴───────────────────────────┤
+│                 SHARED KNOWLEDGE PIPELINE (RAG)              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  PN 流程 · Service Tier 规则 · 审批规则 · PFV 竞品数据 │  │
+│  │  ODT 属性定义 · MT 字段 · Booking 脱敏规则 · 风险映射 │  │
+│  └──────────────────────────────────────────────────────┘  │
+├────────────────────────────────────────────────────────────┤
 │                   SECURITY LAYER                           │
 │  ┌──────────────────┐    ┌──────────────────────┐        │
 │  │ AUTO EXECUTE     │    │ APPROVAL GATE        │        │
@@ -103,10 +109,10 @@ SSG Enablement Agent 直接以 Harness Engineering 为起点构建，核心理�
 |------|---------|---------------|---------------|
 | **GPS PM** | PN 创建、生命周期管理 | PN Agent, Lifecycle Agent | PN 创建视图、审批队列 |
 | **Sales Enablement** | Sales Cost 计算、验证、发布 | Cost Agent | Cost 数据面板、审批 |
-| **Pricing Team** | PFV 分析、定价计算 | Price Agent, Knowledge Agent | 定价工作台、竞品对标 |
+| **Pricing Team** | PFV 分析、定价计算 | Price Agent（共享 Knowledge Pipeline） | 定价工作台、竞品对标 |
 | **Finance Team** | 标准成本计算 | Cost Agent | 成本数据输入 |
-| **TMO/SMO/SA** | PN 需求提交 | PN Agent, Knowledge Agent | 需求提交 + 流程指南 |
-| **Offering Mgr / Portfolio Lead** | PN 报告查询 | Knowledge Agent | 客制化报告 |
+| **TMO/SMO/SA** | PN 需求提交 | PN Agent（共享 Knowledge Pipeline） | 需求提交 + 流程指南 |
+| **Offering Mgr / Portfolio Lead** | PN 报告查询 | Knowledge Pipeline（RAG 直接查询） | 客制化报告 |
 
 ---
 
@@ -139,13 +145,35 @@ SSG Enablement Agent 直接以 Harness Engineering 为起点构建，核心理�
 | #5 PN 定期清理 | 按规则扫描 → 筛选可关闭 PN → 生成审核列表 | **自动筛选** |
 | PN 关闭审批 | 发送审批请求 → 收集各 Geo 反馈 → 汇总 | **半自动**（审批后执行关闭） |
 
-### 4.5 Knowledge Agent（知识检索与培训）
-| 场景 | 能力 | 权限 |
-|------|------|------|
-| #1 ODT 变更分析 | 属性变更 → 分析影响面 → Booking Impact → 风险提示 | **自动**（只读分析） |
-| #4 MT Announcement | 自动捕获 MT 公告 → 提取关键字段 → 入库 | **自动** |
-| #12 PN 主数据查询 | 自然语言 → SQL/API → 客制化报告（Booking、客户维度） | **自动**（只读查询） |
-| #13 新人 Onboarding | 对话式引导 PN 流程、场景、审批规则 | **自动** |
+### 4.5 RAG Knowledge Pipeline（共享知识管线）
+
+> ⚠️ **设计修正 (2026-06-18)**：RAG 知识管线是共享基础设施，不是与 PN/Cost/Price/Lifecycle Agent 同级对等的 Sub-Agent。所有 Sub-Agent 通过工具调用访问 RAG，而不是由 Master Agent 路由到一个独立的 "Knowledge Agent"。
+
+**定位**：所有 Sub-Agent 的底层共享能力，类似数据库或文件系统——任何时候 Sub-Agent 需要查询 PN 流程规则、Service Tier 定义、审批矩阵、MT 字段定义等信息时，直接调用 RAG 管线，不需要通过另一个 Agent。
+
+**为什么不做成独立 Sub-Agent**：
+- 知识和操作不在同一层级：一个 Agent "知道规则" 和 "执行操作" 是两种不同能力，混淆会模糊架构边界
+- 每次知识查询 → Agent → Agent 的调用链增加延迟
+- 直接作为共享工具集更简洁：Sub-Agent 调 `query_rag(query)` 就像调 `query_db(sql)` 一样直接
+
+**能力清单**：
+
+| 能力 | 说明 | 调用方 |
+|------|------|--------|
+| PN 生命周期规则检索 | Create/Extend/End-of-Life 判断条件 | PN Agent, Lifecycle Agent |
+| Service Tier 体系查询 | Tier 定义、归属规则、Sub-Tier 划分 | PN Agent, Price Agent |
+| 审批规则查询 | 哪些操作需要哪级审批、审批人 | 所有 Sub-Agent |
+| ODT 属性字段定义 | 每个属性的含义、影响维度、变更映射 | PN Agent, Lifecycle Agent |
+| MT Announcement 字段解析 | 公告字段定义、结构化提取模板 | RAG（定时任务自动消费） |
+| PFV 竞品数据检索 | 行业价格、竞品对标信息 | Price Agent |
+| 风险映射表 | 变更类型 → 风险等级 | RAG（影响分析时自动消费） |
+| Booking 数据脱敏规则 | 哪些字段不能直接展示 | 所有 Sub-Agent |
+
+**在 Wave 1 中的特殊角色**：
+
+Wave 1 没有 PN/Cost/Price/Lifecycle Agent，只有查询场景。此时 RAG Knowledge Pipeline 通过 Master Agent 直接对用户暴露——表现为"可以自然语言查询任何 SSG GPS 领域知识"。这不是因为它是一个独立 Agent，而是因为没有操作类 Agent 时，所有查询都走 RAG → 用户。
+
+到 Wave 2-4，当操作类 Agent 上线后，RAG 回归其共享管线角色，不再直接面向用户。
 
 ---
 
@@ -223,8 +251,8 @@ Agent 生成建议
 
 ```
 Wave 1（MVP — 4-6 周）
-├── Knowledge Agent（场景 #1, #4, #12） ← 只读，风险最低
-├── Teams Bot 上线
+├── RAG Knowledge Pipeline（场景 #1, #4, #12） ← 只读查询 + 知识检索
+├── Teams Bot 上线（Master Agent 直接对用户暴露 RAG）
 └── 验证"AI 辅助查询"的实际价值
 
 Wave 2（操作自动化 — 6-8 周）
@@ -252,7 +280,7 @@ Wave 4（持续优化）
 | iChain 设计原则 | SSG Sales Enablement 对应 |
 |----------------|--------------------------|
 | Persona Workspace | GPS PM / Sales Enablement / Pricing / Finance 四个 Workspace |
-| Persona Agent | 5 个 Sub-Agent (PN / Cost / Price / Lifecycle / Knowledge) |
+| Persona Agent | 4 个 Sub-Agent (PN / Cost / Price / Lifecycle) + 共享 RAG Knowledge Pipeline |
 | Human-in-the-loop | 半自动模式：成本/价格操作需审批 |
 | Insight → Decision → Action | 分析 → 建议 → 审批 → 执行闭环 |
 | Explainable AI | 定价建议附带 PFV 分析依据和计算逻辑 |

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wave 1 MVP — Knowledge Agent + Teams Bot [static]</title>
+<title>Wave 1 MVP — Knowledge Pipeline + Teams Bot [static]</title>
 <style>
   :root {
     --bg: #020617; --card: rgba(15,23,42,0.9); --border: rgba(148,163,184,0.10);
@@ -111,7 +111,7 @@
 <!-- ========== HEADER ========== -->
 <h1>Wave 1 MVP — Detailed Design</h1>
 <div class="meta">
-  <span>Knowledge Agent + Teams Bot</span>
+  <span>Knowledge Pipeline + Teams Bot</span>
   <span>v1 · 2026-06-17</span>
   <span>SSG Sales Enablement Agent</span>
 </div>
@@ -156,7 +156,7 @@
 </div>
 
 <div class="callout callout-warn">
-  <strong>Why Knowledge Agent first?</strong> All 3 scenarios are read-only → zero destructive risk. Immediate value (team does these daily). Validates API / RAG / Teams Bot feasibility. Builds business trust before Waves 2–4.
+  <strong>Why knowledge queries first?</strong> All 3 scenarios are read-only → zero destructive risk. Immediate value (team does these daily). Validates API / RAG / Teams Bot feasibility. Builds business trust before Waves 2–4.
 </div>
 
 <!-- ========== §2 SCENARIO #1 ========== -->
@@ -177,7 +177,7 @@
 <div class="flow">
 ┌─────────────────────────────────────────────────────────────┐
 │ <span class="hl">Step 1: Master Agent Intent Recognition</span>                    │
-│ Identifies: Knowledge Agent · ODT Change Analysis            │
+│ Identifies: Query (RAG Pipeline) · ODT Change Analysis            │
 │ Extracts: PN=XXXXX, Change Type=Warranty Term, 1Y→3Y        │
 ├─────────────────────────────────────────────────────────────┤
 │ <span class="hl">Step 2: ODT API Query</span>                  <span class="tag tag-auto">AUTO</span>                    │
@@ -514,7 +514,7 @@
 <h2><span class="num">§10</span>Traceability to Architecture V1</h2>
 <table>
   <tr><th>Architecture V1 Design</th><th>Wave 1 MVP</th></tr>
-  <tr><td>5 Sub-Agents</td><td>1 (Knowledge Agent)</td></tr>
+  <tr><td>4 Sub-Agents</td><td>0 (RAG Pipeline direct)</td></tr>
   <tr><td>13 Scenarios</td><td>3 (#1, #4, #12)</td></tr>
   <tr><td>6 Personas</td><td>2 primary (GPS PM + Pricing)</td></tr>
   <tr><td>6 Systems</td><td>5 (ICP / ODT / Concord / CPM / SPEP)</td></tr>

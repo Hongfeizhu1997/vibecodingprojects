@@ -118,7 +118,7 @@ SSG Sales Enablement Agent
 │   ├── Pricing Agent（场景 6,10,11）
 │   ├── Cost Agent（场景 8,9）
 │   ├── Lifecycle Agent（场景 5）
-│   └── Knowledge Agent（场景 1,4,12 + Onboarding）
+│   └── RAG Knowledge Pipeline（共享管线，服务所有 Sub-Agent）
 └── Tech Stack
     ├── DeerFlow (Vetraflow) — Agent 编排
     ├── Lenovo Hybrid AI Platform — 模型/知识/数据

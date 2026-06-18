@@ -1,7 +1,9 @@
-# Wave 1 MVP 详细设计 — Knowledge Agent + Teams Bot
+# Wave 1 MVP 详细设计 — Knowledge Pipeline + Teams Bot
 
-> 创建：2026-06-17 | 版本：v1 | 子项目：Sales Enablement Agent
+> 创建：2026-06-17 | 更新：2026-06-18 | 版本：v1.1 | 子项目：Sales Enablement Agent
 > 基于：架构方案 V1 (§8 落地路径) + 平台评估 + iChain 适配清单
+>
+> ⚠️ **设计修正 (2026-06-18)**：Wave 1 中面向用户的 "Knowledge Agent" 实质是 RAG Knowledge Pipeline 直接通过 Master Agent 暴露——因为 Wave 1 没有操作类 Sub-Agent，RAG 暂时承担了用户交互角色。到 Wave 2-4，RAG 回归共享管线定位，不再直接面向用户。
 
 ---
 
@@ -11,7 +13,7 @@
 
 用最小的技术风险和最短的上线周期，验证「AI 辅助 SSG GPS 团队做数据查询和影响分析」的实际价值。
 
-### 为什么从 Knowledge Agent 开始
+### 为什么从知识查询开始
 
 | 理由 | 说明 |
 |------|------|
@@ -55,7 +57,7 @@ ODT（Offering Data Tool）管理服务 PN 的属性变更（如 Warranty Term �
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  Step 1: Master Agent 意图识别                                │
-│  • 识别：Knowledge Agent · ODT 变更分析                       │
+│  • 识别：RAG Pipeline · ODT 变更分析                       │
 │  • 提取：PN=XXXXX, 变更类型=Warranty Term, 1Y→3Y             │
 └──────────────────────┬──────────────────────────────────────┘
                        ▼
@@ -340,8 +342,9 @@ AI 要做：自然语言单次提问 → 跨系统聚合 → 一张卡片返回�
 ├──────────────────────────────────────────┤
 │          MASTER AGENT (DeerFlow)           │
 │  意图识别 → 拆解子查询 → 聚合结果           │
-├──────────────────────────────────────────┤
-│          KNOWLEDGE AGENT (唯一 Sub-Agent)   │
+│  （Wave 1 无操作类 Sub-Agent，直接调度 RAG） │
+├───────────────────────────────────────────┤
+│       SHARED KNOWLEDGE PIPELINE (RAG)      │
 │  ┌──────────┬──────────┬──────────┐        │
 │  │ #1 ODT   │ #4 MT    │ #12 PN    │        │
 │  │ Analyzer │ Monitor  │ Query     │        │
@@ -352,7 +355,7 @@ AI 要做：自然语言单次提问 → 跨系统聚合 → 一张卡片返回�
 │   ICP  │  ODT  │  Concord  │  CPM  │ SPEP  │
 │  (MT)  │(Attr) │ (Booking) │(Cost) │(PN)   │
 ├───────────────────────────────────────────┤
-│          RAG KNOWLEDGE BASE                 │
+│       RAG KNOWLEDGE BASE (内容层)           │
 │  PN 流程 · Service Tier 规则 · 审批规则     │
 │  MT Announcement 字段定义 · 风险映射表      │
 ├───────────────────────────────────────────┤
@@ -367,7 +370,8 @@ AI 要做：自然语言单次提问 → 跨系统聚合 → 一张卡片返回�
 |------|--------------|-----------|------|
 | Channel | Teams + Web + Embedded | Teams Only | 最快上线渠道 |
 | Persona Workspace | 4 个 Workspace | 无独立 Workspace | 先用 Teams 对话代替 |
-| Sub-Agent | 5 个 (PN/Cost/Price/Lifecycle/Knowledge) | 1 个 (Knowledge) | W1 只做查询 |
+| Sub-Agent | 4 个 (PN/Cost/Price/Lifecycle) | 0 个操作类 | W1 只做查询，RAG 直连 Master |
+| RAG Pipeline | 共享管线（所有 Sub-Agent 调用） | 直连 Master Agent（面用户） | 无操作 Agent 时 RAG 承担交互角色 |
 | Safety Layer | Auto + Approval 两级 | Auto Only | 无需审批（只读） |
 | Integration | 6 个系统 | 5 个系统（无 SCFE） | #8 成本计算不在 W1 |
 
@@ -433,7 +437,7 @@ AI 要做：自然语言单次提问 → 跨系统聚合 → 一张卡片返回�
 
 | 交付物 | 说明 | 产出形式 |
 |--------|------|---------|
-| Knowledge Agent 3 场景实现 | #1 ODT 分析 + #4 MT 监控 + #12 PN 查询 | DeerFlow Skill 包 |
+| Knowledge Pipeline 3 场景实现 | #1 ODT 分析 + #4 MT 监控 + #12 PN 查询 | DeerFlow Skill 包 (RAG + MCP Tools) |
 | Teams Bot 集成 | @Agent 对话 + 通知推送 | DeerFlow IM Gateway 配置 |
 | RAG 知识库 | PN 流程/规则/Mapping（P0 项） | 结构化 Markdown + 向量索引 |
 | API 对接层 | ICP/ODT/Concord/CPM 只读 MCP Tools | MCP Server / Tool 定义 |
@@ -473,12 +477,13 @@ Week 7-8: 上线 & 监测
 
 | 架构 V1 设计 | Wave 1 MVP 实现 |
 |-------------|----------------|
-| 5 个 Sub-Agent | 1 个 (Knowledge Agent) |
+| 4 个 Sub-Agent | 0 个操作类（RAG Pipeline 直连 Master） |
 | 13 个场景 | 3 个 (#1, #4, #12) |
 | 6 个角色 | 2 个主要角色 (GPS PM + Pricing) |
 | 6 个系统集成 | 5 个 (ICP/ODT/Concord/CPM/SPEP) |
 | 3 种 Channel | 1 种 (Teams Bot) |
 | Auto + Approval 两级 | Auto Only（只读无需审批） |
 | 4 个 Persona Workspace | 0（用 Teams 对话代替） |
+| 共享 RAG Pipeline | 共享 RAG Pipeline（W1 直连 Master） |
 | 完整 Memory 体系 | Short-term + Domain（MVP 够用） |
 | 4 波落地 | Wave 1 / 4 波 |

@@ -118,4 +118,4 @@ Sales_Enablement_Agent/
 
 1. 评审架构方案 V1，确认方向
 2. 确认系统 API 可用性（ICP/SPEP/SCFE/CPM/ODT/Concord 能否被 Agent 调用）
-3. 产出 Wave 1 MVP 详细设计（Knowledge Agent + Teams Bot）
+3. 产出 Wave 1 MVP 详细设计（Knowledge Pipeline + Teams Bot）

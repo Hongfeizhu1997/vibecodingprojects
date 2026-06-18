@@ -42,7 +42,14 @@
   .node-red{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.13);color:var(--red)}
   .node-amber{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.13);color:var(--amber)}
   .node-purple{background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.13);color:var(--purple)}
-  .node-dark{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.10);color:var(--dim)}
+  .node-future{background:rgba(148,163,184,0.02);border:1px dashed rgba(148,163,184,0.10);color:var(--dim)}
+.sys-card-future{background:rgba(148,163,184,0.02);border:1px dashed rgba(148,163,184,0.08);border-radius:7px;padding:1rem;text-align:left}
+.sys-card-future .sys-name{color:var(--dim)} .sys-card-future .sys-desc{color:rgba(148,163,184,0.6)} .sys-card-future .sys-detail{color:rgba(148,163,184,0.45)} .sys-card-future .sys-owner{color:rgba(148,163,184,0.35)}
+.future-badge{display:inline-block;font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;padding:.1rem .35rem;border-radius:3px;background:rgba(148,163,184,0.06);color:rgba(148,163,184,0.5);margin-left:.3rem}
+.node-enterprise{background:rgba(20,184,166,0.05);border:1px solid rgba(20,184,166,0.15);color:#5eead4}
+.enterprise-row{margin-top:.4rem;padding:.5rem .8rem;background:rgba(20,184,166,0.02);border:1px solid rgba(20,184,166,0.08);border-radius:8px;font-size:.62rem;color:rgba(148,163,184,0.6)}
+.enterprise-row strong{color:#5eead4}
+.node-dark{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.10);color:var(--dim)}
   .node-xs{font-size:.63rem;padding:.35rem .5rem;border-radius:4px}
   .node-sm{font-size:.64rem;padding:.25rem .45rem}
   .chat-container{margin:.6rem 0;border-radius:10px;overflow:hidden;background:#0a0f1a;border:1px solid rgba(148,163,184,.07)}
@@ -345,7 +352,7 @@
 <h2><span class="num">01</span> Architecture: Full Stack</h2>
 <div class="diagram"><div class="diagram-label">Complete Six-Layer Architecture</div>
 <div style="display:flex;flex-direction:column;gap:.6rem">
-<div style="display:flex;gap:.8rem"><div style="width:68px;flex-shrink:0;font-size:.63rem;color:var(--dim);text-align:right;padding-top:.2rem">CHANNEL</div><div style="flex:1;display:flex;gap:.45rem"><div class="node node-accent node-xs" style="flex:1">💬 Teams</div><div class="node node-accent node-xs" style="flex:1">🖥 Web</div><div class="node node-accent node-xs" style="flex:1">🔌 Embedded</div></div></div>
+<div style="display:flex;gap:.8rem"><div style="width:68px;flex-shrink:0;font-size:.63rem;color:var(--dim);text-align:right;padding-top:.2rem">TOUCHPOINT</div><div style="flex:1;display:flex;gap:.45rem"><div class="node node-accent node-xs" style="flex:1">💬 Teams</div><div class="node node-accent node-xs" style="flex:1">🖥 Web</div><div class="node node-accent node-xs" style="flex:1">🔌 Embedded</div></div></div>
 <div style="text-align:center;font-size:.63rem;color:var(--dim)">↓</div>
 <div style="display:flex;gap:.8rem"><div style="width:68px;flex-shrink:0;font-size:.63rem;color:var(--dim);text-align:right;padding-top:.15rem">WORKSPACE</div><div style="flex:1;display:flex;gap:.45rem"><div class="node node-purple node-xs" style="flex:1">PN Enable</div><div class="node node-purple node-xs" style="flex:1">Sales Enable</div><div class="node node-purple node-xs" style="flex:1">Pricing</div><div class="node node-purple node-xs" style="flex:1">Finance</div></div></div>
 <div style="text-align:center;font-size:.63rem;color:var(--dim)">↓</div>
@@ -353,18 +360,19 @@
 <div style="text-align:center;font-size:.63rem;color:var(--dim)">↓</div>
 <div style="display:flex;gap:.8rem"><div style="width:68px;flex-shrink:0;font-size:.63rem;color:var(--dim);text-align:right;padding-top:.1rem">SAFETY</div><div style="flex:1;display:flex;gap:.45rem"><div class="node node-green node-xs" style="flex:1;padding:0.25rem 0.2rem;">✅ Auto</div><div class="node node-red node-xs" style="flex:1;padding:0.25rem 0.2rem;">🔒 Approval</div><div class="node node-dark node-xs" style="flex:1;padding:0.25rem 0.2rem;color:#cbd5e1;">📋 Audit Log</div></div></div>
 <div style="text-align:center;font-size:.63rem;color:var(--dim)">↓</div>
-<div style="display:flex;gap:.8rem"><div style="width:68px;flex-shrink:0;font-size:.63rem;color:var(--dim);text-align:right;padding-top:.1rem">SYSTEMS</div><div style="flex:1;display:flex;gap:.6rem"><span class="node node-dark node-xs" style="flex:1;color:#cbd5e1;">ICP</span><span class="node node-dark node-xs" style="flex:1;color:#cbd5e1;">SPEP</span><span class="node node-dark node-xs" style="flex:1;color:#cbd5e1;">SCFE</span><span class="node node-dark node-xs" style="flex:1;color:#cbd5e1;">CPM</span><span class="node node-amber node-xs" style="flex:1;">Concord<span style="font-size:0.63rem;display:block;color:var(--dim);">ODT Platform</span></span></div></div>
+<div style="display:flex;gap:.8rem"><div style="width:68px;flex-shrink:0;font-size:.63rem;color:var(--dim);text-align:right;padding-top:.1rem">SYSTEMS</div><div style="flex:1;display:flex;gap:.6rem"><span class="node node-dark node-xs" style="flex:1;color:#cbd5e1;">ICP</span><span class="node node-dark node-xs" style="flex:1;color:#cbd5e1;">SPEP</span><span class="node node-dark node-xs" style="flex:1;color:#cbd5e1;">SCFE</span><span class="node node-dark node-xs" style="flex:1;color:#cbd5e1;">CPM</span><span class="node node-dark node-xs" style="flex:1;color:#cbd5e1;">Concord</span><span style="color:rgba(148,163,184,0.15);font-size:.7rem;align-self:center;">│</span><span class="node node-future node-xs" style="flex:1;">SAP</span><span class="node node-future node-xs" style="flex:1;">LBP</span><span class="node node-future node-xs" style="flex:1;">ServiceNow</span><span class="node node-future node-xs" style="flex:1;">CBSO</span></div></div>
 <div style="text-align:center;font-size:.63rem;color:var(--dim)">↓</div>
-<div style="display:flex;gap:.8rem"><div style="width:68px;flex-shrink:0;font-size:.63rem;color:var(--dim);text-align:right;padding-top:.1rem">FOUNDATION</div><div style="flex:1;display:flex;gap:.45rem"><div class="node node-purple node-xs" style="flex:1">Lenovo Hybrid AI Platform</div><div class="node node-amber node-xs" style="flex:1">Agent Orchestration Engine</div></div></div>
+<div style="display:flex;gap:.8rem;margin-bottom:.5rem"><div style="width:68px;flex-shrink:0;font-size:.63rem;color:var(--dim);text-align:right;padding-top:.1rem">FOUNDATION</div><div style="flex:1;display:flex;gap:.45rem"><div class="node node-purple node-xs" style="flex:1">Lenovo Hybrid AI Platform</div><div class="node node-amber node-xs" style="flex:1">Agent Orchestration Engine</div></div></div>
+<div class="enterprise-row"><strong>Enterprise Foundation</strong> &nbsp; Lenovo Skill Hub &nbsp;|&nbsp; EKP (Enterprise Knowledge Platform) &nbsp;|&nbsp; BCPF · Signavio (L10→L5 process framework)</div>
 </div></div>
 <div class="callout"><strong>We build the top four layers.</strong> The bottom two — Lenovo Hybrid AI Platform and the six business systems — already exist. The Agent Orchestration Engine sits between them, connecting AI intelligence to operational systems through a safety-gated pipeline.</div>
-<div class="callout"><strong>Harness Engineering paradigm.</strong> This architecture follows the same evolution path AI Config validated internally: Prompt Engineering → Context Engineering → Harness Engineering. The core principle — <em>humans set objectives &amp; boundaries, agents autonomously plan &amp; execute, skills serve as reusable capabilities</em> — is implemented through our Safety Layer (boundaries), Master Agent + Sub-Agents (autonomous execution), and 5 specialized Skills (reusable biz capabilities).</div>
+<div class="callout"><strong>Harness Engineering paradigm.</strong> This architecture follows the same evolution path AI Config validated internally: Prompt Engineering → Context Engineering → Harness Engineering. The core principle — <em>humans set objectives &amp; boundaries, agents autonomously plan &amp; execute, skills serve as reusable capabilities</em> — is implemented through our Safety Layer (boundaries), Master Agent + Sub-Agents (autonomous execution), and 5 specialized Skills — sourced from <strong style="color:#5eead4;">Lenovo Skill Hub</strong> (reusable biz capabilities).</div>
 </div></div>
 
-<!-- 3: CHANNELS + WORKSPACE -->
+<!-- 3: TOUCHPOINTS + WORKSPACE -->
 <div class="stage" id="s3"><div class="stage-content">
-<h2><span class="num">01</span> Channels &middot; Persona Workspace</h2>
-<h3>Layer 1 — Omni-Channel, One Backend</h3>
+<h2><span class="num">01</span> Touchpoints &middot; Persona Workspace</h2>
+<h3>Layer 1 — Omni-Touchpoint, One Backend</h3>
 <div class="diagram">
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-bottom:.3rem">
 <div class="node node-accent" style="padding:1rem"><div style="font-size:.68rem">💬 Teams Chat</div><div style="font-weight:400;font-size:.63rem;color:var(--dim)">"What's the sales cost for PN-88421?"</div></div>
@@ -372,16 +380,16 @@
 <div class="node node-accent" style="padding:1rem"><div style="font-size:.68rem">🔌 Embedded Widget</div><div style="font-weight:400;font-size:.63rem;color:var(--dim)">Inside SPEP / CPM</div></div>
 </div>
 <div style="text-align:center;font-size:.7rem;color:var(--dim);margin:.2rem 0">↓ &nbsp; ↓ &nbsp; ↓</div>
-<div style="text-align:center"><div class="node node-purple" style="display:inline-block;font-size:.67rem;padding:.4rem 1.5rem">Unified Agent Gateway<br><span style="font-weight:400;font-size:.63rem;color:var(--dim)">Same logic, knowledge, and safety controls across all channels</span></div></div>
+<div style="text-align:center"><div class="node node-purple" style="display:inline-block;font-size:.67rem;padding:.4rem 1.5rem">Unified Agent Gateway<br><span style="font-weight:400;font-size:.63rem;color:var(--dim)">Same logic, knowledge, and safety controls across all touchpoints</span></div></div>
 </div>
 <h3>Layer 2 — Role-Adapted Views</h3>
 <div class="role-grid">
-<div class="role-card" style="border-color:rgba(56,189,248,0.2);"><div class="role-name">PN Enablement</div><div class="role-sub">PN · Lifecycle · Knowledge Agent</div><div class="role-what">PN creation &amp; attribute maintenance · duplicate checks · lifecycle mgmt · impact analysis</div></div>
+<div class="role-card" style="border-color:rgba(56,189,248,0.2);"><div class="role-name">PN Enablement</div><div class="role-sub">PN · Lifecycle · RAG Pipeline</div><div class="role-what">PN creation &amp; attribute maintenance · duplicate checks · lifecycle mgmt · impact analysis</div></div>
 <div class="role-card"><div class="role-name">SSG Enablement</div><div class="role-sub">Cost Agent</div><div class="role-what">Sales cost calculation · validation · publish to markets</div></div>
-<div class="role-card"><div class="role-name">Pricing Team</div><div class="role-sub">Price · Knowledge Agent</div><div class="role-what">PFV competitive benchmark · sub-tier classification · list/channel pricing</div></div>
+<div class="role-card"><div class="role-name">Pricing Team</div><div class="role-sub">Price · RAG Pipeline</div><div class="role-what">PFV competitive benchmark · sub-tier classification · list/channel pricing</div></div>
 <div class="role-card"><div class="role-name">Finance</div><div class="role-sub">Cost Agent</div><div class="role-what">Standard cost data input &amp; validation</div></div>
-<div class="role-card"><div class="role-name">TMO / SMO / SA / ODT</div><div class="role-sub">PN · Knowledge Agent</div><div class="role-what">PN requests · duplicate checks · offering hand-off to PN Enablement</div></div>
-<div class="role-card"><div class="role-name">Portfolio &amp; Inquiry</div><div class="role-sub">Knowledge Agent</div><div class="role-what">PN master data inquiry · Booking reports · Portfolio views · Impact analysis</div></div>
+<div class="role-card"><div class="role-name">TMO / SMO / SA / ODT</div><div class="role-sub">PN · RAG Pipeline</div><div class="role-what">PN requests · duplicate checks · offering hand-off to PN Enablement</div></div>
+<div class="role-card"><div class="role-name">Portfolio &amp; Inquiry</div><div class="role-sub">RAG Pipeline</div><div class="role-what">PN master data inquiry · Booking reports · Portfolio views · Impact analysis</div></div>
 </div>
 <div class="callout"><strong>One platform, different lens.</strong> Like a banking app showing different features based on account type — same system, role-adapted view. No need for multiple separate applications.</div>
 </div></div>
@@ -389,7 +397,7 @@
 <!-- 4: AGENT ENGINE + SAFETY -->
 <div class="stage" id="s4"><div class="stage-content">
 <h2><span class="num">01</span> Agent Engine &middot; Safety</h2>
-<h3>Layer 3 — Five Specialists, One Coordinator</h3>
+<h3>Layer 3 — Four Specialists + Shared EKP (RAG Pipeline)</h3>
 <div class="diagram">
 <div style="text-align:center;margin-bottom:.5rem"><div class="node node-accent" style="display:inline-block;font-size:.68rem;padding:.4rem 1.5rem;border-width:2px">MASTER AGENT<br><span style="font-weight:400;font-size:.63rem;color:var(--dim)">Intent Recognition · Task Decomposition · Parallel Dispatch · Result Assembly</span></div></div>
 <div style="text-align:center;font-size:.63rem;color:var(--dim);margin:.2rem 0">fan-out → parallel execution → fan-in</div>
@@ -397,7 +405,7 @@
 <div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">PN Agent</div><div style="color:var(--dim)">Create · Dedup · Extend<br>Lifecycle · Retirement</div></div>
 <div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">Cost Agent</div><div style="color:var(--dim)">Standard Cost<br>Sales Cost Uplift</div></div>
 <div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">Price Agent</div><div style="color:var(--dim)">Sub-Tier · PFV<br>List/Channel Price</div></div>
-<div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">Knowledge Agent</div><div style="color:var(--dim)">Reports · MT Capture<br>Onboarding · Inquiry</div></div>
+<div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">RAG Pipeline</div><div style="color:var(--dim)">Reports · MT Capture<br>Onboarding · Inquiry</div><div style="font-size:.62rem;color:#5eead4;margin-top:.15rem;">← powered by EKP</div></div>
 </div>
 <div style="text-align:center;margin-top:.4rem;font-size:.63rem;color:var(--dim)">Memory: Short-term · Long-term · Domain KB &nbsp;|&nbsp; Loop: Perceive → Decide → Execute → Learn</div>
 </div>
@@ -436,16 +444,20 @@
 <div class="sys-card"><div class="sys-name">SPEP</div><div class="sys-desc">Service PN creation &amp; portfolio mgmt</div><div class="sys-detail">PN create/extend · Duplicate search · Portfolio · Semi-auto PN generation</div><div class="sys-owner">API: <span>[TBD — endpoint / auth / owner]</span></div></div>
 <div class="sys-card"><div class="sys-name">SCFE</div><div class="sys-desc">Standard cost foundation engine</div><div class="sys-detail">PH3-level cost data · Weighted avg by tier · Cost assignment to PNs</div><div class="sys-owner">API: <span>[TBD — endpoint / auth / owner]</span></div></div>
 <div class="sys-card"><div class="sys-name">CPM</div><div class="sys-desc">Cost &amp; pricing management</div><div class="sys-detail">Sales cost uplift rules · Uplift values · Cost calculation engine</div><div class="sys-owner">API: <span>[TBD — endpoint / auth / owner]</span></div></div>
-<div class="sys-card"><div class="sys-name">Concord (ODT Platform)</div><div class="sys-desc">ODT offering development &amp; deal governance</div><div class="sys-detail">Offering development · Deal governance workflow · Customer deal requirements → PN Enablement hand-off</div><div class="sys-owner">API: <span>[TBD — endpoint / auth / owner]</span></div></div>
+<div class="sys-card"><div class="sys-name">Concord</div><div class="sys-desc">ODT offering development &amp; deal governance</div><div class="sys-detail">Offering development · Deal governance workflow · Customer deal requirements → PN Enablement hand-off</div><div class="sys-owner">API: <span>[TBD — endpoint / auth / owner]</span></div></div>
+<div class="sys-card-future"><div class="sys-name">SAP <span class="future-badge">future</span></div><div class="sys-desc">ERP &amp; financial master data</div><div class="sys-detail">Cost master · GL accounts · Profit center · Currency rates</div><div class="sys-owner">Scope: <span>Future phase</span></div></div>
+<div class="sys-card-future"><div class="sys-name">LBP <span class="future-badge">future</span></div><div class="sys-desc">Lenovo Business Platform</div><div class="sys-detail">Order management · Fulfillment tracking · Customer contracts</div><div class="sys-owner">Scope: <span>Future phase</span></div></div>
+<div class="sys-card-future"><div class="sys-name">ServiceNow <span class="future-badge">future</span></div><div class="sys-desc">ITSM &amp; workflow automation</div><div class="sys-detail">Ticket routing · Approvals · SLA tracking · Change mgmt</div><div class="sys-owner">Scope: <span>Future phase</span></div></div>
+<div class="sys-card-future"><div class="sys-name">CBSO <span class="future-badge">future</span></div><div class="sys-desc">Customer billing &amp; service ops</div><div class="sys-detail">Billing validation · Service entitlement · Contract linkage</div><div class="sys-owner">Scope: <span>Future phase</span></div></div>
 </div>
 <h3>Layer 6 — Infrastructure Stack</h3>
 <div class="diagram" style="text-align:center">
 <div style="display:inline-block;text-align:center">
-<div class="node node-amber" style="font-size:.68rem;padding:.5rem 2rem;margin-bottom:.3rem">Agent Orchestration Engine<div style="font-weight:400;font-size:.63rem;color:var(--dim);margin-top:.15rem">Sub-Agent Dispatch · Sandbox Isolation · Memory · Skills · Channel Gateway</div></div>
+<div class="node node-amber" style="font-size:.68rem;padding:.5rem 2rem;margin-bottom:.3rem">Agent Orchestration Engine<div style="font-weight:400;font-size:.63rem;color:var(--dim);margin-top:.15rem">Sub-Agent Dispatch · Sandbox Isolation · Memory · Skills (Skill Hub) · Touchpoint Gateway</div></div>
 <div style="font-size:.65rem;color:var(--dim);margin:.2rem 0">↓ runs on ↓</div>
-<div class="node node-purple" style="font-size:.68rem;padding:.5rem 2rem;margin-bottom:.3rem">Lenovo Hybrid AI Platform<div style="font-weight:400;font-size:.63rem;color:var(--dim);margin-top:.15rem;text-align:left">• AI Models — SaaS-hosted LLMs (DeepSeek / GPT-4 class)<br>• Knowledge Base — RAG ingestion of PN rules, Service Tier definitions, pricing logic<br>• Data Sources — Booking data, MT announcements, PFV benchmarks<br>• Tool APIs — Standard interfaces for the 6 business systems above</div></div>
+<div class="node node-purple" style="font-size:.68rem;padding:.5rem 2rem;margin-bottom:.3rem">Lenovo Hybrid AI Platform<div style="font-weight:400;font-size:.63rem;color:var(--dim);margin-top:.15rem;text-align:left">• AI Models — SaaS-hosted LLMs (DeepSeek / GPT-4 class)<br>• EKP (Enterprise Knowledge Platform) — RAG ingestion of PN rules, Service Tier definitions, pricing logic<br>• BCPF (via Signavio) — L10→L5 business process framework for PN lifecycle, approval workflows, role definitions<br>• Data Sources — Booking data, MT announcements, PFV benchmarks<br>• Tool APIs — Standard interfaces for the 6 business systems above</div></div>
 <div style="font-size:.65rem;color:var(--dim);margin:.2rem 0">↓ connects to ↓</div>
-<div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap"><span class="node node-dark node-xs" style="color:#cbd5e1;">ICP</span><span class="node node-dark node-xs" style="color:#cbd5e1;">SPEP</span><span class="node node-dark node-xs" style="color:#cbd5e1;">SCFE</span><span class="node node-dark node-xs" style="color:#cbd5e1;">CPM</span><span class="node node-amber node-xs">Concord</span></div>
+<div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap"><span class="node node-dark node-xs" style="color:#cbd5e1;">ICP</span><span class="node node-dark node-xs" style="color:#cbd5e1;">SPEP</span><span class="node node-dark node-xs" style="color:#cbd5e1;">SCFE</span><span class="node node-dark node-xs" style="color:#cbd5e1;">CPM</span><span class="node node-dark node-xs" style="color:#cbd5e1;">Concord</span><span style="color:rgba(148,163,184,0.15);margin:0 .2rem;">│</span><span class="node node-future node-xs">SAP</span><span class="node node-future node-xs">LBP</span><span class="node node-future node-xs">ServiceNow</span><span class="node node-future node-xs">CBSO</span></div>
 </div></div>
 <div class="callout"><strong>What we build vs. what we leverage.</strong> The Agent Orchestration Engine is the only new component. The Hybrid AI Platform and six business systems already exist — we connect to them through standard APIs. Think of it as building a new application on top of the company's existing IT foundation, not replacing it.</div>
 </div></div>
@@ -458,7 +470,7 @@
 <div class="col-card"><h4>📝 Long-Term Memory</h4><p>Learns your preferences over weeks — like a colleague who knows how you work.</p><div class="example"><em>Example:</em> Sarah prefers a specific PN draft template. After 3 uses, Agent defaults to it.</div></div>
 </div>
 <div class="col2">
-<div class="col-card"><h4>📚 Domain Knowledge Base</h4><p>Stores PN lifecycle rules, pricing logic, approval policies — the team's collective playbook.</p><div class="example"><em>Example:</em> New TMO asks "when to retire a PN?" → retrieves exact policy, not an AI guess.</div></div>
+<div class="col-card"><h4>📚 Domain Knowledge Base</h4><p>Grounded on <strong style="color:#5eead4;">EKP</strong> (enterprise knowledge platform) and <strong style="color:#5eead4;">BCPF</strong> (business process framework in Signavio). Stores PN lifecycle rules, pricing logic, approval policies — the team's collective playbook.</p><div class="example"><em>Example:</em> New TMO asks "when to retire a PN?" → retrieves exact policy, not an AI guess.</div></div>
 <div class="col-card"><h4>💼 Business Impact</h4><p>Without memory, every conversation starts from zero. With it, the Agent builds working knowledge of your role and tasks.<br><br><strong>All data stays within Lenovo infrastructure.</strong></p></div>
 </div></div></div>
 
@@ -511,7 +523,7 @@
 <div class="stage" id="s10"><div class="stage-content">
 <h2><span class="num">05</span> Phased Rollout</h2>
 <div class="wave-grid">
-<div class="wave-card"><div class="wnum">Wave 1 · 4–6 Wk</div><div class="wtitle">Smart Lookups</div><div class="wbody"><strong>Knowledge Agent</strong><br>#1, #4, #12<br>Teams + Web<br><br>Natural-language PN queries. Auto reports. MT tracking.</div><div class="wrisk"><span class="tag tag-auto">Low Risk</span> Read-only.</div></div>
+<div class="wave-card"><div class="wnum">Wave 1 · 4–6 Wk</div><div class="wtitle">Smart Lookups</div><div class="wbody"><strong>RAG Pipeline on EKP</strong><br>#1, #4, #12<br>Teams + Web<br><br>Natural-language PN queries. Auto reports. MT tracking.</div><div class="wrisk"><span class="tag tag-auto">Low Risk</span> Read-only.</div></div>
 <div class="wave-card"><div class="wnum">Wave 2 · 6–8 Wk</div><div class="wtitle">PN Operations</div><div class="wbody"><strong>PN Agent</strong><br>#2, #3, #5, #7<br>Embedded in SPEP<br><br>Auto-forms. Dedup. Extend vs. create. Retirements.</div><div class="wrisk"><span class="tag tag-semi">Medium</span> Approval-gated.</div></div>
 <div class="wave-card"><div class="wnum">Wave 3 · 8–10 Wk</div><div class="wtitle">Pricing &amp; Cost</div><div class="wbody"><strong>Cost + Price</strong><br>#6, #8–#11<br>Full Workspace<br><br>Cost calcs. PFV. Price generation.</div><div class="wrisk"><span class="tag tag-approval">Med-High</span> Financial writes.</div></div>
 <div class="wave-card"><div class="wnum">Wave 4 · Ongoing</div><div class="wtitle">Scale &amp; Optimize</div><div class="wbody"><strong>All Agents</strong><br>#13 + CI<br><br>Onboarding. Cross-role. Approval tuning.</div><div class="wrisk"><span class="tag tag-auto">Low</span> Incremental.</div></div>
@@ -524,8 +536,8 @@
 <h2><span class="num">06</span> Dependencies</h2>
 <table>
 <tr><th>Dependency</th><th>Why It Matters</th><th>Status</th></tr>
-<tr><td><strong>System API Availability</strong></td><td>Agent needs programmatic access to ICP, SPEP, SCFE, CPM, and Concord (ODT Platform).</td><td><span class="tag tag-tbd">TBD</span></td></tr>
-<tr><td><strong>Knowledge Base Quality</strong></td><td>PN rules, Service Tier definitions, pricing logic must be documented.</td><td><span class="tag tag-tbd">TBD</span></td></tr>
+<tr><td><strong>System API Availability</strong></td><td>Agent needs programmatic access to ICP, SPEP, SCFE, CPM, and Concord.</td><td><span class="tag tag-tbd">TBD</span></td></tr>
+<tr><td><strong>Knowledge Base (EKP + BCPF)</strong></td><td>PN rules, Service Tier definitions, pricing logic — sourced from EKP knowledge platform and BCPF process framework (Signavio).</td><td><span class="tag tag-tbd">TBD</span></td></tr>
 <tr><td><strong>Approval Integration</strong></td><td>Approval workflows must accept automated requests.</td><td><span class="tag tag-tbd">TBD</span></td></tr>
 <tr><td><strong>Data Freshness</strong></td><td>Booking data, MT announcements, benchmarks must be current.</td><td><span class="tag tag-tbd">TBD</span></td></tr>
 <tr><td><strong>SME Time (Wave 1)</strong></td><td>GPS PMs, Pricing, SSG Enablement must validate responses in first 4–6 weeks.</td><td><span class="tag tag-tbd">TBD</span></td></tr>
@@ -535,7 +547,7 @@
 <tr><th>Decision</th><th>Choice</th><th>Rationale</th></tr>
 <tr><td><strong>Model Hosting</strong></td><td>SaaS (Cloud)</td><td>Strongest models. No infra overhead.</td></tr>
 <tr><td><strong>Autonomy</strong></td><td>Semi-automatic</td><td>Read auto, write with approval.</td></tr>
-<tr><td><strong>Channels</strong></td><td>Omni-channel, single backend</td><td>Teams · Web · Embedded. One truth.</td></tr>
+<tr><td><strong>Touchpoints</strong></td><td>Omni-touchpoint, single backend</td><td>Teams · Web · Embedded. One truth.</td></tr>
 <tr><td><strong>Agent Count</strong></td><td>4 specialized + 1 Master</td><td>Higher accuracy, independent deploy.</td></tr>
 <tr><td><strong>Memory</strong></td><td>3-tier: Short, Long, Domain</td><td>Coherence, personalization, grounding.</td></tr>
 <tr><td><strong>Rollout</strong></td><td>Lookups → Ops → Pricing → Optimize</td><td>Deliberate risk curve.</td></tr>
@@ -548,7 +560,7 @@
 <strong>This is a teammate, not a replacement.</strong><br><br>
 The GPS team's expertise — knowing which tier fits a new MT, judging when to extend vs. create a PN, deciding whether a benchmark warrants a price change — is irreplaceable. The Agent handles the mechanical work surrounding these decisions: lookups, cross-checks, calculations, approval routing, email chasing.<br><br>
 <strong>13 scenarios. 6 roles. 6 systems. One platform.</strong> Four specialized Agents deployed over four waves — starting with zero-risk read-only lookups and progressing to approval-gated financial operations.<br><br>
-<strong>Wave 1 critical path:</strong> confirm system APIs, build knowledge base with SME input, stand up Knowledge Agent for Teams Q&A. 4–6 weeks. Low risk. High learning.
+<strong>Wave 1 critical path:</strong> confirm system APIs, populate EKP with SME input, stand up RAG Pipeline on EKP for Teams Q&A. 4–6 weeks. Low risk. High learning.
 </div>
 <div class="footer">SSG AI · SSG Enablement Agent · Architecture V1 · June 2026</div>
 </div></div>
