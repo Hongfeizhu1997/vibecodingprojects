@@ -4,6 +4,12 @@
 
 ---
 
+## 2026-06-23
+
+- ✅ **Skill packaging feasibility analysis** — explored packaging ISG SSR (XGBoost rec + LLM explainability) as reusable Skill for all internal AI agents
+- ✅ Created `analysis/insights/skill-packaging-feasibility.md` — 3 architecture options, recommended Agent-based Skill (方案 B), 8-week action plan
+- Key findings: technically feasible, architecture upgrade from project-embedded → platform-level, model inference service deployment is the main engineering work
+
 ## 2026-06-17
 
 - ✅ Confirmed 5 key decisions for Stage 7 (Vetraflow+ChatGPT, multi-language, real-time, SHAP scope)

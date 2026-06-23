@@ -172,12 +172,20 @@ body {
 .ex-lc .addons-note { margin-top:0; margin-bottom:0; }
 .ex-lc .cat-block { margin-top:0; }
 .ex-lc .ex-result { margin-top:0; padding-top:0.3rem; }
+
+/* ===== STAGE 5: OUTLOOK ===== */
+.s5-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem; max-width:900px; width:100%; }
+.s5-card { background:rgba(15,23,42,0.6); border-radius:0.6rem; padding:1rem 0.8rem; border:1px solid rgba(51,65,85,0.3); text-align:center; }
+.s5-card .si { font-size:1.5rem; margin-bottom:0.5rem; }
+.s5-card .sn { font-size:0.72rem; font-weight:700; color:#e2e8f0; margin-bottom:0.3rem; }
+.s5-card .sd { font-size:0.63rem; color:#94a3b8; line-height:1.5; }
+.s5-bottom { margin-top:1.2rem; font-size:0.7rem; color:#34d399; font-weight:600; text-align:center; max-width:680px; line-height:1.5; }
 </style>
 </head>
 <body>
 <div class="brand"></div>
 <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
-<div class="indicator" id="indicator">1 / 5</div>
+<div class="indicator" id="indicator">1 / 6</div>
 <div class="nav-hint">← → Navigate &nbsp;|&nbsp; Lenovo ISG · SSR</div>
 
 <!-- STAGE 0: TITLE -->
@@ -359,8 +367,35 @@ body {
   </div>
 </div>
 
+<!-- STAGE 5: OUTLOOK -->
+<div class="stage" id="s5">
+  <div class="reveal" data-delay="0"><div class="sec-tag">05 · Outlook</div></div>
+  <div class="reveal" data-delay="150"><h2 class="sec-title">From Project to Platform</h2></div>
+  <div class="reveal" data-delay="300"><p class="sec-desc">The ISG SSR pipeline — XGBoost ranking + SHAP explainability + LLM translation — can be packaged as a single reusable Skill, published to Lenovo Skill Hub, and invoked by any internal AI agent.</p></div>
+  <div class="reveal" data-delay="550">
+    <div class="s5-grid">
+      <div class="s5-card">
+        <div class="si">📦</div>
+        <div class="sn">Package</div>
+        <div class="sd">Bid in, recommendations + explanations out. One API, one contract. Feature pipeline, XGBoost model, SHAP engine, and LLM translation — all bundled.</div>
+      </div>
+      <div class="s5-card">
+        <div class="si">🚀</div>
+        <div class="sn">Publish</div>
+        <div class="sd">Register as a Skill on Lenovo Skill Hub. Versioned, monitored, discoverable. Any agent with the right scope can load it.</div>
+      </div>
+      <div class="s5-card">
+        <div class="si">🔄</div>
+        <div class="sn">Multiply</div>
+        <div class="sd">Sales Agent · Pricing Agent · Customer Portal · Batch Analytics. One build, many consumers. Extends the project boundary from ISG to the entire SSG ecosystem.</div>
+      </div>
+    </div>
+  </div>
+  <div class="reveal" data-delay="1000"><div class="s5-bottom">One recommendation pipeline → Any agent, any channel, any audience.</div></div>
+</div>
+
 <script>
-var stages = ['s0','s1','s2','s3','s4'];
+var stages = ['s0','s1','s2','s3','s4','s5'];
 var TOTAL = stages.length;
 var current = 0;
 
