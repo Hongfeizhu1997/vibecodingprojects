@@ -28,6 +28,7 @@ window.onerror = function(msg, src, line, col, err) {
 <script src="../shared/ui-components.js"></script>
 <script src="../shared/stage-bridge.js"></script>
 <script src="../shared/audit-log.js"></script>
+<script src="../pricing-db.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -1491,6 +1492,12 @@ async function renderSkuTab() {
           <span id="import-status" class="text-muted text-sm"></span>
 
         </div>
+        <div id="import-progress-wrap" style="display:none;margin-top:8px">
+          <div style="background:#e5e7eb;border-radius:4px;height:10px;overflow:hidden">
+            <div id="import-progress-bar" style="background:#3b82f6;height:100%;width:0%;transition:width 0.3s"></div>
+          </div>
+          <div id="import-progress-text" class="text-muted text-xs" style="margin-top:3px"></div>
+        </div>
 
       </div>
 
@@ -1724,16 +1731,20 @@ async function handleFiles(files) {
 
   try {
 
-    const buf = await file.arrayBuffer();
-
     if (file.name.endsWith('.csv')) {
 
-      const text = new TextDecoder('utf-8').decode(buf);
-
-      await doImportCSV(text);
+      // Phase 5: streaming import for large CSVs (>500KB)
+      if (file.size >= 500 * 1024) {
+        await doStreamingImport(file);
+      } else {
+        const buf = await file.arrayBuffer();
+        const text = new TextDecoder('utf-8').decode(buf);
+        await doImportCSV(text);
+      }
 
     } else {
 
+      const buf = await file.arrayBuffer();
       await doImportExcel(buf);
 
     }
@@ -2404,6 +2415,136 @@ async function upsertSkus(skus) {
 
   return {count, errs};
 
+}
+
+
+// ── Phase 5: Streaming CSV Import ─────────────────────────────────────────────
+
+async function doStreamingImport(file) {
+  const PROGRESS_WRAP = el('import-progress-wrap');
+  const PROGRESS_BAR = el('import-progress-bar');
+  const PROGRESS_TEXT = el('import-progress-text');
+
+  PROGRESS_WRAP.style.display = 'block';
+  PROGRESS_BAR.style.width = '0%';
+  PROGRESS_TEXT.textContent = 'Starting stream…';
+  el('import-status').textContent = 'Streaming import…';
+
+  const CHUNK_SIZE = 2 * 1024 * 1024; // 2MB
+  const BATCH_SIZE = 5000;
+  const fileSize = file.size;
+  let offset = 0;
+  let isFirst = true;
+  let totalImported = 0;
+  const errs = [];
+  const pendingWrites = [];  // track all batch write promises
+  let streamDone = false;
+
+  const worker = new Worker('import-worker.js');
+
+  const batchRows = [];  // accumulator for row dicts
+
+  // Helper: flush current batch and track the promise
+  function flushBatch() {
+    if (!batchRows.length) return;
+    const batch = batchRows.splice(0);
+    const p = upsertSkusBatched(batch).then(r => {
+      totalImported += r.count;
+      if (r.errs.length) errs.push(...r.errs);
+    });
+    pendingWrites.push(p);
+  }
+
+  // Worker message handler
+  worker.onmessage = async function(e) {
+    const msg = e.data;
+    if (msg.type === 'rows' && msg.rows.length) {
+      for (const row of msg.rows) {
+        const sku = buildSkuRowFromDict(row);
+        if (sku) batchRows.push(sku);
+        if (batchRows.length >= BATCH_SIZE) flushBatch();
+      }
+      const pct = Math.min(100, Math.round((offset / fileSize) * 100));
+      PROGRESS_BAR.style.width = pct + '%';
+      PROGRESS_TEXT.textContent = `Parsed ~${totalImported + batchRows.length} rows (${pct}%)`;
+    }
+    else if (msg.type === 'done') {
+      // Flush final batch
+      flushBatch();
+      // Wait for ALL pending writes to complete
+      await Promise.all(pendingWrites);
+
+      worker.terminate();
+      streamDone = true;
+
+      PROGRESS_BAR.style.width = '100%';
+      PROGRESS_TEXT.textContent = `Imported ${totalImported} SKUs from ${formatBytes(fileSize)}`;
+
+      const message = `Imported ${totalImported} SKUs`;
+      el('import-status').textContent = message;
+      toast(message, errs.length ? 'info' : 'success');
+
+      if (errs.length) showModal('Import Warnings', `<div>${errs.slice(0,20).map(e=>`<div class="err-item">— ${e}</div>`).join('')}</div>`);
+
+      await renderSkuData();
+    }
+  };
+
+  worker.onerror = function(e) {
+    worker.terminate();
+    streamDone = true;
+    el('import-status').textContent = '';
+    PROGRESS_WRAP.style.display = 'none';
+    toast('Worker error: ' + e.message, 'error');
+  };
+
+  // Read file in chunks (loop, not recursive)
+  try {
+    while (offset < fileSize) {
+      const slice = file.slice(offset, offset + CHUNK_SIZE);
+      const text = await slice.text();
+      offset += CHUNK_SIZE;
+      worker.postMessage({ type: 'chunk', data: text, isFirst });
+      isFirst = false;
+    }
+    // Signal worker that all chunks have been sent
+    worker.postMessage({ type: 'finish' });
+  } catch(e) {
+    worker.terminate();
+    el('import-status').textContent = '';
+    PROGRESS_WRAP.style.display = 'none';
+    toast('Streaming import failed: ' + e.message, 'error');
+  }
+}
+
+
+// ── Phase 5: Batched upsert (no pre-load — uses bulkPut allKeys:false) ──
+
+async function upsertSkusBatched(skus) {
+  let count = 0; const errs = [];
+  const toPut = [];
+  for (const sku of skus) {
+    if (!sku.service_pn) continue;
+    const rec = {...sku, cycle_id: currentCycleId, imported_by: currentUser, imported_at: now()};
+    toPut.push(rec);
+    count++;
+  }
+  if (!toPut.length) return {count: 0, errs: []};
+  try {
+    await db.service_pns.bulkPut(toPut, {allKeys: false});
+  } catch(e) {
+    errs.push('Batch upsert error: ' + e.message);
+  }
+  return {count, errs};
+}
+
+
+// ── helpers ──
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
 
@@ -4051,6 +4192,24 @@ async function bridgeToStage4() {
   if (result.success) {
     toast(`Sent ${result.rowCount} SKUs to Stage 4 via Bridge`, 'success');
     Audit.log.bridgeSend(4, result.rowCount, currentUser, 3);
+    // Write to pricing master (Stage 3 fields)
+    PricingDB.init().then(() => {
+      const now = new Date().toISOString();
+      for (const s of calcSkus) {
+        PricingDB.addRecord({
+          cycle_name: cycle?.name || 'Unknown',
+          completed_at: now,
+          service_pn: s.service_pn || '',
+          country: s.country || '',
+          service_tier: s.service_tier || '',
+          upgrade_years: s.service_term || '',
+          delivery_type: s.service_delivery_type || '',
+          aipc: s.aipc || 'No',
+          psc_value: s.psc_value || '',
+          sales_cost: s.sales_cost || ''
+        }).catch(e => console.warn('PricingDB write (S3):', e));
+      }
+    });
     // Open Stage 4 in new tab after a short delay
     setTimeout(function() {
       window.open('../stage4_browser/index.html', '_blank');

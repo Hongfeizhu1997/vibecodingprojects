@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPS Pricing Dashboard [static]</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#020617;color:#e2e8f0;min-height:100vh}
+.brand{background:linear-gradient(90deg,#E1251B,#d97706);padding:10px 24px;font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.brand span{opacity:.7;font-weight:400;font-size:12px}
+.wrap{max-width:1400px;margin:0 auto;padding:24px}
+.card{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:20px;margin-bottom:20px}
+.card-title{font-size:16px;font-weight:700;margin-bottom:12px;color:#f1f5f9}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:20px}
+.stat-card{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:16px}
+.stat-val{font-size:28px;font-weight:900}
+.stat-label{font-size:12px;color:#94a3b8;margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;color:#94a3b8;font-weight:600;border-bottom:2px solid #1e293b;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:8px 10px;border-bottom:1px solid #0f172a}
+tr:hover td{background:rgba(59,130,246,0.04)}
+.btn{padding:6px 14px;border-radius:4px;border:none;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.btn-blue{background:#2563eb;color:#fff}
+.btn-green{background:#059669;color:#fff}
+.btn-outline{background:transparent;border:1px solid #334155;color:#cbd5e1}
+.btn-danger{background:#dc2626;color:#fff}
+.btn:hover{opacity:.85}
+input[type=text],select{background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:4px;padding:6px 10px;font-size:13px}
+input[type=text]::placeholder{color:#64748b}
+.flex-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-pass{background:rgba(34,197,94,0.12);color:#22c55e}
+.badge-fail{background:rgba(239,68,68,0.12);color:#ef4444}
+.badge-warn{background:rgba(251,191,36,0.12);color:#fbbf24}
+.badge-blocked{background:rgba(220,38,38,0.15);color:#f87171}
+.badge-ack{background:rgba(59,130,246,0.12);color:#60a5fa}
+.text-muted{color:#64748b;font-size:12px}
+.text-right{text-align:right}
+.clickable{cursor:pointer;color:#60a5fa}
+.clickable:hover{text-decoration:underline}
+#pn-history-panel{display:none}
+.trend-cell{font-size:12px}
+.trend-up{color:#22c55e}
+.trend-down{color:#ef4444}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #334155;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="brand">
+  📊 GPS Pricing Dashboard
+  <span>| Personal Pricing History</span>
+</div>
+
+<div class="wrap">
+
+  <!-- Stats -->
+  <div class="stat-row" id="stats-row">
+    <div class="stat-card"><div class="stat-val" id="stat-cycles">—</div><div class="stat-label">Total Cycles</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-pns">—</div><div class="stat-label">Unique PNs Tracked</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-records">—</div><div class="stat-label">Total Records</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-latest">—</div><div class="stat-label">Latest Activity</div></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex-row" style="margin-bottom:20px">
+    <button class="btn btn-blue" onclick="location.reload()">🔄 Refresh</button>
+    <button class="btn btn-green" onclick="PricingDB.downloadCSV()">⬇ Download CSV Backup</button>
+    <button class="btn btn-outline" onclick="hidePNHistory()">📋 Back to Cycles</button>
+  </div>
+
+  <!-- Cycle List -->
+  <div class="card" id="cycles-panel">
+    <div class="card-title">📅 Pricing Cycles</div>
+    <table id="cycles-table">
+      <thead><tr>
+        <th>Cycle Name</th><th>PNs</th><th>Avg GP%</th><th>Last Updated</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="cycles-tbody"><tr><td colspan="5" style="text-align:center;padding:30px;color:#64748b">No pricing data yet. Run a cycle through Stage 3→4→5→6 to populate history.</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Cycle Detail -->
+  <div class="card" id="cycle-detail-panel" style="display:none">
+    <div class="card-title" id="cycle-detail-title">Cycle Detail</div>
+    <div class="flex-row" style="margin-bottom:12px">
+      <input type="text" id="pn-search" placeholder="Search PN..." oninput="filterCycleDetail()" style="width:250px">
+      <span class="text-muted" id="pn-count"></span>
+    </div>
+    <table id="cycle-detail-table">
+      <thead><tr>
+        <th>Service PN</th><th>Country</th><th>Tier</th><th>Term</th>
+        <th>Sales Cost</th><th>List Price</th><th>Channel Price</th>
+        <th>GP%</th><th>GVE</th><th>Gradient</th>
+        <th>History</th>
+      </tr></thead>
+      <tbody id="cycle-detail-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- PN History -->
+  <div class="card" id="pn-history-panel" style="display:none">
+    <div class="card-title" id="pn-history-title">PN History</div>
+    <table id="pn-history-table">
+      <thead><tr>
+        <th>Cycle</th><th>Date</th><th>Sales Cost</th><th>List Price</th>
+        <th>Channel Price</th><th>GP%</th><th>GVE</th><th>Gradient</th>
+      </tr></thead>
+      <tbody id="pn-history-tbody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="../pricing-db.js"></script>
+<script>
+let _cycles = [];
+
+async function init() {
+  await PricingDB.init();
+  _cycles = PricingDB.getCycles();
+  renderStats();
+  renderCycles();
+}
+
+function renderStats() {
+  const records = PricingDB.getAll();
+  const uniquePNs = new Set(records.map(r => r.service_pn).filter(Boolean));
+  document.getElementById('stat-cycles').textContent = _cycles.length;
+  document.getElementById('stat-pns').textContent = uniquePNs.size;
+  document.getElementById('stat-records').textContent = records.length;
+
+  const latest = records.reduce((max, r) => {
+    const d = r.completed_at || '';
+    return d > max ? d : max;
+  }, '');
+  document.getElementById('stat-latest').textContent = latest
+    ? new Date(latest).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'})
+    : '—';
+}
+
+function renderCycles() {
+  const tbody = document.getElementById('cycles-tbody');
+  if (!_cycles.length) return;
+  tbody.innerHTML = _cycles.map(c => `
+    <tr>
+      <td><span class="clickable" onclick="showCycleDetail('${escHtml(c.name)}')">${escHtml(c.name)}</span></td>
+      <td>${c.pn_count}</td>
+      <td>${c.avg_gp}</td>
+      <td>${c.completed_at ? new Date(c.completed_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+      <td><button class="btn btn-outline" style="padding:2px 8px;font-size:11px" onclick="showCycleDetail('${escHtml(c.name)}')">View</button></td>
+    </tr>
+  `).join('');
+}
+
+function showCycleDetail(name) {
+  const records = PricingDB.getCycleDetail(name);
+  document.getElementById('cycles-panel').style.display = 'none';
+  document.getElementById('cycle-detail-panel').style.display = '';
+  document.getElementById('cycle-detail-title').textContent = 'Cycle: ' + name;
+  document.getElementById('pn-count').textContent = records.length + ' PNs';
+  window._detailRecords = records;
+  filterCycleDetail();
+}
+
+function filterCycleDetail() {
+  const q = (document.getElementById('pn-search').value || '').toLowerCase();
+  const filtered = q
+    ? window._detailRecords.filter(r => (r.service_pn||'').toLowerCase().includes(q))
+    : window._detailRecords;
+  document.getElementById('pn-count').textContent = filtered.length + ' PNs' + (q ? ' (filtered)' : '');
+  document.getElementById('cycle-detail-tbody').innerHTML = filtered.map(r => {
+    const gveBadge = !r.gve_status ? '' :
+      r.gve_status === 'PASS' ? '<span class="badge badge-pass">PASS</span>' :
+      r.gve_status === 'BLOCKED' ? '<span class="badge badge-blocked">BLOCKED</span>' :
+      r.gve_status === 'ACKNOWLEDGED' ? '<span class="badge badge-ack">ACK</span>' :
+      '<span class="badge badge-warn">'+escHtml(r.gve_status)+'</span>';
+    const gradBadge = !r.gradient_status ? '' :
+      r.gradient_status === 'PASS' ? '<span class="badge badge-pass">PASS</span>' :
+      r.gradient_status === 'WARN' ? '<span class="badge badge-warn">WARN</span>' :
+      '<span class="badge badge-fail">FAIL</span>';
+    const gp = r.gp_percent ? parseFloat(r.gp_percent).toFixed(1)+'%' : '—';
+    return `<tr>
+      <td>${escHtml(r.service_pn||'')}</td>
+      <td>${escHtml(r.country||'')}</td>
+      <td>${escHtml(r.service_tier||'')}</td>
+      <td>${escHtml(r.upgrade_years||'')}</td>
+      <td class="text-right">${r.sales_cost ? '$'+Number(r.sales_cost).toLocaleString() : '—'}</td>
+      <td class="text-right">${r.list_price ? '$'+Number(r.list_price).toLocaleString() : '—'}</td>
+      <td class="text-right">${r.channel_price ? '$'+Number(r.channel_price).toLocaleString() : '—'}</td>
+      <td class="text-right">${gp}</td>
+      <td>${gveBadge}</td>
+      <td>${gradBadge}</td>
+      <td><button class="btn btn-outline" style="padding:2px 8px;font-size:11px" onclick="showPNHistory('${escHtml(r.service_pn||'')}')">Trend</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function showPNHistory(pn) {
+  const records = PricingDB.getPNHistory(pn);
+  document.getElementById('cycle-detail-panel').style.display = 'none';
+  document.getElementById('pn-history-panel').style.display = '';
+  document.getElementById('pn-history-title').textContent = 'PN: ' + pn + ' — ' + records.length + ' pricing cycles';
+
+  if (records.length >= 2) {
+    const newest = parseFloat(records[0].gp_percent) || 0;
+    const oldest = parseFloat(records[records.length-1].gp_percent) || 0;
+    const diff = newest - oldest;
+    const trendHtml = diff > 0 ? '<span class="trend-up">▲+' + diff.toFixed(1) + 'pp</span>'
+      : diff < 0 ? '<span class="trend-down">▼' + diff.toFixed(1) + 'pp</span>'
+      : '<span class="text-muted">—</span>';
+    document.getElementById('pn-history-title').innerHTML += ' | GP% trend: ' + trendHtml;
+  }
+
+  document.getElementById('pn-history-tbody').innerHTML = records.map(r => {
+    const gveBadge = !r.gve_status ? '<span class="text-muted">—</span>' :
+      r.gve_status === 'PASS' ? '<span class="badge badge-pass">PASS</span>' :
+      r.gve_status === 'BLOCKED' ? '<span class="badge badge-blocked">BLOCKED</span>' :
+      '<span class="badge badge-warn">'+escHtml(r.gve_status)+'</span>';
+    const gradBadge = !r.gradient_status ? '<span class="text-muted">—</span>' :
+      r.gradient_status === 'PASS' ? '<span class="badge badge-pass">PASS</span>' :
+      '<span class="badge badge-fail">'+escHtml(r.gradient_status)+'</span>';
+    const gp = r.gp_percent ? parseFloat(r.gp_percent).toFixed(1)+'%' : '—';
+    const date = r.completed_at ? new Date(r.completed_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    return `<tr>
+      <td>${escHtml(r.cycle_name||'')}</td>
+      <td>${date}</td>
+      <td class="text-right">${r.sales_cost ? '$'+Number(r.sales_cost).toLocaleString() : '—'}</td>
+      <td class="text-right">${r.list_price ? '$'+Number(r.list_price).toLocaleString() : '—'}</td>
+      <td class="text-right">${r.channel_price ? '$'+Number(r.channel_price).toLocaleString() : '—'}</td>
+      <td class="text-right">${gp}</td>
+      <td>${gveBadge}</td>
+      <td>${gradBadge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function hidePNHistory() {
+  document.getElementById('cycle-detail-panel').style.display = 'none';
+  document.getElementById('pn-history-panel').style.display = 'none';
+  document.getElementById('cycles-panel').style.display = '';
+  document.getElementById('pn-search').value = '';
+}
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'&quot;'); }
+
+init();
+</script>
+</body>
+</html>

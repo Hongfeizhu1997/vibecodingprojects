@@ -17,7 +17,7 @@
 <script src="../shared/ui-components.js"></script>
 <script src="../shared/stage-bridge.js"></script>
 <script src="../shared/audit-log.js"></script>
-
+<script src="../pricing-db.js"></script>
 <script>
 
 window.onerror = function(msg, src, line, col, err) {
@@ -3002,6 +3002,24 @@ async function sendToStage5() {
   if (result.success) {
     toast(`Sent ${result.rowCount} SKUs to Stage 5 via Bridge`, 'success');
     Audit.log.bridgeSend(5, result.rowCount, currentUser, 4);
+    // Write GVE status to pricing master
+    PricingDB.init().then(async () => {
+      const summary = await getGVESummary(currentCycleId);
+      let gveStatus = 'PASS';
+      if (summary.Critical.unresolved > 0) gveStatus = 'BLOCKED';
+      else if (summary.Systemic.unresolved > 0) gveStatus = 'SYSTEMIC';
+      else if (summary.Warning.unresolved > 0) gveStatus = 'WARNINGS';
+      else if (summary.Critical.resolved > 0 || summary.Systemic.resolved > 0 || summary.Warning.resolved > 0) gveStatus = 'ACKNOWLEDGED';
+      const now = new Date().toISOString();
+      for (const r of flatData) {
+        PricingDB.addRecord({
+          cycle_name: (await db.cycles.get(currentCycleId))?.name || 'Unknown',
+          completed_at: now,
+          service_pn: r.part_number || '',
+          gve_status: gveStatus
+        }).catch(e => console.warn('PricingDB write (S4):', e));
+      }
+    });
   } else {
     toast('Bridge error: ' + result.error, 'error');
   }

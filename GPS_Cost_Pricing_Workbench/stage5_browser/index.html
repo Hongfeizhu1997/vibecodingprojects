@@ -9,6 +9,7 @@
 <script src="../shared/ui-components.js"></script>
 <script src="../shared/stage-bridge.js"></script>
 <script src="../shared/audit-log.js"></script>
+<script src="../pricing-db.js"></script>
 <script>
 window.onerror = function(msg, src, line, col, err) {
   var p = document.getElementById('_err');
@@ -1379,6 +1380,20 @@ async function sendToStage6() {
   if (result.success) {
     toast(`Sent ${result.rowCount} SKUs to Stage 6 via Bridge`, 'success');
     Audit.log.bridgeSend(6, result.rowCount, currentUser || 'unknown', 5);
+    // Write Stage 5 pricing fields to master
+    PricingDB.init().then(() => {
+      const now = new Date().toISOString();
+      for (const r of calcItems) {
+        PricingDB.addRecord({
+          cycle_name: (document.querySelector('#cycle-select option:checked')?.textContent || 'Stage 5 Export'),
+          completed_at: now,
+          service_pn: r.part_number || '',
+          list_price: r.list_price_calc || '',
+          channel_price: r.c_price_calc || '',
+          gp_percent: r.gp_pct != null ? (r.gp_pct * 100).toFixed(1) : ''
+        }).catch(e => console.warn('PricingDB write (S5):', e));
+      }
+    });
   } else {
     toast('Bridge error: ' + result.error, 'error');
   }
@@ -1396,7 +1411,9 @@ async function runCalculation() {
     const topsellerEnabled = settings.topseller_enabled === 'true';
     const topsellerDiscount = parseFloat(settings.topseller_discount || '0.10');
     const gpFloorEnabled = settings.gp_floor_enabled === 'true';
-    const gpFloorPct     = parseFloat(settings.gp_floor_pct || '0.30');
+    let gpFloorRules = [];
+    try { gpFloorRules = JSON.parse(settings.gp_floor_rules || '[]'); } catch(e) { }
+    if (gpFloorRules.length === 0) gpFloorRules = [{country:'Global', sla:'Any', term:'Any', floor: parseFloat(settings.gp_floor_pct || '0.30')}];
 
     const items    = await db.price_items.where('cycle_id').equals(STATE.currentCycleId).toArray();
     const pfvRows  = await db.pfv_rows.where('cycle_id').equals(STATE.currentCycleId).toArray();
@@ -1493,7 +1510,7 @@ async function runCalculation() {
       // 14. Status
       let pfv_status;
       if (pfv <= 0) pfv_status = 'no_pfv';
-      else if (gpFloorEnabled && gp_pct != null && gp_pct < gpFloorPct) pfv_status = 'below_floor';
+      else if (gpFloorEnabled && gp_pct != null && gp_pct < lookupGpFloor(item.region, item.delivery_type, item.upgrade_years, gpFloorRules)) pfv_status = 'below_floor';
       else pfv_status = 'ok';
 
       if (pfv_status === 'below_floor') belowFloorCount++;
@@ -1653,7 +1670,9 @@ async function renderSettingsTab(content) {
   const tsEnabled  = settings.topseller_enabled === 'true';
   const tsDiscount = settings.topseller_discount || '0.10';
   const gpEnabled  = settings.gp_floor_enabled === 'true';
-  const gpFloor    = settings.gp_floor_pct || '0.30';
+  try { _gpFloorRules = JSON.parse(settings.gp_floor_rules || '[]'); } catch(e) { _gpFloorRules = []; }
+  if (_gpFloorRules.length === 0) _gpFloorRules = [{country:'Global', sla:'Any', term:'Any', floor: parseFloat(settings.gp_floor_pct || '0.30')}];
+  renderGpFloorRules();
 
   const geoRows = geoGroups.map((g, idx) => `
     <tr data-geo-id="${g.id}">
@@ -1747,16 +1766,22 @@ async function renderSettingsTab(content) {
           </div>
           <div id="gp-floor-row" ${gpEnabled ? '' : 'class="hidden"'} style="margin-left:24px">
             <div class="form-group">
-              <label class="form-label">Minimum GP% Floor</label>
-              <div style="display:flex;align-items:center;gap:8px">
-                <input id="gp-floor" class="form-control" type="number" step="0.1" min="0" max="100"
-                  value="${(parseFloat(gpFloor)*100).toFixed(1)}" style="width:100px"
-                  onchange="saveGpFloor()">
-                <span class="text-sm text-muted">% — rows below this GP% will be flagged red</span>
+              <label class="form-label">GP% Floor Rules</label>
+              <div style="margin-bottom:6px;font-size:12px;color:#94a3b8">
+                Define floors by Country / SLA Type / Term. Matches from most specific to least specific: exact → country+SLA → country only → Global default.
               </div>
-              <div style="margin-top:8px;padding:8px 10px;background:#fff7ed;border-left:3px solid #ea580c;border-radius:0 4px 4px 0;font-size:12px;color:#9a3412">
-                ⚠️ <strong>Reminder:</strong> Consider adjusting this floor by country and SLA type to account for local GTN (Go-To-Market) and FX (foreign exchange) impacts. A single global floor may not reflect regional profitability targets.
-              </div>
+              <table id="gp-floor-table" style="width:100%;border-collapse:collapse;font-size:13px">
+                <thead><tr style="color:#94a3b8;text-align:left;border-bottom:1px solid #334155">
+                  <th style="padding:4px 8px">Country</th>
+                  <th style="padding:4px 8px">SLA Type</th>
+                  <th style="padding:4px 8px">Term</th>
+                  <th style="padding:4px 8px">GP Floor %</th>
+                  <th style="padding:4px 8px;width:40px"></th>
+                </tr></thead>
+                <tbody id="gp-floor-tbody"></tbody>
+              </table>
+              <button onclick="addGpFloorRule()" style="margin-top:6px;font-size:12px;padding:4px 10px;background:#334155;color:#e2e8f0;border:1px solid #475569;border-radius:4px;cursor:pointer">+ Add Rule</button>
+              <button onclick="saveGpFloorRules()" style="margin-top:6px;margin-left:6px;font-size:12px;padding:4px 10px;background:#2563eb;color:#fff;border:none;border-radius:4px;cursor:pointer">Save Rules</button>
             </div>
           </div>
         </div>
@@ -1798,13 +1823,84 @@ async function saveTopSeller() {
   toast('TopSeller settings saved', 'success');
 }
 
-async function saveGpFloor() {
-  const enabled = el('gp-enabled')?.checked ? 'true' : 'false';
-  const floor   = parseFloat(el('gp-floor')?.value || '30') / 100;
-  await saveSetting('gp_floor_enabled', enabled);
-  await saveSetting('gp_floor_pct',     floor.toFixed(4));
-  toast('GP Floor settings saved', 'success');
+// ── GP Floor dimensional rules ──
+
+let _gpFloorRules = [];
+
+function renderGpFloorRules() {
+  const tbody = document.getElementById('gp-floor-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = _gpFloorRules.map((r, i) => `
+    <tr style="border-bottom:1px solid #1e293b">
+      <td style="padding:2px 4px"><input value="${escHtml(r.country||'')}" onchange="_gpFloorRules[${i}].country=this.value" style="width:80px;background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:3px;padding:2px 6px;font-size:12px"></td>
+      <td style="padding:2px 4px"><input value="${escHtml(r.sla||'')}" onchange="_gpFloorRules[${i}].sla=this.value" style="width:100px;background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:3px;padding:2px 6px;font-size:12px"></td>
+      <td style="padding:2px 4px"><input value="${escHtml(r.term||'')}" onchange="_gpFloorRules[${i}].term=this.value" style="width:80px;background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:3px;padding:2px 6px;font-size:12px"></td>
+      <td style="padding:2px 4px"><input type="number" step="0.1" min="0" max="100" value="${(parseFloat(r.floor)*100).toFixed(1)}" onchange="_gpFloorRules[${i}].floor=parseFloat(this.value)/100" style="width:70px;background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:3px;padding:2px 6px;font-size:12px"></td>
+      <td style="padding:2px 4px;text-align:center"><button onclick="deleteGpFloorRule(${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px" title="Delete">✕</button></td>
+    </tr>
+  `).join('');
 }
+
+function addGpFloorRule() {
+  _gpFloorRules.push({country:'', sla:'', term:'', floor:0.30});
+  renderGpFloorRules();
+}
+
+function deleteGpFloorRule(idx) {
+  _gpFloorRules.splice(idx, 1);
+  renderGpFloorRules();
+}
+
+async function saveGpFloorRules() {
+  const tbody = document.getElementById('gp-floor-tbody');
+  if (!tbody) return;
+  // Collect current values from DOM inputs
+  const inputs = tbody.querySelectorAll('input');
+  let ri = 0, fi = 0;
+  for (const inp of inputs) {
+    if (inp.type === 'number') { _gpFloorRules[ri].floor = parseFloat(inp.value) / 100 || 0.30; ri++; }
+    else {
+      if (fi % 3 === 0) _gpFloorRules[Math.floor(fi/3)].country = inp.value;
+      else if (fi % 3 === 1) _gpFloorRules[Math.floor(fi/3)].sla = inp.value;
+      else _gpFloorRules[Math.floor(fi/3)].term = inp.value;
+      fi++;
+    }
+  }
+  const enabled = document.getElementById('gp-enabled')?.checked ? 'true' : 'false';
+  await saveSetting('gp_floor_enabled', enabled);
+  await saveSetting('gp_floor_rules', JSON.stringify(_gpFloorRules));
+  toast(`Saved ${_gpFloorRules.length} GP floor rule(s)`, 'success');
+}
+
+function lookupGpFloor(country, slaType, term, rules) {
+  // Priority: exact match → country+sla → country → Global
+  const c = (country||'').toUpperCase();
+  const s = (slaType||'').toLowerCase().trim();
+  const t = (term||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  for (const r of rules) {
+    const rc = (r.country||'').toUpperCase();
+    const rs = (r.sla||'').toLowerCase().trim();
+    const rt = (r.term||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    // Exact
+    if (rc === c && rs === s && rt === t) return r.floor;
+  }
+  for (const r of rules) {
+    const rc = (r.country||'').toUpperCase();
+    const rs = (r.sla||'').toLowerCase().trim();
+    if (rc === c && rs === s && (!r.term || r.term === 'Any')) return r.floor;
+  }
+  for (const r of rules) {
+    const rc = (r.country||'').toUpperCase();
+    if (rc === c && (!r.sla || r.sla === 'Any') && (!r.term || r.term === 'Any')) return r.floor;
+  }
+  for (const r of rules) {
+    const rc = (r.country||'').toUpperCase();
+    if (rc === 'GLOBAL') return r.floor;
+  }
+  return 0.30;
+}
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'&quot;'); }
 
 // Geo group helpers
 const _geoPendingChanges = {}; // id -> field -> value

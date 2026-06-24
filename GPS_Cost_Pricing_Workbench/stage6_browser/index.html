@@ -10,6 +10,7 @@
 <script src="../shared/ui-components.js"></script>
 <script src="../shared/stage-bridge.js"></script>
 <script src="../shared/audit-log.js"></script>
+<script src="../pricing-db.js"></script>
 <script>
 window.onerror = function(msg, src, line, col, err) {
   var p = document.getElementById('_err');
@@ -459,6 +460,23 @@ async function runValidation() {
     const warnCount = violations.filter(v => v.severity !== 'Critical').length;
     
     Audit.log.gveRun(critCount, warnCount, currentUser, 6);
+    
+    // Write gradient validation status to pricing master
+    PricingDB.init().then(async () => {
+      const items = await getAllItems();
+      const now = new Date().toISOString();
+      const cycle = await db6.cycles.get(STATE.currentCycleId);
+      const cycleName = cycle?.name || 'Unknown';
+      const gradientStatus = violations.length === 0 ? 'PASS' : (critCount > 0 ? 'FAIL' : 'WARN');
+      for (const r of items) {
+        PricingDB.addRecord({
+          cycle_name: cycleName,
+          completed_at: now,
+          service_pn: r.part_number || '',
+          gradient_status: gradientStatus
+        }).catch(e => console.warn('PricingDB write (S6):', e));
+      }
+    });
     
     const msg = violations.length === 0
       ? 'Validation passed — no gradient violations found'
