@@ -112,6 +112,13 @@ a{color:#E1251B;text-decoration:none}
 
 .badge-service-scope{background:#ecfdf5;color:#064e3b}
 
+/* AIPC badge */
+.aipc-badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
+.aipc-yes{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.aipc-yes:hover{background:#a7f3d0}
+.aipc-no{background:#f1f5f9;color:#64748b;border:1px solid #cbd5e1}
+.aipc-no:hover{background:#e2e8f0}
+
 /* FORMS */
 
 .form-row{display:grid;gap:12px;margin-bottom:12px}
@@ -353,6 +360,7 @@ const FACTOR_DEFINITIONS = [
   {technical_id:'ICISE',     factor_name:'Included ISE Service',       classification:'Service Scope'},
 
   {technical_id:'ICTICRU',   factor_name:'Included TI CRU Service',    classification:'Service Scope'},
+  {technical_id:'AIPC',      factor_name:'AIPC',                       classification:'Hardware'},
 
 ];
 
@@ -375,6 +383,7 @@ const FACTOR_FIELD_MAP = {
   ICADP:'included_adp', ICKYD:'included_kyd', ICSBTY:'included_sbty',
 
   ICISE:'included_ise', ICTICRU:'included_ticru',
+  AIPC:'aipc',
 
 };
 
@@ -411,6 +420,7 @@ const SKU_COLUMN_MAP = {
   'Upgrade From Type':'upgrade_from_type',
 
   'Upgrade From Term':'upgrade_from_term',
+  'AIPC':'aipc',
 
   'Included Premier Service':'included_premier_service',
 
@@ -518,6 +528,10 @@ const SKU_COLUMNS = [
   { key: 'offering_type', label: 'Offering Type', def: false, render: function(s) { return '<td>' + (s.offering_type||'—') + '</td>'; } },
   { key: 'sub_service_tier', label: 'Sub Tier', def: false, render: function(s) { return '<td>' + (s.sub_service_tier||'—') + '</td>'; } },
   { key: 'service_delivery_type', label: 'Delivery Type', def: false, render: function(s) { return '<td>' + (s.service_delivery_type||'—') + '</td>'; } },
+  { key: 'aipc', label: 'AIPC', def: true, render: function(s) {
+    var v = s.aipc || 'No';
+    return '<td><span class="aipc-badge ' + (v==='Yes'?'aipc-yes':'aipc-no') + '" onclick="toggleAIPC(' + s.id + ')" style="cursor:pointer;user-select:none">' + v + '</span></td>';
+  } },
   { key: '_actions', label: '', def: true, render: function(s) { return renderSkuActions(s); } },
 ];
 
@@ -1940,7 +1954,7 @@ function showEditSKU(id) {
     var h = '<div style="max-height:60vh;overflow-y:auto">';
     var fields = ['service_pn','short_description','type_of_service','service_tier','sub_service_tier',
       'offering_type','geo','country','psc_value','service_term','service_delivery_type',
-      'upgrade_from_type','upgrade_from_term'];
+      'upgrade_from_type','upgrade_from_term','aipc'];
     fields.forEach(function(f) {
       var val = sku[f] != null ? String(sku[f]).replace(/"/g,'&quot;') : '';
       h += '<div class="form-group"><label class="form-label">' + f + '</label>';
@@ -1955,7 +1969,7 @@ function showEditSKU(id) {
 function saveEditSKU(id) {
   var fields = ['service_pn','short_description','type_of_service','service_tier','sub_service_tier',
     'offering_type','geo','country','psc_value','service_term','service_delivery_type',
-    'upgrade_from_type','upgrade_from_term'];
+    'upgrade_from_type','upgrade_from_term','aipc'];
   var updates = {};
   fields.forEach(function(f) {
     var el = document.getElementById('esku-' + f);
@@ -1977,6 +1991,15 @@ function deleteSKU(id, pn) {
   if (!confirm('Delete ' + pn + '?')) return;
   db.service_pns.delete(id).then(function() {
     toast('Deleted ' + pn, 'success');
+    renderSkuData();
+  });
+}
+
+function toggleAIPC(id) {
+  db.service_pns.get(id).then(function(sku) {
+    var next = (sku.aipc === 'Yes') ? 'No' : 'Yes';
+    return db.service_pns.update(id, {aipc: next});
+  }).then(function() {
     renderSkuData();
   });
 }
@@ -4015,6 +4038,7 @@ async function bridgeToStage4() {
     included_premier: s.included_premier_service || '',
     upgrade_from_type: s.upgrade_from_type || '',
     upgrade_from_term: s.upgrade_from_term || '',
+    aipc:             s.aipc || 'No',
   }));
 
   const cycle = await db.cycles.get(currentCycleId);

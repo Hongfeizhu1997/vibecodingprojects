@@ -926,6 +926,7 @@ async function importFromStage3Bridge() {
         included_premier: r.addon_premier ? 'Y' : 'N',
         upgrade_from_type: r.upgrade_from_type || '',
         upgrade_from_term: r.upgrade_from_term || '',
+        aipc: r.aipc || 'No',
       });
       
       await db.sku_prices.add({
