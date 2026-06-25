@@ -1,0 +1,9 @@
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+tests/reports/report_*.json
+tests/reports/report_*.md
+tests/reports/latest.md
+__pycache__/
+*.pyc
