@@ -12,7 +12,7 @@ description: "Validates GVE engine, rule presets, cross-check, bridge import, an
   type: static
   - case: "Loads GVE engine"
     check: import_exists
-    file: "../shared/gve-engine.js"
+    file: "gve-engine.js"
   - case: "Loads Stage Bridge"
     check: import_exists
     file: "../shared/stage-bridge.js"

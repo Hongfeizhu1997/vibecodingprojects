@@ -200,7 +200,7 @@ description: "Validates SKU import, data enrichment, uplift management, calculat
   - case: "Uplift values has standard columns"
     check: csv_has_columns
     file: "sample_data/Stage3_Uplift_Values.csv"
-    expect: "Uplift Factors ID,Factor Name,Factor Values,Uplift Value,Status"
+    expect: "value_id,type_of_service,geo,technical_id,factor_name,factor_values,uplift_ratio,status"
   - case: "Uplift values has minimum 5 rows"
     check: csv_min_rows
     file: "sample_data/Stage3_Uplift_Values.csv"
