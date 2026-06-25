@@ -3,58 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GPS Pricing Dashboard v5.0</title>
+<title>GPS Cost Pricing Workbench — Pricing Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ── Base ── */
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#020617;color:#e2e8f0;min-height:100vh}
-.brand{background:linear-gradient(90deg,#E1251B,#d97706);padding:10px 24px;font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
-.brand span{opacity:.7;font-weight:400;font-size:12px}
-.wrap{max-width:1400px;margin:0 auto;padding:24px}
-.card{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:20px;margin-bottom:20px}
-.card-title{font-size:16px;font-weight:700;margin-bottom:12px;color:#f1f5f9}
-.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:20px}
-.stat-card{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:16px}
-.stat-val{font-size:28px;font-weight:900}
-.stat-label{font-size:12px;color:#94a3b8;margin-top:4px}
+body{font-family:'Montserrat','Helvetica Neue',Arial,sans-serif;font-size:14px;background:#F4F4F4;color:#1E0013;min-height:100vh}
+a{color:#E1251B;text-decoration:none}
+
+/* ── Nav ── */
+.nav{background:#11184F;color:#fff;display:flex;align-items:center;padding:0 20px;height:56px;gap:16px;position:sticky;top:0;z-index:100}
+.nav-brand{font-weight:700;font-size:15px;letter-spacing:.3px;color:#fff;text-decoration:none}
+.nav-brand span{color:#a78bfa;font-weight:400;font-size:12px;margin-left:8px}
+.nav-links{display:flex;gap:4px;flex:1;justify-content:flex-end}
+.nav-links a{color:#c4b5fd;padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer}
+.nav-links a:hover{background:rgba(255,255,255,.12);color:#fff}
+
+/* ── Layout ── */
+.wrap{max-width:1320px;margin:0 auto;padding:28px 24px}
+
+/* ── Stats ── */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:#fff;border:1px solid #E6E2E4;border-radius:6px;padding:20px 24px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.stat-val{font-size:32px;font-weight:700;color:#11184F;line-height:1.1}
+.stat-label{font-size:12px;color:#6F7170;margin-top:6px;font-weight:500}
+
+/* ── Card ── */
+.card{background:#fff;border:1px solid #E6E2E4;border-radius:6px;padding:24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-title{font-size:16px;font-weight:600;margin-bottom:16px;color:#11184F}
+
+/* ── Table ── */
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:8px 10px;color:#94a3b8;font-weight:600;border-bottom:2px solid #1e293b;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-td{padding:8px 10px;border-bottom:1px solid #0f172a}
-tr:hover td{background:rgba(59,130,246,0.04)}
-.btn{padding:6px 14px;border-radius:4px;border:none;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
-.btn-blue{background:#2563eb;color:#fff}
-.btn-green{background:#059669;color:#fff}
-.btn-outline{background:transparent;border:1px solid #334155;color:#cbd5e1}
-.btn-danger{background:#dc2626;color:#fff}
-.btn:hover{opacity:.85}
-input[type=text],select{background:#1e293b;color:#e2e8f0;border:1px solid #334155;border-radius:4px;padding:6px 10px;font-size:13px}
-input[type=text]::placeholder{color:#64748b}
+th{text-align:left;padding:10px 12px;color:#6F7170;font-weight:600;border-bottom:2px solid #E6E2E4;font-size:11px;text-transform:uppercase;letter-spacing:.5px;background:#FAFAFA}
+td{padding:9px 12px;border-bottom:1px solid #F0EEEF;color:#1E0013}
+tr:hover td{background:#FAECEB}
+
+/* ── Buttons ── */
+.btn{padding:7px 16px;border-radius:4px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.btn-primary{background:#11184F;color:#fff}
+.btn-primary:hover{background:#1a237e}
+.btn-accent{background:#E1251B;color:#fff}
+.btn-accent:hover{background:#c41e17}
+.btn-outline{background:#fff;border:1px solid #D1CFD0;color:#1E0013}
+.btn-outline:hover{border-color:#E1251B;color:#E1251B}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-sm.btn-outline{padding:3px 9px}
+
+/* ── Input ── */
+input[type=text]{font-family:inherit;font-size:13px;background:#fff;color:#1E0013;border:1px solid #D1CFD0;border-radius:4px;padding:7px 12px;outline:none;transition:border-color .15s}
+input[type=text]:focus{border-color:#E1251B}
+input[type=text]::placeholder{color:#ABA8B1}
+
+/* ── Badges ── */
+.badge{padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;display:inline-block}
+.badge-pass{background:#E8F5E9;color:#2E7D32}
+.badge-fail{background:#FFEBEE;color:#C62828}
+.badge-warn{background:#FFF3E0;color:#E65100}
+.badge-blocked{background:#FFEBEE;color:#C62828}
+.badge-ack{background:#E3F2FD;color:#1565C0}
+
+/* ── Utility ── */
 .flex-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
-.badge-pass{background:rgba(34,197,94,0.12);color:#22c55e}
-.badge-fail{background:rgba(239,68,68,0.12);color:#ef4444}
-.badge-warn{background:rgba(251,191,36,0.12);color:#fbbf24}
-.badge-blocked{background:rgba(220,38,38,0.15);color:#f87171}
-.badge-ack{background:rgba(59,130,246,0.12);color:#60a5fa}
-.text-muted{color:#64748b;font-size:12px}
+.text-muted{color:#ABA8B1;font-size:12px}
 .text-right{text-align:right}
-.clickable{cursor:pointer;color:#60a5fa}
+.clickable{cursor:pointer;color:#E1251B;font-weight:500}
 .clickable:hover{text-decoration:underline}
-#pn-history-panel,#audit-panel{display:none}
-.trend-up{color:#22c55e}
-.trend-down{color:#ef4444}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid #334155;border-top-color:#2563eb;border-radius:50%;animation:spin .6s linear infinite}
-.msg-box{padding:12px 16px;border-radius:4px;margin-bottom:12px;font-size:12px}
-.msg-ok{background:rgba(34,197,94,0.08);color:#22c55e;border:1px solid rgba(34,197,94,0.15)}
-.msg-err{background:rgba(239,68,68,0.08);color:#ef4444;border:1px solid rgba(239,68,68,0.15)}
+.trend-up{color:#2E7D32;font-weight:600}
+.trend-down{color:#C62828;font-weight:600}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #E6E2E4;border-top-color:#E1251B;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+#pn-history-panel,#audit-panel{display:none}
+
+/* ── Messages ── */
+.msg-box{padding:10px 16px;border-radius:4px;margin-bottom:12px;font-size:12px;font-weight:500}
+.msg-ok{background:#E8F5E9;color:#2E7D32;border:1px solid #C8E6C9}
+.msg-err{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2}
 </style>
 </head>
 <body>
 
-<div class="brand">
-  📊 GPS Pricing Dashboard
-  <span>| Pricing History & Trends</span>
-</div>
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-brand" href="../GPS_Cost_Pricing_Workbench.html">GPS · Pricing <span>| Dashboard</span></a>
+  <div class="nav-links">
+    <a href="../stage3_browser/index.html">Stage 3</a>
+    <a href="../stage4_browser/index.html">Stage 4</a>
+    <a href="../stage5_browser/index.html">Stage 5</a>
+    <a href="../stage6_browser/index.html">Stage 6</a>
+  </div>
+</nav>
 
 <div class="wrap">
 
@@ -68,8 +105,8 @@ input[type=text]::placeholder{color:#64748b}
 
   <!-- Actions -->
   <div class="flex-row" style="margin-bottom:20px">
-    <button class="btn btn-blue" onclick="location.reload()">🔄 Refresh</button>
-    <button class="btn btn-green" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="btn btn-primary" onclick="location.reload()">🔄 Refresh</button>
+    <button class="btn btn-accent" onclick="exportCSV()">⬇ Export CSV</button>
     <button class="btn btn-outline" onclick="document.getElementById('csv-import-input').click()">📤 Import CSV</button>
     <input type="file" id="csv-import-input" accept=".csv" style="display:none" onchange="importCSV(this.files[0])">
     <button class="btn btn-outline" onclick="hidePNHistory()">📋 Back to Cycles</button>
@@ -81,17 +118,15 @@ input[type=text]::placeholder{color:#64748b}
   <div class="card" id="cycles-panel">
     <div class="card-title">📅 Pricing Cycles</div>
     <table id="cycles-table">
-      <thead><tr>
-        <th>Cycle Name</th><th>PNs</th><th>Avg GP%</th><th>Last Updated</th><th>Actions</th>
-      </tr></thead>
-      <tbody id="cycles-tbody"><tr><td colspan="5" style="text-align:center;padding:30px;color:#64748b">No pricing data yet. Run a cycle through Stage 3→4→5→6 to populate history.</td></tr></tbody>
+      <thead><tr><th>Cycle Name</th><th>PNs</th><th>Avg GP%</th><th>Last Updated</th><th>Actions</th></tr></thead>
+      <tbody id="cycles-tbody"><tr><td colspan="5" style="text-align:center;padding:36px;color:#ABA8B1">No pricing data yet. Run a cycle through Stage 3→4→5→6 to populate history.</td></tr></tbody>
     </table>
   </div>
 
   <!-- Cycle Detail -->
   <div class="card" id="cycle-detail-panel" style="display:none">
     <div class="card-title" id="cycle-detail-title">Cycle Detail</div>
-    <div class="flex-row" style="margin-bottom:12px">
+    <div class="flex-row" style="margin-bottom:14px">
       <input type="text" id="pn-search" placeholder="Search PN..." oninput="filterCycleDetail()" style="width:250px">
       <span class="text-muted" id="pn-count"></span>
     </div>
@@ -118,9 +153,9 @@ input[type=text]::placeholder{color:#64748b}
     </table>
   </div>
 
-  <!-- Audit History (change log) -->
+  <!-- Change Log -->
   <div class="card" id="audit-panel" style="display:none">
-    <div class="card-title">📝 Change Log (Field-Level Audit)</div>
+    <div class="card-title">📝 Change Log</div>
     <table id="audit-table">
       <thead><tr><th>Field</th><th>Old Value</th><th>New Value</th><th>Changed At</th></tr></thead>
       <tbody id="audit-tbody"></tbody>
@@ -152,7 +187,7 @@ function renderStats() {
   }, '');
   document.getElementById('stat-latest').textContent = latest
     ? new Date(latest).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'})
-    : '—';
+    : '\u2014';
 }
 
 function renderCycles() {
@@ -162,8 +197,8 @@ function renderCycles() {
     '<td><span class="clickable" onclick="showCycleDetail(\''+escHtml(c.name)+'\')">'+escHtml(c.name)+'</span></td>' +
     '<td>'+c.pn_count+'</td>' +
     '<td>'+c.avg_gp+'</td>' +
-    '<td>'+(c.completed_at ? new Date(c.completed_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—')+'</td>' +
-    '<td><button class="btn btn-outline" style="padding:2px 8px;font-size:11px" onclick="showCycleDetail(\''+escHtml(c.name)+'\')">View</button></td>' +
+    '<td>'+(c.completed_at ? new Date(c.completed_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '\u2014')+'</td>' +
+    '<td><button class="btn btn-outline btn-sm" onclick="showCycleDetail(\''+escHtml(c.name)+'\')">View</button></td>' +
     '</tr>').join('');
 }
 
@@ -193,19 +228,19 @@ function filterCycleDetail() {
       r.gradient_status === 'PASS' ? '<span class="badge badge-pass">PASS</span>' :
       r.gradient_status === 'WARN' ? '<span class="badge badge-warn">WARN</span>' :
       '<span class="badge badge-fail">FAIL</span>';
-    const gp = r.gp_percent ? parseFloat(r.gp_percent).toFixed(1)+'%' : '—';
+    const gp = r.gp_percent ? parseFloat(r.gp_percent).toFixed(1)+'%' : '\u2014';
     return '<tr>' +
       '<td>'+escHtml(r.service_pn||'')+'</td>' +
       '<td>'+escHtml(r.country||'')+'</td>' +
       '<td>'+escHtml(r.service_tier||'')+'</td>' +
       '<td>'+escHtml(r.upgrade_years||'')+'</td>' +
-      '<td class="text-right">'+(r.sales_cost ? '$'+Number(r.sales_cost).toLocaleString() : '—')+'</td>' +
-      '<td class="text-right">'+(r.list_price ? '$'+Number(r.list_price).toLocaleString() : '—')+'</td>' +
-      '<td class="text-right">'+(r.channel_price ? '$'+Number(r.channel_price).toLocaleString() : '—')+'</td>' +
+      '<td class="text-right">'+(r.sales_cost ? '$'+Number(r.sales_cost).toLocaleString() : '\u2014')+'</td>' +
+      '<td class="text-right">'+(r.list_price ? '$'+Number(r.list_price).toLocaleString() : '\u2014')+'</td>' +
+      '<td class="text-right">'+(r.channel_price ? '$'+Number(r.channel_price).toLocaleString() : '\u2014')+'</td>' +
       '<td class="text-right">'+gp+'</td>' +
       '<td>'+gveBadge+'</td>' +
       '<td>'+gradBadge+'</td>' +
-      '<td><button class="btn btn-outline" style="padding:2px 8px;font-size:11px" onclick="showPNHistory(\''+escHtml(r.service_pn||'')+'\')">Trend</button></td>' +
+      '<td><button class="btn btn-outline btn-sm" onclick="showPNHistory(\''+escHtml(r.service_pn||'')+'\')">Trend</button></td>' +
       '</tr>';
   }).join('');
 }
@@ -254,26 +289,26 @@ function showPNHistory(pn) {
 
 async function loadAuditHistory(pn) {
   const tbody = document.getElementById('audit-tbody');
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b"><span class="spinner"></span> Loading change log\u2026</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:#ABA8B1"><span class="spinner"></span> Loading\u2026</td></tr>';
   try {
     const resp = await fetch('/api/pn-history?pn=' + encodeURIComponent(pn));
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const logs = await resp.json();
     if (!logs.length) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b">No field-level changes recorded yet. Changes are tracked when a PN is re-priced in the same cycle.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:#ABA8B1">No field-level changes recorded yet. Changes are tracked when a PN is re-priced in the same cycle.</td></tr>';
       return;
     }
     tbody.innerHTML = logs.map(l => {
       const ts = l.changed_at ? new Date(l.changed_at + 'Z').toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '\u2014';
       return '<tr>' +
         '<td><strong>'+escHtml(l.field_name)+'</strong></td>' +
-        '<td style="color:#94a3b8">'+escHtml(l.old_value||'\u2014')+'</td>' +
-        '<td style="color:#e2e8f0">'+escHtml(l.new_value||'\u2014')+'</td>' +
+        '<td style="color:#6F7170">'+escHtml(l.old_value||'\u2014')+'</td>' +
+        '<td style="color:#1E0013">'+escHtml(l.new_value||'\u2014')+'</td>' +
         '<td class="text-muted">'+ts+'</td>' +
         '</tr>';
     }).join('');
   } catch(e) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#ef4444">Failed to load: ' + escHtml(e.message) + '</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#C62828">Failed to load: ' + escHtml(e.message) + '</td></tr>';
   }
 }
 
@@ -287,7 +322,7 @@ function hidePNHistory() {
 
 async function exportCSV() {
   const msg = document.getElementById('action-msg');
-  msg.innerHTML = '<div class="msg-box msg-ok"><span class="spinner"></span> Exporting from SQLite...</div>';
+  msg.innerHTML = '<div class="msg-box msg-ok"><span class="spinner"></span> Exporting...</div>';
   try {
     const resp = await fetch('/api/export-csv');
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -296,7 +331,7 @@ async function exportCSV() {
     a.href = URL.createObjectURL(blob);
     a.download = 'pricing_master_' + new Date().toISOString().slice(0,10) + '.csv';
     a.click();
-    msg.innerHTML = '<div class="msg-box msg-ok">Export complete. CSV downloaded.</div>';
+    msg.innerHTML = '<div class="msg-box msg-ok">\u2713 Export complete. CSV downloaded.</div>';
     setTimeout(() => msg.innerHTML = '', 3000);
   } catch(e) {
     msg.innerHTML = '<div class="msg-box msg-err">Export failed: ' + escHtml(e.message) + '</div>';
@@ -306,7 +341,7 @@ async function exportCSV() {
 async function importCSV(file) {
   if (!file) return;
   const msg = document.getElementById('action-msg');
-  if (!confirm('Import ' + file.name + '?\n\nThis will upsert records into the SQLite database.\nNew records will be added; existing records will be updated.')) {
+  if (!confirm('Import ' + file.name + '?\n\nRecords will be upserted into the database.')) {
     document.getElementById('csv-import-input').value = '';
     return;
   }
@@ -319,7 +354,7 @@ async function importCSV(file) {
       body: text
     });
     const result = await resp.json();
-    msg.innerHTML = '<div class="msg-box msg-ok">Imported: ' + result.imported + ' | Skipped: ' + result.skipped + ' | Errors: ' + (result.errors||[]).length + '</div>';
+    msg.innerHTML = '<div class="msg-box msg-ok">\u2713 Imported: ' + result.imported + ' | Skipped: ' + result.skipped + ' | Errors: ' + (result.errors||[]).length + '</div>';
     setTimeout(() => location.reload(), 1500);
   } catch(e) {
     msg.innerHTML = '<div class="msg-box msg-err">Import failed: ' + escHtml(e.message) + '</div>';
