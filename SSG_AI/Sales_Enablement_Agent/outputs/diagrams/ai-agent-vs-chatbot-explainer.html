@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSG Sales Enablement Agent — Why Beyond Spark [static]</title>
+<style>
+  :root {
+    --bg: #020617; --card: rgba(15,23,42,0.9); --border: rgba(148,163,184,0.10);
+    --text: #e2e8f0; --dim: #94a3b8; --accent: #38bdf8; --red: #f87171;
+    --green: #4ade80; --amber: #fbbf24; --purple: #a78bfa; --teal: #5eead4;
+    --rose: #fb7185;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+  body{background:radial-gradient(ellipse 80% 30% at 50% 0%,rgba(56,189,248,0.03) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 90% 80%,rgba(167,139,250,0.03) 0%,transparent 70%),var(--bg)}
+  .brand-bar{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--accent),var(--purple),#f472b6);z-index:100}
+  .container{max-width:1040px;margin:0 auto;padding:2.5rem 2rem 4rem}
+
+  .header{margin-bottom:2.5rem;padding-top:.5rem}
+  .badge{display:inline-block;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.18rem .55rem;border-radius:20px;background:rgba(94,234,212,0.08);color:var(--teal);border:1px solid rgba(94,234,212,0.15);margin-bottom:.7rem}
+  .header h1{font-size:1.9rem;font-weight:900;margin-bottom:.3rem;background:linear-gradient(135deg,#fff,var(--teal),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
+  .header .sub{font-size:.7rem;color:var(--dim)}
+
+  .section{margin-bottom:2.5rem}
+  .section-label{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:.25rem}
+  .section h2{font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+  .section h2 .num{font-size:.67rem;color:var(--teal);background:rgba(94,234,212,0.1);padding:.12rem .45rem;border-radius:4px;font-weight:700}
+
+  .callout{font-size:.65rem;color:var(--amber);padding:.5rem .8rem;margin:.6rem 0;background:linear-gradient(90deg,rgba(251,191,36,0.04) 0%,transparent 100%);border-left:3px solid rgba(251,191,36,0.25);border-radius:0 6px 6px 0}
+  .callout strong{color:#fde68a}
+  .callout-teal{font-size:.65rem;color:var(--teal);padding:.5rem .8rem;margin:.6rem 0;background:linear-gradient(90deg,rgba(94,234,212,0.04) 0%,transparent 100%);border-left:3px solid rgba(94,234,212,0.2);border-radius:0 6px 6px 0}
+
+  /* Card grids */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:.6rem 0}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin:.6rem 0}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:.6rem 0}
+
+  .card{padding:.8rem .9rem;border-radius:8px;border:1px solid}
+  .card h4{font-size:.68rem;font-weight:700;margin-bottom:.35rem}
+  .card ul{list-style:none;padding:0;margin:0}
+  .card li{font-size:.63rem;color:var(--dim);padding:.12rem 0}
+  .card li::before{content:'— ';color:var(--dim);margin-right:.15rem}
+  .card-t{background:rgba(94,234,212,0.03);border-color:rgba(94,234,212,0.1)}
+  .card-t h4{color:var(--teal)}
+  .card-a{background:rgba(56,189,248,0.03);border-color:rgba(56,189,248,0.1)}
+  .card-a h4{color:var(--accent)}
+  .card-g{background:rgba(74,222,128,0.03);border-color:rgba(74,222,128,0.08)}
+  .card-g h4{color:var(--green)}
+  .card-r{background:rgba(251,113,133,0.03);border-color:rgba(251,113,133,0.08)}
+  .card-r h4{color:var(--rose)}
+  .card-p{background:rgba(167,139,250,0.03);border-color:rgba(167,139,250,0.1)}
+  .card-p h4{color:var(--purple)}
+
+  /* Wave cards */
+  .wave-card{padding:.7rem .8rem;border-radius:8px;border:1px solid;text-align:center}
+  .wave-card .wave-num{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.25rem}
+  .wave-card .wave-scenes{font-size:.62rem;color:var(--dim);line-height:1.4}
+  .w1-card{background:rgba(74,222,128,0.03);border-color:rgba(74,222,128,0.1)}
+  .w1-card .wave-num{color:var(--green)}
+  .w2-card{background:rgba(251,191,36,0.03);border-color:rgba(251,191,36,0.1)}
+  .w2-card .wave-num{color:var(--amber)}
+  .w3-card{background:rgba(251,146,60,0.03);border-color:rgba(251,146,60,0.1)}
+  .w3-card .wave-num{color:#fb923c}
+  .w4-card{background:rgba(148,163,184,0.02);border-color:rgba(148,163,184,0.06)}
+  .w4-card .wave-num{color:var(--dim)}
+
+  /* Safety tags */
+  .safety-row{display:flex;gap:.8rem;margin:.6rem 0}
+  .safety-tag{flex:1;padding:.6rem .8rem;border-radius:6px;text-align:center}
+  .safety-tag .icon{font-size:.85rem;margin-bottom:.2rem}
+  .safety-tag .label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .safety-tag .items{font-size:.62rem;color:var(--dim);margin-top:.3rem;line-height:1.5}
+  .s-auto{background:rgba(74,222,128,0.04);border:1px solid rgba(74,222,128,0.12)}
+  .s-auto .label{color:var(--green)}
+  .s-approve{background:rgba(248,113,113,0.04);border:1px solid rgba(248,113,113,0.12)}
+  .s-approve .label{color:var(--red)}
+
+  /* Table (compact) */
+  table{width:100%;border-collapse:separate;border-spacing:0;margin:.6rem 0;font-size:.64rem;border:1px solid rgba(148,163,184,0.06);border-radius:8px;overflow:hidden;background:rgba(15,23,42,0.5)}
+  thead{background:linear-gradient(180deg,rgba(94,234,212,0.05) 0%,rgba(94,234,212,0.01) 100%)}
+  th{text-align:left;padding:.45rem .55rem;font-weight:700;font-size:.62rem;text-transform:uppercase;letter-spacing:.04em;color:var(--teal);border-bottom:1px solid rgba(94,234,212,0.08);white-space:nowrap}
+  td{padding:.38rem .55rem;border-bottom:1px solid rgba(148,163,184,0.04);color:var(--dim);vertical-align:top;line-height:1.4}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(94,234,212,0.012)}
+  td:first-child{color:var(--text);font-weight:500}
+  .td-ok{color:var(--green);font-weight:600}
+  .td-warn{color:var(--amber);font-weight:600}
+  .td-rose{color:var(--rose);font-weight:600}
+  .td-dim{color:var(--dim)}
+
+  .cmp-table td{font-size:.63rem}
+  .cmp-table td:first-child{font-size:.65rem}
+  .cmp-table th:last-child{color:#fff;background:linear-gradient(180deg,rgba(94,234,212,0.12) 0%,rgba(94,234,212,0.04) 100%)}
+
+  /* Bar chart */
+  .bar-row{display:flex;align-items:center;gap:.7rem;margin:.25rem 0}
+  .bar-label{font-size:.62rem;color:var(--dim);width:75px;text-align:right;flex-shrink:0;font-weight:600}
+  .bar-track{flex:1;height:22px;background:rgba(148,163,184,0.04);border-radius:4px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:.55rem;font-size:.62rem;font-weight:600;color:#fff}
+  .bar-fill-teal{background:linear-gradient(90deg,rgba(94,234,212,0.3),rgba(94,234,212,0.6))}
+  .bar-fill-rose{background:linear-gradient(90deg,rgba(251,113,133,0.3),rgba(251,113,133,0.5))}
+  .bar-hint{font-size:.62rem;color:#334155;text-align:right;margin:.15rem 0 .6rem}
+
+  /* Kflow */
+  .kflow{display:flex;align-items:center;gap:.5rem;margin:.8rem 0;font-size:.63rem;flex-wrap:wrap}
+  .kflow-box{background:rgba(94,234,212,0.06);border:1px solid rgba(94,234,212,0.12);border-radius:6px;padding:.4rem .65rem;color:var(--teal);font-weight:600;white-space:nowrap;text-align:center}
+  .kflow-arrow{color:#475569;font-size:.8rem;flex-shrink:0}
+  .kflow-label{font-size:.62rem;color:var(--dim);text-align:center;line-height:1.3}
+
+  /* SVG */
+  .diagram-wrap{margin:.8rem 0;padding:.8rem;background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.05);border-radius:10px}
+  .diagram-wrap svg{display:block;width:100%;height:auto}
+
+  .callout-teal{font-size:.65rem;color:var(--teal);padding:.5rem .8rem;margin:.6rem 0;background:linear-gradient(90deg,rgba(94,234,212,0.04) 0%,transparent 100%);border-left:3px solid rgba(94,234,212,0.2);border-radius:0 6px 6px 0}
+
+  .footer{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid rgba(148,163,184,0.05);font-size:.62rem;color:#334155}
+
+  @media(max-width:768px){
+    .container{padding:1.5rem 1rem}
+    .header h1{font-size:1.3rem}
+    .grid2,.grid3,.grid4{grid-template-columns:1fr}
+    .safety-row{flex-direction:column}
+    .kflow{font-size:.63rem}
+  }
+</style>
+</head>
+<body>
+<div class="brand-bar"></div>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="badge">SSG GPS · AI Strategy</div>
+  <h1>Why We Need a Layer Beyond Spark</h1>
+  <div class="sub">Spark Chatbot + Vibe Coding Tools + Codex Agents → Enterprise AI Agent Platform</div>
+</div>
+
+<!-- §1: THE CEILING -->
+<div class="section">
+  <div class="section-label">Section 1</div>
+  <h2><span class="num">01</span> Spark Helped — But Hits a Natural Ceiling</h2>
+
+  <div class="grid3">
+    <div class="card card-g">
+      <h4>✅ What Spark Does Well</h4>
+      <ul><li>FAQ lookups &amp; process guidance</li><li>Moved team from docs → asking AI</li></ul>
+    </div>
+    <div class="card card-r">
+      <h4>❌ What Spark Cannot Do</h4>
+      <ul><li>Call system APIs (ODT, CPM, Concord)</li><li>Cross-reference live data across systems</li><li>Proactively monitor &amp; push alerts</li><li>Understand Booking data structures</li></ul>
+    </div>
+    <div class="card card-a">
+      <h4>⚠️ Vibe Coding &amp; Codex Agents</h4>
+      <ul><li>Single-user, single-system scripts</li><li>No security boundaries or audit trail</li><li>Zero knowledge sharing across tools</li><li>Dies when the builder leaves</li></ul>
+    </div>
+  </div>
+
+  <div class="callout"><strong>All three are point solutions.</strong> They prove the demand is real — but each rebuilds from scratch for every scenario.</div>
+</div>
+
+<!-- §2: COMPARISON TABLE -->
+<div class="section">
+  <div class="section-label">Section 2</div>
+  <h2><span class="num">02</span> Capability Boundaries Across Four Approaches</h2>
+
+  <table class="cmp-table">
+    <thead><tr><th>Capability</th><th>Spark</th><th>Vibe Coding</th><th>Codex Agent</th><th>SSG Agent</th></tr></thead>
+    <tbody>
+      <tr><td>Knowledge Q&amp;A</td><td class="td-ok">✅</td><td class="td-dim">❌</td><td class="td-ok">✅</td><td class="td-ok">✅</td></tr>
+      <tr><td>Cross-system live queries</td><td class="td-dim">Chatbot limit</td><td class="td-rose">Single-system</td><td class="td-warn">Per-system dev</td><td class="td-ok">6 system APIs</td></tr>
+      <tr><td>Multi-step orchestration</td><td class="td-dim">❌</td><td class="td-dim">❌</td><td class="td-warn">Per-scenario script</td><td class="td-ok">Auto decompose</td></tr>
+      <tr><td>Approval controls</td><td class="td-dim">❌</td><td class="td-dim">❌</td><td class="td-rose">Build from scratch</td><td class="td-ok">2-tier built-in</td></tr>
+      <tr><td>Data masking</td><td class="td-dim">❌</td><td class="td-rose">May leak to AI</td><td class="td-rose">Build from scratch</td><td class="td-ok">Auto-masked</td></tr>
+      <tr><td>Audit trail</td><td class="td-dim">❌</td><td class="td-dim">❌</td><td class="td-rose">Build from scratch</td><td class="td-ok">Full-chain logs</td></tr>
+      <tr><td>Role-based access</td><td class="td-dim">❌</td><td class="td-dim">❌</td><td class="td-rose">Build from scratch</td><td class="td-ok">PM / Pricing / Finance</td></tr>
+      <tr><td>Proactive monitoring</td><td class="td-dim">❌</td><td class="td-dim">❌</td><td class="td-warn">Manual cron scripts</td><td class="td-ok">Auto-capture + push</td></tr>
+      <tr><td>Team memory</td><td class="td-dim">❌</td><td class="td-dim">❌</td><td class="td-dim">❌</td><td class="td-ok">Cross-session</td></tr>
+      <tr><td>Knowledge compounding</td><td class="td-dim">❌</td><td class="td-rose">Siloed per script</td><td class="td-rose">No cross-sharing</td><td class="td-ok">KB auto-enriches</td></tr>
+      <tr><td>Business-team maintainable</td><td class="td-dim">❌</td><td class="td-warn">Write only</td><td class="td-rose">IT-dependent</td><td class="td-ok">KB update = global</td></tr>
+      <tr><td>Deployment</td><td class="td-dim">SaaS</td><td class="td-rose">External AI</td><td class="td-dim">Varies</td><td class="td-ok">Lenovo internal</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- §3: SOLUTION -->
+<div class="section">
+  <div class="section-label">Section 3</div>
+  <h2><span class="num">03</span> Our Solution: An AI Team That Gets Work Done</h2>
+
+  <p style="font-size:.67rem;color:var(--dim);margin-bottom:.5rem">One <strong style="color:var(--text)">Coordinator</strong> + four <strong style="color:var(--text)">Specialists</strong> + a <strong style="color:var(--text)">shared knowledge base</strong> — all in Teams.</p>
+
+  <div class="diagram-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" font-family="-apple-system,BlinkMacSystemFont,sans-serif">
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10" fill="#475569"/></marker>
+        <marker id="at" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10" fill="#5eead4"/></marker>
+      </defs>
+      <!-- User -->
+      <rect x="310" y="8" width="180" height="34" rx="17" fill="#0f172a" stroke="#38bdf8" stroke-width="1.3"/>
+      <text x="400" y="30" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="700">You (in Teams)</text>
+      <line x1="400" y1="42" x2="400" y2="68" stroke="#475569" stroke-width="1.3" marker-end="url(#a)"/>
+      <!-- Master -->
+      <rect x="175" y="72" width="450" height="44" rx="8" fill="#0f172a" stroke="#5eead4" stroke-width="1.5"/>
+      <rect x="175" y="72" width="450" height="44" rx="8" fill="rgba(20,184,166,0.06)"/>
+      <text x="400" y="91" text-anchor="middle" fill="#5eead4" font-size="13" font-weight="700">Coordinator</text>
+      <text x="400" y="107" text-anchor="middle" fill="#64748b" font-size="9">Intent Recognition · Task Dispatch · Result Aggregation</text>
+      <!-- Fan-out -->
+      <line x1="240" y1="116" x2="160" y2="162" stroke="#475569" stroke-width="1" marker-end="url(#a)"/>
+      <line x1="302" y1="116" x2="340" y2="162" stroke="#475569" stroke-width="1" marker-end="url(#a)"/>
+      <line x1="500" y1="116" x2="520" y2="162" stroke="#475569" stroke-width="1" marker-end="url(#a)"/>
+      <line x1="560" y1="116" x2="640" y2="162" stroke="#475569" stroke-width="1" marker-end="url(#a)"/>
+      <!-- 4 Specialists -->
+      <rect x="40" y="168" width="155" height="56" rx="7" fill="#0f172a" stroke="#a78bfa" stroke-width="1.2"/>
+      <rect x="40" y="168" width="155" height="56" rx="7" fill="rgba(167,139,250,0.05)"/>
+      <text x="117" y="191" text-anchor="middle" fill="#c4b5fd" font-size="10" font-weight="700">PN Specialist</text>
+      <text x="117" y="208" text-anchor="middle" fill="#64748b" font-size="7.5">Data Lookup</text>
+      <text x="117" y="219" text-anchor="middle" fill="#64748b" font-size="7.5">Change Impact</text>
+      <rect x="210" y="168" width="155" height="56" rx="7" fill="#0f172a" stroke="#a78bfa" stroke-width="1.2"/>
+      <rect x="210" y="168" width="155" height="56" rx="7" fill="rgba(167,139,250,0.05)"/>
+      <text x="287" y="191" text-anchor="middle" fill="#c4b5fd" font-size="10" font-weight="700">Cost Specialist</text>
+      <text x="287" y="208" text-anchor="middle" fill="#64748b" font-size="7.5">Sales Cost</text>
+      <text x="287" y="219" text-anchor="middle" fill="#64748b" font-size="7.5">Uplift Rules</text>
+      <rect x="380" y="168" width="155" height="56" rx="7" fill="#0f172a" stroke="#a78bfa" stroke-width="1.2"/>
+      <rect x="380" y="168" width="155" height="56" rx="7" fill="rgba(167,139,250,0.05)"/>
+      <text x="457" y="191" text-anchor="middle" fill="#c4b5fd" font-size="10" font-weight="700">Pricing Specialist</text>
+      <text x="457" y="208" text-anchor="middle" fill="#64748b" font-size="7.5">PFV Benchmarking</text>
+      <text x="457" y="219" text-anchor="middle" fill="#64748b" font-size="7.5">List / Channel Price</text>
+      <rect x="550" y="168" width="155" height="56" rx="7" fill="#0f172a" stroke="#a78bfa" stroke-width="1.2"/>
+      <rect x="550" y="168" width="155" height="56" rx="7" fill="rgba(167,139,250,0.05)"/>
+      <text x="627" y="191" text-anchor="middle" fill="#c4b5fd" font-size="10" font-weight="700">Lifecycle Specialist</text>
+      <text x="627" y="208" text-anchor="middle" fill="#64748b" font-size="7.5">MT Monitoring</text>
+      <text x="627" y="219" text-anchor="middle" fill="#64748b" font-size="7.5">PN Retirement</text>
+      <!-- KB arrows -->
+      <line x1="117" y1="224" x2="117" y2="265" stroke="#5eead4" stroke-width="0.7" stroke-dasharray="4,3" marker-end="url(#at)"/>
+      <line x1="287" y1="224" x2="287" y2="265" stroke="#5eead4" stroke-width="0.7" stroke-dasharray="4,3" marker-end="url(#at)"/>
+      <line x1="457" y1="224" x2="457" y2="265" stroke="#5eead4" stroke-width="0.7" stroke-dasharray="4,3" marker-end="url(#at)"/>
+      <line x1="627" y1="224" x2="627" y2="265" stroke="#5eead4" stroke-width="0.7" stroke-dasharray="4,3" marker-end="url(#at)"/>
+      <line x1="127" y1="263" x2="127" y2="226" stroke="#5eead4" stroke-width="0.7" stroke-dasharray="4,3" marker-end="url(#at)"/>
+      <line x1="297" y1="263" x2="297" y2="226" stroke="#5eead4" stroke-width="0.7" stroke-dasharray="4,3" marker-end="url(#at)"/>
+      <line x1="467" y1="263" x2="467" y2="226" stroke="#5eead4" stroke-width="0.7" stroke-dasharray="4,3" marker-end="url(#at)"/>
+      <line x1="637" y1="263" x2="637" y2="226" stroke="#5eead4" stroke-width="0.7" stroke-dasharray="4,3" marker-end="url(#at)"/>
+      <!-- KB -->
+      <rect x="70" y="270" width="660" height="48" rx="7" fill="#0f172a" stroke="#5eead4" stroke-width="1.2"/>
+      <rect x="70" y="270" width="660" height="48" rx="7" fill="rgba(20,184,166,0.04)"/>
+      <text x="400" y="291" text-anchor="middle" fill="#5eead4" font-size="11" font-weight="700">Shared Knowledge Base</text>
+      <text x="400" y="307" text-anchor="middle" fill="#64748b" font-size="8">PN Lifecycle Rules · Tier Definitions · Approval Matrix · ODT Fields · Risk Mapping</text>
+    </svg>
+  </div>
+
+  <div class="callout-teal">Like a customer service team: billing, returns, and support specialists — each owns a domain, all share the same SOP manual.</div>
+
+  <!-- Scenarios as wave cards -->
+  <p style="font-size:.67rem;color:var(--dim);margin:.8rem 0 .4rem"><strong style="color:var(--text)">13 scenarios across 4 waves</strong></p>
+  <div class="grid4">
+    <div class="wave-card w1-card">
+      <div class="wave-num">Wave 1 · 4–6 wks</div>
+      <div class="wave-scenes">Read-only queries<br>#12 PN lookup · #1 ODT impact · #4 MT capture</div>
+    </div>
+    <div class="wave-card w2-card">
+      <div class="wave-num">Wave 2 · 6–8 wks</div>
+      <div class="wave-scenes">Semi-auto PN ops<br>#2 POR gen · #3 Dup check · #5 Lifecycle · #7 Create/Extend</div>
+    </div>
+    <div class="wave-card w3-card">
+      <div class="wave-num">Wave 3 · 8–10 wks</div>
+      <div class="wave-scenes">Cost + Pricing closed loop<br>#6 Sub-Tier · #8 Std Cost · #9 Uplift · #10 PFV · #11 Price</div>
+    </div>
+    <div class="wave-card w4-card">
+      <div class="wave-num">Wave 4 · Ongoing</div>
+      <div class="wave-scenes">Optimization<br>#13 Onboarding · Cross-role workflow</div>
+    </div>
+  </div>
+
+  <!-- Safety -->
+  <p style="font-size:.67rem;color:var(--dim);margin:.8rem 0 .4rem"><strong style="color:var(--text)">Two-tier safety</strong></p>
+  <div class="safety-row">
+    <div class="safety-tag s-auto">
+      <div class="icon">🟢</div><div class="label">Auto-Execute</div>
+      <div class="items">Query data · Generate reports · MT ingestion · ODT analysis</div>
+    </div>
+    <div class="safety-tag s-approve">
+      <div class="icon">🔴</div><div class="label">Requires Approval</div>
+      <div class="items">Cost writes to CPM · Price publication · PN batch retirement</div>
+    </div>
+  </div>
+  <p style="font-size:.62rem;color:var(--dim)">Booking data auto-masked before AI · Full-chain audit trail · Spark continues alongside for FAQ</p>
+</div>
+
+<!-- §4: ECONOMICS -->
+<div class="section">
+  <div class="section-label">Section 4</div>
+  <h2><span class="num">04</span> The Economics: Platform vs. Point Solutions</h2>
+
+  <p style="font-size:.67rem;color:var(--dim);margin-bottom:.2rem"><strong style="color:var(--text)">Point solutions:</strong> each scenario ~4 weeks, zero sharing. <strong style="color:var(--text)">Platform:</strong> foundation built once, each new scenario gets faster.</p>
+
+  <div style="margin:.6rem 0">
+    <div style="font-size:.62rem;color:var(--rose);font-weight:700;margin-bottom:.4rem">Point Solutions — 13 × 4w ≈ 52 weeks + 13 maintenance streams</div>
+    <div class="bar-row"><span class="bar-label">Scenario #1</span><div class="bar-track"><div class="bar-fill bar-fill-rose" style="width:75%">~4w (integration + security + permissions)</div></div></div>
+    <div class="bar-row"><span class="bar-label">Scenario #5</span><div class="bar-track"><div class="bar-fill bar-fill-rose" style="width:75%">~4w</div></div></div>
+    <div class="bar-row"><span class="bar-label">Scenario #10</span><div class="bar-track"><div class="bar-fill bar-fill-rose" style="width:75%">~4w</div></div></div>
+  </div>
+
+  <div style="margin:.8rem 0">
+    <div style="font-size:.62rem;color:var(--teal);font-weight:700;margin-bottom:.4rem">SSG Agent Platform — ~20 weeks total + 1 maintenance stream</div>
+    <div class="bar-row"><span class="bar-label">Platform</span><div class="bar-track"><div class="bar-fill bar-fill-teal" style="width:100%">~6w (6 system APIs + security + approval + KB)</div></div></div>
+    <div class="bar-row"><span class="bar-label">Scenario #1</span><div class="bar-track"><div class="bar-fill bar-fill-teal" style="width:38%">~2w</div></div></div>
+    <div class="bar-row"><span class="bar-label">Scenario #5</span><div class="bar-track"><div class="bar-fill bar-fill-teal" style="width:20%">~1w</div></div></div>
+    <div class="bar-row"><span class="bar-label">Scenario #10</span><div class="bar-track"><div class="bar-fill bar-fill-teal" style="width:10%">~2-3d</div></div></div>
+    <div class="bar-hint">~40% of point-solution cost after 13 scenarios</div>
+  </div>
+
+  <p style="font-size:.67rem;color:var(--dim);margin:.8rem 0 .4rem"><strong style="color:var(--text)">Knowledge compounding</strong> — each scenario enriches the shared KB, automatically inherited by the next.</p>
+  <div class="kflow">
+    <span class="kflow-box">#1 ODT<br>Analysis</span>
+    <span class="kflow-arrow">→</span>
+    <span class="kflow-label">Builds risk<br>mapping rules</span>
+    <span class="kflow-arrow">→</span>
+    <span class="kflow-box">#5 PN<br>Lifecycle</span>
+    <span class="kflow-arrow">→</span>
+    <span class="kflow-label">Auto-inherits<br>risk rules</span>
+    <span class="kflow-arrow">→</span>
+    <span class="kflow-box">#13 New<br>Onboarding</span>
+    <span class="kflow-arrow">→</span>
+    <span class="kflow-label">Auto-owns all<br>12 scenarios'<br>knowledge</span>
+  </div>
+
+  <p style="font-size:.67rem;color:var(--dim);margin:.8rem 0 .4rem"><strong style="color:var(--text)">Maintenance: change one place, not N</strong></p>
+  <table>
+    <thead><tr><th>Change event</th><th>Point solutions</th><th>Platform</th></tr></thead>
+    <tbody>
+      <tr><td>PN approval rule update</td><td class="td-rose">Update every tool/agent individually</td><td class="td-ok">One KB rule — all specialists effective</td></tr>
+      <tr><td>New business system added</td><td class="td-rose">Each tool connects separately</td><td class="td-ok">Connect once — all available</td></tr>
+      <tr><td>Colleague leaves</td><td class="td-rose">Successor learns N codebases</td><td class="td-ok">Successor maintains one platform</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- §5: RISK -->
+<div class="section">
+  <div class="section-label">Section 5</div>
+  <h2><span class="num">05</span> The Hidden Cost of Not Investing</h2>
+
+  <table>
+    <thead><tr><th>Risk</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Missed MT announcements</strong></td><td>Manual scan — one miss = compliance issue or PN creation delay</td></tr>
+      <tr><td><strong>Slow ODT change response</strong></td><td>Hours cross-referencing 3–4 systems — Bookings may use old attributes</td></tr>
+      <tr><td><strong>Knowledge tied to individuals</strong></td><td>Veteran leaves → knowledge leaves. No systematic retention</td></tr>
+      <tr><td><strong>More scenarios = more strain</strong></td><td>Each new scenario = another tool to build. Queues grow longer</td></tr>
+      <tr><td><strong>Blurred security boundaries</strong></td><td>No unified approval — who accessed what? Hard to trace</td></tr>
+      <tr style="background:rgba(251,113,133,0.03)"><td><strong style="color:var(--rose)">⚠ Vibe coding data leak</strong></td><td style="color:var(--rose)">Booking data may reach external AI — no masking, no audit</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- §6: SUMMARY -->
+<div class="section">
+  <div class="section-label">Section 6</div>
+  <h2><span class="num">06</span> Summary &amp; Recommendation</h2>
+
+  <div class="grid3" style="margin-bottom:.8rem">
+    <div class="card card-a">
+      <h4>Spark Continues</h4>
+      <ul><li>FAQ · Process guidance</li><li>No changes needed</li></ul>
+    </div>
+    <div class="card card-t">
+      <h4>Agent Adds New Capability</h4>
+      <ul><li>Cross-system live queries</li><li>Multi-step analysis</li><li>Proactive monitoring &amp; push</li></ul>
+    </div>
+    <div class="card card-g">
+      <h4>Wave 1: Prove It First</h4>
+      <ul><li>#12 PN lookup — most used</li><li>#1 ODT impact — highest value</li><li>#4 MT capture — close the gap</li></ul>
+    </div>
+  </div>
+
+  <div class="callout-teal">
+    <strong>4–6 weeks · 3 scenarios · Read-only · Zero disruption.</strong> Let the team use it for 2–4 weeks, then decide on Wave 2. Not betting everything — validating the biggest value with the smallest investment.
+  </div>
+</div>
+
+<div class="footer">
+  SSG Sales Enablement Agent · Strategy Document · V1 · 2026-07-01 · Confidential
+</div>
+
+</div>
+</body>
+</html>
