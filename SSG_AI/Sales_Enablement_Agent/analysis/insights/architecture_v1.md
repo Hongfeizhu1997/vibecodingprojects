@@ -1,6 +1,6 @@
 # SSG Sales Enablement Agent — 架构方案 V1
 
-> 创建：2026-06-03 | 更新：2026-06-10 | 来源：iChain Persona Workspace + DeerFlow (Vetraflow) + SSG GPS 业务需求 + ITshare Engineering & AI Workshop (2026 May)
+> 创建：2026-06-03 | 更新：2026-07-02 | 来源：iChain Persona Workspace + Vetra (VetraFlow) 平台 + SSG GPS 业务需求 + ITshare Engineering & AI Workshop (2026 May) + NextOra SW Dev Agent Phase1 方案
 
 ---
 
@@ -8,7 +8,7 @@
 
 **一句话**：为 SSG GPS 每个角色构建 Persona Agent，覆盖服务 PN 从创建到退出的全生命周期。
 
-借鉴 iChain 三层模型：`Persona Workspace → Persona Agent → Execution Loop`，技术底座用 DeerFlow (Vetraflow) + Lenovo Hybrid AI Platform。
+借鉴 iChain 三层模型：`Persona Workspace → Persona Agent → Execution Loop`，技术底座用 Vetra (VetraFlow) 平台（基于 DeerFlow 框架）+ Lenovo Hybrid AI Platform。
 
 ### Harness Engineering 定位
 
@@ -95,11 +95,24 @@ SSG Enablement Agent 直接以 Harness Engineering 为起点构建，核心理�
 │  │  Models (SaaS LLM) / Knowledge (RAG) / Data / Tools│   │
 │  └────────────────────────────────────────────────────┘   │
 │  ┌────────────────────────────────────────────────────┐   │
-│  │  DeerFlow (Vetraflow)                              │   │
-│  │  Sub-Agent · Sandbox · Memory · Skills · Gateway   │   │
+│  │  Vetra (VetraFlow) — 基于 DeerFlow 框架              │   │
+│  │  Memory · Skills · Constraints · Sandbox              │   │
 │  └────────────────────────────────────────────────────┘   │
 └───────────────────────────────────────────────────────────┘
 ```
+
+### Vetra 2.0 核心组件与 SSG 架构映射
+
+Vetra 平台定义四大核心组件，SSG 架构的各层直接对其映射：
+
+| Vetra 2.0 组件 | 职责 | SSG 架构对应层 |
+|---------------|------|---------------|
+| **Memory** | 跨会话状态、经验、知识连续性 | §7 Memory System（短期/长期/领域记忆） |
+| **Skills** | 可复用能力封装，独立版本化与测试 | Sub-Agent 能力以 Skill 形式封装，可插拔、可独立演进 |
+| **Constraints** | 规则、权限、边界——确保 Agent 在受控范围内行动 | §5 Security Layer（Auto/Approval 分级 + Audit Log） |
+| **Sandbox** | 隔离执行环境，安全验证代码与操作 | Integration Layer 中的所有系统调用均在沙箱内执行 |
+
+> 注：DeerFlow 是字节跳动开源的多 Agent 编排框架（MIT 许可），Vetra 是联想基于 DeerFlow 构建的公司级 Agent 编排平台。关系类似于「Docker 是容器引擎，Kubernetes 是编排平台」——DeerFlow 提供 Sub-Agent 调度/编排原语，Vetra 在其上叠加企业级治理（Memory / Skills / Constraints / Sandbox）。
 
 ---
 
@@ -117,6 +130,8 @@ SSG Enablement Agent 直接以 Harness Engineering 为起点构建，核心理�
 ---
 
 ## 4. Sub-Agent 能力矩阵
+
+> **Skill-as-Product 原则**：每个 Sub-Agent 的能力以 Skill 形式封装，遵循独立版本化和独立测试策略。Skill = `prompts` + `tools` + `knowledge` + `tests` 四位一体，可插拔、可独立升级，不相互耦合。新增或修改一个 Skill 不影响其他 Agent 运行。
 
 ### 4.1 PN Agent（PN 全生命周期）
 | 场景 | 能力 | 权限 |
@@ -155,6 +170,37 @@ SSG Enablement Agent 直接以 Harness Engineering 为起点构建，核心理�
 - 知识和操作不在同一层级：一个 Agent "知道规则" 和 "执行操作" 是两种不同能力，混淆会模糊架构边界
 - 每次知识查询 → Agent → Agent 的调用链增加延迟
 - 直接作为共享工具集更简洁：Sub-Agent 调 `query_rag(query)` 就像调 `query_db(sql)` 一样直接
+
+**知识架构：Hybrid RAG + PageIndex**
+
+纯语义 RAG（chunk + embedding retrieval）在 SSG 场景中存在三个缺陷：
+
+| 问题 | 说明 | SSG 示例 |
+|------|------|---------|
+| **上下文分裂** | 依赖关系跨 chunk 断裂，语义检索无法还原完整推理链 | PN 生命周期规则 "A→B→C" 被切成 3 个 chunk，检索只返回 B |
+| **路径不透明** | 检索到的上下文来源路径不可追踪，无法验证信息权威性 | 审批规则版本 v2 和 v3 未区分，Agent 用了过期规则 |
+| **输出不稳定** | 同一问题的向量召回结果随 embedding 浮动，答案不一致 | 两次问 "Warranty 变更审批流程"，返回结果不同 |
+
+因此采用 **Hybrid RAG + PageIndex** 双层知识架构：
+
+```
+┌─────────────────────────────────────────────────┐
+│              Hybrid 知识架构                      │
+│                                                  │
+│  PageIndex（结构化检索）          RAG（语义补充）  │
+│  ┌─────────────────────┐    ┌─────────────────┐  │
+│  │ 按领域组织层次路径    │    │ chunk + embedding│  │
+│  │ 完整推理上下文加载    │    │ 补充细节粒度检索  │  │
+│  │ 路径可追踪、输出稳定  │    │ 覆盖非结构化内容  │  │
+│  └─────────────────────┘    └─────────────────┘  │
+│         ↓                          ↓             │
+│   权威规则/流程/          非结构化文档/           │
+│   审批矩阵/字段定义        历史经验/FAQ           │
+└─────────────────────────────────────────────────┘
+```
+
+- **PageIndex**：对 PN 生命周期规则、Service Tier 定义、审批矩阵、ODT 字段定义等**结构化权威知识**，按领域建层次化页面索引，Agent 决策时加载完整上下文而非碎片 chunk
+- **RAG**：对 MT 公告历史、PFV 竞品报告等**非结构化增量内容**，用语义检索补充细节，兼顾覆盖广度
 
 **能力清单**：
 
@@ -296,3 +342,56 @@ Wave 4（持续优化）
 2. **审批流打通**：现有审批系统能否接收 Agent 发起的审批请求？
 3. **知识库质量**：PN 流程、Service Tier 规则、审批规则是否有成文文档可供 RAG 摄入？
 4. **数据新鲜度**：Booking 数据、MT Announcement 的实时性如何保证？
+
+---
+
+## 11. 持续改进闭环（Eval-driven Loop）
+
+借鉴 Vetra 平台的 Eval-driven Loop 策略，SSG Agent 架构内建持续改进机制：
+
+```
+┌──────────────────────────────────────────────────────┐
+│                 Eval-driven Loop                      │
+│                                                       │
+│  追踪 → 分析 → 优化 → 验证 → 追踪 → ...              │
+│                                                       │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐            │
+│  │ Quality  │  │ Latency  │  │ Cost     │            │
+│  │ 质量指标  │  │ 延迟指标  │  │ 成本指标  │            │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘            │
+│       │             │             │                   │
+│       ▼             ▼             ▼                   │
+│  审批通过率     端到端响应时间   Token/调用成本        │
+│  建议采纳率     Sub-Agent耗时    API 调用次数         │
+│  知识检索准确率  人工等待占比    模型费用趋势          │
+└──────────────────────────────────────────────────────┘
+```
+
+**三类追踪指标**：
+
+| 维度 | 指标 | 用途 |
+|------|------|------|
+| **Quality** | 审批通过率、建议采纳率、知识检索准确率 | 判断 Agent 输出是否可信、是否需要调整 prompt 或知识库 |
+| **Latency** | 端到端响应时间、各 Sub-Agent 耗时、人工等待占比 | 定位性能瓶颈，优化 Sub-Agent 调度策略 |
+| **Cost** | Token 消耗、模型调用成本、API 调用次数 | 控制运营成本，识别可优化为本地缓存的重复调用 |
+
+**改进节奏**：每个 Wave 结束后收集 2-4 周数据 → 分析趋势 → 确定下个 Wave 的优化优先级 → 实施 → 验证。
+
+---
+
+## 12. 平台边界原则
+
+SSG Sales Enablement Agent 运行在 Vetra 平台上，遵循明确边界：
+
+> **Vetra 不替代现有系统——它编排、集成和可视化现有系统的能力。**
+
+| Vetra 负责（编排层） | 业务系统保留（执行层） |
+|---------------------|----------------------|
+| Agent 工作流编排与调度 | SPEP：PN 创建/生命周期管理 |
+| 跨系统 API 集成与数据聚合 | CPM：Sales Cost / Pricing 计算 |
+| 结果可视化与状态追踪 | SCFE：标准成本数据 |
+| 质量信号汇总与风险预警 | ODT：属性定义与变更 |
+| 审批路由与 Audit Log | Concord / ICP：Booking 与公告 |
+| Knowledge Pipeline（RAG + PageIndex） | 各系统的数据库和业务逻辑 |
+
+**价值**：低侵入性集成——不改现有系统代码，不重建业务流程，只在上层增加 AI 编排能力。业务团队可以继续使用熟悉的系统，Agent 在后端自动串联数据流。

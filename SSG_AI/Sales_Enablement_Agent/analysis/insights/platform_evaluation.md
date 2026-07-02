@@ -146,14 +146,17 @@ iChain（供应链 Persona Workspace & Agent）的设计理念可直接指导 Sa
 5. [x] ~~DeerFlow + Skill Hub 的具体能力~~ → 字节开源 DeerFlow，已调查完毕
 6. [ ] 是否有内部 AI 平台团队可提供支持？
 
-## 新发现：Vetraflow = DeerFlow 内部部署
+## 新发现：Vetra = 联想公司级 Agent 编排平台
 
-从 `references/Vetraflow wukong.pptx` 确认：
-- Vetraflow 的架构完全等于 DeerFlow（Sub-Agent / Sandbox / Memory / Skills / Guardrail）
-- PPT 中明确提到 "DeerFlow Agent"
-- "wukong" 可能指联想的内部部署代号或基础设施
+从 `references/Vetraflow wukong.pptx` + NextOra SW Dev Agent Phase1 方案（2026.6）确认：
 
-这意味着：**DeerFlow 在联想内部有现成的评估/部署方案（Vetraflow）**，不需要从零引入。
+- **Vetra（VetraFlow）** 是联想公司级 Agent 编排平台，基于 DeerFlow（process-driven multi-agent orchestration）构建
+- **DeerFlow** 是底层开源框架（字节跳动，MIT），**Vetra** 是联想内部部署实例名——关系类似 Kubernetes 是框架、某个内部 K8s 集群是平台
+- Vetra 2.0 四大核心组件：**Memory**（跨会话状态/知识连续性）、**Skills**（可复用能力封装）、**Constraints**（规则/权限/边界）、**Sandbox**（隔离执行环境）
+- Vetra 已承载多个联想内部项目：SSG Sales Enablement Agent + IDG CS SW Development Agent（含 Dev Agent、Test Agent 等 6 个子 Agent，Phase 1 2026.6-8 进行中）
+- 关键设计边界：Vetra 不替代现有系统（GitLab/Jira/Confluence/测试平台），只做编排、集成、可视化
+- 开发策略：Workflow-First → Skill-as-Product → Agent Assembly → Eval-driven Loop
+- 知识库方案：Hybrid RAG + PageIndex（结构化可追踪上下文，解决纯语义 RAG 的路径不透明/输出不稳定问题）
 
 ---
 
