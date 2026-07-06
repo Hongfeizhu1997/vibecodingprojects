@@ -73,22 +73,22 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
   <h2><span class="num">02</span> 为什么现在必须做</h2>
   <div class="grid2">
     <div class="card top-red">
-      <h3>现状：HW 降价直接拖垮服务利润</h3>
+      <h3>现状：同一 Tier 下，不同 HW 的价格差异被忽略</h3>
       <table class="tbl" style="margin-top:.6rem">
-        <tr><th>场景</th><th>HW 渠道价</th><th>Pen Rate</th><th>服务收入</th></tr>
-        <tr><td>基准</td><td>$100</td><td>8%</td><td>$8.00</td></tr>
-        <tr><td style="color:#E1251B">HW 降 10%</td><td style="color:#E1251B">$90</td><td>8%（不变）</td><td style="color:#E1251B">$7.20 ↓10%</td></tr>
-        <tr><td>HW 涨 10%</td><td>$110</td><td>8%（不变）</td><td>$8.80 ↑10%</td></tr>
+        <tr><th></th><th>SR650 V3</th><th>ST50 V2</th><th>差异</th></tr>
+        <tr><td>HW 渠道价</td><td>$15,000</td><td>$1,200</td><td style="color:#E1251B"><strong>12.5×</strong></td></tr>
+        <tr><td>3yr Support（Pen Rate 8%）</td><td>$1,200</td><td>$96</td><td style="color:#E1251B"><strong>12.5×</strong></td></tr>
+        <tr><td>服务交付成本差异</td><td colspan="2">~3×（远小于价格差）</td><td></td></tr>
       </table>
-      <p style="margin-top:.6rem;font-size:.65rem;color:#94a3b8">B2B 大单 HW 折扣是常态，固定 Pen Rate 意味着每次让利都在等比侵蚀服务利润</p>
+      <p style="margin-top:.6rem;font-size:.65rem;color:#94a3b8">同一个 Service Tier 用一个 Pen Rate 覆盖所有 HW——高价值 HW 服务定价不足（margin leakage），低价值 HW 竞争力不足</p>
     </div>
     <div class="card top-green">
-      <h3>目标：服务价格随 HW 价格智能波动</h3>
+      <h3>目标：让服务价格反映 HW 的价值差异</h3>
       <table class="tbl" style="margin-top:.6rem">
         <tr><th>场景</th><th>当前</th><th>方案后</th></tr>
-        <tr><td>HW 降价 10%</td><td style="color:#E1251B">服务同步缩水</td><td style="color:#34d399">Pen Rate 上调，收入不被等比拖低</td></tr>
-        <tr><td>HW 涨价 10%</td><td>服务跟涨</td><td style="color:#34d399">Pen Rate 微调，释放 attach 空间</td></tr>
-        <tr><td>新客群冷启动</td><td style="color:#fbbf24">一刀切全局均值</td><td style="color:#34d399">借用相似客群经验</td></tr>
+        <tr><td>高价值 HW</td><td style="color:#E1251B">定价被 Pen Rate 锁死</td><td style="color:#34d399">Pen Rate 上调，充分捕获 HW 价值</td></tr>
+        <tr><td>低价值 HW</td><td style="color:#fbbf24">Pen Rate 一刀切</td><td style="color:#34d399">灵活调整，找最优平衡</td></tr>
+        <tr><td>HW 降价</td><td style="color:#E1251B">服务等比缩水</td><td style="color:#34d399">Pen Rate 上调，收入不被拖低</td></tr>
       </table>
     </div>
   </div>
