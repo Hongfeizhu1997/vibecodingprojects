@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSG Dynamic Pricing — 产品价格推荐方案 V2 [static]</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:3rem 2rem}
+
+/* Hero */
+.hero{text-align:center;padding:3rem 0 2rem}
+.hero .badge{display:inline-block;padding:.25rem 1rem;border-radius:20px;background:rgba(225,37,27,.12);color:#E1251B;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#fff,#38bdf8,#a78bfa,#4ade80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+.hero .sub{color:#94a3b8;font-size:.8rem}
+
+/* Section */
+.sec{margin:2.5rem 0}
+.sec h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1.2rem;padding-bottom:.5rem;border-bottom:2px solid rgba(225,37,27,.3);display:flex;align-items:center;gap:.5rem}
+.sec h2 .num{color:#E1251B;font-size:.7rem;font-weight:600;text-transform:uppercase}
+
+/* Grids */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem}
+.card{background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.08);border-radius:10px;padding:1.5rem}
+.card h3{font-size:.78rem;font-weight:700;color:#fff;margin-bottom:.6rem}
+.card p,.card li{font-size:.7rem;color:#94a3b8}
+.card ul{list-style:none;padding:0}
+.card li::before{content:"→ ";color:#E1251B}
+
+/* Color tops */
+.top-red{border-top:3px solid #E1251B}
+.top-cyan{border-top:3px solid #38bdf8}
+.top-green{border-top:3px solid #34d399}
+.top-violet{border-top:3px solid #a78bfa}
+.top-amber{border-top:3px solid #fbbf24}
+.top-teal{border-top:3px solid #5eead4}
+
+/* Big number */
+.big-num{font-size:2.2rem;font-weight:900;line-height:1}
+.big-num.red{color:#E1251B}
+.big-num.cyan{color:#38bdf8}
+.big-num.green{color:#34d399}
+.big-num.violet{color:#a78bfa}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:.7rem}
+.tbl th{text-align:left;color:#94a3b8;font-weight:600;padding:.5rem .8rem;background:rgba(15,23,42,.6);font-size:.65rem;text-transform:uppercase;letter-spacing:.03em}
+.tbl td{padding:.6rem .8rem;border-bottom:1px solid rgba(148,163,184,.06);color:#cbd5e1}
+.tbl tr:last-child td{border-bottom:none}
+.tbl .tag{display:inline-block;padding:.1rem .4rem;border-radius:4px;font-size:.6rem;font-weight:600}
+.tag-green{background:rgba(52,211,153,.1);color:#34d399}
+.tag-yellow{background:rgba(251,191,36,.1);color:#fbbf24}
+.tag-red{background:rgba(225,37,27,.1);color:#E1251B}
+.tag{font-size:.63rem}
+
+/* Flow */
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1rem 0}
+.flow .node{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.12);border-radius:8px;padding:.8rem 1.2rem;text-align:center;font-size:.7rem}
+.flow .node strong{display:block;color:#fff;font-size:.75rem}
+.flow .arrow{color:#38bdf8;font-size:1.2rem}
+.flow .hl{border-color:#E1251B;background:rgba(225,37,27,.06)}
+
+/* Callout */
+.callout{padding:1rem 1.2rem;border-radius:8px;font-size:.7rem;margin:1rem 0}
+.callout.info{background:rgba(56,189,248,.05);border-left:3px solid rgba(56,189,248,.3)}
+
+/* Wave cards */
+.wave-card{padding:1.2rem;border-radius:10px;background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.08)}
+.wave-card .wave-tag{font-size:.6rem;font-weight:700;text-transform:uppercase;margin-bottom:.5rem}
+.wave-card h4{font-size:.8rem;color:#fff;margin-bottom:.6rem}
+
+/* Footer */
+.ft{text-align:center;padding:2rem 0;color:rgba(148,163,184,.4);font-size:.62rem;border-top:1px solid rgba(148,163,184,.05);margin-top:2rem}
+
+@media(max-width:768px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Hero -->
+<div class="hero">
+  <div class="badge">SSG Dynamic Pricing · V2</div>
+  <h1>服务价格随硬件价格智能联动</h1>
+  <div class="sub">面向业务决策层 · 2026-07-06</div>
+</div>
+
+<!-- §1 定位 -->
+<div class="sec">
+  <h2><span class="num">01</span> 一句话定位</h2>
+  <div class="grid3">
+    <div class="card top-red">
+      <div class="big-num red">1:1 → ≤0.3:1</div>
+      <p style="margin-top:.5rem">HW 降价对服务收入的传导衰减率目标</p>
+    </div>
+    <div class="card top-cyan">
+      <div class="big-num cyan">6 个月</div>
+      <p style="margin-top:.5rem">POC → Pilot → Rollout 完整可投产</p>
+    </div>
+    <div class="card top-green">
+      <div class="big-num green">3 个 Tier</div>
+      <p style="margin-top:.5rem">POC 覆盖 EMEA + 3 个服务 Tier 起步</p>
+    </div>
+  </div>
+</div>
+
+<!-- §2 问题 -->
+<div class="sec">
+  <h2><span class="num">02</span> 为什么现在必须做</h2>
+  <div class="grid2">
+    <div class="card top-red">
+      <h3>现状：HW 降价直接拖垮服务利润</h3>
+      <table class="tbl" style="margin-top:.6rem">
+        <tr><th>场景</th><th>HW 渠道价</th><th>Pen Rate</th><th>服务收入</th></tr>
+        <tr><td>基准</td><td>$100</td><td>8%</td><td>$8.00</td></tr>
+        <tr><td style="color:#E1251B">HW 降 10%</td><td style="color:#E1251B">$90</td><td>8%（不变）</td><td style="color:#E1251B">$7.20 ↓10%</td></tr>
+        <tr><td>HW 涨 10%</td><td>$110</td><td>8%（不变）</td><td>$8.80 ↑10%</td></tr>
+      </table>
+      <p style="margin-top:.6rem;font-size:.65rem;color:#94a3b8">SSR EMEA Q3 真实数据：$/HW $41.51→$46.83 靠操作指标改善，但有天花板</p>
+    </div>
+    <div class="card top-green">
+      <h3>目标：服务价格主动适应 HW 波动</h3>
+      <table class="tbl" style="margin-top:.6rem">
+        <tr><th>场景</th><th>当前</th><th>方案后</th></tr>
+        <tr><td>HW 降价 10%</td><td style="color:#E1251B">服务同步缩水</td><td style="color:#34d399">Pen Rate 自动上调，$/HW 守住</td></tr>
+        <tr><td>HW 涨价 10%</td><td>服务跟涨</td><td style="color:#34d399">Pen Rate 微调，释放 attach 空间</td></tr>
+        <tr><td>新客群冷启动</td><td style="color:#fbbf24">一刀切全局均值</td><td style="color:#34d399">借用相似客群经验</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- §3 方案 -->
+<div class="sec">
+  <h2><span class="num">03</span> 核心方案</h2>
+  <div class="flow">
+    <div class="node"><strong>HW Channel Price</strong>PAIDS / 交易系统</div>
+    <div class="arrow">→</div>
+    <div class="node"><strong>服务 Tier × Term</strong>服务主数据</div>
+    <div class="arrow">→</div>
+    <div class="node"><strong>GEO × 客户段</strong>CRM</div>
+    <div class="arrow">→</div>
+    <div class="node hl"><strong>推荐引擎</strong>输出 Pen Rate</div>
+    <div class="arrow">→</div>
+    <div class="node" style="border-color:#34d399;color:#34d399"><strong>Service Sales Price</strong>自动填入报价单</div>
+  </div>
+  <div class="callout info">
+    <strong>类比：</strong>导航软件——目的地（$/HW 目标）不变，路况（HW 价格）变了自动换路线（Pen Rate）。销售在报价阶段配置完硬件+服务后，推荐价自动展示。
+  </div>
+</div>
+
+<!-- §4 技术方向 -->
+<div class="sec">
+  <h2><span class="num">04</span> 三个技术方向（聚焦业务效果）</h2>
+  <div class="grid3">
+    <div class="card top-teal">
+      <h3>A · 精准型</h3>
+      <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">贝叶斯分层模型</p>
+      <ul>
+        <li>小市场不翻车：LA 自动借用 EMEA 经验</li>
+        <li>每笔推荐带置信度，不稳的推人工</li>
+        <li>可解释："因为该客户段对价格不敏感"</li>
+      </ul>
+      <p style="margin-top:.5rem;font-size:.62rem;color:#5eead4">Wave 2 上线 · +6个月</p>
+    </div>
+    <div class="card top-amber">
+      <h3>B · 速赢型</h3>
+      <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">XGBoost + 优化层</p>
+      <ul>
+        <li>2-3 周可出第一版推荐表</li>
+        <li>自动捕捉 HW×Tier×Term 交叉效应</li>
+        <li>团队已有经验，学习成本低</li>
+      </ul>
+      <p style="margin-top:.5rem;font-size:.62rem;color:#fbbf24">Wave 1 全阶段使用</p>
+    </div>
+    <div class="card top-violet">
+      <h3>C · 进阶型</h3>
+      <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">价格弹性模型</p>
+      <ul>
+        <li>"这个客户段价格弹性 -0.3"</li>
+        <li>模拟「全线调价 5%」的利润影响</li>
+        <li>从被动反应到主动管理</li>
+      </ul>
+      <p style="margin-top:.5rem;font-size:.62rem;color:#a78bfa">Wave 3 升级 · +12个月</p>
+    </div>
+  </div>
+</div>
+
+<!-- §5 业务效果 -->
+<div class="sec">
+  <h2><span class="num">05</span> 业务效果量化</h2>
+  <div class="grid4">
+    <div class="card top-red">
+      <div class="big-num red" style="font-size:1.6rem">≤ 0.3:1</div>
+      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">传导衰减率<br>（原 1:1）</p>
+    </div>
+    <div class="card top-cyan">
+      <div class="big-num cyan" style="font-size:1.6rem">≥ 60%</div>
+      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">Pilot 期<br>AI 采纳率目标</p>
+    </div>
+    <div class="card top-green">
+      <div class="big-num green" style="font-size:1.6rem">+30%</div>
+      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">冷启动精度<br>优于全局均值</p>
+    </div>
+    <div class="card top-violet">
+      <div class="big-num violet" style="font-size:1.6rem">-50%</div>
+      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">$/HW 波动<br>幅度缩小</p>
+    </div>
+  </div>
+</div>
+
+<!-- §6 落地节奏 -->
+<div class="sec">
+  <h2><span class="num">06</span> 落地节奏</h2>
+  <table class="tbl">
+    <tr>
+      <th></th><th>POC</th><th>Pilot</th><th>Rollout</th><th style="color:#5eead4">Wave 2</th><th style="color:#a78bfa">Wave 3</th>
+    </tr>
+    <tr>
+      <td style="color:#94a3b8">时间</td>
+      <td><strong>2 个月</strong></td><td><strong>3 个月</strong></td><td><strong>1 个月</strong></td>
+      <td style="color:#5eead4">+6 个月</td><td style="color:#a78bfa">+12 个月</td>
+    </tr>
+    <tr>
+      <td style="color:#94a3b8">范围</td>
+      <td>EMEA + 3 Tier</td><td>全部 GEO + Tier</td><td>嵌入报价流程</td>
+      <td style="color:#5eead4">全量</td><td style="color:#a78bfa">全量</td>
+    </tr>
+    <tr>
+      <td style="color:#94a3b8">业务变化</td>
+      <td>离线实验<br>AI vs 人工比对</td><td>试点团队看推荐价<br>销售保留决定权</td><td>推荐价自动填入<br>修改需记录原因</td>
+      <td style="color:#5eead4">低置信→审批<br>高置信→自动</td>
+      <td style="color:#a78bfa">被动反应→<br>主动策略管理</td>
+    </tr>
+    <tr>
+      <td style="color:#94a3b8">风险</td>
+      <td><span class="tag tag-green">🟢 零风险</span></td>
+      <td><span class="tag tag-yellow">🟡 低风险</span></td>
+      <td><span class="tag tag-yellow">🟡 中低</span></td>
+      <td style="color:#5eead4"><span class="tag tag-red">🔴 流程变更</span></td>
+      <td style="color:#a78bfa"><span class="tag tag-red">🔴 数据门槛</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- §7 场景 -->
+<div class="sec">
+  <h2><span class="num">07</span> 典型业务场景</h2>
+  <div class="grid3">
+    <div class="card top-red">
+      <h3>HW 大单降价，服务利润不崩</h3>
+      <p>EMEA ThinkSystem 大单 HW 折扣 15%。引擎识别该段 $/HW 目标，自动上调 Pen Rate 5-8pp，守住服务收入底线。</p>
+    </div>
+    <div class="card top-cyan">
+      <h3>HW 涨价，释放 attach 空间</h3>
+      <p>HW 供不应求涨 8%。Pen Rate 适度下调 2-3pp，服务价仅涨 5%，降低客户总拥有成本感知，提升 attach 率。</p>
+    </div>
+    <div class="card top-green">
+      <h3>新 GEO 冷启动，不拍脑袋</h3>
+      <p>AP 新市场数据少。模型自动收缩到相似 GEO（EMEA）先验，推荐精度高于全局一刀切。</p>
+    </div>
+  </div>
+</div>
+
+<!-- §8 结论 -->
+<div class="sec">
+  <h2><span class="num">08</span> 结论</h2>
+  <div class="card top-teal" style="text-align:center;padding:2rem">
+    <p style="font-size:1rem;color:#fff;font-weight:700">服务价格不再被 HW 价格牵着走，而是跟着 HW 价格聪明地走。</p>
+    <p style="margin-top:.8rem;font-size:.7rem;color:#94a3b8">6 个月可投产 · 不动现有定价体系 · 销售多一个帮算价的助手</p>
+  </div>
+</div>
+
+<div class="ft">SSG Dynamic Pricing · Product Pricing Recommendation V2 · Confidential</div>
+
+</div>
+</body>
+</html>

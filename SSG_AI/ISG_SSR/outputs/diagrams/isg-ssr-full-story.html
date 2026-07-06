@@ -833,6 +833,71 @@ body {
   </div>
 </div>
 <div class="stage" id="s10">
+  <div class="scene-title">This Process Runs for Every Candidate — Then Produces a Ranked List</div>
+
+  <div class="reveal" data-delay="300">
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:1.2rem;">
+      <div style="background:rgba(167,139,250,0.12);border:1px solid rgba(167,139,250,0.25);border-radius:6px;padding:0.4rem 0.8rem;font-size:0.65rem;color:#c4b5fd;">
+        K Candidates<br/><b style="font-size:0.85rem;">31–56</b><br/><span style="color:#64748b;">per Geo</span>
+      </div>
+      <span style="color:#475569;">×</span>
+      <div style="background:rgba(34,211,238,0.12);border:1px solid rgba(34,211,238,0.25);border-radius:6px;padding:0.4rem 0.8rem;font-size:0.65rem;color:#22d3ee;">
+        SHAP Breakdown<br/><b style="font-size:0.85rem;">Per Service</b><br/><span style="color:#64748b;">traceable</span>
+      </div>
+      <span style="color:#475569;">=</span>
+      <div style="background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:6px;padding:0.4rem 0.8rem;font-size:0.65rem;color:#34d399;">
+        Ranked Output<br/><b style="font-size:0.85rem;">Top-N List</b><br/><span style="color:#64748b;">to downstream</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ranked list visualization -->
+  <div class="ranked-list" style="max-width:600px;width:100%;">
+    <div class="ranked-header reveal" data-delay="800">
+      <span style="width:30px;">#</span>
+      <span style="flex:1;">Service</span>
+      <span style="width:70px;text-align:right;">Score</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="1100" style="--w:0.88;">
+      <span class="ranked-pos" style="color:#fbbf24;">1</span>
+      <span class="ranked-name">3-Year Onsite Warranty</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#22c55e;width:88%;"></span></span>
+      <span class="ranked-val">0.88</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="1400" style="--w:0.72;">
+      <span class="ranked-pos" style="color:#94a3b8;">2</span>
+      <span class="ranked-name">3-Year Onsite + 4-Hour</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#22c55e;width:72%;"></span></span>
+      <span class="ranked-val">0.72</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="1700" style="--w:0.61;">
+      <span class="ranked-pos" style="color:#94a3b8;">3</span>
+      <span class="ranked-name">3-Year Onsite + Premium</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#fbbf24;width:61%;"></span></span>
+      <span class="ranked-val">0.61</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="2000" style="--w:0.45;">
+      <span class="ranked-pos" style="color:#94a3b8;">4</span>
+      <span class="ranked-name">1-Year Onsite Warranty</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#94a3b8;width:45%;"></span></span>
+      <span class="ranked-val">0.45</span>
+    </div>
+    <div class="ranked-row reveal" data-delay="2300" style="--w:0.28;">
+      <span class="ranked-pos" style="color:#64748b;">5</span>
+      <span class="ranked-name">1-Year Depot Warranty</span>
+      <span class="ranked-bar-wrap"><span class="ranked-bar" style="background:#64748b;width:28%;"></span></span>
+      <span class="ranked-val">0.28</span>
+    </div>
+    <div style="text-align:center;color:#475569;font-size:0.62rem;margin-top:0.5rem;" class="reveal" data-delay="2600">
+      ... remaining K candidates ranked below</div>
+  </div>
+
+  <div class="reveal" data-delay="2900" style="font-size:0.68rem;color:#94a3b8;margin-top:1rem;text-align:center;max-width:550px;">
+    This ranked list feeds into Business Rules for filtering, then GBB Presentation for the sales team.
+  </div>
+</div>
+
+<div class="stage" id="s11">
   <div class="reveal scene-label" data-delay="100">2.3  Explainability - SHAP</div>
   <div class="scene-title">Explainability — Step Through Each Feature's Impact</div>
   <div class="reveal" data-delay="200" style="font-size:0.75rem;color:#94a3b8;margin-bottom:1rem;">
@@ -906,7 +971,7 @@ body {
     Space to pause auto-play | Click "Next Step" to walk through manually
   </div>
 </div>
-<div class="stage" id="s11">
+<div class="stage" id="s12">
   <div class="reveal scene-label" data-delay="100">2.4  LLM - SHAP to Business Language</div>
   <div class="scene-title">LLM Translates Numerical SHAP into Business-Language Explanations</div>
 
@@ -978,7 +1043,7 @@ body {
     Degrades gracefully → if LLM unavailable, falls back to rule-based templates
   </div>
 </div>
-<div class="stage" id="s12">
+<div class="stage" id="s13">
   <div class="reveal scene-label" data-delay="100">2.5  Three Layers of Safety</div>
   <div class="scene-title">Three Layers of Safety</div>
   <div class="safety-row">
@@ -999,7 +1064,7 @@ body {
     </div>
   </div>
 </div>
-<div class="stage" id="s13">
+<div class="stage" id="s14">
   <div class="reveal scene-label" data-delay="100">2.6  Every Factor Traceable</div>
   <div class="scene-title"></div>
   <div class="reveal" data-delay="300">
@@ -1012,13 +1077,13 @@ body {
     <div class="c5-line">All <span>traceable</span> to specific factors. All <span>auditable</span>. No black boxes.</div>
   </div>
 </div>
-<div class="stage" id="s14">
+<div class="stage" id="s15">
   <div class="reveal scene-label" data-delay="100">Part 3 Overview</div>
   <div class="reveal" data-delay="0"><span class="s0-tag">Lenovo ISG · Service Smart Recommendation</span></div>
   <div class="reveal" data-delay="200"><h1 class="s0-title">How the <span>Catalog</span> Consumes AI Recommendations</h1></div>
   <div class="reveal" data-delay="400"><p class="s0-sub">AI model output passes through catalog product logic before reaching the GBB frontend. Not every AI top pick makes it to the bid — and that's by design.</p></div>
 </div>
-<div class="stage" id="s15">
+<div class="stage" id="s16">
   <div class="reveal scene-label" data-delay="100">3.1  Catalog Product Logic</div>
   
   <div class="reveal" data-delay="150"><h2 class="sec-title">From AI Prediction to GBB Display</h2></div>
@@ -1045,7 +1110,7 @@ body {
     </div>
   </div>
 </div>
-<div class="stage" id="s16">
+<div class="stage" id="s17">
   <div class="reveal scene-label" data-delay="100">3.2  GBB Decision Logic</div>
   
   <div class="reveal" data-delay="150"><h2 class="sec-title">Not Every AI Recommendation Survives the Catalog</h2></div>
@@ -1062,7 +1127,7 @@ body {
     <div class="s2-note"><span>Expected behavior:</span> AI best-pick being filtered by catalog logic is <span>not a bug</span> — it's the system correctly enforcing business guardrails. The AI recommends based on learned patterns; the catalog ensures only valid, deliverable products reach the customer.</div>
   </div>
 </div>
-<div class="stage" id="s17">
+<div class="stage" id="s18">
   <div class="reveal scene-label" data-delay="100">3.3  Real-World Examples</div>
   
   <div class="reveal" data-delay="150"><h2 class="sec-title">After Filtering — Two Paths to Three Cards</h2></div>
@@ -1105,7 +1170,7 @@ body {
     </div>
   </div>
 </div>
-<div class="stage" id="s18">
+<div class="stage" id="s19">
   <div class="reveal scene-label" data-delay="100">3.4  Full Pipeline Recap</div>
   
   <div class="reveal" data-delay="150"><h2 class="sec-title">Two Scenarios — Low vs High Confidence</h2></div>
@@ -1186,7 +1251,7 @@ body {
     </div>
   </div>
 </div>
-<div class="stage" id="s19">
+<div class="stage" id="s20">
   <div class="reveal scene-label" data-delay="100">The Big Picture</div>
   <div class="reveal" data-delay="200" style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.5rem;">Finale</div>
   <div class="reveal" data-delay="500" style="font-size:1.5rem;font-weight:800;margin-bottom:2rem;">The Big Picture</div>
@@ -1208,7 +1273,7 @@ body {
 </div>
 
 <!-- STAGE 20: OUTLOOK -->
-<div class="stage" id="s20">
+<div class="stage" id="s21">
   <div class="reveal scene-label" data-delay="100">Beyond ISG</div>
   <div class="reveal" data-delay="200" style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.5rem;">Outlook</div>
   <div class="reveal" data-delay="500" style="font-size:1.5rem;font-weight:800;margin-bottom:2rem;">From Project to Platform</div>
@@ -1231,8 +1296,8 @@ body {
 
 <script>
 
-const stages = ['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14','s15','s16','s17','s18','s20','s19'];
-const TOTAL = 21;
+const stages = ['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14','s15','s16','s17','s18','s19','s20','s21'];
+const TOTAL = 22;
 let wfStep = 0;
 const wfTotal = 5;
 const wfValues = [
@@ -1246,7 +1311,7 @@ let current = 0;
 let paused = false;
 let timer = null;
 
-const DURATIONS = [4000,5000,5000,7000,7000,8000,10000,5000,8000,8000,8000,9000,7000,5000,8000,7000,6000,7000,10000,8000,8000];
+const DURATIONS = [4000, 5000, 5000, 7000, 7000, 8000, 10000, 5000, 8000, 8000, 8000, 8000, 9000, 7000, 5000, 8000, 7000, 6000, 7000, 10000, 8000, 8000];
 let cumDurs = [0];
 for(let i=0;i<DURATIONS.length;i++) cumDurs.push(cumDurs[i]+DURATIONS[i]);
 const TOTAL_MS = cumDurs[TOTAL];
