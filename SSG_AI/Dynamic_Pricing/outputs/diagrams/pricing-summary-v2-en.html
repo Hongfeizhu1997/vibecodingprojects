@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSG Dynamic Pricing — Product Pricing Recommendation V2 [static]</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:3rem 2rem}
+.hero{text-align:center;padding:3rem 0 2rem}
+.hero .badge{display:inline-block;padding:.25rem 1rem;border-radius:20px;background:rgba(225,37,27,.12);color:#E1251B;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#fff,#38bdf8,#a78bfa,#4ade80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+.hero .sub{color:#94a3b8;font-size:.8rem}
+.sec{margin:2.5rem 0}
+.sec h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1.2rem;padding-bottom:.5rem;border-bottom:2px solid rgba(225,37,27,.3);display:flex;align-items:center;gap:.5rem}
+.sec h2 .num{color:#E1251B;font-size:.7rem;font-weight:600;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem}
+.card{background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.08);border-radius:10px;padding:1.5rem}
+.card h3{font-size:.78rem;font-weight:700;color:#fff;margin-bottom:.6rem}
+.card p,.card li{font-size:.7rem;color:#94a3b8}
+.card ul{list-style:none;padding:0}
+.card li::before{content:"→ ";color:#E1251B}
+.top-red{border-top:3px solid #E1251B}
+.top-cyan{border-top:3px solid #38bdf8}
+.top-green{border-top:3px solid #34d399}
+.top-violet{border-top:3px solid #a78bfa}
+.top-amber{border-top:3px solid #fbbf24}
+.top-teal{border-top:3px solid #5eead4}
+.big-num{font-size:2.2rem;font-weight:900;line-height:1}
+.big-num.red{color:#E1251B}
+.big-num.cyan{color:#38bdf8}
+.big-num.green{color:#34d399}
+.big-num.violet{color:#a78bfa}
+.tbl{width:100%;border-collapse:collapse;font-size:.7rem}
+.tbl th{text-align:left;color:#94a3b8;font-weight:600;padding:.5rem .8rem;background:rgba(15,23,42,.6);font-size:.65rem;text-transform:uppercase;letter-spacing:.03em}
+.tbl td{padding:.6rem .8rem;border-bottom:1px solid rgba(148,163,184,.06);color:#cbd5e1}
+.tbl tr:last-child td{border-bottom:none}
+.tag{display:inline-block;padding:.1rem .4rem;border-radius:4px;font-size:.63rem;font-weight:600}
+.tag-green{background:rgba(52,211,153,.1);color:#34d399}
+.tag-yellow{background:rgba(251,191,36,.1);color:#fbbf24}
+.tag-red{background:rgba(225,37,27,.1);color:#E1251B}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1rem 0}
+.flow .node{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.12);border-radius:8px;padding:.8rem 1.2rem;text-align:center;font-size:.7rem}
+.flow .node strong{display:block;color:#fff;font-size:.75rem}
+.flow .arrow{color:#38bdf8;font-size:1.2rem}
+.flow .hl{border-color:#E1251B;background:rgba(225,37,27,.06)}
+.callout{padding:1rem 1.2rem;border-radius:8px;font-size:.7rem;margin:1rem 0}
+.callout.info{background:rgba(56,189,248,.05);border-left:3px solid rgba(56,189,248,.3)}
+.ft{text-align:center;padding:2rem 0;color:rgba(148,163,184,.4);font-size:.62rem;border-top:1px solid rgba(148,163,184,.05);margin-top:2rem}
+@media(max-width:768px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="badge">SSG Dynamic Pricing · V2</div>
+  <h1>Intelligent Service-Hardware Price Alignment</h1>
+  <div class="sub">For Business Decision Makers · July 06, 2026</div>
+</div>
+
+<!-- §1 Positioning -->
+<div class="sec">
+  <h2><span class="num">01</span> One-Line Positioning</h2>
+  <div class="grid3">
+    <div class="card top-red">
+      <div class="big-num red">1:1 → ≤0.3:1</div>
+      <p style="margin-top:.5rem">Target pass-through rate from HW price drop to service revenue loss</p>
+    </div>
+    <div class="card top-cyan">
+      <div class="big-num cyan">6 Months</div>
+      <p style="margin-top:.5rem">POC → Pilot → Rollout to production-ready</p>
+    </div>
+    <div class="card top-green">
+      <div class="big-num green">3 Tiers</div>
+      <p style="margin-top:.5rem">POC starts with EMEA + 3 service tiers</p>
+    </div>
+  </div>
+</div>
+
+<!-- §2 Problem -->
+<div class="sec">
+  <h2><span class="num">02</span> Why Now</h2>
+  <div class="grid2">
+    <div class="card top-red">
+      <h3>Status Quo: HW Discounts Erode Service Margin</h3>
+      <table class="tbl" style="margin-top:.6rem">
+        <tr><th>Scenario</th><th>HW Price</th><th>Pen Rate</th><th>Service Rev</th></tr>
+        <tr><td>Baseline</td><td>$100</td><td>8%</td><td>$8.00</td></tr>
+        <tr><td style="color:#E1251B">HW -10%</td><td style="color:#E1251B">$90</td><td>8% (fixed)</td><td style="color:#E1251B">$7.20 ↓10%</td></tr>
+        <tr><td>HW +10%</td><td>$110</td><td>8% (fixed)</td><td>$8.80 ↑10%</td></tr>
+      </table>
+      <p style="margin-top:.6rem;font-size:.65rem;color:#94a3b8">SSR EMEA Q3 data: $/HW grew $41.51→$46.83 via operational metrics — but metrics have a ceiling</p>
+    </div>
+    <div class="card top-green">
+      <h3>Target: Service Prices That Adapt to HW</h3>
+      <table class="tbl" style="margin-top:.6rem">
+        <tr><th>Scenario</th><th>Current</th><th>Post-Launch</th></tr>
+        <tr><td>HW -10%</td><td style="color:#E1251B">Service shrinks equally</td><td style="color:#34d399">Pen Rate auto-adjusted, $/HW defended</td></tr>
+        <tr><td>HW +10%</td><td>Service rises equally</td><td style="color:#34d399">Pen Rate eased, attach rate gains space</td></tr>
+        <tr><td>New segment</td><td style="color:#fbbf24">Global average only</td><td style="color:#34d399">Borrows from similar segments</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- §3 Solution -->
+<div class="sec">
+  <h2><span class="num">03</span> Core Mechanism</h2>
+  <div class="flow">
+    <div class="node"><strong>HW Channel Price</strong>PAIDS / Transaction</div>
+    <div class="arrow">→</div>
+    <div class="node"><strong>Service Tier × Term</strong>Service Master Data</div>
+    <div class="arrow">→</div>
+    <div class="node"><strong>GEO × Segment</strong>CRM</div>
+    <div class="arrow">→</div>
+    <div class="node hl"><strong>Pricing Engine</strong>Outputs Pen Rate</div>
+    <div class="arrow">→</div>
+    <div class="node" style="border-color:#34d399;color:#34d399"><strong>Service Sales Price</strong>Auto-populated in quote</div>
+  </div>
+  <div class="callout info">
+    <strong>Analogy:</strong> GPS navigation — destination ($/HW target) stays fixed, route (Pen Rate) adapts to traffic (HW price). Sales team configures HW + services, and the recommended price appears automatically during quoting.
+  </div>
+</div>
+
+<!-- §4 Technical Directions -->
+<div class="sec">
+  <h2><span class="num">04</span> Three Approaches (Business Impact Focus)</h2>
+  <div class="grid3">
+    <div class="card top-teal">
+      <h3>A · Precision</h3>
+      <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">Bayesian Hierarchical Model</p>
+      <ul>
+        <li>Small markets borrow large-market experience</li>
+        <li>Every recommendation has a confidence score</li>
+        <li>Explainable: "Client segment shows low price sensitivity"</li>
+      </ul>
+      <p style="margin-top:.5rem;font-size:.62rem;color:#5eead4">Wave 2 · +6 months</p>
+    </div>
+    <div class="card top-amber">
+      <h3>B · Speed</h3>
+      <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">XGBoost + Constraints</p>
+      <ul>
+        <li>First recommendations in 2-3 weeks</li>
+        <li>Auto-discovers HW×Tier×Term interactions</li>
+        <li>Team has existing expertise</li>
+      </ul>
+      <p style="margin-top:.5rem;font-size:.62rem;color:#fbbf24">Wave 1 · All phases</p>
+    </div>
+    <div class="card top-violet">
+      <h3>C · Strategy</h3>
+      <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">Price Elasticity Model</p>
+      <ul>
+        <li>"This segment elasticity = -0.3"</li>
+        <li>Simulate: "What if we adjust rates 5%?"</li>
+        <li>From reactive → proactive pricing</li>
+      </ul>
+      <p style="margin-top:.5rem;font-size:.62rem;color:#a78bfa">Wave 3 · +12 months</p>
+    </div>
+  </div>
+</div>
+
+<!-- §5 Business Impact -->
+<div class="sec">
+  <h2><span class="num">05</span> Quantified Business Impact</h2>
+  <div class="grid4">
+    <div class="card top-red">
+      <div class="big-num red" style="font-size:1.6rem">≤ 0.3:1</div>
+      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">Pass-through rate<br>(from 1:1)</p>
+    </div>
+    <div class="card top-cyan">
+      <div class="big-num cyan" style="font-size:1.6rem">≥ 60%</div>
+      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">Pilot AI<br>adoption target</p>
+    </div>
+    <div class="card top-green">
+      <div class="big-num green" style="font-size:1.6rem">+30%</div>
+      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">Cold-start accuracy<br>vs. global average</p>
+    </div>
+    <div class="card top-violet">
+      <div class="big-num violet" style="font-size:1.6rem">-50%</div>
+      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">$/HW volatility<br>reduction</p>
+    </div>
+  </div>
+</div>
+
+<!-- §6 Rollout -->
+<div class="sec">
+  <h2><span class="num">06</span> Rollout Roadmap</h2>
+  <table class="tbl">
+    <tr>
+      <th></th><th>POC</th><th>Pilot</th><th>Rollout</th><th style="color:#5eead4">Wave 2</th><th style="color:#a78bfa">Wave 3</th>
+    </tr>
+    <tr>
+      <td style="color:#94a3b8">Timeline</td>
+      <td><strong>2 months</strong></td><td><strong>3 months</strong></td><td><strong>1 month</strong></td>
+      <td style="color:#5eead4">+6 months</td><td style="color:#a78bfa">+12 months</td>
+    </tr>
+    <tr>
+      <td style="color:#94a3b8">Scope</td>
+      <td>EMEA + 3 Tiers</td><td>All GEOs + Tiers</td><td>Embed in quoting</td>
+      <td style="color:#5eead4">Full scale</td><td style="color:#a78bfa">Full scale</td>
+    </tr>
+    <tr>
+      <td style="color:#94a3b8">Business Change</td>
+      <td>Offline experiment<br>AI vs. human benchmark</td><td>Pilot team sees AI price<br>Sales keeps final say</td><td>AI price auto-populated<br>Overrides require reason</td>
+      <td style="color:#5eead4">Low-confidence → approval<br>High-confidence → auto</td>
+      <td style="color:#a78bfa">Reactive →<br>Proactive strategy</td>
+    </tr>
+    <tr>
+      <td style="color:#94a3b8">Risk</td>
+      <td><span class="tag tag-green">🟢 Zero Risk</span></td>
+      <td><span class="tag tag-yellow">🟡 Low Risk</span></td>
+      <td><span class="tag tag-yellow">🟡 Medium-Low</span></td>
+      <td style="color:#5eead4"><span class="tag tag-red">🔴 Process Change</span></td>
+      <td style="color:#a78bfa"><span class="tag tag-red">🔴 Data Threshold</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- §7 Scenarios -->
+<div class="sec">
+  <h2><span class="num">07</span> Key Business Scenarios</h2>
+  <div class="grid3">
+    <div class="card top-red">
+      <h3>Large HW Deal — Margin Intact</h3>
+      <p>EMEA ThinkSystem deal with 15% HW discount. Engine recognizes segment $/HW target, auto-adjusts Pen Rate +5-8pp, defending service revenue floor.</p>
+    </div>
+    <div class="card top-cyan">
+      <h3>HW Price Hike — Attach Opportunity</h3>
+      <p>HW supply-constrained, price up 8%. Pen Rate eases 2-3pp, service price rises only 5%, lowering total cost perception and boosting attach.</p>
+    </div>
+    <div class="card top-green">
+      <h3>New GEO Launch — No Guesswork</h3>
+      <p>AP new market with sparse data. Model shrinks to similar GEO (EMEA) priors — accuracy beats global one-size-fits-all.</p>
+    </div>
+  </div>
+</div>
+
+<!-- §8 Conclusion -->
+<div class="sec">
+  <h2><span class="num">08</span> Bottom Line</h2>
+  <div class="card top-teal" style="text-align:center;padding:2rem">
+    <p style="font-size:1rem;color:#fff;font-weight:700">Service pricing no longer dragged by HW pricing — it moves with it, intelligently.</p>
+    <p style="margin-top:.8rem;font-size:.7rem;color:#94a3b8">6 months to production · No disruption to existing pricing systems · Sales gets a co-pilot, not a replacement</p>
+  </div>
+</div>
+
+<div class="ft">SSG Dynamic Pricing · Product Pricing Recommendation V2 · Confidential</div>
+
+</div>
+</body>
+</html>
