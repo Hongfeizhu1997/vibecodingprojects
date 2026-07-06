@@ -64,17 +64,16 @@ body{background:#f5f6f8;color:#1a202c;font-family:'Inter',-apple-system,BlinkMac
 .gantt{margin-top:1rem}
 .gantt-header{display:flex;margin-bottom:.4rem;padding-left:180px}
 .gantt-header span{flex:1;text-align:center;font-size:.62rem;color:#94a3b8;border-left:1px solid #e2e8f0;padding:0 1px;overflow:hidden;text-overflow:ellipsis}
-.gantt-header span.qtr{flex:3;font-weight:600;color:#64748b}
 .gantt-header span:first-child{border-left:none}
 .gantt-row{display:flex;align-items:center;margin-bottom:.3rem}
 .gantt-label{width:170px;font-size:.68rem;color:#475569;text-align:right;padding-right:1rem;font-weight:600}
-.gantt-track{flex:1;height:30px;background:repeating-linear-gradient(to right,#f1f5f9,#f1f5f9 calc(100%/18 - 1px),#e2e8f0 calc(100%/18 - 1px),#e2e8f0 calc(100%/18));border-radius:4px;position:relative;overflow:hidden}
+.gantt-track{flex:1;height:30px;background:repeating-linear-gradient(to right,#f1f5f9,#f1f5f9 calc(10% - 1px),#e2e8f0 calc(10% - 1px),#e2e8f0 10%);border-radius:4px;position:relative;overflow:hidden}
 .gantt-bar{position:absolute;top:4px;height:22px;border-radius:3px;font-size:.63rem;font-weight:700;display:flex;align-items:center;padding-left:.5rem}
-.gantt-bar.poc{left:0;width:11.1%;background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
-.gantt-bar.pilot{left:11.1%;width:16.7%;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
-.gantt-bar.rollout{left:27.8%;width:5.6%;background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
-.gantt-bar.wave2{left:33.4%;width:33.3%;background:#ccfbf1;color:#0f766e;border:1px solid #99f6e4}
-.gantt-bar.wave3{left:66.7%;width:33.3%;background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd}
+.gantt-bar.poc{left:0;width:20%;background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.gantt-bar.pilot{left:20%;width:30%;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.gantt-bar.rollout{left:50%;width:10%;background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.gantt-bar.wave2{left:60%;width:20%;background:#ccfbf1;color:#0f766e;border:1px solid #99f6e4}
+.gantt-bar.wave3{left:80%;width:20%;background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd}
 
 /* Stage-specific headings */
 h2.stage-h2{font-size:1.1rem;font-weight:700;color:#1a202c;margin-bottom:1rem;padding-bottom:.4rem;border-bottom:2px solid #fecaca}
@@ -299,7 +298,7 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#1a202c;margin-bottom:1rem;pa
     <h2 class="stage-h2">Timeline View</h2>
     <div class="gantt">
       <div class="gantt-header">
-        <span>Aug<br>26</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan<br>27</span><span class="qtr">Q2 2027</span><span class="qtr">Q3 2027</span><span class="qtr">Q4 2027</span><span class="qtr">Q1 2028</span>
+        <span>Aug<br>26</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan<br>27</span><span>Q2<br>2027</span><span>Q3<br>2027</span><span>Q4<br>2027</span><span>Q1<br>2028</span>
       </div>
       <div class="gantt-row">
         <div class="gantt-label">POC</div>
