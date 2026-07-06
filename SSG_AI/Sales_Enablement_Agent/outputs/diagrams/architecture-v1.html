@@ -287,16 +287,20 @@
 </div></div>
 </div></div>
 
-<!-- 6: MEMORY -->
+<!-- 6: VETRA CORE COMPONENTS -->
 <div class="stage" id="s6"><div class="stage-content">
-<h2><span class="num">02</span> Memory System</h2>
+<h2><span class="num">02</span> Vetra Core Components — What Powers the Agent</h2>
+<p style="font-size:.7rem;color:var(--dim);margin-bottom:.8rem">Four components work together to make the Agent capable, safe, and continuously improving — not just a chatbot with a rulebook.</p>
 <div class="col2">
-<div class="col-card"><h4>🧠 Short-Term Memory</h4><p>Remembers your current conversation — like holding a discussion without repeating context.</p><div class="example"><em>Example:</em> "Cost for PN-88421?" → "And channel price?" — knows you're still on PN-88421.</div></div>
-<div class="col-card"><h4>📝 Long-Term Memory</h4><p>Learns your preferences over weeks — like a colleague who knows how you work.</p><div class="example"><em>Example:</em> Sarah prefers a specific PN draft template. After 3 uses, Agent defaults to it.</div></div>
+<div class="col-card"><h4>🧠 Memory</h4><p>Remembers context across conversations — short-term, long-term, and domain knowledge.</p><div class="example"><em>Example:</em> "Cost for PN-88421?" → "And channel price?" — knows you're still on PN-88421. Learns Sarah's template preferences over time. Grounded on EKP + BCPF (Signavio).</div></div>
+<div class="col-card"><h4>🔧 Skills</h4><p>Reusable capabilities packaged as independent modules — each versioned, tested, and pluggable.</p><div class="example"><em>Example:</em> PN Creation Skill handles duplicate detection, POR form generation, and SPEP submission. Upgrading this Skill doesn't affect Cost Calculation or Pricing Skills.</div></div>
 </div>
 <div class="col2">
-<div class="col-card"><h4>📚 Domain Knowledge Base</h4><p>Grounded on <strong style="color:var(--teal);">EKP</strong> and <strong style="color:var(--teal);">BCPF</strong> (Signavio). Stores PN lifecycle rules, pricing logic, approval policies.</p></div>
-<div class="col-card"><h4>💼 Business Impact</h4><p>Without memory, every conversation starts from zero. With it, the Agent builds working knowledge.<br><br><strong>All data stays within Lenovo infrastructure.</strong></p></div>
+<div class="col-card"><h4>🛡️ Constraints</h4><p>Rules, permissions, and boundaries that keep the Agent operating safely within defined limits.</p><div class="example"><em>Example:</em> PN creation requires manager approval before SPEP submission. Pricing changes above 15% deviation trigger mandatory review. Low-confidence recommendations route to human.</div></div>
+<div class="col-card"><h4>📦 Sandbox</h4><p>Isolated execution environment — the Agent tests actions here before touching real systems.</p><div class="example"><em>Example:</em> When generating a new PN draft, the Agent builds and validates it in Sandbox first. Only after all checks pass does it push to SPEP. No live system is touched without verification.</div></div>
+</div>
+<div style="margin-top:.8rem;padding:.6rem .8rem;background:rgba(94,234,212,.04);border:1px solid rgba(94,234,212,.12);border-radius:6px;font-size:.65rem;color:rgba(148,163,184,.7);text-align:center">
+<strong style="color:var(--teal);">How they work together:</strong> Memory provides context → Skills execute tasks → Constraints enforce boundaries → Sandbox ensures safety. All four sourced from the <strong style="color:var(--teal);">Lenovo Skill Hub</strong> enterprise platform.
 </div></div></div>
 
 <!-- 7: JOURNEY A -->

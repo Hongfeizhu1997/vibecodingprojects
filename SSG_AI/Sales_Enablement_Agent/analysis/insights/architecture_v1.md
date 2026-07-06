@@ -281,15 +281,18 @@ Agent 生成建议
 
 ---
 
-## 7. Memory System
+## 7. Vetra 核心组件 — Agent 的能力底座
 
-借鉴 DeerFlow + iChain 的 Memory 体系：
+四个组件协同工作，使 Agent 不只是"带规则手册的聊天机器人"。
 
-| 记忆类型 | 内容 | 生命周期 |
-|---------|------|---------|
-| **Short-term** | 当前对话上下文、正在操作的 PN、任务状态 | 单次会话 |
-| **Long-term** | 用户偏好、常用 PN、历史决策偏好、角色习惯 | 跨会话持久化 |
-| **Domain** | PN Lifecycle 规则、审批规则、定价逻辑、Service Tier 体系 | 团队共享知识库 |
+| 组件 | 做什么 | 在 PN 管理中的例子 |
+|------|--------|------------------|
+| **Memory** | 跨会话记忆：短期对话上下文、长期用户偏好、领域知识库 | "PN-88421 的成本？"→"渠道价呢？"——知道还在问同一个 PN。Sarah 的模板偏好被记住，第三次自动套用。底层对接 EKP + BCPF (Signavio) |
+| **Skills** | 可复用能力封装，独立版本化、独立测试、可插拔 | PN Creation Skill 负责查重、POR 表单生成、SPEP 提交。升级它不影响 Cost Calculation 或 Pricing Skill |
+| **Constraints** | 规则、权限、边界——确保 Agent 在受控范围内行动 | PN 创建需要 Manager 审批后才能提交 SPEP。定价偏离 >15% 触发强制复核。低置信推荐路由到人工 |
+| **Sandbox** | 隔离执行环境，Agent 先在此验证再接触真实系统 | 生成新 PN 草稿时，Agent 在 Sandbox 中构建并校验，全部检查通过后才推到 SPEP |
+
+**协作逻辑**：Memory 提供上下文 → Skills 执行任务 → Constraints 强制边界 → Sandbox 确保安全。四组件全部来源于 **Lenovo Skill Hub** 企业级平台。
 
 ---
 
