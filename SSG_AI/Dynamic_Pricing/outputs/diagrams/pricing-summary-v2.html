@@ -97,6 +97,7 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
 <!-- §3 方案 -->
 <div class="sec">
   <h2><span class="num">03</span> 核心方案</h2>
+  <p style="font-size:.78rem;color:#e2e8f0;margin-bottom:1rem">把 Pen Rate 从一个固定值变成一个由多维度决定的动态值。</p>
   <div class="flow">
     <div class="node"><strong>HW Channel Price</strong>PAIDS / 交易系统</div>
     <div class="arrow">→</div>
@@ -108,8 +109,27 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
     <div class="arrow">→</div>
     <div class="node" style="border-color:#34d399;color:#34d399"><strong>Service Sales Price</strong>自动填入报价单</div>
   </div>
-  <div class="callout info">
-    <strong>类比：</strong>导航软件——目的地不变，路况变了自动换路线。销售在报价阶段配置完硬件+服务后，推荐价自动展示。
+  <div class="grid2" style="margin-top:1.2rem">
+    <div class="card top-teal">
+      <h3>具体例子：3 年 Premier Support</h3>
+      <table class="tbl" style="margin-top:.5rem">
+        <tr><th></th><th>X1 Carbon</th><th>ThinkBook 14</th></tr>
+        <tr><td>HW 渠道价</td><td>$2,000</td><td>$800</td></tr>
+        <tr><td>当前 Pen Rate</td><td style="color:#E1251B">8%（一刀切）</td><td style="color:#E1251B">8%（一刀切）</td></tr>
+        <tr><td style="color:#34d399">方案后 Pen Rate</td><td style="color:#34d399"><strong>10%</strong></td><td style="color:#34d399"><strong>7%</strong></td></tr>
+        <tr><td>效果</td><td>充分反映 HW 高端定位</td><td>降低门槛提升 attach</td></tr>
+      </table>
+    </div>
+    <div class="card top-violet">
+      <h3>引擎四大输入维度</h3>
+      <ul>
+        <li><strong>HW 价值段</strong>：$0-500 / $500-1000 / $1000-2000 / $2000+</li>
+        <li><strong>服务 Tier × Term</strong>：服务等级 + 合同年限</li>
+        <li><strong>GEO × 客户分层</strong>：区域 + 客户级别</li>
+        <li><strong>竞争信号</strong>（Phase 2+）：区域同类客户的赢单价区间</li>
+      </ul>
+      <p style="margin-top:.6rem;font-size:.65rem;color:#94a3b8">引擎从历史交易数据中自动学习最优 Pen Rate，叠加不亏 / 合理 / 可控三道约束</p>
+    </div>
   </div>
 </div>
 

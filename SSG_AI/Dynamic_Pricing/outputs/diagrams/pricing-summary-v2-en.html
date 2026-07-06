@@ -97,6 +97,7 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
 <!-- §3 Solution -->
 <div class="sec">
   <h2><span class="num">03</span> Core Mechanism</h2>
+  <p style="font-size:.78rem;color:#e2e8f0;margin-bottom:1rem">Turn Pen Rate from a fixed value into a dynamic, multi-dimensional decision.</p>
   <div class="flow">
     <div class="node"><strong>HW Channel Price</strong>PAIDS / Transaction</div>
     <div class="arrow">→</div>
@@ -108,8 +109,27 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
     <div class="arrow">→</div>
     <div class="node" style="border-color:#34d399;color:#34d399"><strong>Service Sales Price</strong>Auto-populated in quote</div>
   </div>
-  <div class="callout info">
-    <strong>Analogy:</strong> GPS navigation — destination stays fixed, route adapts to traffic. Sales configures HW + services, and the recommended price appears automatically during quoting.
+  <div class="grid2" style="margin-top:1.2rem">
+    <div class="card top-teal">
+      <h3>Example: 3yr Premier Support</h3>
+      <table class="tbl" style="margin-top:.5rem">
+        <tr><th></th><th>X1 Carbon</th><th>ThinkBook 14</th></tr>
+        <tr><td>HW Channel Price</td><td>$2,000</td><td>$800</td></tr>
+        <tr><td>Current Pen Rate</td><td style="color:#E1251B">8% (flat)</td><td style="color:#E1251B">8% (flat)</td></tr>
+        <tr><td style="color:#34d399">Post-Launch Pen Rate</td><td style="color:#34d399"><strong>10%</strong></td><td style="color:#34d399"><strong>7%</strong></td></tr>
+        <tr><td>Impact</td><td>Captures premium HW value</td><td>Lowers barrier, boosts attach</td></tr>
+      </table>
+    </div>
+    <div class="card top-violet">
+      <h3>Four Engine Inputs</h3>
+      <ul>
+        <li><strong>HW Value Band</strong>: $0-500 / $500-1K / $1K-2K / $2K+</li>
+        <li><strong>Service Tier × Term</strong>: Service level + contract duration</li>
+        <li><strong>GEO × Segment</strong>: Region + customer tier</li>
+        <li><strong>Competitive Signals</strong> (Phase 2+): Win-price range by segment</li>
+      </ul>
+      <p style="margin-top:.6rem;font-size:.65rem;color:#94a3b8">Engine learns optimal Pen Rate from historical transactions, with three guardrails: above cost, below list price, flag outliers for review</p>
+    </div>
   </div>
 </div>
 
