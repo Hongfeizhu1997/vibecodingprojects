@@ -19,11 +19,11 @@
 
 当前服务定价以 Service Tier 为主要维度：3 年 Premier Support 对所有 HW 型号收取相同的 Pen Rate（如均为 HW 渠道价的 8%）。但同一个 Tier 下，不同 HW 的价格和价值差距可能极大：
 
-| 对比 | ThinkSystem SR650 V3 | ThinkSystem ST50 V2 | 差异 |
+| 对比 | ThinkPad X1 Carbon | ThinkBook 14 | 差异 |
 |------|---------------------|--------------------|------|
-| HW 渠道价 | $15,000 | $1,200 | **12.5×** |
-| 3yr Premier Support（Pen Rate 8%） | $1,200 | $96 | **12.5×** |
-| 实际服务交付成本差异 | ~3× | — | 远小于价格差 |
+| HW 渠道价 | $2,000 | $800 | **2.5×** |
+| 3yr Premier Support（Pen Rate 8%） | $160 | $64 | **2.5×** |
+| 实际服务交付成本差异 | ~1.5× | — | 远小于价格差 |
 | **结果** | Margins 可能偏低（服务定价未反映高 HW 价值） | Margins 偏高但竞争力弱（客户愿付的服务费有限） | **两个方向都在漏利润** |
 
 **问题本质**：同一个 Service Tier 用一个 Pen Rate 覆盖所有 HW，忽略了 HW 之间的价值和成本差异——高价值 HW 上服务定价不足（margin leakage），低价值 HW 上可能竞争力不足。
@@ -122,7 +122,7 @@ POC (方向 B) → Pilot (方向 B) → Rollout (方向 B) → Wave 2 (方向 A 
 
 **场景 1：HW 大单降价，服务利润不崩**
 
-某大客户 EMEA 区，ThinkSystem 服务器大单 HW 折扣 15%。当前：所有服务 PN 的 Sales Price 被等比压低 15%（因为 Pen Rate 固定）。方案后：系统识别该客户段 $/HW 目标，自动上调服务 Pen Rate 5-8pp，守住服务收入底线。
+某大客户 EMEA 区，ThinkPad 企业采购大单 HW 折扣 15%。当前：所有服务 PN 的 Sales Price 被等比压低 15%（因为 Pen Rate 固定）。方案后：系统识别该客户段 $/HW 目标，自动上调服务 Pen Rate 5-8pp，守住服务收入底线。
 
 **场景 2：HW 涨价，释放 space 抢 attach**
 
