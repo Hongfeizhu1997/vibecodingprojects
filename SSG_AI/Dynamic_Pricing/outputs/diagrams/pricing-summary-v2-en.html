@@ -3,24 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SSG Dynamic Pricing — Product Pricing Recommendation V2 [static]</title>
+<title>SSG Dynamic Pricing — Product Pricing Recommendation V2 [animated]</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6}
-.wrap{max-width:1100px;margin:0 auto;padding:3rem 2rem}
-.hero{text-align:center;padding:3rem 0 2rem}
-.hero .badge{display:inline-block;padding:.25rem 1rem;border-radius:20px;background:rgba(225,37,27,.12);color:#E1251B;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
-.hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#fff,#38bdf8,#a78bfa,#4ade80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
-.hero .sub{color:#94a3b8;font-size:.8rem}
-.sec{margin:2.5rem 0}
-.sec h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1.2rem;padding-bottom:.5rem;border-bottom:2px solid rgba(225,37,27,.3);display:flex;align-items:center;gap:.5rem}
-.sec h2 .num{color:#E1251B;font-size:.7rem;font-weight:600;text-transform:uppercase}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem}
-.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem}
+body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;width:100vw;height:100vh}
+.stage{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .5s ease;display:flex;align-items:center;justify-content:center;padding:4rem 3rem 5rem}
+.stage.active{opacity:1;pointer-events:auto}
+.inner{max-width:1050px;width:100%;max-height:80vh;overflow-y:auto}
+
+/* Fixed chrome */
+.brand{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#E1251B,#38bdf8,#34d399,#a78bfa);z-index:100}
+.progress-wrap{position:fixed;bottom:0;left:0;right:0;height:3px;background:rgba(148,163,184,.08);z-index:100}
+.progress-fill{height:100%;background:#E1251B;transition:width .4s ease}
+.indicator{position:fixed;top:1.2rem;right:2rem;font-size:.65rem;color:rgba(148,163,184,.5);z-index:100}
+.nav-hint{position:fixed;bottom:1.2rem;right:2rem;font-size:.62rem;color:rgba(148,163,184,.3);z-index:100}
+.stage-title{position:fixed;top:1.2rem;left:2rem;font-size:.65rem;color:rgba(148,163,184,.4);text-transform:uppercase;letter-spacing:.05em;z-index:100}
+
+/* Components */
 .card{background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.08);border-radius:10px;padding:1.5rem}
 .card h3{font-size:.78rem;font-weight:700;color:#fff;margin-bottom:.6rem}
-.card p,.card li{font-size:.7rem;color:#94a3b8}
+.card p,.card li{font-size:.7rem;color:#94a3b8;margin-bottom:.3rem}
 .card ul{list-style:none;padding:0}
 .card li::before{content:"→ ";color:#E1251B}
 .top-red{border-top:3px solid #E1251B}
@@ -29,230 +31,332 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
 .top-violet{border-top:3px solid #a78bfa}
 .top-amber{border-top:3px solid #fbbf24}
 .top-teal{border-top:3px solid #5eead4}
-.big-num{font-size:2.2rem;font-weight:900;line-height:1}
+.big-num{font-size:2rem;font-weight:900;line-height:1;margin-bottom:.3rem}
 .big-num.red{color:#E1251B}
 .big-num.cyan{color:#38bdf8}
 .big-num.green{color:#34d399}
 .big-num.violet{color:#a78bfa}
-.tbl{width:100%;border-collapse:collapse;font-size:.7rem}
-.tbl th{text-align:left;color:#94a3b8;font-weight:600;padding:.5rem .8rem;background:rgba(15,23,42,.6);font-size:.65rem;text-transform:uppercase;letter-spacing:.03em}
-.tbl td{padding:.6rem .8rem;border-bottom:1px solid rgba(148,163,184,.06);color:#cbd5e1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem}
+.tbl{width:100%;border-collapse:collapse;font-size:.68rem}
+.tbl th{text-align:left;color:#94a3b8;font-weight:600;padding:.4rem .7rem;background:rgba(15,23,42,.6);font-size:.63rem;text-transform:uppercase;letter-spacing:.03em}
+.tbl td{padding:.5rem .7rem;border-bottom:1px solid rgba(148,163,184,.06);color:#cbd5e1}
 .tbl tr:last-child td{border-bottom:none}
 .tag{display:inline-block;padding:.1rem .4rem;border-radius:4px;font-size:.63rem;font-weight:600}
 .tag-green{background:rgba(52,211,153,.1);color:#34d399}
 .tag-yellow{background:rgba(251,191,36,.1);color:#fbbf24}
 .tag-red{background:rgba(225,37,27,.1);color:#E1251B}
-.flow{display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1rem 0}
-.flow .node{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.12);border-radius:8px;padding:.8rem 1.2rem;text-align:center;font-size:.7rem}
-.flow .node strong{display:block;color:#fff;font-size:.75rem}
-.flow .arrow{color:#38bdf8;font-size:1.2rem}
+.flow{display:flex;align-items:center;justify-content:center;gap:.8rem;flex-wrap:wrap;padding:.6rem 0}
+.flow .node{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.12);border-radius:8px;padding:.6rem 1rem;text-align:center;font-size:.68rem}
+.flow .node strong{display:block;color:#fff;font-size:.72rem}
+.flow .arrow{color:#38bdf8;font-size:1.1rem}
 .flow .hl{border-color:#E1251B;background:rgba(225,37,27,.06)}
-.callout{padding:1rem 1.2rem;border-radius:8px;font-size:.7rem;margin:1rem 0}
-.callout.info{background:rgba(56,189,248,.05);border-left:3px solid rgba(56,189,248,.3)}
-.ft{text-align:center;padding:2rem 0;color:rgba(148,163,184,.4);font-size:.62rem;border-top:1px solid rgba(148,163,184,.05);margin-top:2rem}
+.section-label{font-size:.65rem;color:#E1251B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;font-weight:600}
+
+/* Title slide */
+.title-slide{text-align:center}
+.title-slide .badge{display:inline-block;padding:.25rem 1rem;border-radius:20px;background:rgba(225,37,27,.12);color:#E1251B;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.title-slide h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#fff,#38bdf8,#a78bfa,#4ade80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+.title-slide .sub{color:#94a3b8;font-size:.8rem}
+
+/* Gantt */
+.gantt{margin-top:1rem}
+.gantt-header{display:flex;margin-bottom:.4rem;padding-left:180px}
+.gantt-header span{flex:1;text-align:center;font-size:.62rem;color:rgba(148,163,184,.5)}
+.gantt-row{display:flex;align-items:center;margin-bottom:.3rem}
+.gantt-label{width:170px;font-size:.68rem;color:#cbd5e1;text-align:right;padding-right:1rem;font-weight:600}
+.gantt-track{flex:1;height:28px;background:rgba(15,23,42,.6);border-radius:4px;position:relative;overflow:hidden}
+.gantt-bar{position:absolute;top:4px;height:20px;border-radius:3px;font-size:.63rem;font-weight:700;display:flex;align-items:center;padding-left:.5rem}
+.gantt-bar.poc{left:0;width:11.1%;background:rgba(251,191,36,.2);color:#fbbf24;border:1px solid rgba(251,191,36,.3)}
+.gantt-bar.pilot{left:11.1%;width:16.7%;background:rgba(56,189,248,.2);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
+.gantt-bar.rollout{left:27.8%;width:5.6%;background:rgba(52,211,153,.2);color:#34d399;border:1px solid rgba(52,211,153,.3)}
+.gantt-bar.wave2{left:33.4%;width:33.3%;background:rgba(94,234,212,.1);color:#5eead4;border:1px solid rgba(94,234,212,.2)}
+.gantt-bar.wave3{left:66.7%;width:33.3%;background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.gantt-marker{position:absolute;top:0;width:1px;height:100%;background:rgba(225,37,27,.4)}
+.gantt-marker::after{content:'';position:absolute;top:-4px;left:-3px;width:7px;height:7px;border-radius:50%;background:#E1251B}
+
+/* Stage-specific headings */
+h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;padding-bottom:.4rem;border-bottom:2px solid rgba(225,37,27,.2)}
+
 @media(max-width:768px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-<div class="hero">
-  <div class="badge">SSG Dynamic Pricing · V2</div>
-  <h1>Service Pricing That Moves With Hardware</h1>
-  <div class="sub">For Business Decision Makers · July 06, 2026</div>
-</div>
+<div class="brand"></div>
+<div class="progress-wrap"><div class="progress-fill" id="progress"></div></div>
+<div class="indicator" id="indicator">1 / 8</div>
+<div class="stage-title" id="stageTitle">Dynamic Pricing V2</div>
+<div class="nav-hint">← → to navigate</div>
 
-<!-- §1 Positioning -->
-<div class="sec">
-  <h2><span class="num">01</span> One-Line Positioning</h2>
-  <p style="font-size:.85rem;color:#e2e8f0;max-width:700px">Dynamic Pricing: when HW prices move, service prices move with them — up with HW increases, and when HW is discounted, Pen Rate automatically adjusts so service revenue isn't proportionally eroded.</p>
-</div>
-
-<!-- §2 Problem -->
-<div class="sec">
-  <h2><span class="num">02</span> Why Now</h2>
-  <div class="grid2">
-    <div class="card top-red">
-      <h3>Status Quo: Same Tier, Different HW — Same Pen Rate</h3>
-      <table class="tbl" style="margin-top:.6rem">
-        <tr><th></th><th>X1 Carbon</th><th>ThinkBook 14</th><th>Gap</th></tr>
-        <tr><td>HW Channel Price</td><td>$2,000</td><td>$800</td><td style="color:#E1251B"><strong>2.5×</strong></td></tr>
-        <tr><td>3yr Support (Pen Rate 8%)</td><td>$160</td><td>$64</td><td style="color:#E1251B"><strong>2.5×</strong></td></tr>
-        <tr><td>Service Delivery Cost Gap</td><td colspan="2">~1.5× (far smaller than price gap)</td><td></td></tr>
-      </table>
-      <p style="margin-top:.6rem;font-size:.65rem;color:#94a3b8">One Pen Rate for all HW within a service tier — high-value HW underpriced (margin leakage), low-value HW uncompetitive</p>
-    </div>
-    <div class="card top-green">
-      <h3>Target: Service Prices That Reflect HW Value</h3>
-      <table class="tbl" style="margin-top:.6rem">
-        <tr><th>Scenario</th><th>Current</th><th>Post-Launch</th></tr>
-        <tr><td>High-value HW</td><td style="color:#E1251B">Price locked by fixed Pen Rate</td><td style="color:#34d399">Pen Rate adjusted up, capturing HW value</td></tr>
-        <tr><td>Low-value HW</td><td style="color:#fbbf24">One-size-fits-all</td><td style="color:#34d399">Flexible adjustment, optimal balance</td></tr>
-        <tr><td>HW discount</td><td style="color:#E1251B">Service shrinks equally</td><td style="color:#34d399">Pen Rate up, revenue not eroded</td></tr>
-      </table>
+<!-- s0: Title -->
+<div class="stage active" id="s0">
+  <div class="inner title-slide">
+    <div class="badge">SSG Dynamic Pricing · V2</div>
+    <h1>Service Pricing That Moves With Hardware</h1>
+    <div class="sub">For Business Decision Makers · July 06, 2026</div>
+    <div class="grid4" style="margin-top:2rem">
+      <div class="card top-red"><div class="big-num red">6 Mo</div><p style="font-size:.65rem;color:#94a3b8">POC → Rollout</p></div>
+      <div class="card top-cyan"><div class="big-num cyan">3 Tiers</div><p style="font-size:.65rem;color:#94a3b8">POC Scope</p></div>
+      <div class="card top-green"><div class="big-num green">≥ 60%</div><p style="font-size:.65rem;color:#94a3b8">AI Adoption Target</p></div>
+      <div class="card top-violet"><div class="big-num violet">3 Dir</div><p style="font-size:.65rem;color:#94a3b8">Technical Paths</p></div>
     </div>
   </div>
 </div>
 
-<!-- §3 Solution -->
-<div class="sec">
-  <h2><span class="num">03</span> Core Mechanism</h2>
-  <p style="font-size:.78rem;color:#e2e8f0;margin-bottom:1rem">Turn Pen Rate from a fixed value into a dynamic, multi-dimensional decision.</p>
-  <div class="flow">
-    <div class="node"><strong>HW Channel Price</strong>PAIDS / Transaction</div>
-    <div class="arrow">→</div>
-    <div class="node"><strong>Service Tier × Term</strong>Service Master Data</div>
-    <div class="arrow">→</div>
-    <div class="node"><strong>GEO × Segment</strong>CRM</div>
-    <div class="arrow">→</div>
-    <div class="node hl"><strong>Pricing Engine</strong>Outputs Pen Rate</div>
-    <div class="arrow">→</div>
-    <div class="node" style="border-color:#34d399;color:#34d399"><strong>Service Sales Price</strong>Auto-populated in quote</div>
-  </div>
-  <div class="grid2" style="margin-top:1.2rem">
-    <div class="card top-teal">
-      <h3>Example: 3yr Premier Support</h3>
-      <table class="tbl" style="margin-top:.5rem">
-        <tr><th></th><th>X1 Carbon</th><th>ThinkBook 14</th></tr>
-        <tr><td>HW Channel Price</td><td>$2,000</td><td>$800</td></tr>
-        <tr><td>Current Pen Rate</td><td style="color:#E1251B">8% (flat)</td><td style="color:#E1251B">8% (flat)</td></tr>
-        <tr><td style="color:#34d399">Post-Launch Pen Rate</td><td style="color:#34d399"><strong>10%</strong></td><td style="color:#34d399"><strong>7%</strong></td></tr>
-        <tr><td>Impact</td><td>Captures premium HW value</td><td>Lowers barrier, boosts attach</td></tr>
-      </table>
-    </div>
-    <div class="card top-violet">
-      <h3>Four Engine Inputs</h3>
-      <ul>
-        <li><strong>HW Value Band</strong>: $0-500 / $500-1K / $1K-2K / $2K+</li>
-        <li><strong>Service Tier × Term</strong>: Service level + contract duration</li>
-        <li><strong>GEO × Segment</strong>: Region + customer tier</li>
-        <li><strong>Competitive Signals</strong> (Phase 2+): Win-price range by segment</li>
-      </ul>
-      <p style="margin-top:.6rem;font-size:.65rem;color:#94a3b8">Engine learns optimal Pen Rate from historical transactions, with three guardrails: above cost, below list price, flag outliers for review</p>
+<!-- s1: Positioning + Problem -->
+<div class="stage" id="s1">
+  <div class="inner">
+    <div class="section-label">01 · Positioning</div>
+    <h2 class="stage-h2">One-Line Positioning</h2>
+    <p style="font-size:.82rem;color:#e2e8f0;margin-bottom:2rem">Dynamic Pricing: when HW prices move, service prices move with them — up with HW increases, and when HW is discounted, Pen Rate automatically adjusts so service revenue isn't proportionally eroded.</p>
+
+    <div class="section-label">02 · Why Now</div>
+    <h2 class="stage-h2">Status Quo: Same Tier, Different HW — Same Pen Rate</h2>
+    <div class="grid2">
+      <div class="card top-red">
+        <h3>The Margin Leakage</h3>
+        <table class="tbl" style="margin-top:.5rem">
+          <tr><th></th><th>X1 Carbon</th><th>ThinkBook 14</th><th>Gap</th></tr>
+          <tr><td>HW Channel Price</td><td>$2,000</td><td>$800</td><td style="color:#E1251B"><strong>2.5×</strong></td></tr>
+          <tr><td>3yr Support (Pen Rate 8%)</td><td>$160</td><td>$64</td><td style="color:#E1251B"><strong>2.5×</strong></td></tr>
+          <tr><td>Service Delivery Cost Gap</td><td colspan="2">~1.5× (far smaller than price gap)</td><td></td></tr>
+        </table>
+        <p style="margin-top:.5rem;font-size:.65rem;color:#94a3b8">One Pen Rate for all HW within a service tier — high-value HW underpriced (margin leakage), low-value HW uncompetitive</p>
+      </div>
+      <div class="card top-green">
+        <h3>Target: Service Prices That Reflect HW Value</h3>
+        <table class="tbl" style="margin-top:.5rem">
+          <tr><th>Scenario</th><th>Current</th><th>Post-Launch</th></tr>
+          <tr><td>High-value HW</td><td style="color:#E1251B">Price locked by Pen Rate</td><td style="color:#34d399">Pen Rate up, capturing HW value</td></tr>
+          <tr><td>Low-value HW</td><td style="color:#fbbf24">One-size-fits-all</td><td style="color:#34d399">Flexible, optimal balance</td></tr>
+          <tr><td>HW discount</td><td style="color:#E1251B">Service shrinks equally</td><td style="color:#34d399">Pen Rate up, revenue not eroded</td></tr>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- §4 Technical Directions -->
-<div class="sec">
-  <h2><span class="num">04</span> Three Approaches (Business Impact Focus)</h2>
-  <div class="grid3">
-    <div class="card top-teal">
-      <h3>A · Precision</h3>
-      <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">Bayesian Hierarchical Model</p>
-      <ul>
-        <li>Small markets borrow large-market experience</li>
-        <li>Every recommendation has a confidence score</li>
-        <li>Explainable: "Client segment shows low price sensitivity"</li>
-      </ul>
-      <p style="margin-top:.5rem;font-size:.62rem;color:#5eead4">Wave 2 · +6 months</p>
+<!-- s2: Core Mechanism -->
+<div class="stage" id="s2">
+  <div class="inner">
+    <div class="section-label">03 · Core Mechanism</div>
+    <h2 class="stage-h2">Turn Pen Rate From Fixed → Multi-Dimensional</h2>
+    <div class="flow" style="margin-bottom:1rem">
+      <div class="node"><strong>HW Channel Price</strong>PAIDS / Transaction</div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>Service Tier × Term</strong>Service Master Data</div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>GEO × Segment</strong>CRM</div>
+      <div class="arrow">→</div>
+      <div class="node hl"><strong>Pricing Engine</strong>Outputs Pen Rate</div>
+      <div class="arrow">→</div>
+      <div class="node" style="border-color:#34d399;color:#34d399"><strong>Service Sales Price</strong>Auto-populated</div>
     </div>
-    <div class="card top-amber">
-      <h3>B · Speed</h3>
-      <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">XGBoost + Constraints</p>
-      <ul>
-        <li>First recommendations in 2-3 weeks</li>
-        <li>Auto-discovers HW×Tier×Term interactions</li>
-        <li>Team has existing expertise</li>
-      </ul>
-      <p style="margin-top:.5rem;font-size:.62rem;color:#fbbf24">Wave 1 · All phases</p>
-    </div>
-    <div class="card top-violet">
-      <h3>C · Strategy</h3>
-      <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">Price Elasticity Model</p>
-      <ul>
-        <li>"This segment elasticity = -0.3"</li>
-        <li>Simulate: "What if we adjust rates 5%?"</li>
-        <li>From reactive → proactive pricing</li>
-      </ul>
-      <p style="margin-top:.5rem;font-size:.62rem;color:#a78bfa">Wave 3 · +12 months</p>
-    </div>
-  </div>
-</div>
-
-<!-- §5 Business Impact -->
-<div class="sec">
-  <h2><span class="num">05</span> Quantified Business Impact</h2>
-  <div class="grid3">
-    <div class="card top-cyan">
-      <div class="big-num cyan">6 Months</div>
-      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">POC → Pilot → Rollout<br>to production-ready</p>
-    </div>
-    <div class="card top-green">
-      <div class="big-num green">≥ 60%</div>
-      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">Pilot AI<br>adoption target</p>
-    </div>
-    <div class="card top-violet">
-      <div class="big-num violet">-50%</div>
-      <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">$/HW volatility<br>reduction</p>
+    <div class="grid2">
+      <div class="card top-teal">
+        <h3>Concrete Example: 3yr Premier Support</h3>
+        <table class="tbl" style="margin-top:.5rem">
+          <tr><th></th><th>X1 Carbon</th><th>ThinkBook 14</th></tr>
+          <tr><td>HW Channel Price</td><td>$2,000</td><td>$800</td></tr>
+          <tr><td>Current Pen Rate</td><td style="color:#E1251B">8% (flat)</td><td style="color:#E1251B">8% (flat)</td></tr>
+          <tr><td style="color:#34d399">Post-Launch Pen Rate</td><td style="color:#34d399"><strong>10%</strong></td><td style="color:#34d399"><strong>7%</strong></td></tr>
+          <tr><td>Impact</td><td>Captures premium HW value</td><td>Lowers barrier, boosts attach</td></tr>
+        </table>
+      </div>
+      <div class="card top-violet">
+        <h3>Four Engine Inputs</h3>
+        <ul>
+          <li><strong>HW Value Band</strong>: $0-500 / $500-1K / $1K-2K / $2K+</li>
+          <li><strong>Service Tier × Term</strong>: Level + duration</li>
+          <li><strong>GEO × Segment</strong>: Region + customer tier</li>
+          <li><strong>Competitive Signals</strong> (Phase 2+): Win-price range</li>
+        </ul>
+        <p style="margin-top:.5rem;font-size:.65rem;color:#94a3b8">Three guardrails: ≥ cost · ≤ list price · flag outliers for review</p>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- §6 Rollout -->
-<div class="sec">
-  <h2><span class="num">06</span> Rollout Roadmap</h2>
-  <table class="tbl">
-    <tr>
-      <th></th><th>POC</th><th>Pilot</th><th>Rollout</th><th style="color:#5eead4">Wave 2</th><th style="color:#a78bfa">Wave 3</th>
-    </tr>
-    <tr>
-      <td style="color:#94a3b8">Timeline</td>
-      <td><strong>2 months</strong></td><td><strong>3 months</strong></td><td><strong>1 month</strong></td>
-      <td style="color:#5eead4">+6 months</td><td style="color:#a78bfa">+12 months</td>
-    </tr>
-    <tr>
-      <td style="color:#94a3b8">Scope</td>
-      <td>EMEA + 3 Tiers</td><td>All GEOs + Tiers</td><td>Embed in quoting</td>
-      <td style="color:#5eead4">Full scale</td><td style="color:#a78bfa">Full scale</td>
-    </tr>
-    <tr>
-      <td style="color:#94a3b8">Business Change</td>
-      <td>Offline experiment<br>AI vs. human benchmark</td><td>Pilot team sees AI price<br>Sales keeps final say</td><td>AI price auto-populated<br>Overrides require reason</td>
-      <td style="color:#5eead4">Low-confidence → approval<br>High-confidence → auto</td>
-      <td style="color:#a78bfa">Reactive →<br>Proactive strategy</td>
-    </tr>
-    <tr>
-      <td style="color:#94a3b8">Risk</td>
-      <td><span class="tag tag-green">🟢 Zero Risk</span></td>
-      <td><span class="tag tag-yellow">🟡 Low Risk</span></td>
-      <td><span class="tag tag-yellow">🟡 Medium-Low</span></td>
-      <td style="color:#5eead4"><span class="tag tag-red">🔴 Process Change</span></td>
-      <td style="color:#a78bfa"><span class="tag tag-red">🔴 Data Threshold</span></td>
-    </tr>
-  </table>
-</div>
-
-<!-- §7 Scenarios -->
-<div class="sec">
-  <h2><span class="num">07</span> Key Business Scenarios</h2>
-  <div class="grid3">
-    <div class="card top-red">
-      <h3>Large HW Deal — Margin Intact</h3>
-      <p>EMEA ThinkPad enterprise deal with 15% HW discount. Engine auto-adjusts Pen Rate +5-8pp, defending service revenue floor.</p>
+<!-- s3: Design Principles -->
+<div class="stage" id="s3">
+  <div class="inner">
+    <div class="section-label">03 · Design Principles</div>
+    <h2 class="stage-h2">Three Principles</h2>
+    <div class="grid3">
+      <div class="card top-teal">
+        <h3>Learn, Don't Hard-Code</h3>
+        <p>Pen Rate isn't looked up from a static table — it's learned from historical transactions. The engine discovers: "For X1 Carbon at $2,000 with 3yr Premier Support, the optimal Pen Rate is 10%, not 8%."</p>
+      </div>
+      <div class="card top-amber">
+        <h3>Independent From HW Pricing</h3>
+        <p>The Dynamic Pricing engine does not couple with PAIDS. HW price is just one input feature — the engine independently decides service price, not bound by HW pricing strategy.</p>
+      </div>
+      <div class="card top-green">
+        <h3>Progressive Trust</h3>
+        <p>POC: offline validation → Pilot: recommendation as reference → Rollout: auto-fill with manual override → Wave 2: high-confidence auto-approve. Trust builds step by step.</p>
+      </div>
     </div>
-    <div class="card top-cyan">
-      <h3>HW Price Hike — Attach Opportunity</h3>
-      <p>HW supply-constrained, price up 8%. Pen Rate eases, service price rise is moderated, lowering total cost perception and boosting attach.</p>
-    </div>
-    <div class="card top-green">
-      <h3>New GEO Launch — No Guesswork</h3>
-      <p>AP new market with sparse data. Model borrows similar GEO (EMEA) experience — accuracy beats global one-size-fits-all.</p>
+    <div class="card top-cyan" style="margin-top:1.2rem">
+      <h3>B2B Sales Flow Integration</h3>
+      <div class="flow">
+        <div class="node"><strong>Opportunity</strong></div>
+        <div class="arrow">→</div>
+        <div class="node"><strong>Quote</strong></div>
+        <div class="arrow">→</div>
+        <div class="node"><strong>Contract</strong></div>
+        <div class="arrow">→</div>
+        <div class="node"><strong>Order</strong></div>
+      </div>
+      <p style="text-align:center;margin-top:.5rem;font-size:.68rem;color:#38bdf8">↑ Dynamic Pricing fires here — sales configures HW + services, recommendation auto-populates</p>
     </div>
   </div>
 </div>
 
-<!-- §8 Conclusion -->
-<div class="sec">
-  <h2><span class="num">08</span> Bottom Line</h2>
-  <div class="card top-teal" style="text-align:center;padding:2rem">
-    <p style="font-size:1rem;color:#fff;font-weight:700">Dynamic Pricing — service pricing that moves with hardware, not dragged by it.</p>
-    <p style="margin-top:.8rem;font-size:.7rem;color:#94a3b8">6 months to production · No disruption to existing pricing systems · Sales gets a co-pilot, not a replacement</p>
+<!-- s4: Three Approaches -->
+<div class="stage" id="s4">
+  <div class="inner">
+    <div class="section-label">04 · Technical Directions</div>
+    <h2 class="stage-h2">Three Approaches — Business Impact Focus</h2>
+    <div class="grid3">
+      <div class="card top-teal">
+        <h3>A · Precision</h3>
+        <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">Bayesian Hierarchical Model</p>
+        <ul>
+          <li>Small markets borrow large-market experience</li>
+          <li>Every recommendation has a confidence score</li>
+          <li>Explainable: "Segment shows low price sensitivity"</li>
+        </ul>
+        <p style="margin-top:.8rem;font-size:.62rem;color:#5eead4">Wave 2 · +6 months</p>
+      </div>
+      <div class="card top-amber">
+        <h3>B · Speed</h3>
+        <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">XGBoost + Constraints</p>
+        <ul>
+          <li>First recommendations in 2-3 weeks</li>
+          <li>Auto-discovers HW × Tier × Term interactions</li>
+          <li>Team has existing expertise</li>
+        </ul>
+        <p style="margin-top:.8rem;font-size:.62rem;color:#fbbf24">Wave 1 · All phases</p>
+      </div>
+      <div class="card top-violet">
+        <h3>C · Strategy</h3>
+        <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">Price Elasticity Model</p>
+        <ul>
+          <li>"This segment elasticity = -0.3"</li>
+          <li>Simulate: "What if we adjust rates 5%?"</li>
+          <li>From reactive → proactive pricing</li>
+        </ul>
+        <p style="margin-top:.8rem;font-size:.62rem;color:#a78bfa">Wave 3 · +12 months</p>
+      </div>
+    </div>
   </div>
 </div>
 
-<div class="ft">SSG Dynamic Pricing · Product Pricing Recommendation V2 · Confidential</div>
-
+<!-- s5: Business Impact -->
+<div class="stage" id="s5">
+  <div class="inner">
+    <div class="section-label">05 · Quantified Business Impact</div>
+    <h2 class="stage-h2">Measurable Targets</h2>
+    <div class="grid3" style="margin-bottom:1.2rem">
+      <div class="card top-cyan"><div class="big-num cyan">6 Mo</div><p style="font-size:.65rem;color:#94a3b8">POC → Pilot → Rollout to production-ready</p></div>
+      <div class="card top-green"><div class="big-num green">≥ 60%</div><p style="font-size:.65rem;color:#94a3b8">Pilot AI adoption target</p></div>
+      <div class="card top-violet"><div class="big-num violet">-50%</div><p style="font-size:.65rem;color:#94a3b8">$/HW volatility reduction</p></div>
+    </div>
+    <div class="section-label">07 · Key Business Scenarios</div>
+    <h2 class="stage-h2">What This Looks Like in Practice</h2>
+    <div class="grid3">
+      <div class="card top-red">
+        <h3>Large HW Deal — Margin Intact</h3>
+        <p>EMEA ThinkPad enterprise deal with 15% HW discount. Engine auto-adjusts Pen Rate +5-8pp, defending service revenue floor.</p>
+      </div>
+      <div class="card top-cyan">
+        <h3>HW Price Hike — Attach Opportunity</h3>
+        <p>HW supply-constrained, price up 8%. Pen Rate eases, service price rise is moderated, lowering total cost perception and boosting attach.</p>
+      </div>
+      <div class="card top-green">
+        <h3>New GEO Launch — No Guesswork</h3>
+        <p>AP new market with sparse data. Model borrows similar GEO (EMEA) experience — accuracy beats global one-size-fits-all.</p>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- s6: Rollout Roadmap with Gantt -->
+<div class="stage" id="s6">
+  <div class="inner">
+    <div class="section-label">06 · Rollout Roadmap</div>
+    <h2 class="stage-h2">6 Months to Production</h2>
+    <table class="tbl" style="margin-bottom:1.2rem">
+      <tr><th></th><th>POC</th><th>Pilot</th><th>Rollout</th><th style="color:#5eead4">Wave 2</th><th style="color:#a78bfa">Wave 3</th></tr>
+      <tr><td style="color:#94a3b8">Timeline</td><td><strong>2 months</strong></td><td><strong>3 months</strong></td><td><strong>1 month</strong></td><td style="color:#5eead4">+6 months</td><td style="color:#a78bfa">+12 months</td></tr>
+      <tr><td style="color:#94a3b8">Scope</td><td>EMEA + 3 Tiers</td><td>All GEOs + Tiers</td><td>Embed in quoting</td><td style="color:#5eead4">Full scale</td><td style="color:#a78bfa">Full scale</td></tr>
+      <tr><td style="color:#94a3b8">Business Change</td><td>Offline experiment<br>AI vs. human benchmark</td><td>Pilot team sees AI price<br>Sales keeps final say</td><td>AI price auto-populated<br>Overrides require reason</td><td style="color:#5eead4">Low-confidence → approval<br>High-confidence → auto</td><td style="color:#a78bfa">Reactive →<br>Proactive strategy</td></tr>
+      <tr><td style="color:#94a3b8">Risk</td><td><span class="tag tag-green">Zero Risk</span></td><td><span class="tag tag-yellow">Low Risk</span></td><td><span class="tag tag-yellow">Medium-Low</span></td><td style="color:#5eead4"><span class="tag tag-red">Process Change</span></td><td style="color:#a78bfa"><span class="tag tag-red">Data Threshold</span></td></tr>
+    </table>
+
+    <h2 class="stage-h2">Timeline View</h2>
+    <div class="gantt">
+      <div class="gantt-header">
+        <span>M0</span><span>M2</span><span>M4</span><span>M6</span><span>M8</span><span>M10</span><span>M12</span><span>M14</span><span>M16</span><span>M18</span>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">POC</div>
+        <div class="gantt-track"><div class="gantt-bar poc">2 mo · EMEA + 3 Tiers</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Pilot</div>
+        <div class="gantt-track"><div class="gantt-bar pilot">3 mo · All GEOs</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Rollout</div>
+        <div class="gantt-track"><div class="gantt-bar rollout">1 mo</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Wave 2</div>
+        <div class="gantt-track"><div class="gantt-bar wave2">Bayesian + Confidence</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Wave 3</div>
+        <div class="gantt-track"><div class="gantt-bar wave3">Elasticity + Simulation</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- s7: Conclusion -->
+<div class="stage" id="s7">
+  <div class="inner" style="text-align:center">
+    <div class="section-label">08 · Bottom Line</div>
+    <div class="card top-teal" style="padding:2.5rem;max-width:700px;margin:0 auto">
+      <p style="font-size:1.1rem;color:#fff;font-weight:700;margin-bottom:1rem">Dynamic Pricing — service pricing that moves with hardware, not dragged by it.</p>
+      <p style="font-size:.72rem;color:#94a3b8;margin-bottom:.3rem">6 months to production</p>
+      <p style="font-size:.72rem;color:#94a3b8;margin-bottom:.3rem">No disruption to existing pricing systems</p>
+      <p style="font-size:.72rem;color:#94a3b8">Sales gets a co-pilot, not a replacement</p>
+    </div>
+    <p style="margin-top:1.5rem;font-size:.62rem;color:rgba(148,163,184,.3)">SSG Dynamic Pricing · Product Pricing Recommendation V2 · Confidential</p>
+  </div>
+</div>
+
+<script>
+const TOTAL = 8;
+let current = 0;
+
+function showStage(i) {
+  document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('s' + i);
+  if (el) el.classList.add('active');
+  document.getElementById('progress').style.width = ((i + 1) / TOTAL * 100) + '%';
+  document.getElementById('indicator').textContent = (i + 1) + ' / ' + TOTAL;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { current = Math.min(current + 1, TOTAL - 1); showStage(current); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { current = Math.max(current - 1, 0); showStage(current); }
+});
+
+showStage(0);
+</script>
 </body>
 </html>
