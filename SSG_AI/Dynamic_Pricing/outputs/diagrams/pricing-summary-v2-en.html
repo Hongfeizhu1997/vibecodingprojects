@@ -6,78 +6,76 @@
 <title>SSG Dynamic Pricing — Product Pricing Recommendation V2 [animated]</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;width:100vw;height:100vh}
+body{background:#f5f6f8;color:#1a202c;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;width:100vw;height:100vh}
 .stage{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity .5s ease;display:flex;align-items:center;justify-content:center;padding:4rem 3rem 5rem}
 .stage.active{opacity:1;pointer-events:auto}
 .inner{max-width:1050px;width:100%;max-height:80vh;overflow-y:auto}
 
 /* Fixed chrome */
-.brand{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#E1251B,#38bdf8,#34d399,#a78bfa);z-index:100}
-.progress-wrap{position:fixed;bottom:0;left:0;right:0;height:3px;background:rgba(148,163,184,.08);z-index:100}
+.brand{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#E1251B,#2563eb,#059669,#7c3aed);z-index:100}
+.progress-wrap{position:fixed;bottom:0;left:0;right:0;height:3px;background:#e2e8f0;z-index:100}
 .progress-fill{height:100%;background:#E1251B;transition:width .4s ease}
-.indicator{position:fixed;top:1.2rem;right:2rem;font-size:.65rem;color:rgba(148,163,184,.5);z-index:100}
-.nav-hint{position:fixed;bottom:1.2rem;right:2rem;font-size:.62rem;color:rgba(148,163,184,.3);z-index:100}
-.stage-title{position:fixed;top:1.2rem;left:2rem;font-size:.65rem;color:rgba(148,163,184,.4);text-transform:uppercase;letter-spacing:.05em;z-index:100}
+.indicator{position:fixed;top:1.2rem;right:2rem;font-size:.65rem;color:#64748b;z-index:100}
+.nav-hint{position:fixed;bottom:1.2rem;right:2rem;font-size:.62rem;color:#cbd5e1;z-index:100}
+.stage-title{position:fixed;top:1.2rem;left:2rem;font-size:.65rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;z-index:100}
 
 /* Components */
-.card{background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.08);border-radius:10px;padding:1.5rem}
-.card h3{font-size:.78rem;font-weight:700;color:#fff;margin-bottom:.6rem}
-.card p,.card li{font-size:.7rem;color:#94a3b8;margin-bottom:.3rem}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card h3{font-size:.78rem;font-weight:700;color:#1a202c;margin-bottom:.6rem}
+.card p,.card li{font-size:.7rem;color:#475569;margin-bottom:.3rem}
 .card ul{list-style:none;padding:0}
 .card li::before{content:"→ ";color:#E1251B}
 .top-red{border-top:3px solid #E1251B}
-.top-cyan{border-top:3px solid #38bdf8}
-.top-green{border-top:3px solid #34d399}
-.top-violet{border-top:3px solid #a78bfa}
-.top-amber{border-top:3px solid #fbbf24}
-.top-teal{border-top:3px solid #5eead4}
+.top-cyan{border-top:3px solid #2563eb}
+.top-green{border-top:3px solid #059669}
+.top-violet{border-top:3px solid #7c3aed}
+.top-amber{border-top:3px solid #d97706}
+.top-teal{border-top:3px solid #0d9488}
 .big-num{font-size:2rem;font-weight:900;line-height:1;margin-bottom:.3rem}
 .big-num.red{color:#E1251B}
-.big-num.cyan{color:#38bdf8}
-.big-num.green{color:#34d399}
-.big-num.violet{color:#a78bfa}
+.big-num.cyan{color:#2563eb}
+.big-num.green{color:#059669}
+.big-num.violet{color:#7c3aed}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem}
 .grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem}
 .tbl{width:100%;border-collapse:collapse;font-size:.68rem}
-.tbl th{text-align:left;color:#94a3b8;font-weight:600;padding:.4rem .7rem;background:rgba(15,23,42,.6);font-size:.63rem;text-transform:uppercase;letter-spacing:.03em}
-.tbl td{padding:.5rem .7rem;border-bottom:1px solid rgba(148,163,184,.06);color:#cbd5e1}
+.tbl th{text-align:left;color:#64748b;font-weight:600;padding:.4rem .7rem;background:#f1f5f9;font-size:.63rem;text-transform:uppercase;letter-spacing:.03em}
+.tbl td{padding:.5rem .7rem;border-bottom:1px solid #f1f5f9;color:#334155}
 .tbl tr:last-child td{border-bottom:none}
 .tag{display:inline-block;padding:.1rem .4rem;border-radius:4px;font-size:.63rem;font-weight:600}
-.tag-green{background:rgba(52,211,153,.1);color:#34d399}
-.tag-yellow{background:rgba(251,191,36,.1);color:#fbbf24}
-.tag-red{background:rgba(225,37,27,.1);color:#E1251B}
+.tag-green{background:#ecfdf5;color:#059669}
+.tag-yellow{background:#fffbeb;color:#d97706}
+.tag-red{background:#fef2f2;color:#dc2626}
 .flow{display:flex;align-items:center;justify-content:center;gap:.8rem;flex-wrap:wrap;padding:.6rem 0}
-.flow .node{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.12);border-radius:8px;padding:.6rem 1rem;text-align:center;font-size:.68rem}
-.flow .node strong{display:block;color:#fff;font-size:.72rem}
-.flow .arrow{color:#38bdf8;font-size:1.1rem}
-.flow .hl{border-color:#E1251B;background:rgba(225,37,27,.06)}
+.flow .node{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:.6rem 1rem;text-align:center;font-size:.68rem;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.flow .node strong{display:block;color:#1a202c;font-size:.72rem}
+.flow .arrow{color:#2563eb;font-size:1.1rem}
+.flow .hl{border-color:#E1251B;background:#fef2f2}
 .section-label{font-size:.65rem;color:#E1251B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;font-weight:600}
 
 /* Title slide */
 .title-slide{text-align:center}
-.title-slide .badge{display:inline-block;padding:.25rem 1rem;border-radius:20px;background:rgba(225,37,27,.12);color:#E1251B;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
-.title-slide h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#fff,#38bdf8,#a78bfa,#4ade80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
-.title-slide .sub{color:#94a3b8;font-size:.8rem}
+.title-slide .badge{display:inline-block;padding:.25rem 1rem;border-radius:20px;background:#fef2f2;color:#E1251B;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.title-slide h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#E1251B,#2563eb,#7c3aed,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem}
+.title-slide .sub{color:#64748b;font-size:.8rem}
 
 /* Gantt */
 .gantt{margin-top:1rem}
 .gantt-header{display:flex;margin-bottom:.4rem;padding-left:180px}
-.gantt-header span{flex:1;text-align:center;font-size:.62rem;color:rgba(148,163,184,.5)}
+.gantt-header span{flex:1;text-align:center;font-size:.62rem;color:#64748b}
 .gantt-row{display:flex;align-items:center;margin-bottom:.3rem}
-.gantt-label{width:170px;font-size:.68rem;color:#cbd5e1;text-align:right;padding-right:1rem;font-weight:600}
-.gantt-track{flex:1;height:28px;background:rgba(15,23,42,.6);border-radius:4px;position:relative;overflow:hidden}
+.gantt-label{width:170px;font-size:.68rem;color:#475569;text-align:right;padding-right:1rem;font-weight:600}
+.gantt-track{flex:1;height:28px;background:#f1f5f9;border-radius:4px;position:relative;overflow:hidden}
 .gantt-bar{position:absolute;top:4px;height:20px;border-radius:3px;font-size:.63rem;font-weight:700;display:flex;align-items:center;padding-left:.5rem}
-.gantt-bar.poc{left:0;width:11.1%;background:rgba(251,191,36,.2);color:#fbbf24;border:1px solid rgba(251,191,36,.3)}
-.gantt-bar.pilot{left:11.1%;width:16.7%;background:rgba(56,189,248,.2);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
-.gantt-bar.rollout{left:27.8%;width:5.6%;background:rgba(52,211,153,.2);color:#34d399;border:1px solid rgba(52,211,153,.3)}
-.gantt-bar.wave2{left:33.4%;width:33.3%;background:rgba(94,234,212,.1);color:#5eead4;border:1px solid rgba(94,234,212,.2)}
-.gantt-bar.wave3{left:66.7%;width:33.3%;background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
-.gantt-marker{position:absolute;top:0;width:1px;height:100%;background:rgba(225,37,27,.4)}
-.gantt-marker::after{content:'';position:absolute;top:-4px;left:-3px;width:7px;height:7px;border-radius:50%;background:#E1251B}
+.gantt-bar.poc{left:0;width:11.1%;background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.gantt-bar.pilot{left:11.1%;width:16.7%;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.gantt-bar.rollout{left:27.8%;width:5.6%;background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.gantt-bar.wave2{left:33.4%;width:33.3%;background:#ccfbf1;color:#0f766e;border:1px solid #99f6e4}
+.gantt-bar.wave3{left:66.7%;width:33.3%;background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd}
 
 /* Stage-specific headings */
-h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;padding-bottom:.4rem;border-bottom:2px solid rgba(225,37,27,.2)}
+h2.stage-h2{font-size:1.1rem;font-weight:700;color:#1a202c;margin-bottom:1rem;padding-bottom:.4rem;border-bottom:2px solid #fecaca}
 
 @media(max-width:768px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
 </style>
@@ -97,10 +95,10 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;paddi
     <h1>Service Pricing That Moves With Hardware</h1>
     <div class="sub">For Business Decision Makers · July 06, 2026</div>
     <div class="grid4" style="margin-top:2rem">
-      <div class="card top-red"><div class="big-num red">6 Mo</div><p style="font-size:.65rem;color:#94a3b8">POC → Rollout</p></div>
-      <div class="card top-cyan"><div class="big-num cyan">3 Tiers</div><p style="font-size:.65rem;color:#94a3b8">POC Scope</p></div>
-      <div class="card top-green"><div class="big-num green">≥ 60%</div><p style="font-size:.65rem;color:#94a3b8">AI Adoption Target</p></div>
-      <div class="card top-violet"><div class="big-num violet">3 Dir</div><p style="font-size:.65rem;color:#94a3b8">Technical Paths</p></div>
+      <div class="card top-red"><div class="big-num red">6 Mo</div><p style="font-size:.65rem;color:#64748b">POC → Rollout</p></div>
+      <div class="card top-cyan"><div class="big-num cyan">3 Tiers</div><p style="font-size:.65rem;color:#64748b">POC Scope</p></div>
+      <div class="card top-green"><div class="big-num green">≥ 60%</div><p style="font-size:.65rem;color:#64748b">AI Adoption Target</p></div>
+      <div class="card top-violet"><div class="big-num violet">3 Dir</div><p style="font-size:.65rem;color:#64748b">Technical Paths</p></div>
     </div>
   </div>
 </div>
@@ -110,7 +108,7 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;paddi
   <div class="inner">
     <div class="section-label">01 · Positioning</div>
     <h2 class="stage-h2">One-Line Positioning</h2>
-    <p style="font-size:.82rem;color:#e2e8f0;margin-bottom:2rem">Dynamic Pricing: when HW prices move, service prices move with them — up with HW increases, and when HW is discounted, Pen Rate automatically adjusts so service revenue isn't proportionally eroded.</p>
+    <p style="font-size:.82rem;color:#1a202c;margin-bottom:2rem">Dynamic Pricing: when HW prices move, service prices move with them — up with HW increases, and when HW is discounted, Pen Rate automatically adjusts so service revenue isn't proportionally eroded.</p>
 
     <div class="section-label">02 · Why Now</div>
     <h2 class="stage-h2">Status Quo: Same Tier, Different HW — Same Pen Rate</h2>
@@ -123,14 +121,14 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;paddi
           <tr><td>3yr Support (Pen Rate 8%)</td><td>$160</td><td>$64</td><td style="color:#E1251B"><strong>2.5×</strong></td></tr>
           <tr><td>Service Delivery Cost Gap</td><td colspan="2">~1.5× (far smaller than price gap)</td><td></td></tr>
         </table>
-        <p style="margin-top:.5rem;font-size:.65rem;color:#94a3b8">One Pen Rate for all HW within a service tier — high-value HW underpriced (margin leakage), low-value HW uncompetitive</p>
+        <p style="margin-top:.5rem;font-size:.65rem;color:#64748b">One Pen Rate for all HW within a service tier — high-value HW underpriced (margin leakage), low-value HW uncompetitive</p>
       </div>
       <div class="card top-green">
         <h3>Target: Service Prices That Reflect HW Value</h3>
         <table class="tbl" style="margin-top:.5rem">
           <tr><th>Scenario</th><th>Current</th><th>Post-Launch</th></tr>
           <tr><td>High-value HW</td><td style="color:#E1251B">Price locked by Pen Rate</td><td style="color:#34d399">Pen Rate up, capturing HW value</td></tr>
-          <tr><td>Low-value HW</td><td style="color:#fbbf24">One-size-fits-all</td><td style="color:#34d399">Flexible, optimal balance</td></tr>
+          <tr><td>Low-value HW</td><td style="color:#d97706">One-size-fits-all</td><td style="color:#34d399">Flexible, optimal balance</td></tr>
           <tr><td>HW discount</td><td style="color:#E1251B">Service shrinks equally</td><td style="color:#34d399">Pen Rate up, revenue not eroded</td></tr>
         </table>
       </div>
@@ -173,7 +171,7 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;paddi
           <li><strong>GEO × Segment</strong>: Region + customer tier</li>
           <li><strong>Competitive Signals</strong> (Phase 2+): Win-price range</li>
         </ul>
-        <p style="margin-top:.5rem;font-size:.65rem;color:#94a3b8">Three guardrails: ≥ cost · ≤ list price · flag outliers for review</p>
+        <p style="margin-top:.5rem;font-size:.65rem;color:#64748b">Three guardrails: ≥ cost · ≤ list price · flag outliers for review</p>
       </div>
     </div>
   </div>
@@ -209,7 +207,7 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;paddi
         <div class="arrow">→</div>
         <div class="node"><strong>Order</strong></div>
       </div>
-      <p style="text-align:center;margin-top:.5rem;font-size:.68rem;color:#38bdf8">↑ Dynamic Pricing fires here — sales configures HW + services, recommendation auto-populates</p>
+      <p style="text-align:center;margin-top:.5rem;font-size:.68rem;color:#2563eb">↑ Dynamic Pricing fires here — sales configures HW + services, recommendation auto-populates</p>
     </div>
   </div>
 </div>
@@ -222,33 +220,33 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;paddi
     <div class="grid3">
       <div class="card top-teal">
         <h3>A · Precision</h3>
-        <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">Bayesian Hierarchical Model</p>
+        <p style="font-size:.65rem;color:#64748b;margin-bottom:.5rem">Bayesian Hierarchical Model</p>
         <ul>
           <li>Small markets borrow large-market experience</li>
           <li>Every recommendation has a confidence score</li>
           <li>Explainable: "Segment shows low price sensitivity"</li>
         </ul>
-        <p style="margin-top:.8rem;font-size:.62rem;color:#5eead4">Wave 2 · +6 months</p>
+        <p style="margin-top:.8rem;font-size:.62rem;color:#0d9488">Wave 2 · +6 months</p>
       </div>
       <div class="card top-amber">
         <h3>B · Speed</h3>
-        <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">XGBoost + Constraints</p>
+        <p style="font-size:.65rem;color:#64748b;margin-bottom:.5rem">XGBoost + Constraints</p>
         <ul>
           <li>First recommendations in 2-3 weeks</li>
           <li>Auto-discovers HW × Tier × Term interactions</li>
           <li>Team has existing expertise</li>
         </ul>
-        <p style="margin-top:.8rem;font-size:.62rem;color:#fbbf24">Wave 1 · All phases</p>
+        <p style="margin-top:.8rem;font-size:.62rem;color:#d97706">Wave 1 · All phases</p>
       </div>
       <div class="card top-violet">
         <h3>C · Strategy</h3>
-        <p style="font-size:.65rem;color:#94a3b8;margin-bottom:.5rem">Price Elasticity Model</p>
+        <p style="font-size:.65rem;color:#64748b;margin-bottom:.5rem">Price Elasticity Model</p>
         <ul>
           <li>"This segment elasticity = -0.3"</li>
           <li>Simulate: "What if we adjust rates 5%?"</li>
           <li>From reactive → proactive pricing</li>
         </ul>
-        <p style="margin-top:.8rem;font-size:.62rem;color:#a78bfa">Wave 3 · +12 months</p>
+        <p style="margin-top:.8rem;font-size:.62rem;color:#7c3aed">Wave 3 · +12 months</p>
       </div>
     </div>
   </div>
@@ -260,9 +258,9 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;paddi
     <div class="section-label">05 · Quantified Business Impact</div>
     <h2 class="stage-h2">Measurable Targets</h2>
     <div class="grid3" style="margin-bottom:1.2rem">
-      <div class="card top-cyan"><div class="big-num cyan">6 Mo</div><p style="font-size:.65rem;color:#94a3b8">POC → Pilot → Rollout to production-ready</p></div>
-      <div class="card top-green"><div class="big-num green">≥ 60%</div><p style="font-size:.65rem;color:#94a3b8">Pilot AI adoption target</p></div>
-      <div class="card top-violet"><div class="big-num violet">-50%</div><p style="font-size:.65rem;color:#94a3b8">$/HW volatility reduction</p></div>
+      <div class="card top-cyan"><div class="big-num cyan">6 Mo</div><p style="font-size:.65rem;color:#64748b">POC → Pilot → Rollout to production-ready</p></div>
+      <div class="card top-green"><div class="big-num green">≥ 60%</div><p style="font-size:.65rem;color:#64748b">Pilot AI adoption target</p></div>
+      <div class="card top-violet"><div class="big-num violet">-50%</div><p style="font-size:.65rem;color:#64748b">$/HW volatility reduction</p></div>
     </div>
     <div class="section-label">07 · Key Business Scenarios</div>
     <h2 class="stage-h2">What This Looks Like in Practice</h2>
@@ -289,11 +287,11 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;paddi
     <div class="section-label">06 · Rollout Roadmap</div>
     <h2 class="stage-h2">6 Months to Production</h2>
     <table class="tbl" style="margin-bottom:1.2rem">
-      <tr><th></th><th>POC</th><th>Pilot</th><th>Rollout</th><th style="color:#5eead4">Wave 2</th><th style="color:#a78bfa">Wave 3</th></tr>
-      <tr><td style="color:#94a3b8">Timeline</td><td><strong>2 months</strong></td><td><strong>3 months</strong></td><td><strong>1 month</strong></td><td style="color:#5eead4">+6 months</td><td style="color:#a78bfa">+12 months</td></tr>
-      <tr><td style="color:#94a3b8">Scope</td><td>EMEA + 3 Tiers</td><td>All GEOs + Tiers</td><td>Embed in quoting</td><td style="color:#5eead4">Full scale</td><td style="color:#a78bfa">Full scale</td></tr>
-      <tr><td style="color:#94a3b8">Business Change</td><td>Offline experiment<br>AI vs. human benchmark</td><td>Pilot team sees AI price<br>Sales keeps final say</td><td>AI price auto-populated<br>Overrides require reason</td><td style="color:#5eead4">Low-confidence → approval<br>High-confidence → auto</td><td style="color:#a78bfa">Reactive →<br>Proactive strategy</td></tr>
-      <tr><td style="color:#94a3b8">Risk</td><td><span class="tag tag-green">Zero Risk</span></td><td><span class="tag tag-yellow">Low Risk</span></td><td><span class="tag tag-yellow">Medium-Low</span></td><td style="color:#5eead4"><span class="tag tag-red">Process Change</span></td><td style="color:#a78bfa"><span class="tag tag-red">Data Threshold</span></td></tr>
+      <tr><th></th><th>POC</th><th>Pilot</th><th>Rollout</th><th style="color:#0d9488">Wave 2</th><th style="color:#7c3aed">Wave 3</th></tr>
+      <tr><td style="color:#64748b">Timeline</td><td><strong>2 months</strong></td><td><strong>3 months</strong></td><td><strong>1 month</strong></td><td style="color:#0d9488">+6 months</td><td style="color:#7c3aed">+12 months</td></tr>
+      <tr><td style="color:#64748b">Scope</td><td>EMEA + 3 Tiers</td><td>All GEOs + Tiers</td><td>Embed in quoting</td><td style="color:#0d9488">Full scale</td><td style="color:#7c3aed">Full scale</td></tr>
+      <tr><td style="color:#64748b">Business Change</td><td>Offline experiment<br>AI vs. human benchmark</td><td>Pilot team sees AI price<br>Sales keeps final say</td><td>AI price auto-populated<br>Overrides require reason</td><td style="color:#0d9488">Low-confidence → approval<br>High-confidence → auto</td><td style="color:#7c3aed">Reactive →<br>Proactive strategy</td></tr>
+      <tr><td style="color:#64748b">Risk</td><td><span class="tag tag-green">Zero Risk</span></td><td><span class="tag tag-yellow">Low Risk</span></td><td><span class="tag tag-yellow">Medium-Low</span></td><td style="color:#0d9488"><span class="tag tag-red">Process Change</span></td><td style="color:#7c3aed"><span class="tag tag-red">Data Threshold</span></td></tr>
     </table>
 
     <h2 class="stage-h2">Timeline View</h2>
@@ -330,12 +328,12 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;paddi
   <div class="inner" style="text-align:center">
     <div class="section-label">08 · Bottom Line</div>
     <div class="card top-teal" style="padding:2.5rem;max-width:700px;margin:0 auto">
-      <p style="font-size:1.1rem;color:#fff;font-weight:700;margin-bottom:1rem">Dynamic Pricing — service pricing that moves with hardware, not dragged by it.</p>
-      <p style="font-size:.72rem;color:#94a3b8;margin-bottom:.3rem">6 months to production</p>
-      <p style="font-size:.72rem;color:#94a3b8;margin-bottom:.3rem">No disruption to existing pricing systems</p>
-      <p style="font-size:.72rem;color:#94a3b8">Sales gets a co-pilot, not a replacement</p>
+      <p style="font-size:1.1rem;color:#1a202c;font-weight:700;margin-bottom:1rem">Dynamic Pricing — service pricing that moves with hardware, not dragged by it.</p>
+      <p style="font-size:.72rem;color:#64748b;margin-bottom:.3rem">6 months to production</p>
+      <p style="font-size:.72rem;color:#64748b;margin-bottom:.3rem">No disruption to existing pricing systems</p>
+      <p style="font-size:.72rem;color:#64748b">Sales gets a co-pilot, not a replacement</p>
     </div>
-    <p style="margin-top:1.5rem;font-size:.62rem;color:rgba(148,163,184,.3)">SSG Dynamic Pricing · Product Pricing Recommendation V2 · Confidential</p>
+    <p style="margin-top:1.5rem;font-size:.62rem;color:#cbd5e1">SSG Dynamic Pricing · Product Pricing Recommendation V2 · Confidential</p>
   </div>
 </div>
 
