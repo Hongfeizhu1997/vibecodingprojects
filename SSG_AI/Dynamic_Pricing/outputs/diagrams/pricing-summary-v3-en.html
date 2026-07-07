@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSG Dynamic Pricing — B2B Price Band Recommendation V3 [static]</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#f5f6f8;color:#1a202c;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:3rem 2rem}
+.hero{text-align:center;padding:3rem 0 2rem}
+.hero .badge{display:inline-block;padding:.25rem 1rem;border-radius:20px;background:rgba(225,37,27,.08);color:#E1251B;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.hero h1{font-size:2rem;font-weight:800;color:#1a202c;margin-bottom:.5rem}
+.hero h1 span{background:linear-gradient(135deg,#E1251B,#2563eb,#059669);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero .sub{color:#64748b;font-size:.8rem}
+.sec{margin:2.5rem 0}
+.sec h2{font-size:1.1rem;font-weight:700;color:#1a202c;margin-bottom:1.2rem;padding-bottom:.5rem;border-bottom:2px solid rgba(225,37,27,.2);display:flex;align-items:center;gap:.5rem}
+.sec h2 .num{color:#E1251B;font-size:.7rem;font-weight:600;text-transform:uppercase}
+
+/* Grids */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1rem}
+
+/* Cards */
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card h3{font-size:.78rem;font-weight:700;color:#1a202c;margin-bottom:.6rem}
+.card p,.card li{font-size:.7rem;color:#475569}
+.card ul{list-style:none;padding:0}
+.card li::before{content:"→ ";color:#E1251B}
+.top-red{border-top:3px solid #E1251B}
+.top-cyan{border-top:3px solid #2563eb}
+.top-green{border-top:3px solid #059669}
+.top-violet{border-top:3px solid #7c3aed}
+.top-amber{border-top:3px solid #d97706}
+.top-teal{border-top:3px solid #0d9488}
+
+/* Pipeline flow */
+.pipe-flow{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding:1rem 0}
+.pipe-step{flex:1;min-width:110px;text-align:center;position:relative;padding:.6rem .3rem}
+.pipe-step .step-num{width:28px;height:28px;border-radius:50%;margin:0 auto .5rem;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;background:#E1251B}
+.pipe-step .step-label{font-size:.68rem;font-weight:700;color:#1a202c;margin-bottom:.2rem}
+.pipe-step .step-desc{font-size:.62rem;color:#64748b;line-height:1.3}
+.pipe-step::after{content:"";position:absolute;top:14px;left:calc(50% + 30px);width:calc(100% - 60px);height:1px;background:rgba(37,99,235,.25)}
+.pipe-step:last-child::after{display:none}
+
+/* Foundation */
+.found{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:1rem}
+.found .f-cell{background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.7rem;text-align:center}
+.found .f-cell .f-name{font-size:.62rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem}
+.found .f-cell .f-items{font-size:.62rem;color:#94a3b8;line-height:1.4}
+
+/* Big numbers */
+.big-num{font-size:2.2rem;font-weight:900;line-height:1}
+.big-num.red{color:#E1251B}
+.big-num.blue{color:#2563eb}
+.big-num.green{color:#059669}
+.big-num.violet{color:#7c3aed}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:.7rem}
+.tbl th{text-align:left;color:#64748b;font-weight:600;padding:.5rem .8rem;background:#f8fafc;font-size:.65rem;text-transform:uppercase;letter-spacing:.03em}
+.tbl td{padding:.6rem .8rem;border-bottom:1px solid #f1f5f9;color:#475569}
+.tbl tr:last-child td{border-bottom:none}
+
+/* Tags */
+.tag{display:inline-block;padding:.1rem .4rem;border-radius:4px;font-size:.63rem;font-weight:600}
+.tag-green{background:rgba(5,150,105,.08);color:#059669}
+.tag-yellow{background:rgba(217,119,6,.08);color:#d97706}
+
+/* Callout */
+.callout{padding:1rem 1.2rem;border-radius:8px;font-size:.7rem;margin:1rem 0}
+.callout.teal{background:rgba(13,148,136,.04);border-left:3px solid rgba(13,148,136,.25)}
+
+/* Price Band cards */
+.band-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:1rem 0}
+.band-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:1rem 1.2rem;text-align:center}
+.band-card .band-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
+.band-card .band-ex{font-size:.62rem;color:#64748b;line-height:1.4}
+.band-f{border-color:rgba(225,37,27,.15)} .band-f .band-label{color:#E1251B}
+.band-t{border-color:rgba(5,150,105,.15)} .band-t .band-label{color:#059669}
+.band-s{border-color:rgba(37,99,235,.15)} .band-s .band-label{color:#2563eb}
+
+/* Principle row */
+.pr-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:.8rem 0}
+.pr-card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:1rem 1.2rem}
+.pr-card .pr-num{font-size:.62rem;color:#E1251B;font-weight:700;text-transform:uppercase;margin-bottom:.3rem}
+.pr-card .pr-title{font-size:.72rem;font-weight:700;color:#1a202c;margin-bottom:.4rem}
+.pr-card .pr-desc{font-size:.65rem;color:#64748b;line-height:1.5}
+
+/* Timeline trust bar */
+.trust-bar{display:flex;align-items:center;gap:.5rem;margin:1rem 0;padding:1rem;background:#fff;border-radius:8px;border:1px solid #e2e8f0}
+.trust-node{flex:1;text-align:center;padding:.5rem}
+.trust-node .t-dot{width:10px;height:10px;border-radius:50%;margin:0 auto .4rem}
+.trust-node .t-label{font-size:.65rem;font-weight:700;color:#1a202c}
+.trust-node .t-sub{font-size:.62rem;color:#64748b;margin-top:.15rem}
+.t-green .t-dot{background:#059669} .t-green .t-label{color:#059669}
+.t-yellow .t-dot{background:#d97706} .t-yellow .t-label{color:#d97706}
+.t-red .t-dot{background:#E1251B} .t-red .t-label{color:#E1251B}
+.trust-arrow{color:#cbd5e1;font-size:.9rem;flex-shrink:0}
+
+/* Footer */
+.ft{text-align:center;padding:2rem 0;color:#94a3b8;font-size:.62rem;border-top:1px solid #e2e8f0;margin-top:2rem}
+
+@media(max-width:768px){
+  .grid2,.grid3,.grid4,.band-row,.pr-row,.found{grid-template-columns:1fr}
+  .pipe-flow{flex-direction:column;gap:.5rem}
+  .pipe-step::after{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <div class="badge">SSG Dynamic Pricing · V3</div>
+  <h1><span>Service Price Follows Hardware Price</span></h1>
+  <div class="sub">Wave 1 · B2B (LBPi + LBPe) · 2026-07-07</div>
+</div>
+
+<!-- §1 Scope -->
+<div class="sec">
+  <h2><span class="num">01</span> Scope</h2>
+  <p style="font-size:.85rem;color:#475569;max-width:800px">
+    Dynamic Pricing: when HW prices fluctuate, service Price Bands adjust automatically. Covers <strong>B2B Direct (LBPi + ISO Sales)</strong> and <strong>Channel B2B (LBPe + Partner)</strong>. The engine framework is channel-agnostic — designed for future horizontal expansion into eCommerce, Renewal, and beyond.
+  </p>
+</div>
+
+<!-- §2 Why Now -->
+<div class="sec">
+  <h2><span class="num">02</span> Why Now</h2>
+  <div class="grid2">
+    <div class="card top-red">
+      <h3>Current State: One Pen Rate Ignores PFV Differences Across HW</h3>
+      <table class="tbl" style="margin-top:.6rem">
+        <tr><th></th><th>X1 Carbon</th><th>ThinkBook 14</th><th>Delta</th></tr>
+        <tr><td>HW Channel Price</td><td>$2,000</td><td>$800</td><td style="color:#E1251B"><strong>2.5×</strong></td></tr>
+        <tr><td>3yr Support (Pen Rate 8%)</td><td>$160</td><td>$64</td><td style="color:#E1251B"><strong>2.5×</strong></td></tr>
+        <tr><td>Service Delivery Cost Gap</td><td colspan="2">~1.5× (far less than price gap)</td><td></td></tr>
+      </table>
+      <p style="margin-top:.6rem;font-size:.65rem;color:#64748b">Same Tier, same Pen Rate — margin leakage on high-PFV HW, weak competitiveness on low-PFV HW. Leaking profits in both directions.</p>
+    </div>
+    <div class="card top-green">
+      <h3>Target: Service Price Band Reflects HW Value Differences</h3>
+      <table class="tbl" style="margin-top:.6rem">
+        <tr><th>Scenario</th><th>Current</th><th>With Engine</th></tr>
+        <tr><td>High-PFV HW</td><td style="color:#E1251B">Price locked by Pen Rate</td><td style="color:#059669">Pen Rate up, Stretch captures HW value</td></tr>
+        <tr><td>HW Discounted</td><td style="color:#E1251B">Service shrinks proportionally</td><td style="color:#059669">Pen Rate up, Floor holds Margin Floor</td></tr>
+        <tr><td>New Segment</td><td style="color:#d97706">Global average Pen Rate</td><td style="color:#059669">Comparable Benchmark borrows similar-segment data</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- §3 Solution -->
+<div class="sec">
+  <h2><span class="num">03</span> Solution: 6-Step Engine → Price Band</h2>
+
+  <!-- Core formula -->
+  <div class="callout teal" style="font-size:.75rem;text-align:center;margin-bottom:1.5rem">
+    <strong>Maximize Expected Profit = Conversion Probability × (Net Price − Service Cost − Sales Cost)</strong>
+    <br><span style="font-size:.62rem;color:#64748b">Three constraints: ≥ Margin Floor &nbsp;|&nbsp; ≤ List Price &nbsp;|&nbsp; Beyond DOA → manual approval</span>
+  </div>
+
+  <!-- 4-Dimension Input -->
+  <p style="font-size:.72rem;font-weight:700;color:#1a202c;margin-bottom:.5rem">Four Input Dimensions</p>
+  <div class="grid4">
+    <div class="card top-red" style="padding:1rem">
+      <h3 style="font-size:.7rem">HW Context</h3>
+      <ul style="font-size:.63rem"><li>HW Config / Cost / Price</li><li>PFV (competitive reference)</li></ul>
+    </div>
+    <div class="card top-cyan" style="padding:1rem">
+      <h3 style="font-size:.7rem">Service Economics</h3>
+      <ul style="font-size:.63rem"><li>SVS Cost / Sales Cost</li><li>List Price / Margin Target</li></ul>
+    </div>
+    <div class="card top-green" style="padding:1rem">
+      <h3 style="font-size:.7rem">Deal Context</h3>
+      <ul style="font-size:.63rem"><li>Country / GEO</li><li>Segment / Deal Size</li></ul>
+    </div>
+    <div class="card top-violet" style="padding:1rem">
+      <h3 style="font-size:.7rem">Historical Behavior</h3>
+      <ul style="font-size:.63rem"><li>Quote / Contracts / Orders</li><li>Win-Loss / Pen Rate</li></ul>
+    </div>
+  </div>
+
+  <!-- 6-Step Pipeline -->
+  <p style="font-size:.72rem;font-weight:700;color:#1a202c;margin:1.5rem 0 .5rem">Six-Step Engine Pipeline</p>
+  <div class="pipe-flow">
+    <div class="pipe-step">
+      <div class="step-num">1</div>
+      <div class="step-label">Request Intake &<br>Feature Assembly</div>
+      <div class="step-desc">Receive quote request<br>Assemble 4D features</div>
+    </div>
+    <div class="pipe-step">
+      <div class="step-num">2</div>
+      <div class="step-label">Comparable<br>Benchmark</div>
+      <div class="step-desc">Retrieve similar deals<br>Price range & win-loss</div>
+    </div>
+    <div class="pipe-step">
+      <div class="step-num">3</div>
+      <div class="step-label">Generate<br>Candidate Prices</div>
+      <div class="step-desc">Multiple Pen Rate<br>& price candidates</div>
+    </div>
+    <div class="pipe-step">
+      <div class="step-num">4</div>
+      <div class="step-label">Price<br>Scoring</div>
+      <div class="step-desc">Conversion Probability<br>× Expected Profit</div>
+    </div>
+    <div class="pipe-step">
+      <div class="step-num">5</div>
+      <div class="step-label">Apply<br>Guardrails</div>
+      <div class="step-desc">Margin Floor / Policy<br>Contract / Exception</div>
+    </div>
+    <div class="pipe-step">
+      <div class="step-num">6</div>
+      <div class="step-label">Reason Code<br>+ Confidence</div>
+      <div class="step-desc">Output rationale<br>Low confidence → DOA</div>
+    </div>
+  </div>
+
+  <!-- Output: Price Band -->
+  <p style="font-size:.72rem;font-weight:700;color:#1a202c;margin:1.5rem 0 .5rem">Output: Three-Tier Price Band</p>
+  <div class="band-row">
+    <div class="band-card band-f">
+      <div class="band-label">Floor · Minimum Viable</div>
+      <div class="band-ex">Below this = no deal<br>Negotiation bottom line</div>
+    </div>
+    <div class="band-card band-t">
+      <div class="band-label">Target · Recommended</div>
+      <div class="band-ex">Optimal balance point<br>Default quote value</div>
+    </div>
+    <div class="band-card band-s">
+      <div class="band-label">Stretch · Upside</div>
+      <div class="band-ex">Low-sensitivity ceiling<br>Large deals / sole-source</div>
+    </div>
+  </div>
+
+  <!-- Example -->
+  <div class="card top-teal" style="margin-top:1rem">
+    <h3>Example: 3-Year Premier Support — X1 Carbon vs ThinkBook 14</h3>
+    <table class="tbl" style="margin-top:.5rem">
+      <tr><th></th><th>X1 Carbon ($2,000)</th><th>ThinkBook 14 ($800)</th></tr>
+      <tr><td>Current Pen Rate (flat)</td><td style="color:#E1251B">8%</td><td style="color:#E1251B">8%</td></tr>
+      <tr><td style="color:#059669">Engine Pen Rate</td><td style="color:#059669"><strong>10%</strong></td><td style="color:#059669"><strong>7%</strong></td></tr>
+      <tr><td style="color:#1a202c">Price Band</td><td>
+        <span style="color:#E1251B;font-size:.62rem">F $180</span>&nbsp;
+        <span style="color:#059669;font-size:.62rem">T $200</span>&nbsp;
+        <span style="color:#2563eb;font-size:.62rem">S $220</span>
+      </td><td>
+        <span style="color:#E1251B;font-size:.62rem">F $50</span>&nbsp;
+        <span style="color:#059669;font-size:.62rem">T $56</span>&nbsp;
+        <span style="color:#2563eb;font-size:.62rem">S $62</span>
+      </td></tr>
+      <tr><td>Effect</td><td>Captures HW premium positioning</td><td>Lowers barrier, boosts attach rate</td></tr>
+    </table>
+  </div>
+
+  <!-- Foundation -->
+  <p style="font-size:.72rem;font-weight:700;color:#1a202c;margin:1.5rem 0 .5rem">Foundation Layer — Six Core Capabilities</p>
+  <div class="found">
+    <div class="f-cell"><div class="f-name">Data Readiness</div><div class="f-items">Integration · Cleansing · Standardization</div></div>
+    <div class="f-cell"><div class="f-name">Feature Engineering</div><div class="f-items">Pricing Signals · HW Value Tier · Customer/Deal Profile</div></div>
+    <div class="f-cell"><div class="f-name">Comparable Benchmark</div><div class="f-items">Accept Price Range · Pen Rate · Win/Loss Pattern</div></div>
+    <div class="f-cell"><div class="f-name">Price Response Model</div><div class="f-items">Conversion Probability by Candidate Price</div></div>
+    <div class="f-cell"><div class="f-name">Pricing Guardrail</div><div class="f-items">Margin Floor · Local Policy · Contract Restriction · Exception</div></div>
+    <div class="f-cell"><div class="f-name">Margin & Cost Model</div><div class="f-items">SVS Cost · Sales Cost · Target Margin · Expected Profit</div></div>
+  </div>
+</div>
+
+<!-- §4 Design Principles -->
+<div class="sec">
+  <h2><span class="num">04</span> Design Principles</h2>
+  <div class="pr-row">
+    <div class="pr-card">
+      <div class="pr-num">Principle 1</div>
+      <div class="pr-title">Learn, Don't Prescribe</div>
+      <div class="pr-desc">Pen Rates are learned from historical transaction data — not looked up from a static rule table. The engine automatically discovers the optimal Price Band for "X1 Carbon × 3yr Premier × EMEA × Enterprise" without anyone maintaining a manual rulebook.</div>
+    </div>
+    <div class="pr-card">
+      <div class="pr-num">Principle 2</div>
+      <div class="pr-title">Decoupled from HW Pricing</div>
+      <div class="pr-desc">The Dynamic Pricing engine is not coupled to PAIDS (HW pricing system). PAIDS output is just one input to HW Context — the engine independently decides the service Price Band, unbound by HW pricing strategy.</div>
+    </div>
+  </div>
+</div>
+
+<!-- §5 Timeline -->
+<div class="sec">
+  <h2><span class="num">05</span> Delivery Timeline</h2>
+
+  <!-- Progressive Trust -->
+  <div class="trust-bar">
+    <div class="trust-node t-green">
+      <div class="t-dot"></div><div class="t-label">POC</div><div class="t-sub">Offline · Zero Risk</div>
+    </div>
+    <div class="trust-arrow">→</div>
+    <div class="trust-node t-yellow">
+      <div class="t-dot"></div><div class="t-label">Pilot</div><div class="t-sub">Advisory · Low Risk</div>
+    </div>
+    <div class="trust-arrow">→</div>
+    <div class="trust-node t-red">
+      <div class="t-dot"></div><div class="t-label">Rollout</div><div class="t-sub">Embedded · Medium-Low</div>
+    </div>
+  </div>
+  <p style="font-size:.65rem;color:#64748b;text-align:center;margin-bottom:.8rem"><strong style="color:#1a202c">Core Principle: Progressive Trust</strong> — trust is earned incrementally. Every stage is reversible.</p>
+
+  <!-- Three Stages -->
+  <table class="tbl">
+    <tr><th></th><th>POC (2 months)</th><th>Pilot (3 months)</th><th>Rollout (1 month)</th></tr>
+    <tr><td style="color:#64748b">Scope</td><td>EMEA + 3 Tiers</td><td>All GEOs + Tiers</td><td>LBPi + LBPe full</td></tr>
+    <tr><td style="color:#64748b">Tech</td><td>Offline 6-step pipeline<br>Price Band table output</td><td>API integration with<br>quoting tool</td><td>Target auto-fills quote<br>DOA breaches logged</td></tr>
+    <tr><td style="color:#64748b">Business</td><td>AI vs. human deviation report</td><td>Adoption tracking ≥ 60%</td><td>Adoption + deviation KPI</td></tr>
+    <tr><td style="color:#64748b">Risk</td><td><span class="tag tag-green">🟢 Offline</span></td><td><span class="tag tag-yellow">🟡 Advisory</span></td><td><span class="tag tag-yellow">🟡 Overridable</span></td></tr>
+  </table>
+
+  <!-- Monthly Roadmap -->
+  <p style="font-size:.72rem;font-weight:700;color:#1a202c;margin:1.5rem 0 .5rem">Monthly Roadmap (6 Months to Production)</p>
+  <table class="tbl">
+    <tr><th>Month</th><th>Phase</th><th>Milestone</th></tr>
+    <tr><td>M1</td><td>POC</td><td>Data ingestion complete (HW Price / Service Cost / Historical / CRM)</td></tr>
+    <tr><td>M2</td><td>POC</td><td>Engine pipeline live, first Price Band table + deviation analysis</td></tr>
+    <tr><td>M3</td><td>Pilot</td><td>Quoting tool API integrated, 5–10 pilot sales reps onboard</td></tr>
+    <tr><td>M4</td><td>Pilot</td><td>Adoption data collected, Guardrail thresholds iterated</td></tr>
+    <tr><td>M5</td><td>Pilot</td><td>All GEOs + Tiers, adoption ≥ 60%, begin Rollout prep</td></tr>
+    <tr><td>M6</td><td>Rollout</td><td>LBPi + LBPe full embed, daily KPIs live</td></tr>
+  </table>
+</div>
+
+<!-- §6 Impact -->
+<div class="sec">
+  <h2><span class="num">06</span> Expected Business Impact</h2>
+  <div class="grid3">
+    <div class="card top-cyan">
+      <div class="big-num blue">6 months</div>
+      <p style="font-size:.65rem;color:#64748b;margin-top:.3rem">POC → Pilot → Rollout<br>LBPi + LBPe in production</p>
+    </div>
+    <div class="card top-green">
+      <div class="big-num green">≥ 60%</div>
+      <p style="font-size:.65rem;color:#64748b;margin-top:.3rem">Pilot Price Band<br>Adoption Rate Target</p>
+    </div>
+    <div class="card top-violet">
+      <div class="big-num violet">-50%</div>
+      <p style="font-size:.65rem;color:#64748b;margin-top:.3rem">$/HW volatility<br>reduction</p>
+    </div>
+  </div>
+</div>
+
+<!-- §7 Scenarios -->
+<div class="sec">
+  <h2><span class="num">07</span> Key Scenarios</h2>
+  <div class="grid3">
+    <div class="card top-red">
+      <h3>HW Discounted — Service Margin Intact</h3>
+      <p>EMEA Enterprise ThinkPad deal with 15% HW discount. Engine raises Pen Rate 5–8pp; Floor holds Margin Floor. Service revenue isn't dragged down by HW discounting.</p>
+    </div>
+    <div class="card top-cyan">
+      <h3>HW Price Up — Attach Window Opens</h3>
+      <p>HW price rises 8% on supply shortage. Engine outputs a moderated Pen Rate; Target service price rises only 5%, lowering TCO perception and boosting attach rate.</p>
+    </div>
+    <div class="card top-green">
+      <h3>New GEO — No Guesswork</h3>
+      <p>AP market has sparse data. Comparable Benchmark shrinks to EMEA priors (price range + win-loss). Accuracy beats global flat rate; Confidence = Low flags caution.</p>
+    </div>
+  </div>
+</div>
+
+<!-- §8 Future -->
+<div class="sec">
+  <h2><span class="num">08</span> Future: Same Engine, Horizontal Expansion</h2>
+  <p style="font-size:.72rem;color:#64748b;margin-bottom:1rem">After Wave 1 B2B delivery, the engine framework stays the same — only input dimension weights change per channel.</p>
+  <div class="grid3">
+    <div class="card top-amber">
+      <h3>eCommerce</h3>
+      <p style="font-size:.65rem">Consumer/SMB self-service<br>Heavier Conversion Probability<br>Service recs in online checkout</p>
+    </div>
+    <div class="card top-violet">
+      <h3>Channel RunRate</h3>
+      <p style="font-size:.65rem">ESS / 4P volume scenarios<br>Batch pricing + tiered discount<br>Same engine, different Deal Context</p>
+    </div>
+    <div class="card top-teal">
+      <h3>APOS Renewal</h3>
+      <p style="font-size:.65rem">LBP renewal/upgrade scenarios<br>Heavier Historical Behavior<br>Renewal preferences drive price</p>
+    </div>
+  </div>
+</div>
+
+<!-- §9 Conclusion -->
+<div class="sec">
+  <h2><span class="num">09</span> Conclusion</h2>
+  <div class="card top-teal" style="text-align:center;padding:2rem">
+    <p style="font-size:1rem;color:#1a202c;font-weight:700">Service price follows hardware price — not dragged by it.</p>
+    <p style="margin-top:.8rem;font-size:.7rem;color:#64748b">6 months to production · LBPi + LBPe full coverage · Channel-agnostic engine · Built for horizontal reuse</p>
+  </div>
+</div>
+
+<div class="ft">SSG Dynamic Pricing · B2B Price Band Recommendation V3 · Confidential</div>
+
+</div>
+</body>
+</html>
