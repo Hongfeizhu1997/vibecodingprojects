@@ -98,6 +98,19 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#1a202c;margin-bottom:1rem;pa
 .t-red .t-dot{background:#E1251B} .t-red .t-label{color:#E1251B}
 .trust-arrow{color:#cbd5e1;font-size:.9rem;flex-shrink:0}
 
+/* Gantt */
+.gantt{margin-top:.8rem}
+.gantt-header{display:flex;margin-bottom:.4rem;padding-left:120px}
+.gantt-header span{flex:1;text-align:center;font-size:.62rem;color:#94a3b8;border-left:1px solid #e2e8f0;padding:0 1px}
+.gantt-header span:first-child{border-left:none}
+.gantt-row{display:flex;align-items:center;margin-bottom:.3rem}
+.gantt-label{width:110px;font-size:.68rem;color:#475569;text-align:right;padding-right:1rem;font-weight:600}
+.gantt-track{flex:1;height:30px;background:repeating-linear-gradient(to right,#f1f5f9,#f1f5f9 calc(16.66% - 1px),#e2e8f0 calc(16.66% - 1px),#e2e8f0 16.66%);border-radius:4px;position:relative;overflow:hidden}
+.gantt-bar{position:absolute;top:4px;height:22px;border-radius:3px;font-size:.63rem;font-weight:700;display:flex;align-items:center;padding-left:.5rem}
+.gantt-bar.poc{left:0;width:33.33%;background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.gantt-bar.pilot{left:33.33%;width:50%;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.gantt-bar.rollout{left:83.33%;width:16.67%;background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+
 /* Foundation */
 .found{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
 .found .f-cell{background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:.6rem;text-align:center}
@@ -280,7 +293,7 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#1a202c;margin-bottom:1rem;pa
   </div>
 </div>
 
-<!-- s5: Timeline — Progressive Trust → Stages → Monthly Roadmap -->
+<!-- s5: Timeline — Progressive Trust → Monthly Roadmap → Stages -->
 <div class="stage" id="s5">
   <div class="inner">
     <div class="section-label">05 · Delivery Timeline</div>
@@ -294,24 +307,32 @@ h2.stage-h2{font-size:1.1rem;font-weight:700;color:#1a202c;margin-bottom:1rem;pa
     </div>
     <p style="text-align:center;font-size:.65rem;color:#64748b;margin-bottom:1.2rem">Trust is earned incrementally. Every stage is reversible.</p>
 
-    <h2 class="stage-h2" style="font-size:.85rem;margin-bottom:.6rem">Three Stages — 6 Months Total</h2>
-    <table class="tbl" style="margin-bottom:1.2rem">
+    <h2 class="stage-h2" style="font-size:.85rem;margin-bottom:.6rem">Monthly Roadmap — 6 Months to Production</h2>
+    <div class="gantt" style="margin-bottom:1.2rem">
+      <div class="gantt-header">
+        <span>M1</span><span>M2</span><span>M3</span><span>M4</span><span>M5</span><span>M6</span>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">POC</div>
+        <div class="gantt-track"><div class="gantt-bar poc">Data + Engine pipeline live</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Pilot</div>
+        <div class="gantt-track"><div class="gantt-bar pilot">Quoting tool API · Adoption ≥ 60% · All GEOs</div></div>
+      </div>
+      <div class="gantt-row">
+        <div class="gantt-label">Rollout</div>
+        <div class="gantt-track"><div class="gantt-bar rollout">LBPi + LBPe</div></div>
+      </div>
+    </div>
+
+    <h2 class="stage-h2" style="font-size:.85rem;margin-bottom:.6rem">Three Stages Detail</h2>
+    <table class="tbl">
       <tr><th></th><th>POC (2 mo)</th><th>Pilot (3 mo)</th><th>Rollout (1 mo)</th></tr>
       <tr><td style="color:#64748b">Scope</td><td>EMEA + 3 Tiers</td><td>All GEOs + Tiers</td><td>LBPi + LBPe full</td></tr>
       <tr><td style="color:#64748b">Tech</td><td>Offline 6-step pipeline<br>Price Band table</td><td>API to quoting tool<br>Sales sees AI Band</td><td>Target auto-fills<br>DOA breaches logged</td></tr>
       <tr><td style="color:#64748b">Business</td><td>AI vs. human deviation</td><td>Adoption ≥ 60%</td><td>Adoption + deviation KPI</td></tr>
       <tr><td style="color:#64748b">Risk</td><td><span class="tag tag-green">🟢 Zero</span></td><td><span class="tag tag-yellow">🟡 Low</span></td><td><span class="tag tag-yellow">🟡 Med-Low</span></td></tr>
-    </table>
-
-    <h2 class="stage-h2" style="font-size:.85rem;margin-bottom:.6rem">Monthly Roadmap</h2>
-    <table class="tbl">
-      <tr><th>Mo</th><th>Phase</th><th>Milestone</th></tr>
-      <tr><td>M1</td><td>POC</td><td>Data ingestion (HW Price / Cost / Historical / CRM)</td></tr>
-      <tr><td>M2</td><td>POC</td><td>Engine live, first Price Band table + deviation report</td></tr>
-      <tr><td>M3</td><td>Pilot</td><td>Quoting tool API, 5–10 pilot sales reps onboard</td></tr>
-      <tr><td>M4</td><td>Pilot</td><td>Adoption data, Guardrail thresholds iterated</td></tr>
-      <tr><td>M5</td><td>Pilot</td><td>All GEOs + Tiers, adoption ≥ 60%, Rollout prep</td></tr>
-      <tr><td>M6</td><td>Rollout</td><td>LBPi + LBPe full embed, daily KPIs live</td></tr>
     </table>
   </div>
 </div>
