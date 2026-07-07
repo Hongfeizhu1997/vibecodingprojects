@@ -280,8 +280,8 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
     </div>
     <div class="pr-card">
       <div class="pr-num">原则 2</div>
-      <div class="pr-title">独立于 HW 定价</div>
-      <div class="pr-desc">Dynamic Pricing 引擎不与 PAIDS 耦合。PAIDS 输出的 HW 价格只是 HW Context 输入之一——引擎独立决策服务 Price Band，不被 HW 定价策略绑定。</div>
+      <div class="pr-title">引用，不依赖</div>
+      <div class="pr-desc">HW 价格作为 HW Context 的一个特征进入引擎——和 HW Config、Cost、PFV 没有区别。每个输入都有独立适配器：上游定价系统换了，只换那个适配器。6 步流水线、Price Band 逻辑、Guardrail 层不感知也不关心数据从哪来。引擎引用 HW 价格作为数据点——不依赖产生它的系统。</div>
     </div>
   </div>
 </div>
@@ -308,23 +308,26 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
 
   <!-- 三阶段表 -->
   <table class="tbl">
-    <tr><th></th><th>POC（2 个月）</th><th>Pilot（3 个月）</th><th>Rollout（1 个月）</th></tr>
-    <tr><td style="color:#94a3b8">范围</td><td>EMEA + 3 Tier</td><td>全部 GEO + Tier</td><td>LBPi + LBPe 全量</td></tr>
+    <tr><th></th><th>POC（2 个月）</th><th>Pilot（6 个月）</th><th>Rollout（1 个月）</th></tr>
+    <tr><td style="color:#94a3b8">范围</td><td>1 个 GEO + 3 Tier</td><td>1 个 GEO + 全部 Tier</td><td>LBPi + LBPe 全量</td></tr>
     <tr><td style="color:#94a3b8">技术</td><td>离线跑通 6 步流水线<br>产出 Price Band 表</td><td>接入报价工具<br>销售看到 AI Price Band</td><td>Target 自动填入报价单<br>超 DOA 修改记录原因</td></tr>
     <tr><td style="color:#94a3b8">业务</td><td>AI vs 人工偏差分析</td><td>采纳率追踪 ≥ 60%</td><td>采纳率 + 偏离度 KPI</td></tr>
     <tr><td style="color:#94a3b8">风险</td><td><span class="tag tag-green">🟢 离线</span></td><td><span class="tag tag-yellow">🟡 推荐参考</span></td><td><span class="tag tag-yellow">🟡 可覆盖</span></td></tr>
   </table>
 
   <!-- 月度路线图 -->
-  <p style="font-size:.72rem;font-weight:700;color:#fff;margin:1.5rem 0 .5rem">月度路线图（6 个月投产）</p>
+  <p style="font-size:.72rem;font-weight:700;color:#fff;margin:1.5rem 0 .5rem">月度路线图（9 个月投产 · 2026年8月 – 2027年4月）</p>
   <table class="tbl">
     <tr><th>月</th><th>阶段</th><th>里程碑</th></tr>
-    <tr><td>M1</td><td>POC</td><td>数据接入完成（HW Price / Service Cost / 历史交易 / CRM）</td></tr>
-    <tr><td>M2</td><td>POC</td><td>引擎跑通，第一版 Price Band 推荐 + 偏差分析报告</td></tr>
-    <tr><td>M3</td><td>Pilot</td><td>报价工具 API 对接，试点 5-10 名销售开始使用</td></tr>
-    <tr><td>M4</td><td>Pilot</td><td>收集采纳率，迭代 Guardrail 阈值</td></tr>
-    <tr><td>M5</td><td>Pilot</td><td>全 GEO + Tier 覆盖，采纳率 ≥ 60%，启动 Rollout</td></tr>
-    <tr><td>M6</td><td>Rollout</td><td>LBPi + LBPe 全量嵌入，日常 KPI 上线</td></tr>
+    <tr><td>8月</td><td>POC</td><td>数据接入完成（HW Price / Service Cost / 历史交易 / CRM）</td></tr>
+    <tr><td>9月</td><td>POC</td><td>引擎跑通，第一版 Price Band 推荐 + 偏差分析报告</td></tr>
+    <tr><td>10月</td><td>Pilot</td><td>报价工具 API 对接，试点 5-10 名销售开始使用</td></tr>
+    <tr><td>11月</td><td>Pilot</td><td>收集采纳率，迭代 Guardrail 阈值</td></tr>
+    <tr><td>12月</td><td>Pilot</td><td>扩展至全部 Tier，持续优化推荐精度</td></tr>
+    <tr><td>1月</td><td>Pilot</td><td>采纳率 ≥ 60%，启动 Rollout 准备</td></tr>
+    <tr><td>2月</td><td>Pilot</td><td>全量销售试点，收集反馈</td></tr>
+    <tr><td>3月</td><td>Pilot</td><td>最终迭代，确定 Rollout 参数</td></tr>
+    <tr><td>4月</td><td>Rollout</td><td>LBPi + LBPe 全量嵌入，日常 KPI 上线</td></tr>
   </table>
 </div>
 
@@ -333,7 +336,7 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
   <h2><span class="num">06</span> 业务效果量化</h2>
   <div class="grid3">
     <div class="card top-cyan">
-      <div class="big-num cyan">6 个月</div>
+      <div class="big-num cyan">9 个月</div>
       <p style="font-size:.65rem;color:#94a3b8;margin-top:.3rem">POC → Pilot → Rollout<br>LBPi + LBPe 完整投产</p>
     </div>
     <div class="card top-green">
@@ -391,7 +394,7 @@ body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMac
   <h2><span class="num">09</span> 结论</h2>
   <div class="card top-teal" style="text-align:center;padding:2rem">
     <p style="font-size:1rem;color:#fff;font-weight:700">让服务的价格跟着硬件的价格走——而不是被硬件价格牵着走。</p>
-    <p style="margin-top:.8rem;font-size:.7rem;color:#94a3b8">6 个月投产 · LBPi + LBPe 全量覆盖 · 引擎渠道无关 · 未来横向复用</p>
+    <p style="margin-top:.8rem;font-size:.7rem;color:#94a3b8">9 个月投产 · LBPi + LBPe 全量覆盖 · 引擎渠道无关 · 未来横向复用</p>
   </div>
 </div>
 
