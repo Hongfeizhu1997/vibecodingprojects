@@ -120,7 +120,29 @@ Dynamic_Pricing/
 
 ## 当前状态
 
-🆕 项目初始化 | 已通读 PAIDS 参考材料 | 待确认方向
+🔄 V3 方案已产出 | 聚焦 Wave 1 B2B (LBPi + LBPe) | 引擎框架设计为渠道无关
+
+### 核心文档
+
+| 文档 | 版本 | 说明 |
+|------|:--:|------|
+| `product-pricing-recommendation-v3.md` | **V3 · 当前** | 聚焦 B2B Wave 1：6 步引擎流水线 + Price Band (Floor/Target/Stretch) + Reason Code + Confidence。Design Principles → Progressive Trust → Timeline。未来横向拓展渠道 |
+| `product-pricing-recommendation-v2.md` | V2 (归档) | 通用三 Wave 方案，含贝叶斯 + 弹性模型 |
+| `high-level-design-v1.md` | V1 | 技术架构设计 |
+| `scheme-comparison-paids-vs-standalone.md` | V1 | PAIDS 对比分析 |
+
+### 关键术语（统一使用）
+
+| 术语 | 含义 |
+|------|------|
+| PFV | Product Fair Value — 产品市场参考价/竞品价 |
+| LBPi | Lenovo Bid Platform — Lenovo lead direct sale（直销） |
+| LBPe | Lenovo Bid Platform — Partner lead indirect sale（渠道） |
+| Price Band | 三档推荐：Floor / Target / Stretch |
+| Reason Code | 推荐定价的原因编码 |
+| DOA | Delegation of Authority — 审批授权阈值 |
+| Conversion Probability | 给定价格下的成交概率 |
+| Comparable Benchmark | 可比较基准（accept price range / pen rate / win-loss）
 
 ## 待确认
 
