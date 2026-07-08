@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,13 +69,13 @@
 <body>
 
 <header>
-  <h1>Lenovo PCG EOW 发布规律</h1>
-  <div class="subtitle">数据范围 2020–2026 · 6,614 records · EOW Date = 实际出货/上市日期</div>
+  <h1>Lenovo PCG EOW Release Patterns</h1>
+  <div class="subtitle">2020–2026 · 6,614 records · EOW Date = actual shipment date</div>
 </header>
 
 <div class="grid grid-3">
   <div class="card full">
-    <h2>整体月度分布 · 按 Segment</h2>
+    <h2>Monthly Distribution by Segment</h2>
     <canvas id="chartMonthly"></canvas>
     <div class="legend-row">
       <span><span class="legend-dot" style="background:var(--commercial)"></span>Commercial</span>
@@ -85,71 +85,71 @@
   </div>
 
   <div class="card">
-    <h2>Commercial 品牌 · 月度热力</h2>
+    <h2>Commercial Brands · Monthly Heatmap</h2>
     <canvas id="chartCommercial"></canvas>
   </div>
 
   <div class="card">
-    <h2>Consumer 品牌 · 月度热力</h2>
+    <h2>Consumer Brands · Monthly Heatmap</h2>
     <canvas id="chartConsumer"></canvas>
   </div>
 
   <div class="card">
-    <h2>各品牌峰值集中度</h2>
+    <h2>Peak Month Concentration by Brand</h2>
     <canvas id="chartConcentration"></canvas>
   </div>
 </div>
 
 <div class="insights">
-  <h2>经验规律速查</h2>
+  <h2>Quick Reference</h2>
   <div class="insight-grid">
     <div class="insight-item c-commercial">
       <div class="brand">ThinkPad</div>
-      <div class="peak">峰值月：3月</div>
+      <div class="peak">Peak: March</div>
       <div class="pct">33%</div>
-      <div class="peak">Q1+Q2 占全年 75%</div>
+      <div class="peak">Q1+Q2 = 75% of year</div>
     </div>
     <div class="insight-item c-commercial">
       <div class="brand">ThinkCentre</div>
-      <div class="peak">峰值月：3月</div>
+      <div class="peak">Peak: March</div>
       <div class="pct">22%</div>
-      <div class="peak">3-7月持续出货</div>
+      <div class="peak">Mar–Jul steady flow</div>
     </div>
     <div class="insight-item c-commercial">
       <div class="brand">ThinkStation</div>
-      <div class="peak">峰值月：4月</div>
+      <div class="peak">Peak: April</div>
       <div class="pct">42%</div>
-      <div class="peak">极度集中在一个半月</div>
+      <div class="peak">Extreme concentration</div>
     </div>
     <div class="insight-item c-commercial">
       <div class="brand">ThinkSmart</div>
-      <div class="peak">峰值月：11月</div>
+      <div class="peak">Peak: November</div>
       <div class="pct">47%</div>
-      <div class="peak">近一半在 11 月</div>
+      <div class="peak">Nearly half in Nov</div>
     </div>
     <div class="insight-item c-consumer">
       <div class="brand">IdeaPad</div>
-      <div class="peak">峰值月：10月</div>
+      <div class="peak">Peak: October</div>
       <div class="pct">18%</div>
-      <div class="peak">Q4 占全年 46%</div>
+      <div class="peak">Q4 = 46% of year</div>
     </div>
     <div class="insight-item c-consumer">
       <div class="brand">Yoga</div>
-      <div class="peak">峰值月：10月</div>
+      <div class="peak">Peak: October</div>
       <div class="pct">29%</div>
-      <div class="peak">Q4 独占 78%</div>
+      <div class="peak">Q4 dominates at 78%</div>
     </div>
     <div class="insight-item c-consumer">
       <div class="brand">Legion</div>
-      <div class="peak">峰值月：2月</div>
+      <div class="peak">Peak: February</div>
       <div class="pct">25%</div>
-      <div class="peak">双峰：年初+年末</div>
+      <div class="peak">Dual peak: Feb + Dec</div>
     </div>
     <div class="insight-item" style="border-left-color: var(--accent)">
       <div class="brand">ThinkBook</div>
-      <div class="peak">峰值月：10月</div>
+      <div class="peak">Peak: October</div>
       <div class="pct" style="color:var(--accent)">21%</div>
-      <div class="peak">SMB 线，Q3-Q4 为主</div>
+      <div class="peak">SMB line, Q3–Q4</div>
     </div>
   </div>
 </div>
@@ -188,7 +188,7 @@ new Chart(document.getElementById('chartMonthly'), {
   }
 });
 
-// 2. Commercial brand heatmap (horizontal bar per brand per month)
+// 2. Commercial brand heatmap
 const commBrands = ['ThinkPad','ThinkCentre','ThinkStation','ThinkSmart','ThinkEdge'];
 const commData = {
   'ThinkPad':    [16,38,150,112,44,28,24,8,0,8,0,22],
@@ -281,7 +281,7 @@ new Chart(document.getElementById('chartConcentration'), {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (ctx) => `${peakMonths[ctx.dataIndex]} 月占全年 ${ctx.raw}%`
+          label: (ctx) => `${peakMonths[ctx.dataIndex]} accounts for ${ctx.raw}% of annual volume`
         }
       }
     },
