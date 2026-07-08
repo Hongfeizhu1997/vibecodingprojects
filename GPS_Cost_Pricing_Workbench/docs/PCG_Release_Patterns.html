@@ -64,6 +64,28 @@
 
   .legend-row { display: flex; gap: 18px; margin-top: 8px; font-size: 0.72rem; color: var(--text-dim); }
   .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+
+  .key-takeaways {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+    background: linear-gradient(135deg, #1a1d2e 0%, #1f2237 100%);
+    border: 1px solid var(--border);
+    border-left: 3px solid #a78bfa;
+    border-radius: 10px;
+    padding: 16px 22px;
+    margin-bottom: 20px;
+  }
+  .kw-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.78rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .kw-item strong { color: #fff; }
+  .kw-icon { font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
 </style>
 </head>
 <body>
@@ -72,6 +94,13 @@
   <h1>Lenovo PCG EOW Release Patterns</h1>
   <div class="subtitle">2020–2026 · 6,614 records · EOW Date = actual shipment date</div>
 </header>
+
+<div class="key-takeaways">
+  <div class="kw-item"><span class="kw-icon">❶</span><span><strong>Commercial peaks Mar–Apr</strong> — 40% of annual volume in Q1–Q2. ThinkPad (33% in March), ThinkStation (42% in April), ThinkCentre (22% in March).</span></div>
+  <div class="kw-item"><span class="kw-icon">❷</span><span><strong>Consumer peaks Oct–Nov</strong> — 44% in Q4 for holiday season. Yoga (78% Q4), IdeaPad (46% Q4).</span></div>
+  <div class="kw-item"><span class="kw-icon">❸</span><span><strong>Two completely different cadences</strong> — Commercial and Consumer release cycles are fully decoupled under one roof.</span></div>
+  <div class="kw-item"><span class="kw-icon">❹</span><span><strong>Announce lags shipment</strong> — Median −20 days (ships first, announces later). Enterprise pipeline pattern, not consumer-style launch.</span></div>
+</div>
 
 <div class="grid grid-3">
   <div class="card full">
