@@ -112,7 +112,7 @@
   <div class="kw-item"><span class="kw-icon">❹</span><span><strong>Idea NB tiers: Q4-heavy but staggered</strong> — Mainstream peaks Oct (18.8%), Entry peaks Sep (23.2%), Halo peaks Oct-Nov (52%).</span></div>
   <div class="kw-item"><span class="kw-icon">❺</span><span><strong>ThinkSmart: dual-peak Nov+Mar</strong> — 34% Nov (holiday) + 29.8% Mar (enterprise refresh). Unique among all tiers.</span></div>
   <div class="kw-item"><span class="kw-icon">❻</span><span><strong>SMB Entry: Jan+Nov+Dec</strong> — 16.7% Jan + 15.3% Nov + 16.7% Dec = 48.7% in bookend months. No Oct releases.</span></div>
-  <div class="kw-item"><span class="kw-icon">❼</span><span><strong>ThinkPad × 5 Service Tiers = 5 different calendars</strong> — from Mar-Apr burst (Mainstream) to Jul-Sep spread (Workstation) to Feb-Apr wave (Entry).</span></div>
+    <div class="kw-item"><span class="kw-icon">❼</span><span><strong>ThinkPad × 3 Service Tiers = 3 different calendars</strong> — Mar-Apr burst (Mainstream), Feb-Apr wave (Entry), Jan-Mar burst (Halo).</span></div>
   <div class="kw-item"><span class="kw-icon">❽</span><span><strong>ThinkCentre × 7 Service Tiers = 3 distinct cluster patterns</strong> — Q1 cluster (DT Mainstream, AIO Halo), summer cluster (DT Entry, AIO Entry), spread (DT Halo).</span></div>
 </div>
 
@@ -139,7 +139,7 @@
 </div>
 
 <!-- SECTION 2: ThinkPad × Service Tier -->
-<div class="section-title">Deep Dive — ThinkPad: 1 Brand, 5 Service Tiers, 5 Calendars</div>
+<div class="section-title">Deep Dive — ThinkPad: 1 Brand, 3 Service Tiers, 3 Calendars</div>
 
 <div class="grid grid-2">
   <div class="card full">
@@ -148,8 +148,6 @@
     <div class="legend-row">
       <span><span class="legend-dot" style="background:#5eead4"></span>TP Mainstream (192)</span>
       <span><span class="legend-dot" style="background:#f59e0b"></span>TP Entry (102)</span>
-      <span><span class="legend-dot" style="background:#f87171"></span>TP Workstation Entry (60)</span>
-      <span><span class="legend-dot" style="background:#a78bfa"></span>TP Workstation (32)</span>
       <span><span class="legend-dot" style="background:#34d399"></span>TP Halo (28)</span>
     </div>
   </div>
@@ -165,8 +163,8 @@
     <canvas id="chartTPEntry"></canvas>
   </div>
   <div class="card">
-    <h2>TP Workstation Entry (n=60)</h2>
-    <canvas id="chartTPWE"></canvas>
+    <h2>TP Halo (n=28)</h2>
+    <canvas id="chartTPHalo"></canvas>
   </div>
 </div>
 
@@ -253,9 +251,9 @@
       <div class="pct" style="color:var(--commercial)">Zero Jul–Nov</div>
     </div>
     <div class="insight-item" style="border-left-color:var(--red)">
-      <div class="brand">TP Workstation Entry</div><div class="st">ThinkPad</div>
-      <div class="peak">Peak: Mar (53%) + Jul</div>
-      <div class="pct" style="color:var(--red)">Dual pulse</div>
+      <div class="brand">TP Halo</div><div class="st">ThinkPad</div>
+      <div class="peak">Peak: Jan–Mar (85.7%)</div>
+      <div class="pct" style="color:var(--red)">Q1 burst</div>
     </div>
     <div class="insight-item" style="border-left-color:var(--consumer)">
       <div class="brand">TC DT Entry</div><div class="st">ThinkCentre</div>
@@ -352,8 +350,6 @@ new Chart(document.getElementById('chartSTHeatmap'), {
 // === CHART 3: ThinkPad × ST (grouped) ===
 const tpMain = [8,4,60,64,16,24,8,0,0,0,0,8];
 const tpEntry = [0,12,32,24,18,4,0,0,0,0,0,12];
-const tpWE = [0,0,32,16,0,0,12,0,0,0,0,0];
-const tpWS = [0,0,0,8,8,0,4,8,0,4,0,0];
 const tpHalo = [8,8,8,0,0,0,0,0,0,4,0,0];
 
 new Chart(document.getElementById('chartThinkPadST'), {
@@ -363,8 +359,6 @@ new Chart(document.getElementById('chartThinkPadST'), {
     datasets: [
       { label: 'TP Mainstream', data: tpMain, backgroundColor: '#5eead488', borderColor: '#5eead4', borderWidth: 1, borderRadius: 3 },
       { label: 'TP Entry', data: tpEntry, backgroundColor: '#f59e0b88', borderColor: '#f59e0b', borderWidth: 1, borderRadius: 3 },
-      { label: 'TP Workstation Entry', data: tpWE, backgroundColor: '#f8717188', borderColor: '#f87171', borderWidth: 1, borderRadius: 3 },
-      { label: 'TP Workstation', data: tpWS, backgroundColor: '#a78bfa88', borderColor: '#a78bfa', borderWidth: 1, borderRadius: 3 },
       { label: 'TP Halo', data: tpHalo, backgroundColor: '#34d39988', borderColor: '#34d399', borderWidth: 1, borderRadius: 3 },
     ]
   },
@@ -389,7 +383,7 @@ function makeMonthlyChart(id, data, color) {
 }
 makeMonthlyChart('chartTPMain', tpMain, '#5eead4');
 makeMonthlyChart('chartTPEntry', tpEntry, '#f59e0b');
-makeMonthlyChart('chartTPWE', tpWE, '#f87171');
+makeMonthlyChart('chartTPHalo', tpHalo, '#34d399');
 
 // === CHART 7: ThinkCentre × ST ===
 const tcDTMain = [0,0,84,42,52,0,72,8,26,0,0,8];
