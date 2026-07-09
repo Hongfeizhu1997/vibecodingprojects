@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCG MT Release Patterns — by Service Tier</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117; --card: #161822; --border: #252836;
+    --text: #c8ccd4; --text-dim: #7a7f8a;
+    --commercial: #5eead4; --consumer: #f59e0b; --smb: #818cf8;
+    --accent: #a78bfa; --red: #f87171; --green: #34d399;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 32px 40px; max-width: 1500px; margin: 0 auto;
+  }
+  header { margin-bottom: 24px; }
+  h1 { font-size: 1.5rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+  .subtitle { color: var(--text-dim); font-size: 0.8rem; margin-top: 4px; line-height: 1.5; }
+
+  .section-title {
+    color: var(--text-dim); font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.08em; font-weight: 600; margin: 28px 0 12px;
+    padding-bottom: 6px; border-bottom: 1px solid var(--border);
+  }
+
+  .grid { display: grid; gap: 18px; margin-bottom: 4px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 22px 14px;
+  }
+  .card h2 {
+    font-size: 0.74rem; color: var(--text-dim); text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 10px; font-weight: 600;
+  }
+  .card canvas { max-height: 300px; }
+  .full { grid-column: 1 / -1; }
+  .full canvas { max-height: 340px; }
+
+  .key-takeaways {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px 20px;
+    background: linear-gradient(135deg, #1a1d2e 0%, #1f2237 100%);
+    border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 10px; padding: 16px 22px; margin-bottom: 20px;
+  }
+  .kw-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 0.76rem; color: var(--text); line-height: 1.5;
+  }
+  .kw-item strong { color: #fff; }
+  .kw-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 1px; }
+
+  .legend-row { display: flex; gap: 16px; margin-top: 6px; font-size: 0.68rem; color: var(--text-dim); flex-wrap: wrap; }
+  .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+  .stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 8px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 18px; text-align: center;
+  }
+  .stat-card .num { font-size: 1.5rem; font-weight: 700; color: #fff; }
+  .stat-card .label { font-size: 0.68rem; color: var(--text-dim); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .insights {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 22px 26px; margin-top: 16px;
+  }
+  .insights h2 { font-size: 0.74rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; font-weight: 600; }
+  .insight-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .insight-item { border-left: 3px solid var(--border); padding-left: 12px; }
+  .insight-item .brand { font-size: 0.82rem; font-weight: 700; color: #fff; }
+  .insight-item .st { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; font-style: italic; }
+  .insight-item .peak { font-size: 0.72rem; color: var(--text-dim); margin-top: 3px; }
+  .insight-item .pct { font-size: 0.95rem; font-weight: 700; margin-top: 3px; }
+
+  .badge { display: inline-block; font-size: 0.62rem; padding: 1px 7px; border-radius: 3px; font-weight: 500; }
+  .badge-c { background: rgba(94,234,212,0.12); color: var(--commercial); }
+  .badge-s { background: rgba(129,140,248,0.12); color: var(--smb); }
+  .badge-u { background: rgba(245,158,11,0.12); color: var(--consumer); }
+
+  @media (max-width: 900px) {
+    body { padding: 16px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .stat-cards, .insight-grid { grid-template-columns: repeat(2, 1fr); }
+    .key-takeaways { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PCG MT Release Patterns — by Service Tier</h1>
+  <div class="subtitle">
+    Source: PDM Dashboard 6,614 releases (3,701 w/ EOW) &nbsp;×&nbsp; HW Extract Service Tier mapping (4,525 MTs) &nbsp;→&nbsp; 2,162 MTs matched (89.3%)<br>
+    Enrichment: MT → Service Tier lookup from HW Extract → analyze release timing per Service Tier
+  </div>
+</header>
+
+<!-- Key Takeaways -->
+<div class="key-takeaways">
+  <div class="kw-item"><span class="kw-icon">❶</span><span><strong>Service Tier determines release timing more than Brand alone</strong> — same Brand, different Tier = completely different calendar.</span></div>
+  <div class="kw-item"><span class="kw-icon">❷</span><span><strong>TP Mainstream: extreme Mar-Apr concentration</strong> — 64.5% of annual releases in just 2 months. Jul–Nov = zero releases.</span></div>
+  <div class="kw-item"><span class="kw-icon">❸</span><span><strong>TC DT Entry: summer-only window</strong> — 60.7% in Jun+Aug. No Q1, no Q4 releases. Completely opposite to TC DT Mainstream (Mar+Jul peaks).</span></div>
+  <div class="kw-item"><span class="kw-icon">❹</span><span><strong>Idea NB tiers: Q4-heavy but staggered</strong> — Mainstream peaks Oct (18.8%), Entry peaks Sep (23.2%), Halo peaks Oct-Nov (52%).</span></div>
+  <div class="kw-item"><span class="kw-icon">❺</span><span><strong>ThinkSmart: dual-peak Nov+Mar</strong> — 34% Nov (holiday) + 29.8% Mar (enterprise refresh). Unique among all tiers.</span></div>
+  <div class="kw-item"><span class="kw-icon">❻</span><span><strong>SMB Entry: Jan+Nov+Dec</strong> — 16.7% Jan + 15.3% Nov + 16.7% Dec = 48.7% in bookend months. No Oct releases.</span></div>
+  <div class="kw-item"><span class="kw-icon">❼</span><span><strong>ThinkPad × 5 Service Tiers = 5 different calendars</strong> — from Mar-Apr burst (Mainstream) to Jul-Sep spread (Workstation) to Feb-Apr wave (Entry).</span></div>
+  <div class="kw-item"><span class="kw-icon">❽</span><span><strong>ThinkCentre × 7 Service Tiers = 3 distinct cluster patterns</strong> — Q1 cluster (DT Mainstream, AIO Halo), summer cluster (DT Entry, AIO Entry), spread (DT Halo).</span></div>
+</div>
+
+<!-- Stat Cards -->
+<div class="stat-cards">
+  <div class="stat-card"><div class="num" style="color:var(--commercial)">2,162</div><div class="label">MTs Matched</div></div>
+  <div class="stat-card"><div class="num" style="color:var(--accent)">89.3%</div><div class="label">Match Rate</div></div>
+  <div class="stat-card"><div class="num" style="color:var(--consumer)">45</div><div class="label">Unique Service Tiers</div></div>
+  <div class="stat-card"><div class="num" style="color:var(--green)">15</div><div class="label">Tiers with 50+ MTs</div></div>
+</div>
+
+<!-- SECTION 1: ST Distribution & Monthly Heatmap -->
+<div class="section-title">Service Tier Landscape — Distribution &amp; Monthly Calendar</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2>Top 15 Service Tiers by MT Count</h2>
+    <canvas id="chartSTDist"></canvas>
+  </div>
+  <div class="card">
+    <h2>Service Tier Monthly Heatmap (% of Annual)</h2>
+    <canvas id="chartSTHeatmap"></canvas>
+  </div>
+</div>
+
+<!-- SECTION 2: ThinkPad × Service Tier -->
+<div class="section-title">Deep Dive — ThinkPad: 1 Brand, 5 Service Tiers, 5 Calendars</div>
+
+<div class="grid grid-2">
+  <div class="card full">
+    <h2>ThinkPad Release Patterns by Service Tier (Monthly)</h2>
+    <canvas id="chartThinkPadST"></canvas>
+    <div class="legend-row">
+      <span><span class="legend-dot" style="background:#5eead4"></span>TP Mainstream (192)</span>
+      <span><span class="legend-dot" style="background:#f59e0b"></span>TP Entry (102)</span>
+      <span><span class="legend-dot" style="background:#f87171"></span>TP Workstation Entry (60)</span>
+      <span><span class="legend-dot" style="background:#a78bfa"></span>TP Workstation (32)</span>
+      <span><span class="legend-dot" style="background:#34d399"></span>TP Halo (28)</span>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-3">
+  <div class="card">
+    <h2>TP Mainstream (n=192)</h2>
+    <canvas id="chartTPMain"></canvas>
+  </div>
+  <div class="card">
+    <h2>TP Entry (n=102)</h2>
+    <canvas id="chartTPEntry"></canvas>
+  </div>
+  <div class="card">
+    <h2>TP Workstation Entry (n=60)</h2>
+    <canvas id="chartTPWE"></canvas>
+  </div>
+</div>
+
+<!-- SECTION 3: ThinkCentre × Service Tier -->
+<div class="section-title">Deep Dive — ThinkCentre: 1 Brand, 3 Timing Clusters</div>
+
+<div class="grid grid-2">
+  <div class="card full">
+    <h2>ThinkCentre Release Patterns by Service Tier</h2>
+    <canvas id="chartThinkCentreST"></canvas>
+    <div class="legend-row">
+      <span><span class="legend-dot" style="background:#5eead4"></span>DT Mainstream (292)</span>
+      <span><span class="legend-dot" style="background:#f59e0b"></span>DT Entry (106)</span>
+      <span><span class="legend-dot" style="background:#f87171"></span>DT Halo (86)</span>
+      <span><span class="legend-dot" style="background:#a78bfa"></span>AIO Halo (32)</span>
+      <span><span class="legend-dot" style="background:#34d399"></span>AIO Entry (24)</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4: IdeaPad & Consumer tiers -->
+<div class="section-title">Consumer Tiers — IdeaPad / Yoga / Legion</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2>IdeaPad — NB Mainstream vs NB Entry</h2>
+    <canvas id="chartIdeaPad"></canvas>
+    <div class="legend-row">
+      <span><span class="legend-dot" style="background:#5eead4"></span>NB Mainstream (132)</span>
+      <span><span class="legend-dot" style="background:#f59e0b"></span>NB Entry (100)</span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Consumer Tiers Compared — Q4 Concentration</h2>
+    <canvas id="chartConsumerCompare"></canvas>
+    <div class="legend-row">
+      <span><span class="legend-dot" style="background:#5eead4"></span>Idea NB Halo — Yoga (84)</span>
+      <span><span class="legend-dot" style="background:#f59e0b"></span>Gaming NB Mainstream — Legion (22)</span>
+      <span><span class="legend-dot" style="background:#f87171"></span>Idea Desktop — IdeaCentre (26)</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: Cross-Tier Comparison -->
+<div class="section-title">Cross-Tier — Peak Quarter Concentration &amp; Calendar Overlap</div>
+
+<div class="grid grid-2">
+  <div class="card full">
+    <h2>Peak Quarter Concentration by Service Tier (% of annual in busiest quarter)</h2>
+    <canvas id="chartPeakQuarter"></canvas>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h2>Commercial ST Cluster: Q1 vs Q3 Peaks</h2>
+    <canvas id="chartCommCluster"></canvas>
+    <div class="legend-row">
+      <span><span class="legend-dot" style="background:#5eead4"></span>TP Mainstream (Q1 68.7%)</span>
+      <span><span class="legend-dot" style="background:#f59e0b"></span>TC DT Mainstream (Q1 40.2%)</span>
+      <span><span class="legend-dot" style="background:#f87171"></span>TC DT Entry (Q3 60.7%)</span>
+      <span><span class="legend-dot" style="background:#a78bfa"></span>ThinkSmart (Q4 38.3% + Q1 36.2%)</span>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Consumer ST Cluster: Q4 Peaks (staggered)</h2>
+    <canvas id="chartConsCluster"></canvas>
+    <div class="legend-row">
+      <span><span class="legend-dot" style="background:#5eead4"></span>Idea NB Mainstream (Q4 44.5%)</span>
+      <span><span class="legend-dot" style="background:#f59e0b"></span>Idea NB Entry (Q4 53.9%)</span>
+      <span><span class="legend-dot" style="background:#f87171"></span>Idea NB Halo (Q4 70.6%)</span>
+      <span><span class="legend-dot" style="background:#a78bfa"></span>SMB Entry (Q4 48.7%)</span>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Reference -->
+<div class="insights">
+  <h2>Quick Reference — Service Tier × Timing</h2>
+  <div class="insight-grid">
+    <div class="insight-item" style="border-left-color:var(--commercial)">
+      <div class="brand">TP Mainstream</div><div class="st">ThinkPad</div>
+      <div class="peak">Peak: Mar–Apr (64.5%)</div>
+      <div class="pct" style="color:var(--commercial)">Zero Jul–Nov</div>
+    </div>
+    <div class="insight-item" style="border-left-color:var(--red)">
+      <div class="brand">TP Workstation Entry</div><div class="st">ThinkPad</div>
+      <div class="peak">Peak: Mar (53%) + Jul</div>
+      <div class="pct" style="color:var(--red)">Dual pulse</div>
+    </div>
+    <div class="insight-item" style="border-left-color:var(--consumer)">
+      <div class="brand">TC DT Entry</div><div class="st">ThinkCentre</div>
+      <div class="peak">Peak: Jun–Aug (60.7%)</div>
+      <div class="pct" style="color:var(--consumer)">Summer only</div>
+    </div>
+    <div class="insight-item" style="border-left-color:var(--commercial)">
+      <div class="brand">TC DT Mainstream</div><div class="st">ThinkCentre</div>
+      <div class="peak">Mar (26.6%) + Jul (22.8%)</div>
+      <div class="pct" style="color:var(--commercial)">Dual peak</div>
+    </div>
+    <div class="insight-item" style="border-left-color:var(--accent)">
+      <div class="brand">ThinkSmart</div><div class="st">ThinkSmart</div>
+      <div class="peak">Nov (34%) + Mar (29.8%)</div>
+      <div class="pct" style="color:var(--accent)">Unique dual peak</div>
+    </div>
+    <div class="insight-item" style="border-left-color:var(--consumer)">
+      <div class="brand">Idea NB Mainstream</div><div class="st">IdeaPad</div>
+      <div class="peak">Oct (18.8%) + Nov (16.5%)</div>
+      <div class="pct" style="color:var(--consumer)">Q4 = 44.5%</div>
+    </div>
+    <div class="insight-item" style="border-left-color:var(--consumer)">
+      <div class="brand">Idea NB Entry</div><div class="st">IdeaPad</div>
+      <div class="peak">Sep (23.2%)</div>
+      <div class="pct" style="color:var(--consumer)">1 month earlier</div>
+    </div>
+    <div class="insight-item" style="border-left-color:var(--green)">
+      <div class="brand">Idea NB Halo</div><div class="st">Yoga</div>
+      <div class="peak">Oct–Dec (70.6%)</div>
+      <div class="pct" style="color:var(--green)">Q4 dominant</div>
+    </div>
+  </div>
+</div>
+
+<script>
+Chart.defaults.color = '#7a7f8a';
+Chart.defaults.borderColor = '#252836';
+Chart.defaults.font.family = "'Inter', -apple-system, sans-serif";
+Chart.defaults.font.size = 10;
+const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// === CHART 1: ST Distribution ===
+const stLabels = ['TC DT Main','TP Entry','TP Main','Idea NB Main','SMB Entry','Idea NB Entry','TC DT Entry','Idea NB Halo','ThinkSmart','TC DT Halo','ThinkStation Entry','Idea Desktop','TP Workstation Entry','Idea AIO','TP Workstation'];
+const stCounts = [316,208,192,170,144,138,122,102,94,94,94,66,60,48,32];
+const stColors = stLabels.map((_,i) => i<7?'#5eead488':(i<11?'#f59e0b88':'#a78bfa88'));
+
+new Chart(document.getElementById('chartSTDist'), {
+  type: 'bar', data: { labels: stLabels, datasets: [{ data: stCounts, backgroundColor: stColors, borderRadius: 3 }] },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { color: '#1e2030' }, ticks: { font: { size: 8 } } }, y: { grid: { display: false }, ticks: { font: { size: 8, weight: '600' }, color: '#c8ccd4' } } }
+  }
+});
+
+// === CHART 2: ST Monthly Heatmap (% of annual) ===
+const heatSTs = ['TP Main','TP Entry','TP Workstation Entry','TC DT Main','TC DT Entry','TC DT Halo','ThinkSmart','Idea NB Main','Idea NB Entry','Idea NB Halo','SMB Entry','Gaming NB Main'];
+const heatData = {
+  'TP Main': [4.2,2.1,31.2,33.3,8.3,12.5,4.2,0,0,0,0,4.2],
+  'TP Entry': [0,11.5,19.2,13.5,9.6,2.9,6.7,8.7,4.8,7.7,6.7,7.7],
+  'TP Workstation Entry': [0,0,53.3,26.7,0,0,20,0,0,0,0,0],
+  'TC DT Main': [0,7.6,26.6,13.3,16.5,0,22.8,2.5,8.2,0,0,2.5],
+  'TC DT Entry': [6.6,0,0,0,6.6,32.8,0,27.9,13.1,0,13.1,0],
+  'TC DT Halo': [0,14,37.2,23.3,0,25.6,0,0,0,0,0,0],
+  'ThinkSmart': [2.1,4.3,29.8,4.3,0,2.1,8.5,0,8.5,4.3,34,2.1],
+  'Idea NB Main': [7.1,9.4,8.2,3.5,1.2,3.5,7.1,9.4,8.2,18.8,16.5,7.1],
+  'Idea NB Entry': [8.7,5.8,1.4,0,4.3,5.8,8.7,8.7,23.2,14.5,7.2,11.6],
+  'Idea NB Halo': [3.9,11.8,0,2,7.8,2,0,2,0,27.5,24.5,18.6],
+  'SMB Entry': [16.7,5.6,13.9,2.8,4.2,9.7,1.4,5.6,8.3,0,15.3,16.7],
+  'Gaming NB Main': [9.1,0,0,0,0,18.2,0,18.2,9.1,9.1,27.3,9.1],
+};
+
+new Chart(document.getElementById('chartSTHeatmap'), {
+  type: 'bar',
+  data: {
+    labels: heatSTs,
+    datasets: M.map((m, i) => ({
+      label: m,
+      data: heatSTs.map(s => heatData[s]?.[i] || 0),
+      backgroundColor: `hsla(${200 - i*12}, 60%, ${50 + i*3}%, 0.8)`,
+      borderRadius: 1, borderSkipped: false,
+    }))
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toFixed(1)}%` } } },
+    scales: {
+      x: { stacked: true, grid: { color: '#1e2030' }, ticks: { font: { size: 8 }, callback: v=>v+'%' }, max: 105 },
+      y: { stacked: true, grid: { display: false }, ticks: { font: { size: 9, weight: '600' }, color: '#c8ccd4' } }
+    }
+  }
+});
+
+// === CHART 3: ThinkPad × ST (grouped) ===
+const tpMain = [8,4,60,64,16,24,8,0,0,0,0,8];
+const tpEntry = [0,12,32,24,18,4,0,0,0,0,0,12];
+const tpWE = [0,0,32,16,0,0,12,0,0,0,0,0];
+const tpWS = [0,0,0,8,8,0,4,8,0,4,0,0];
+const tpHalo = [8,8,8,0,0,0,0,0,0,4,0,0];
+
+new Chart(document.getElementById('chartThinkPadST'), {
+  type: 'bar',
+  data: {
+    labels: M,
+    datasets: [
+      { label: 'TP Mainstream', data: tpMain, backgroundColor: '#5eead488', borderColor: '#5eead4', borderWidth: 1, borderRadius: 3 },
+      { label: 'TP Entry', data: tpEntry, backgroundColor: '#f59e0b88', borderColor: '#f59e0b', borderWidth: 1, borderRadius: 3 },
+      { label: 'TP Workstation Entry', data: tpWE, backgroundColor: '#f8717188', borderColor: '#f87171', borderWidth: 1, borderRadius: 3 },
+      { label: 'TP Workstation', data: tpWS, backgroundColor: '#a78bfa88', borderColor: '#a78bfa', borderWidth: 1, borderRadius: 3 },
+      { label: 'TP Halo', data: tpHalo, backgroundColor: '#34d39988', borderColor: '#34d399', borderWidth: 1, borderRadius: 3 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } } }, y: { grid: { color: '#1e2030' }, ticks: { font: { size: 9 } } } }
+  }
+});
+
+// === CHARTS 4-6: Individual TP STs ===
+function makeMonthlyChart(id, data, color) {
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels: M, datasets: [{ data, backgroundColor: color+'88', borderColor: color, borderWidth: 1, borderRadius: 4 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false }, ticks: { font: { size: 8 } } }, y: { grid: { color: '#1e2030' }, ticks: { font: { size: 8 } } } }
+    }
+  });
+}
+makeMonthlyChart('chartTPMain', tpMain, '#5eead4');
+makeMonthlyChart('chartTPEntry', tpEntry, '#f59e0b');
+makeMonthlyChart('chartTPWE', tpWE, '#f87171');
+
+// === CHART 7: ThinkCentre × ST ===
+const tcDTMain = [0,0,84,42,52,0,72,8,26,0,0,8];
+const tcDTEntry = [8,0,0,0,8,32,0,26,16,0,16,0];
+const tcDTHalo = [0,12,32,20,0,22,0,0,0,0,0,0];
+const tcAIOHalo = [0,14,10,0,0,0,0,0,0,0,0,8];
+const tcAIOEntry = [8,0,0,0,8,4,0,4,0,0,0,0];
+
+new Chart(document.getElementById('chartThinkCentreST'), {
+  type: 'bar',
+  data: {
+    labels: M,
+    datasets: [
+      { label: 'DT Mainstream', data: tcDTMain, backgroundColor: '#5eead488', borderColor: '#5eead4', borderRadius: 3 },
+      { label: 'DT Entry', data: tcDTEntry, backgroundColor: '#f59e0b88', borderColor: '#f59e0b', borderRadius: 3 },
+      { label: 'DT Halo', data: tcDTHalo, backgroundColor: '#f8717188', borderColor: '#f87171', borderRadius: 3 },
+      { label: 'AIO Halo', data: tcAIOHalo, backgroundColor: '#a78bfa88', borderColor: '#a78bfa', borderRadius: 3 },
+      { label: 'AIO Entry', data: tcAIOEntry, backgroundColor: '#34d39988', borderColor: '#34d399', borderRadius: 3 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } } }, y: { grid: { color: '#1e2030' }, ticks: { font: { size: 9 } } } }
+  }
+});
+
+// === CHART 8: IdeaPad ===
+const ideaNBMain = [12,4,8,4,0,4,10,16,12,26,28,12];
+const ideaNBEntry = [10,4,0,0,0,4,12,8,26,18,6,12];
+
+new Chart(document.getElementById('chartIdeaPad'), {
+  type: 'bar',
+  data: {
+    labels: M,
+    datasets: [
+      { label: 'NB Mainstream', data: ideaNBMain, backgroundColor: '#5eead488', borderColor: '#5eead4', borderRadius: 3 },
+      { label: 'NB Entry', data: ideaNBEntry, backgroundColor: '#f59e0b88', borderColor: '#f59e0b', borderRadius: 3 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } } }, y: { grid: { color: '#1e2030' }, ticks: { font: { size: 9 } } } }
+  }
+});
+
+// === CHART 9: Consumer Tiers Compared ===
+const ideaNBHalo = [4,12,0,2,8,2,0,2,0,28,25,19];
+const gamingNB = [2,0,0,0,0,4,0,4,2,2,6,2];
+const ideaDesk = [4,0,0,4,2,0,8,2,4,0,2,0];
+
+new Chart(document.getElementById('chartConsumerCompare'), {
+  type: 'line',
+  data: {
+    labels: M,
+    datasets: [
+      { label: 'Idea NB Halo', data: ideaNBHalo, borderColor: '#5eead4', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#5eead4', tension: 0.3 },
+      { label: 'Gaming NB Main', data: gamingNB, borderColor: '#f59e0b', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#f59e0b', tension: 0.3, borderDash: [4,2] },
+      { label: 'Idea Desktop', data: ideaDesk, borderColor: '#f87171', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#f87171', tension: 0.3, borderDash: [2,2] },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } } }, y: { grid: { color: '#1e2030' }, ticks: { font: { size: 9 } } } }
+  }
+});
+
+// === CHART 10: Peak Quarter Concentration ===
+const pqLabels = ['TP Main','TP Wrkstn E','TC DT Main','TC DT Entry','TC DT Halo','ThinkSmart','Idea NB Main','Idea NB Entry','Idea NB Halo','SMB Entry','Gaming NB Main','TP Entry'];
+const pqQ1 = [68.7,80,40.2,6.6,51.2,36.2,24.7,12.9,5.9,36.2,9.1,19.2];
+const pqQ2 = [20.8,0,29.8,39.4,25.6,6.4,8.2,10.1,11.8,18.1,18.2,5.8];
+const pqQ3 = [4.2,20,33.5,41,0,17,24.6,41.6,4,12.5,27.3,15.4];
+const pqQ4 = [4.2,0,4,13.1,0,40.4,44.5,53.9,70.6,48.7,45.5,28.8];
+
+new Chart(document.getElementById('chartPeakQuarter'), {
+  type: 'bar',
+  data: {
+    labels: pqLabels,
+    datasets: [
+      { label: 'Q1', data: pqQ1, backgroundColor: '#5eead4', borderRadius: 2, borderSkipped: false },
+      { label: 'Q2', data: pqQ2, backgroundColor: '#34d399', borderRadius: 2, borderSkipped: false },
+      { label: 'Q3', data: pqQ3, backgroundColor: '#f59e0b', borderRadius: 2, borderSkipped: false },
+      { label: 'Q4', data: pqQ4, backgroundColor: '#f87171', borderRadius: 2, borderSkipped: false },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { font: { size: 9 }, usePointStyle: true, pointStyleWidth: 8, padding: 12 } } },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 8 }, maxRotation: 45 } },
+      y: { stacked: true, grid: { color: '#1e2030' }, ticks: { font: { size: 8 }, callback: v=>v+'%' }, max: 110 }
+    }
+  }
+});
+
+// === CHART 11: Commercial ST Cluster ===
+const commQM = [4.2,2.1,31.2,33.3,8.3,12.5,4.2,0,0,0,0,4.2];
+const commQMDT = [0,7.6,26.6,13.3,16.5,0,22.8,2.5,8.2,0,0,2.5];
+const commQMDTE = [6.6,0,0,0,6.6,32.8,0,27.9,13.1,0,13.1,0];
+const commSmart = [2.1,4.3,29.8,4.3,0,2.1,8.5,0,8.5,4.3,34,2.1];
+
+new Chart(document.getElementById('chartCommCluster'), {
+  type: 'line',
+  data: {
+    labels: M,
+    datasets: [
+      { label: 'TP Mainstream', data: commQM, borderColor: '#5eead4', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: '#5eead4', tension: 0.3 },
+      { label: 'TC DT Main', data: commQMDT, borderColor: '#f59e0b', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: '#f59e0b', tension: 0.3 },
+      { label: 'TC DT Entry', data: commQMDTE, borderColor: '#f87171', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: '#f87171', tension: 0.3, borderDash: [5,3] },
+      { label: 'ThinkSmart', data: commSmart, borderColor: '#a78bfa', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#a78bfa', tension: 0.3, borderDash: [3,3] },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } } }, y: { grid: { color: '#1e2030' }, ticks: { font: { size: 9 }, callback: v=>v+'%' }, max: 40 } }
+  }
+});
+
+// === CHART 12: Consumer ST Cluster ===
+const consMain = [7.1,9.4,8.2,3.5,1.2,3.5,7.1,9.4,8.2,18.8,16.5,7.1];
+const consEntry = [8.7,5.8,1.4,0,4.3,5.8,8.7,8.7,23.2,14.5,7.2,11.6];
+const consHalo = [3.9,11.8,0,2,7.8,2,0,2,0,27.5,24.5,18.6];
+const consSMB = [16.7,5.6,13.9,2.8,4.2,9.7,1.4,5.6,8.3,0,15.3,16.7];
+
+new Chart(document.getElementById('chartConsCluster'), {
+  type: 'line',
+  data: {
+    labels: M,
+    datasets: [
+      { label: 'Idea NB Main', data: consMain, borderColor: '#5eead4', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: '#5eead4', tension: 0.3 },
+      { label: 'Idea NB Entry', data: consEntry, borderColor: '#f59e0b', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: '#f59e0b', tension: 0.3 },
+      { label: 'Idea NB Halo', data: consHalo, borderColor: '#f87171', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: '#f87171', tension: 0.3 },
+      { label: 'SMB Entry', data: consSMB, borderColor: '#a78bfa', backgroundColor: 'transparent', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#a78bfa', tension: 0.3, borderDash: [4,3] },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } } }, y: { grid: { color: '#1e2030' }, ticks: { font: { size: 9 }, callback: v=>v+'%' }, max: 30 } }
+  }
+});
+</script>
+
+</body>
+</html>
