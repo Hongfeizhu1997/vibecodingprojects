@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SSG Sales Enablement Agent — Delivery Phase Replan V2 [static]</title>
+<title>SSG Sales Enablement Agent — Delivery Phase Replan V3 [static]</title>
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   body{background:#020617;color:#e2e8f0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;padding:0;}
@@ -26,6 +26,8 @@
   .callout strong{color:#fbbf24;}
   .callout-teal{background:rgba(94,234,212,0.04);border-left:3px solid rgba(94,234,212,0.2);padding:.6rem .9rem;border-radius:0 6px 6px 0;margin-bottom:1rem;font-size:.65rem;color:#5eead4;line-height:1.5;}
   .callout-teal strong{color:#5eead4;}
+  .callout-dim{background:rgba(148,163,184,0.04);border-left:3px solid rgba(148,163,184,0.15);padding:.6rem .9rem;border-radius:0 6px 6px 0;margin-bottom:1rem;font-size:.65rem;color:#94a3b8;line-height:1.5;}
+  .callout-dim strong{color:#cbd5e1;}
 
   table{width:100%;border-collapse:collapse;font-size:.65rem;}
   thead{background:rgba(94,234,212,0.03);}
@@ -45,7 +47,6 @@
   .dr-na{color:#64748b;}
   .vd{color:#94a3b8;}
 
-  /* Framework cards */
   .fw-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem;margin-bottom:1.2rem;}
   .fw-card{background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.06);border-radius:8px;padding:.8rem;text-align:center;}
   .fw-card.new{border-color:rgba(94,234,212,0.12);}
@@ -55,13 +56,11 @@
   .fw-card .fw-pct{font-size:.6rem;color:#5eead4;font-weight:600;margin-bottom:.15rem;}
   .fw-card .fw-role{font-size:.58rem;color:#64748b;line-height:1.3;}
 
-  /* Flow chain */
   .flow{display:flex;align-items:center;gap:.3rem;margin:.8rem 0;font-size:.6rem;flex-wrap:wrap;}
   .flow-s{background:rgba(94,234,212,0.06);color:#5eead4;padding:.2rem .5rem;border-radius:4px;font-weight:600;border:1px solid rgba(94,234,212,0.1);}
   .flow-s.crit{background:rgba(248,113,113,0.08);color:#f87171;border-color:rgba(248,113,113,0.12);}
   .flow-sep{color:#334155;font-weight:700;}
 
-  /* Matrix */
   .mx-wrap{background:rgba(15,23,42,0.5);border:1px solid rgba(148,163,184,0.06);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem;}
   .mx-row{display:flex;align-items:center;gap:.4rem;}
   .mx-row .lb{width:70px;font-size:.58rem;color:#64748b;text-align:right;flex-shrink:0;}
@@ -76,7 +75,6 @@
   .lg-d{width:8px;height:8px;border-radius:2px;}
   .mx-h{display:flex;align-items:center;gap:.4rem;margin-bottom:.2rem;}
 
-  /* Timeline card */
   .tl-card{background:#020617;border:1px solid rgba(148,163,184,0.06);border-radius:10px;overflow:hidden;margin-bottom:2rem;}
   .tl-card svg{display:block;width:100%;height:auto;}
 
@@ -96,17 +94,17 @@
 <div class="container">
 
 <div class="header">
-  <div class="badge">Sales Enablement Agent · Delivery Planning V2</div>
+  <div class="badge">Sales Enablement Agent · Delivery Planning V3</div>
   <h1>SSG GPS Delivery Phase Replan</h1>
-  <div class="sub">Re-sequenced by <span>Sensitivity · Complexity · Coupling · Data Readiness · Value Density</span></div>
+  <div class="sub">Re-sequenced by <span>Business Priority: Price → Cost → PN</span></div>
 </div>
 
 <!-- OVERVIEW -->
 <div class="section">
   <div class="section-title">01 · Overview</div>
-  <h2>4-Phase Plan<span class="dur">~24–30 weeks</span></h2>
-  <p class="desc">Five-dimension framework reorders execution without compressing timeline. Key shift: <strong>P3 pricing layer</strong> restructured from parallel to linear dependency chain with PFV promoted to first — accumulating competitive data while awaiting SCFE API readiness.</p>
-  <div class="callout"><strong>Core benefits:</strong> explicit hard-blocker visibility · value-density-calibrated sequencing · eliminated idle wait</div>
+  <h2>5-Phase Plan<span class="dur">~24–30 weeks</span></h2>
+  <p class="desc">Business-driven reorder: <strong>P2 Pricing</strong> moved from P3 to first — highest value, least blocked by internal APIs. <strong>P3 Cost</strong> follows once SCFE ready. <strong>P4 PN Ops</strong> deprioritized — team already uses Spark / Copilot / Web Coding for automation.</p>
+  <div class="callout"><strong>Core shift:</strong> Price first (external data, ready now) → Cost second (SCFE-dependent) → PN last (complement existing tools, don't rebuild)</div>
 </div>
 
 <!-- TIMELINE -->
@@ -114,17 +112,17 @@
   <div class="section-title">02 · Timeline</div>
   <h2>24-Week Roadmap<span class="dur">Week 1 = Aug 3, 2026</span></h2>
   <div class="tl-card">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 440" font-family="'Inter',-apple-system,BlinkMacSystemFont,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 480" font-family="'Inter',-apple-system,BlinkMacSystemFont,sans-serif">
   <defs>
     <pattern id="tgrid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.3"/></pattern>
     <linearGradient id="gp1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#34d399" stop-opacity="0.35"/><stop offset="100%" stop-color="#34d399" stop-opacity="0.15"/></linearGradient>
-    <linearGradient id="gp2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fbbf24" stop-opacity="0.35"/><stop offset="100%" stop-color="#fbbf24" stop-opacity="0.15"/></linearGradient>
-    <linearGradient id="gp3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fb923c" stop-opacity="0.35"/><stop offset="100%" stop-color="#fb923c" stop-opacity="0.15"/></linearGradient>
-    <linearGradient id="gp4" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#94a3b8" stop-opacity="0.2"/><stop offset="100%" stop-color="#94a3b8" stop-opacity="0.08"/></linearGradient>
+    <linearGradient id="gp2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.15"/></linearGradient>
+    <linearGradient id="gp3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fbbf24" stop-opacity="0.35"/><stop offset="100%" stop-color="#fbbf24" stop-opacity="0.15"/></linearGradient>
+    <linearGradient id="gp4" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fb923c" stop-opacity="0.25"/><stop offset="100%" stop-color="#fb923c" stop-opacity="0.1"/></linearGradient>
+    <linearGradient id="gp5" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#94a3b8" stop-opacity="0.2"/><stop offset="100%" stop-color="#94a3b8" stop-opacity="0.08"/></linearGradient>
   </defs>
-  <rect width="1080" height="440" fill="#020617"/><rect width="1080" height="440" fill="url(#tgrid)"/>
+  <rect width="1080" height="480" fill="#020617"/><rect width="1080" height="480" fill="url(#tgrid)"/>
 
-  <!-- Months -->
   <text x="140" y="34" fill="#64748b" font-size="8.5" font-weight="600">Aug</text>
   <text x="260" y="34" fill="#64748b" font-size="8.5" font-weight="600">Sep</text>
   <text x="340" y="34" fill="#64748b" font-size="8.5" font-weight="600">Oct</text>
@@ -133,67 +131,76 @@
   <text x="580" y="34" fill="#64748b" font-size="8.5" font-weight="600">Jan</text>
   <text x="660" y="34" fill="#64748b" font-size="8.5" font-weight="600">Feb</text>
 
-  <!-- Week grid lines -->
   <g stroke="#1e293b" stroke-width="0.5">
-    <line x1="120" y1="44" x2="120" y2="410"/><text x="118" y="56" fill="#475569" font-size="7" text-anchor="middle">W1</text>
-    <line x1="200" y1="44" x2="200" y2="410"/><text x="198" y="56" fill="#475569" font-size="7" text-anchor="middle">W3</text>
-    <line x1="280" y1="44" x2="280" y2="410"/><text x="278" y="56" fill="#475569" font-size="7" text-anchor="middle">W5</text>
-    <line x1="320" y1="44" x2="320" y2="410"/>
-    <line x1="400" y1="44" x2="400" y2="410"/><text x="398" y="56" fill="#475569" font-size="7" text-anchor="middle">W8</text>
-    <line x1="480" y1="44" x2="480" y2="410"/><text x="478" y="56" fill="#475569" font-size="7" text-anchor="middle">W10</text>
-    <line x1="560" y1="44" x2="560" y2="410"/><text x="558" y="56" fill="#475569" font-size="7" text-anchor="middle">W12</text>
-    <line x1="640" y1="44" x2="640" y2="410"/><text x="638" y="56" fill="#475569" font-size="7" text-anchor="middle">W14</text>
-    <line x1="720" y1="44" x2="720" y2="410"/><text x="718" y="56" fill="#475569" font-size="7" text-anchor="middle">W16</text>
-    <line x1="800" y1="44" x2="800" y2="410"/><text x="798" y="56" fill="#475569" font-size="7" text-anchor="middle">W18</text>
-    <line x1="880" y1="44" x2="880" y2="410"/><text x="878" y="56" fill="#475569" font-size="7" text-anchor="middle">W20</text>
-    <line x1="960" y1="44" x2="960" y2="410"/><text x="958" y="56" fill="#475569" font-size="7" text-anchor="middle">W22</text>
-    <line x1="1040" y1="44" x2="1040" y2="410"/><text x="1038" y="56" fill="#475569" font-size="7" text-anchor="middle">W24</text>
+    <line x1="120" y1="44" x2="120" y2="450"/><text x="118" y="56" fill="#475569" font-size="7" text-anchor="middle">W1</text>
+    <line x1="200" y1="44" x2="200" y2="450"/><text x="198" y="56" fill="#475569" font-size="7" text-anchor="middle">W3</text>
+    <line x1="280" y1="44" x2="280" y2="450"/><text x="278" y="56" fill="#475569" font-size="7" text-anchor="middle">W5</text>
+    <line x1="320" y1="44" x2="320" y2="450"/>
+    <line x1="400" y1="44" x2="400" y2="450"/><text x="398" y="56" fill="#475569" font-size="7" text-anchor="middle">W8</text>
+    <line x1="480" y1="44" x2="480" y2="450"/><text x="478" y="56" fill="#475569" font-size="7" text-anchor="middle">W10</text>
+    <line x1="560" y1="44" x2="560" y2="450"/><text x="558" y="56" fill="#475569" font-size="7" text-anchor="middle">W12</text>
+    <line x1="640" y1="44" x2="640" y2="450"/><text x="638" y="56" fill="#475569" font-size="7" text-anchor="middle">W14</text>
+    <line x1="720" y1="44" x2="720" y2="450"/><text x="718" y="56" fill="#475569" font-size="7" text-anchor="middle">W16</text>
+    <line x1="800" y1="44" x2="800" y2="450"/><text x="798" y="56" fill="#475569" font-size="7" text-anchor="middle">W18</text>
+    <line x1="880" y1="44" x2="880" y2="450"/><text x="878" y="56" fill="#475569" font-size="7" text-anchor="middle">W20</text>
+    <line x1="960" y1="44" x2="960" y2="450"/><text x="958" y="56" fill="#475569" font-size="7" text-anchor="middle">W22</text>
+    <line x1="1040" y1="44" x2="1040" y2="450"/><text x="1038" y="56" fill="#475569" font-size="7" text-anchor="middle">W24</text>
   </g>
 
   <!-- Phase labels -->
   <text x="108" y="94" fill="#34d399" font-size="9.5" font-weight="700" text-anchor="end">P1</text>
-  <text x="108" y="170" fill="#fbbf24" font-size="9.5" font-weight="700" text-anchor="end">P2</text>
-  <text x="108" y="262" fill="#fb923c" font-size="9.5" font-weight="700" text-anchor="end">P3</text>
-  <text x="108" y="358" fill="#94a3b8" font-size="9.5" font-weight="700" text-anchor="end">P4</text>
+  <text x="108" y="170" fill="#38bdf8" font-size="9.5" font-weight="700" text-anchor="end">P2</text>
+  <text x="108" y="246" fill="#fbbf24" font-size="9.5" font-weight="700" text-anchor="end">P3</text>
+  <text x="108" y="322" fill="#fb923c" font-size="9.5" font-weight="700" text-anchor="end">P4</text>
+  <text x="108" y="398" fill="#94a3b8" font-size="9.5" font-weight="700" text-anchor="end">P5</text>
 
   <!-- P1: W1-6 (x=120→360) -->
   <rect x="120" y="72" width="240" height="38" rx="6" fill="url(#gp1)" stroke="#34d399" stroke-width="1.2"/>
   <text x="240" y="88" fill="#34d399" font-size="8.5" font-weight="700" text-anchor="middle">Read-Only Intel</text>
   <text x="240" y="102" fill="#64748b" font-size="7" text-anchor="middle">#12 Query → #4 MT Capture → #1 ODT Impact</text>
 
-  <!-- P2: W6-14 (x=320→680) -->
-  <rect x="320" y="148" width="360" height="38" rx="6" fill="url(#gp2)" stroke="#fbbf24" stroke-width="1.2"/>
-  <text x="500" y="164" fill="#fbbf24" font-size="8.5" font-weight="700" text-anchor="middle">Semi-Auto PN Ops</text>
-  <text x="500" y="178" fill="#64748b" font-size="7" text-anchor="middle">#3 Dup → #2 POR → #7 Create/Extend → #5 Cleanup · +Web Workspace</text>
+  <!-- P2: Price (W6-12, x=320→600) -->
+  <rect x="320" y="148" width="280" height="38" rx="6" fill="url(#gp2)" stroke="#38bdf8" stroke-width="1.2"/>
+  <text x="460" y="164" fill="#38bdf8" font-size="8.5" font-weight="700" text-anchor="middle">Price Agent</text>
+  <text x="460" y="178" fill="#64748b" font-size="7" text-anchor="middle">#10 PFV → #11 Pricing · +Pricing Workspace</text>
 
-  <!-- P3: W14-24 (x=640→1040) -->
-  <rect x="640" y="240" width="400" height="38" rx="6" fill="url(#gp3)" stroke="#fb923c" stroke-width="1.2"/>
-  <text x="840" y="256" fill="#fb923c" font-size="8.5" font-weight="700" text-anchor="middle">Intel → Cost → Price Chain</text>
-  <text x="840" y="270" fill="#64748b" font-size="7" text-anchor="middle">#10 PFV → #8 Cost → #9 Uplift → #6 Sub-Tier → #11 Pricing</text>
+  <!-- P3: Cost (W12-18, x=560→800) -->
+  <rect x="560" y="224" width="240" height="38" rx="6" fill="url(#gp3)" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="680" y="240" fill="#fbbf24" font-size="8.5" font-weight="700" text-anchor="middle">Cost Agent</text>
+  <text x="680" y="254" fill="#64748b" font-size="7" text-anchor="middle">#8 Std Cost → #9 Uplift</text>
 
-  <!-- P4: W24+ -->
-  <rect x="1040" y="336" width="28" height="38" rx="6" fill="url(#gp4)" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="3,2"/>
-  <text x="1054" y="352" fill="#94a3b8" font-size="8" font-weight="700" text-anchor="middle">P4</text>
-  <text x="1054" y="366" fill="#475569" font-size="6.5" text-anchor="middle">+</text>
+  <!-- P4: PN (W18-24, x=800→1040) -->
+  <rect x="800" y="300" width="240" height="38" rx="6" fill="url(#gp4)" stroke="#fb923c" stroke-width="1.2"/>
+  <text x="920" y="316" fill="#fb923c" font-size="8.5" font-weight="700" text-anchor="middle">PN Ops (Complement)</text>
+  <text x="920" y="330" fill="#64748b" font-size="7" text-anchor="middle">#3 Dup → #2 POR → #7 Create · +Web WS</text>
+
+  <!-- P5: W24+ -->
+  <rect x="1040" y="376" width="28" height="38" rx="6" fill="url(#gp5)" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <text x="1054" y="392" fill="#94a3b8" font-size="8" font-weight="700" text-anchor="middle">P5</text>
+  <text x="1054" y="406" fill="#475569" font-size="6.5" text-anchor="middle">+</text>
 
   <!-- Dependency arrows -->
   <line x1="360" y1="110" x2="360" y2="122" stroke="#475569" stroke-width="0.8"/>
   <polygon points="356,122 364,122 360,128" fill="#475569"/>
-  <line x1="640" y1="186" x2="640" y2="212" stroke="#475569" stroke-width="0.8"/>
-  <polygon points="636,212 644,212 640,218" fill="#475569"/>
+  <line x1="560" y1="186" x2="560" y2="198" stroke="#475569" stroke-width="0.8"/>
+  <polygon points="556,198 564,198 560,204" fill="#475569"/>
+  <line x1="800" y1="262" x2="800" y2="274" stroke="#475569" stroke-width="0.8"/>
+  <polygon points="796,274 804,274 800,280" fill="#475569"/>
 
-  <line x1="20" y1="410" x2="1060" y2="410" stroke="#1e293b" stroke-width="0.5"/>
+  <line x1="20" y1="450" x2="1060" y2="450" stroke="#1e293b" stroke-width="0.5"/>
 
   <!-- Legend -->
-  <rect x="24" y="420" width="8" height="8" rx="2" fill="#34d399" opacity="0.8"/>
-  <text x="37" y="429" fill="#64748b" font-size="7">P1 Read-Only</text>
-  <rect x="130" y="420" width="8" height="8" rx="2" fill="#fbbf24" opacity="0.8"/>
-  <text x="143" y="429" fill="#64748b" font-size="7">P2 Semi-Auto</text>
-  <rect x="238" y="420" width="8" height="8" rx="2" fill="#fb923c" opacity="0.8"/>
-  <text x="251" y="429" fill="#64748b" font-size="7">P3 Financial</text>
-  <rect x="340" y="420" width="8" height="8" rx="2" fill="#94a3b8" opacity="0.6"/>
-  <text x="353" y="429" fill="#64748b" font-size="7">P4 Tuning</text>
-  <text x="480" y="429" fill="#475569" font-size="7">Week 1 = Aug 3, 2026 · 24-week horizon</text>
+  <rect x="24" y="460" width="8" height="8" rx="2" fill="#34d399" opacity="0.8"/>
+  <text x="37" y="469" fill="#64748b" font-size="7">P1 Read-Only</text>
+  <rect x="130" y="460" width="8" height="8" rx="2" fill="#38bdf8" opacity="0.8"/>
+  <text x="143" y="469" fill="#64748b" font-size="7">P2 Price</text>
+  <rect x="200" y="460" width="8" height="8" rx="2" fill="#fbbf24" opacity="0.8"/>
+  <text x="213" y="469" fill="#64748b" font-size="7">P3 Cost</text>
+  <rect x="278" y="460" width="8" height="8" rx="2" fill="#fb923c" opacity="0.8"/>
+  <text x="291" y="469" fill="#64748b" font-size="7">P4 PN</text>
+  <rect x="340" y="460" width="8" height="8" rx="2" fill="#94a3b8" opacity="0.6"/>
+  <text x="353" y="469" fill="#64748b" font-size="7">P5 Tuning</text>
+  <text x="480" y="469" fill="#475569" font-size="7">Week 1 = Aug 3, 2026 · 24-week horizon</text>
 </svg>
   </div>
 </div>
@@ -203,7 +210,6 @@
   <div class="section-title">03 · Evaluation Framework</div>
   <h2>Five Dimensions</h2>
   <p class="desc">Original 3D (Sensitivity · Complexity · Coupling) + <strong>Data Readiness</strong> (can we start?) + <strong>Value Density</strong> (should we start first?).</p>
-
   <div class="fw-grid">
     <div class="fw-card"><div class="fw-i">🛡️</div><div class="fw-n">Sensitivity</div><div class="fw-pct">30%</div><div class="fw-role">Financial/compliance risk of errors</div></div>
     <div class="fw-card"><div class="fw-i">⚙️</div><div class="fw-n">Complexity</div><div class="fw-pct">20%</div><div class="fw-role">System count × logic depth</div></div>
@@ -221,102 +227,111 @@
   <table>
     <thead><tr><th>#</th><th>Scenario</th><th>Cplx</th><th>Data</th><th>Value</th><th>Depends</th><th>Rationale</th></tr></thead>
     <tbody>
-      <tr><td><code>P1.1</code></td><td><strong>#12</strong> PN Master Data Query</td><td>⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐⭐⭐</td><td>—</td><td>Highest frequency (20+/day), fastest to demo (~2w) — natural first</td></tr>
-      <tr><td><code>P1.2</code></td><td><strong>#4</strong> MT Announcement Capture</td><td>⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐⭐</td><td><code>P1.1</code></td><td>Auto pipeline — MT data is critical upstream for P2/P3</td></tr>
-      <tr><td><code>P1.3</code></td><td><strong>#1</strong> ODT Change + Booking Impact</td><td>⭐⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐</td><td><code>P1.1 P1.2</code></td><td>Most value-dense — requires Booking de-ID confirmed</td></tr>
+      <tr><td><code>P1.1</code></td><td><strong>#12</strong> PN Master Data Query</td><td>⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐⭐⭐</td><td>—</td><td>Highest frequency (20+/day), fastest to demo (~2w)</td></tr>
+      <tr><td><code>P1.2</code></td><td><strong>#4</strong> MT Announcement Capture</td><td>⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐⭐</td><td><code>P1.1</code></td><td>Auto pipeline — MT data critical upstream</td></tr>
+      <tr><td><code>P1.3</code></td><td><strong>#1</strong> ODT Change + Booking Impact</td><td>⭐⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐</td><td><code>P1.1 P1.2</code></td><td>Most value-dense — requires Booking de-ID</td></tr>
     </tbody>
   </table>
   <div class="callout-teal"><strong>Strategy:</strong> All three share RAG + Teams Bot + Master Agent. Demo P1.1 immediately — don't wait for full P1.</div>
 </div>
 
-<!-- P2 -->
+<!-- P2: Price -->
 <div class="section">
   <div class="section-title">05 · Phase 2</div>
-  <h2>Semi-Auto PN Operations<span class="dur">Weeks 6–14</span></h2>
-  <p class="desc"><span class="s-md">🟡 Medium sensitivity</span> — read-only → controlled writes · introduces approval mechanism · no financial data.</p>
-  <table>
-    <thead><tr><th>#</th><th>Scenario</th><th>Cplx</th><th>Data</th><th>Value</th><th>Depends</th><th>Mode</th><th>Rationale</th></tr></thead>
-    <tbody>
-      <tr><td><code>P2.1</code></td><td><strong>#3</strong> PN Duplicate Check</td><td>⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐⭐</td><td>—</td><td>Auto</td><td>Pure read-only — minimal "read→write" transition</td></tr>
-      <tr><td><code>P2.2</code></td><td><strong>#2</strong> POR Auto-Generation</td><td>⭐⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐⭐</td><td>—</td><td>Approve→Write</td><td>Introduces approval without touching financials</td></tr>
-      <tr><td><code>P2.3</code></td><td><strong>#7</strong> Create / Extend Decision</td><td>⭐⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐</td><td><code>P1.2 P2.2</code></td><td>Approve→Exec</td><td>MT attribution + multi-layer rules</td></tr>
-      <tr><td><code>P2.4</code></td><td><strong>#5</strong> PN Periodic Cleanup</td><td>⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐</td><td>—</td><td>Approve→Exec</td><td>Lowest value density — defer to P4 if rules unclear</td></tr>
-    </tbody>
-  </table>
-  <div class="callout"><strong>+Web Workspace launches with P2.2:</strong> Dashboard for approval queue + PN status — Teams Bot alone insufficient.</div>
-  <div class="callout-teal"><strong>Alert:</strong> #5 Cleanup at ⭐⭐ value density — don't force low-value features to "cover everything."</div>
-</div>
-
-<!-- P3 -->
-<div class="section">
-  <div class="section-title">06 · Phase 3</div>
-  <h2>Intel → Cost → Price Chain<span class="dur">Weeks 14–24</span></h2>
-  <p class="desc"><span class="s-hi">🔴 Highest sensitivity</span> — financial writes · linear dependency enforced.<br><strong>Key change vs original:</strong> PFV (#10) promoted to first — accumulates data while awaiting SCFE API.</p>
-
+  <h2>Price Agent<span class="dur">Weeks 6–12</span></h2>
+  <p class="desc"><span class="s-md">🟡 Medium sensitivity</span> — pricing recommendations with human approval · external data, zero internal API dependency · <strong>highest business value, ready now</strong>.</p>
   <div class="flow">
-    <span class="flow-s">P3.1 PFV 🟢</span><span class="flow-sep">→</span>
-    <span class="flow-s">P3.2 Cost 🔴</span><span class="flow-sep">→</span>
-    <span class="flow-s">P3.3 Uplift</span><span class="flow-sep">→</span>
-    <span class="flow-s">P3.4 Sub-Tier</span><span class="flow-sep">→</span>
-    <span class="flow-s crit">P3.5 Price Publish</span>
+    <span class="flow-s">P2.1 PFV 🟢</span><span class="flow-sep">→</span>
+    <span class="flow-s crit">P2.2 Price Publish</span>
   </div>
-
   <table>
     <thead><tr><th>#</th><th>Scenario</th><th>Cplx</th><th>Data</th><th>Value</th><th>Depends</th><th>Rationale</th></tr></thead>
     <tbody>
-      <tr><td><code>P3.1</code></td><td><strong>#10</strong> PFV Analysis</td><td>⭐⭐</td><td><span class="dr-ok">🟢 Ready</span></td><td>⭐⭐⭐⭐</td><td>—</td><td>External crawler — no internal API dep, runs now</td></tr>
-      <tr><td><code>P3.2</code></td><td><strong>#8</strong> Standard Cost Calc</td><td>⭐⭐⭐</td><td><span class="dr-no">🔴 SCFE</span></td><td>⭐⭐⭐⭐</td><td><code>P3.1</code></td><td>PFV validates cost — <strong>SCFE API is hard block</strong></td></tr>
-      <tr><td><code>P3.3</code></td><td><strong>#9</strong> Sales Cost Uplift</td><td>⭐⭐⭐⭐</td><td><span class="dr-tb">🟡 CPM</span></td><td>⭐⭐⭐</td><td><code>P3.2</code></td><td>Need cost baseline before adjusting uplift</td></tr>
-      <tr><td><code>P3.4</code></td><td><strong>#6</strong> Sub-Tier Definition</td><td>⭐⭐⭐</td><td><span class="dr-tb">🟡 ICP</span></td><td>⭐⭐⭐</td><td><code>P1.2 P3.1</code></td><td>Tier = pricing bracket — lock before pricing</td></tr>
-      <tr><td><code>P3.5</code></td><td><strong>#11</strong> Pricing Calculation</td><td>⭐⭐⭐⭐⭐</td><td><span class="dr-no">🔴 Multi</span></td><td>⭐⭐⭐⭐⭐</td><td><code>P3.1–4</code></td><td>Aggregates all upstream — direct revenue impact</td></tr>
+      <tr><td><code>P2.1</code></td><td><strong>#10</strong> PFV Analysis</td><td>⭐⭐</td><td><span class="dr-ok">🟢 Ready</span></td><td>⭐⭐⭐⭐</td><td>—</td><td>External crawler — no internal API dep, runs now</td></tr>
+      <tr><td><code>P2.2</code></td><td><strong>#11</strong> Pricing Calculation</td><td>⭐⭐⭐⭐⭐</td><td><span class="dr-no">🔴 Multi</span></td><td>⭐⭐⭐⭐⭐</td><td><code>P2.1</code></td><td>Direct revenue impact — approval-gated publish</td></tr>
     </tbody>
   </table>
-  <div class="callout"><strong>Anti-waste:</strong> P3.1 PFV runs immediately while P3.2 awaits SCFE — no idle time.</div>
+  <div class="callout-teal"><strong>+Pricing Workspace launches:</strong> Dedicated persona workspace for Pricing team — PFV dashboard + pricing recommendation queue.</div>
 </div>
 
-<!-- P4 -->
+<!-- P3: Cost -->
+<div class="section">
+  <div class="section-title">06 · Phase 3</div>
+  <h2>Cost Agent<span class="dur">Weeks 12–18</span></h2>
+  <p class="desc"><span class="s-hi">🔴 High sensitivity</span> — financial writes to SCFE/CPM · <strong>SCFE API is hard blocker</strong> — P3 gates on API readiness.</p>
+  <div class="flow">
+    <span class="flow-s">P3.1 Cost 🔴</span><span class="flow-sep">→</span>
+    <span class="flow-s">P3.2 Uplift</span>
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Scenario</th><th>Cplx</th><th>Data</th><th>Value</th><th>Depends</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td><code>P3.1</code></td><td><strong>#8</strong> Standard Cost Calc</td><td>⭐⭐⭐</td><td><span class="dr-no">🔴 SCFE</span></td><td>⭐⭐⭐⭐</td><td>—</td><td>SCFE API is hard block — gates entire P3</td></tr>
+      <tr><td><code>P3.2</code></td><td><strong>#9</strong> Sales Cost Uplift</td><td>⭐⭐⭐⭐</td><td><span class="dr-tb">🟡 CPM</span></td><td>⭐⭐⭐</td><td><code>P3.1</code></td><td>Need cost baseline before adjusting uplift</td></tr>
+    </tbody>
+  </table>
+  <div class="callout"><strong>Anti-waste:</strong> P2 PFV runs independently while P3 awaits SCFE — no idle time. Pricing loop closes once Cost is online: PFV + Cost → full pricing chain.</div>
+</div>
+
+<!-- P4: PN -->
 <div class="section">
   <div class="section-title">07 · Phase 4</div>
+  <h2>PN Operations (Complement)<span class="dur">Weeks 18–24</span></h2>
+  <p class="desc"><span class="s-md">🟡 Medium sensitivity</span> — controlled writes to SPEP · <strong>deprioritized</strong> — PN team already uses AI tools for automation.</p>
+  <div class="callout-dim"><strong>Deprioritization rationale:</strong> PN team currently uses Spark / Copilot / Web Coding for repetitive coding and form generation. This phase complements — not replaces — existing automation, focusing on decision support and lifecycle management not yet covered by current tools.</div>
+  <table>
+    <thead><tr><th>#</th><th>Scenario</th><th>Cplx</th><th>Data</th><th>Value</th><th>Depends</th><th>Mode</th></tr></thead>
+    <tbody>
+      <tr><td><code>P4.1</code></td><td><strong>#3</strong> PN Duplicate Check</td><td>⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐⭐</td><td>—</td><td>Auto</td></tr>
+      <tr><td><code>P4.2</code></td><td><strong>#2</strong> POR Auto-Generation</td><td>⭐⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐⭐</td><td>—</td><td>Approve→Write</td></tr>
+      <tr><td><code>P4.3</code></td><td><strong>#7</strong> Create / Extend Decision</td><td>⭐⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐⭐</td><td><code>P1.2 P4.2</code></td><td>Approve→Exec</td></tr>
+      <tr><td><code>P4.4</code></td><td><strong>#5</strong> PN Periodic Cleanup</td><td>⭐⭐</td><td><span class="dr-tb">🟡</span></td><td>⭐⭐</td><td>—</td><td>Approve→Exec</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- P5 -->
+<div class="section">
+  <div class="section-title">08 · Phase 5</div>
   <h2>Ecosystem Tuning<span class="dur">Week 24+</span></h2>
-  <p class="desc">Continuous optimization — no blocking deps on P1–P3.</p>
+  <p class="desc">Continuous optimization — no blocking deps on P1–P4.</p>
   <table>
     <thead><tr><th>#</th><th>Scope</th><th>Data</th><th>Trigger</th></tr></thead>
     <tbody>
-      <tr><td><code>P4.1</code></td><td><strong>#13</strong> Onboarding Agent</td><td><span class="dr-na">Internal</span></td><td>Team scales</td></tr>
-      <tr><td><code>P4.2</code></td><td>Embedded Widget — SPEP/CPM</td><td><span class="dr-tb">🟡 P2/P3 backend</span></td><td>Backend mature</td></tr>
-      <tr><td><code>P4.3</code></td><td>Approval data-driven optimization</td><td><span class="dr-na">Internal</span></td><td>Sufficient approval history</td></tr>
-      <tr><td><code>P4.4</code></td><td>Cross-role collaboration tuning</td><td><span class="dr-na">Internal</span></td><td>Per-role agents mature</td></tr>
+      <tr><td><code>P5.1</code></td><td><strong>#13</strong> Onboarding Agent</td><td><span class="dr-na">Internal</span></td><td>Team scales</td></tr>
+      <tr><td><code>P5.2</code></td><td>Embedded Widget — SPEP/CPM</td><td><span class="dr-tb">🟡 P2/P3 backend</span></td><td>Backend mature</td></tr>
+      <tr><td><code>P5.3</code></td><td>Approval data-driven optimization</td><td><span class="dr-na">Internal</span></td><td>Sufficient approval history</td></tr>
+      <tr><td><code>P5.4</code></td><td>Cross-role collaboration tuning</td><td><span class="dr-na">Internal</span></td><td>Per-role agents mature</td></tr>
     </tbody>
   </table>
 </div>
 
 <!-- MATRIX -->
 <div class="section">
-  <div class="section-title">08 · Sensitivity × Complexity Matrix</div>
+  <div class="section-title">09 · Sensitivity × Complexity Matrix</div>
   <h2>Global View</h2>
-  <p class="desc">Bottom-left → top-right gradient: P1 (safe/simple) → P2 → P3 (sensitive/complex). Data readiness: 🟢 ready · 🟡 TBD · 🔴 blocked.</p>
-
+  <p class="desc">Bottom-left → top-right: P1 (safe/simple) → P2 (Price) → P3 (Cost) → P4 (PN). Data readiness: 🟢 ready · 🟡 TBD · 🔴 blocked.</p>
   <div class="mx-wrap">
     <div class="mx-h"><div class="lb">Cplx</div></div>
     <div class="mx-row"><div class="lb">⭐⭐⭐⭐⭐</div><div class="mx-cell mc-e"></div><div class="mx-cell mc-e"></div><div class="mx-cell mc-e"></div><div class="mx-cell mc-e"></div><div class="mx-cell mc-r">#11 Pricing 🔴</div></div>
     <div class="mx-row"><div class="lb">⭐⭐⭐⭐</div><div class="mx-cell mc-e"></div><div class="mx-cell mc-e"></div><div class="mx-cell mc-e"></div><div class="mx-cell mc-o">#9 Uplift 🟡</div><div class="mx-cell mc-e"></div></div>
     <div class="mx-row"><div class="lb">⭐⭐⭐</div><div class="mx-cell mc-e"></div><div class="mx-cell mc-g">#1 ODT 🟡</div><div class="mx-cell mc-a">#2 POR · #7 C/E 🟡</div><div class="mx-cell mc-o">#8 Cost 🔴</div><div class="mx-cell mc-e"></div></div>
-    <div class="mx-row"><div class="lb">⭐⭐</div><div class="mx-cell mc-g">#4 MT 🟡</div><div class="mx-cell mc-e"></div><div class="mx-cell mc-a">#3 Dup · #5 Clean 🟡</div><div class="mx-cell mc-o">#10 PFV 🟢</div><div class="mx-cell mc-o">#6 SubTier 🟡</div></div>
+    <div class="mx-row"><div class="lb">⭐⭐</div><div class="mx-cell mc-g">#4 MT 🟡</div><div class="mx-cell mc-e"></div><div class="mx-cell mc-a">#3 Dup · #5 Clean 🟡</div><div class="mx-cell mc-o">#10 PFV 🟢</div><div class="mx-cell mc-e"></div></div>
     <div class="mx-row"><div class="lb">⭐</div><div class="mx-cell mc-g">#12 Query 🟡</div><div class="mx-cell mc-e"></div><div class="mx-cell mc-e"></div><div class="mx-cell mc-e"></div><div class="mx-cell mc-e"></div></div>
     <div class="mx-row" style="margin-top:.3rem;"><div class="lb"></div><div class="lb" style="font-size:.58rem;color:#64748b;text-align:left;">🟢 Read-Only</div><div class="lb" style="font-size:.58rem;color:#64748b;text-align:left;">🟡 Semi-Auto</div><div class="lb" style="font-size:.58rem;color:#64748b;text-align:left;">🔴 Financial Write</div><div class="lb" style="font-size:.58rem;color:#64748b;text-align:left;">🔴🔴 Publish</div></div>
     <div class="mx-lg">
       <span><span class="lg-d" style="background:#34d399;"></span>P1 Read-Only</span>
-      <span><span class="lg-d" style="background:#fbbf24;"></span>P2 PN Ops</span>
-      <span><span class="lg-d" style="background:#fb923c;"></span>P3 Cost/Pricing</span>
-      <span><span class="lg-d" style="background:#f87171;"></span>P3 Publish</span>
+      <span><span class="lg-d" style="background:#38bdf8;"></span>P2 Price</span>
+      <span><span class="lg-d" style="background:#fbbf24;"></span>P3 Cost</span>
+      <span><span class="lg-d" style="background:#fb923c;"></span>P4 PN</span>
       <span>🟢 Ready · 🟡 TBD · 🔴 Blocked</span>
     </div>
   </div>
 </div>
 
 <div class="footer">
-  SSG Sales Enablement Agent · Delivery Phase Replan · V2 (Five-Dimension) · 2026-06-30<br>
-  Sequenced by Sensitivity · Complexity · Coupling · <strong style="color:#5eead4;">Data Readiness</strong> · <strong style="color:#5eead4;">Value Density</strong>
+  SSG Sales Enablement Agent · Delivery Phase Replan · V3 (Business Priority) · 2026-07-09<br>
+  Sequenced by Business Priority · <strong style="color:#5eead4;">Price → Cost → PN</strong> (PN deprioritized — Spark / Copilot / Web Coding already active in PN team)
 </div>
 
 </div>
