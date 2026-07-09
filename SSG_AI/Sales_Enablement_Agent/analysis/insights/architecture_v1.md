@@ -1,6 +1,6 @@
 # SSG Sales Enablement Agent — 架构方案 V1
 
-> 创建：2026-06-03 | 更新：2026-07-02 | 来源：iChain Persona Workspace + Vetra (VetraFlow) 平台 + SSG GPS 业务需求 + ITshare Engineering & AI Workshop (2026 May) + NextOra SW Dev Agent Phase1 方案
+> 创建：2026-06-03 | 更新：2026-07-09 | 来源：iChain Persona Workspace + Vetra (VetraFlow) 平台 + SSG GPS 业务需求 + ITshare Engineering & AI Workshop (2026 May) + NextOra SW Dev Agent Phase1 方案
 
 ---
 
@@ -59,13 +59,13 @@ SSG Enablement Agent 直接以 Harness Engineering 为起点构建，核心理�
 │  │                   MASTER AGENT                       │   │
 │  │         意图识别 · 任务拆解 · 审批路由 · 结果汇总      │   │
 │  └───┬─────────┬─────────┬─────────┬──────────┬────────┘   │
-│      │         │         │         │          │             │
-│  ┌───┴──┐ ┌───┴──┐ ┌───┴──┐ ┌───┴───┐                     │
-│  │PN    │ │Cost  │ │Price │ │Life-  │                     │
-│  │Agent │ │Agent │ │Agent │ │cycle  │                     │
-│  │      │ │      │ │      │ │Agent  │                     │
-│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬────┘                     │
-│     │        │        │        │                           │
+│  │         │         │         │          │             │
+│  │  ┌───┴──┐ ┌───┴──┐ ┌───┴──┐ ┌───┴───┐                  │
+│  │  │Price │ │Cost  │ │PN    │ │Life-  │                  │
+│  │  │Agent │ │Agent │ │Agent │ │cycle  │                  │
+│  │  │      │ │      │ │      │ │Agent  │                  │
+│  │  └──┬───┘ └──┬───┘ └──┬───┘ └──┬────┘                  │
+│  │     │        │        │        │                        │
 ├─────┴────────┴────────┴────────┴───────────────────────────┤
 │                 SHARED KNOWLEDGE PIPELINE (RAG)              │
 │  ┌──────────────────────────────────────────────────────┐  │
@@ -120,10 +120,10 @@ Vetra 平台定义四大核心组件，SSG 架构的各层直接对其映射：
 
 | 角色 | 主要场景 | 对应 Sub-Agent | Workspace 焦点 |
 |------|---------|---------------|---------------|
-| **GPS PM** | PN 创建、生命周期管理 | PN Agent, Lifecycle Agent | PN 创建视图、审批队列 |
-| **Sales Enablement** | Sales Cost 计算、验证、发布 | Cost Agent | Cost 数据面板、审批 |
 | **Pricing Team** | PFV 分析、定价计算 | Price Agent（共享 Knowledge Pipeline） | 定价工作台、竞品对标 |
+| **Sales Enablement** | Sales Cost 计算、验证、发布 | Cost Agent | Cost 数据面板、审批 |
 | **Finance Team** | 标准成本计算 | Cost Agent | 成本数据输入 |
+| **GPS PM** | PN 创建、生命周期管理 | PN Agent, Lifecycle Agent | PN 创建视图、审批队列 |
 | **TMO/SMO/SA** | PN 需求提交 | PN Agent（共享 Knowledge Pipeline） | 需求提交 + 流程指南 |
 | **Offering Mgr / Portfolio Lead** | PN 报告查询 | Knowledge Pipeline（RAG 直接查询） | 客制化报告 |
 
@@ -133,12 +133,11 @@ Vetra 平台定义四大核心组件，SSG 架构的各层直接对其映射：
 
 > **Skill-as-Product 原则**：每个 Sub-Agent 的能力以 Skill 形式封装，遵循独立版本化和独立测试策略。Skill = `prompts` + `tools` + `knowledge` + `tests` 四位一体，可插拔、可独立升级，不相互耦合。新增或修改一个 Skill 不影响其他 Agent 运行。
 
-### 4.1 PN Agent（PN 全生命周期）
+### 4.1 Price Agent（定价）
 | 场景 | 能力 | 权限 |
 |------|------|------|
-| #2 自动生成 POR/表单 | 接收需求信息 → 调 SPEP API 生成 | **自动** |
-| #3 重复检查 | PN 编号/属性 → 调 SPEP 查重 → 返回建议 | **自动** |
-| #7 创建/扩展判断 | 分析 MT 归属 → 建议 extend 或 create new | **半自动**（涉及新 PN Portfolio 创建需审批） |
+| #10 PFV 分析 | 自动抓取行业/竞品价格 → 生成对标报告 | **自动**（只读研究） |
+| #11 定价计算 | 输入 Std Cost + PFV → 计算 List/Channel Price → 建议 | **审批后发布** |
 
 ### 4.2 Cost Agent（成本管理）
 | 场景 | 能力 | 权限 |
@@ -147,12 +146,14 @@ Vetra 平台定义四大核心组件，SSG 架构的各层直接对其映射：
 | #9 Sales Cost Uplift | 分析历史 uplift 规则 → 建议规则和数值 | **审批后写入 CPM** |
 | Sales Cost 验证 | 对标 HW AUR → 完整性检查 → 报告异常 | **自动**（只读） |
 
-### 4.3 Price Agent（定价）
+### 4.3 PN Agent（PN 全生命周期）
 | 场景 | 能力 | 权限 |
 |------|------|------|
-| #6 Sub-Tier 定义 | 读 MT target price → 模型分析 sub-tier 归属 → 建议 | **审批后确认** |
-| #10 PFV 分析 | 自动抓取行业/竞品价格 → 生成对标报告 | **自动**（只读研究） |
-| #11 定价计算 | 输入 Std Cost + PFV → 计算 List/Channel Price → 建议 | **审批后发布** |
+| #2 自动生成 POR/表单 | 接收需求信息 → 调 SPEP API 生成 | **自动** |
+| #3 重复检查 | PN 编号/属性 → 调 SPEP 查重 → 返回建议 | **自动** |
+| #7 创建/扩展判断 | 分析 MT 归属 → 建议 extend 或 create new | **半自动**（涉及新 PN Portfolio 创建需审批） |
+
+> ⚠️ **优先级调整 (2026-07-09)**：PN Agent 从 Wave 2 后移至 Wave 3。PN 团队当前已在使用 Spark / Copilot / Web Coding 等 AI 工具覆盖重复性编码和表单生成场景，本阶段聚焦团队尚未覆盖的决策辅助与生命周期管理，不重复建设已有能力。
 
 ### 4.4 Lifecycle Agent（生命周期管理）
 | 场景 | 能力 | 权限 |
@@ -301,22 +302,28 @@ Agent 生成建议
 ```
 Wave 1（MVP — 4-6 周）
 ├── RAG Knowledge Pipeline（场景 #1, #4, #12） ← 只读查询 + 知识检索
+├── 知识库优先摄入 Pricing 领域（PFV 规则、Cost 计算逻辑、GP Floor 规则）
 ├── Teams Bot 上线（Master Agent 直接对用户暴露 RAG）
 └── 验证"AI 辅助查询"的实际价值
 
-Wave 2（操作自动化 — 6-8 周）
+Wave 2（定价核心 — 6-8 周）
+├── Price Agent（场景 #10, #11）
+├── Web Persona Workspace 上线（Pricing Workspace 优先）
+└── PFV 对标 → List Price / Channel Price 计算 → 定价建议
+
+Wave 3（成本计算 — 6-8 周）
+├── Cost Agent（场景 #8, #9）
+└── 标准成本计算 + Sales Cost Uplift → 定价全链路闭环
+
+Wave 4（PN 保底 — 6-8 周）
 ├── PN Agent（场景 #2, #3, #7）
 ├── Lifecycle Agent（场景 #5）
-├── Web Persona Workspace 上线
-└── 验证"半自动 PN 管理"
+└── 与已有 AI 实施互补，而非替代
+    ├── PN 团队当前已在使用 AI 工具进行部分自动化
+    ├── Spark / Copilot / Web Coding 等工具已覆盖重复性编码和表单生成场景
+    └── 本阶段不重复建设已有能力，聚焦团队尚未覆盖的决策辅助与生命周期管理
 
-Wave 3（定价与成本 — 8-10 周）
-├── Cost Agent（场景 #8, #9）
-├── Price Agent（场景 #6, #10, #11）
-├── 系统嵌入式 Widget
-└── 完整定价闭环
-
-Wave 4（持续优化）
+Wave 5（持续优化）
 ├── Onboarding Agent（场景 #13）
 ├── 审批数据驱动优化
 └── 跨角色协作优化
@@ -329,13 +336,13 @@ Wave 4（持续优化）
 | iChain 设计原则 | SSG Sales Enablement 对应 |
 |----------------|--------------------------|
 | Persona Workspace | GPS PM / Sales Enablement / Pricing / Finance 四个 Workspace |
-| Persona Agent | 4 个 Sub-Agent (PN / Cost / Price / Lifecycle) + 共享 RAG Knowledge Pipeline |
+| Persona Agent | 4 个 Sub-Agent (Price / Cost / PN / Lifecycle) + 共享 RAG Knowledge Pipeline |
 | Human-in-the-loop | 半自动模式：成本/价格操作需审批 |
 | Insight → Decision → Action | 分析 → 建议 → 审批 → 执行闭环 |
 | Explainable AI | 定价建议附带 PFV 分析依据和计算逻辑 |
 | Machine Suggestion | Agent 出建议，人做决策 |
 | All Knowledge On-line | PN 主数据 + PFV + 流程规则 全部入 RAG 知识库 |
-| Phase 1→2→3 演进 | Wave 1(查询)→2(操作)→3(定价)→4(优化) |
+| Phase 1→2→3 演进 | Wave 1(查询)→2(Price)→3(Cost)→4(PN)→5(优化) |
 
 ---
 
