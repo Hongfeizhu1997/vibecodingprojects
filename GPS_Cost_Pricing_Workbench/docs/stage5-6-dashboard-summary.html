@@ -106,11 +106,10 @@
         </div>
         <div class="card-problem"><strong>Problem:</strong> How to translate internal Sales Cost into a market-competitive List Price while protecting GP% targets?</div>
         <ul class="card-desc">
-          <li>PFV benchmark import — market reference prices by Tier × Term × Geo</li>
-          <li>Dual pricing models: C→L (cost-driven) and L→C (market-driven)</li>
-          <li>Multi-dimensional GP Floor rules — Country × SLA × Term granularity</li>
-          <li>Auto-calculates Channel Price, List Price, GP% per PN</li>
-          <li>One-click bridge to Stage 6 for validation</li>
+          <li>PFV benchmarks — market price references by Tier · Term · Geo</li>
+          <li>C→L & L→C dual models — cost-driven or market-driven pricing</li>
+          <li>Multi-dimensional GP Floor — Country × SLA × Term granularity</li>
+          <li>Auto-output: Channel Price, List Price, GP% per PN</li>
         </ul>
       </div>
 
@@ -125,8 +124,7 @@
           <li>L1 Monotonicity — Tier ↑ → Price ↑, no inversions</li>
           <li>L2 Ratio Bands — Inter-tier/term ratios within acceptable range</li>
           <li>L3 Cross-Geo — Same product across countries: deviation &lt; 20%</li>
-          <li>Pass / Warn / Fail per PN with detailed violation explanation</li>
-          <li>Excel export for review and sign-off</li>
+          <li>Pass / Warn / Fail per PN, Excel export for sign-off</li>
         </ul>
       </div>
 
@@ -138,11 +136,10 @@
         </div>
         <div class="card-problem"><strong>Problem:</strong> Pricing decisions happen across cycles. Without history, there's no trend analysis, no accountability, no way to learn from past pricing.</div>
         <ul class="card-desc">
-          <li>Cycle-level overview — all PNs, prices, GP% per cycle at a glance</li>
-          <li>PN trend view — GP% change across cycles (▲/▼ Xpp)</li>
-          <li>Field-level audit trail — every value change logged (who, when, old→new)</li>
-          <li>CSV bidirectional sync — export → edit in Excel → import back</li>
-          <li>SQLite persistence — data survives browser refresh, no server needed</li>
+          <li>Cycle overview — all PNs, prices, GP% at a glance</li>
+          <li>PN trend — GP% change across cycles (▲/▼ Xpp)</li>
+          <li>Field-level audit trail — every change logged, traceable</li>
+          <li>CSV sync — export → edit in Excel → import back</li>
         </ul>
       </div>
 
