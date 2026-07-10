@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IDG vs ISG — Dynamic Pricing Approach Comparison (Pending Decision)</title>
+<title>IDG vs ISG — Dynamic Pricing Approach Comparison</title>
 <style>
   :root {
     --bg: #0f1117; --card: #161822; --border: #252836;
@@ -17,194 +17,177 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     padding: 48px 40px; display: flex; justify-content: center; min-height: 100vh;
   }
-  .container { max-width: 960px; width: 100%; }
+  .container { max-width: 900px; width: 100%; }
 
-  h1 { font-size: 1.3rem; color: #fff; text-align: center; letter-spacing: -0.02em; margin-bottom: 6px; }
-  .subtitle { text-align: center; font-size: 0.72rem; color: var(--text-dim); margin-bottom: 8px; }
-  .status-badge {
-    display: inline-block; background: #2d1f0e; color: var(--warn); font-size: 0.62rem;
-    padding: 2px 10px; border-radius: 10px; border: 1px solid #3d2f0e;
-    margin: 0 auto 28px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
-  }
+  h1 { font-size: 1.3rem; color: #fff; text-align: center; letter-spacing: -0.02em; margin-bottom: 40px; }
+
+  .section { margin-bottom: 36px; }
   .section-title {
-    font-size: 0.78rem; color: #fff; font-weight: 700; letter-spacing: -0.01em;
-    margin: 32px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    font-size: 0.8rem; color: #fff; font-weight: 700; letter-spacing: -0.01em;
+    margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
   }
 
-  .shared-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-  .shared-tag {
+  /* ── Goal ── */
+  .goal-card {
     background: var(--card); border: 1px solid var(--border); border-left: 3px solid #818cf8;
-    border-radius: 8px; padding: 12px 14px;
+    border-radius: 10px; padding: 20px 24px;
   }
-  .shared-tag .num { font-size: 0.6rem; color: #818cf8; font-weight: 700; letter-spacing: 0.06em; }
-  .shared-tag .label { font-size: 0.72rem; color: #e2e4e9; font-weight: 600; margin: 2px 0 4px; }
-  .shared-tag .desc { font-size: 0.62rem; color: var(--text-dim); line-height: 1.5; }
-  .shared-note {
-    margin-top: 14px; padding: 12px 16px; background: #1a1d2e; border-left: 3px solid #818cf8;
-    border-radius: 6px; font-size: 0.68rem; line-height: 1.5; color: var(--text-dim);
+  .goal-card .formula { font-size: 0.85rem; color: #c4b5fd; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 10px; }
+  .goal-card .desc { font-size: 0.72rem; line-height: 1.6; color: var(--text); }
+  .goal-constraints { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+  .constraint {
+    background: #1a1d2e; border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 12px; font-size: 0.64rem; color: var(--text-dim);
   }
-  .shared-note strong { color: #c4b5fd; }
+  .constraint strong { color: #e2e4e9; }
 
-  .diff-table { width: 100%; border-collapse: collapse; font-size: 0.68rem; }
-  .diff-table th { text-align: left; padding: 10px 14px; font-size: 0.64rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--border); }
+  /* ── Current approach ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .side {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px;
+  }
+  .side h3 { font-size: 0.85rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .side .tagline { font-size: 0.62rem; color: var(--text-dim); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .isg-side { border-top: 3px solid var(--isg); } .isg-side h3 { color: var(--isg); }
+  .idg-side { border-top: 3px solid var(--idg); } .idg-side h3 { color: var(--idg); }
+  .side p { font-size: 0.7rem; line-height: 1.6; color: var(--text); }
+
+  /* ── Common + Diff ── */
+  .shared-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .stag {
+    background: #1a1d2e; border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 10px; font-size: 0.66rem; color: #c4b5fd;
+  }
+
+  .diff-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+  .diff-table th { text-align: left; padding: 8px 14px; font-size: 0.64rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--border); }
   .diff-table th:nth-child(2) { color: var(--isg); }
   .diff-table th:nth-child(3) { color: var(--idg); }
-  .diff-table td { padding: 9px 14px; border-bottom: 1px solid #1e2030; vertical-align: top; line-height: 1.5; }
+  .diff-table td { padding: 8px 14px; border-bottom: 1px solid #1e2030; line-height: 1.5; }
   .diff-table tr:last-child td { border-bottom: none; }
-  .diff-table .dim { color: var(--text-dim); font-size: 0.64rem; white-space: nowrap; width: 130px; }
 
-  .paths { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .path-card {
+  /* ── Pros/Cons ── */
+  .proscons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .pc-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px;
   }
-  .path-card h3 { font-size: 0.82rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
-  .path-card .tagline { font-size: 0.62rem; color: var(--text-dim); margin-bottom: 10px; }
-  .path-a { border-top: 3px solid #818cf8; } .path-a h3 { color: #818cf8; }
-  .path-b { border-top: 3px solid var(--warn); } .path-b h3 { color: var(--warn); }
+  .pc-card h3 { font-size: 0.82rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 3px; }
+  .pc-card .tagline { font-size: 0.62rem; color: var(--text-dim); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .isg-card { border-top: 3px solid var(--isg); } .isg-card h3 { color: var(--isg); }
+  .idg-card { border-top: 3px solid var(--idg); } .idg-card h3 { color: var(--idg); }
 
-  .subpath { margin-top: 12px; padding: 10px 12px; background: #1a1d2e; border-radius: 6px; }
-  .subpath .sp-label { font-size: 0.64rem; color: var(--text-dim); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
-
-  .pros, .cons { list-style: none; }
-  .pros li, .cons li { font-size: 0.7rem; line-height: 1.55; padding: 2px 0; display: flex; gap: 8px; align-items: flex-start; }
+  .col-label { font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
+  .pros, .cons { list-style: none; margin-top: 4px; }
+  .pros li, .cons li { font-size: 0.72rem; line-height: 1.55; padding: 3px 0; display: flex; gap: 8px; align-items: flex-start; }
   .pros li::before { content: '+'; color: var(--green); font-weight: 700; font-size: 0.75rem; flex-shrink: 0; }
   .cons li::before { content: '\2212'; color: var(--red); font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
 
-  .decision {
-    background: linear-gradient(135deg, #1f1d0e 0%, #1a1d2e 100%);
-    border: 1px solid #3d2f0e; border-radius: 10px; padding: 20px 26px; margin-top: 24px;
-  }
-  .decision h3 { font-size: 0.76rem; color: var(--warn); margin-bottom: 12px; letter-spacing: -0.01em; }
-  .decision table { width: 100%; border-collapse: collapse; font-size: 0.68rem; }
-  .decision th { text-align: left; padding: 8px 10px; font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #2a2a1e; }
-  .decision td { padding: 8px 10px; border-bottom: 1px solid #1e2030; line-height: 1.5; }
-  .decision td:first-child { font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; width: 36px; }
-  .decision td:nth-child(2) { font-weight: 600; color: #e2e4e9; width: 180px; }
-
-  .col-label { font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
-  .risk-note { font-size: 0.62rem; color: var(--text-dim); margin-top: 8px; font-style: italic; }
-
   @media (max-width: 720px) {
-    .paths, .shared-grid { grid-template-columns: 1fr; }
+    .compare, .proscons { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>IDG vs ISG — Dynamic Pricing Approach Comparison</h1>
-  <div class="subtitle">Shared engine foundation — unify or fork the Pen Rate method?</div>
-  <div style="text-align:center"><span class="status-badge">Pending Decision</span></div>
 
-  <!-- Commonalities -->
-  <div class="section-title">I. Commonalities — Shared Engine Foundation</div>
-  <div class="shared-grid">
-    <div class="shared-tag"><div class="num">01</div><div class="label">Core Formula</div><div class="desc">ServicePrice = HWPrice × PenRate</div></div>
-    <div class="shared-tag"><div class="num">02</div><div class="label">6-Step Engine</div><div class="desc">Intake → Benchmark → Candidate → Score → Guardrail → Output</div></div>
-    <div class="shared-tag"><div class="num">03</div><div class="label">Output Format</div><div class="desc">Price Band (F/T/S) + Reason + Confidence</div></div>
-    <div class="shared-tag"><div class="num">04</div><div class="label">4D Input</div><div class="desc">HW Context / Economics / Deal / History</div></div>
-    <div class="shared-tag"><div class="num">05</div><div class="label">Guardrails</div><div class="desc">Margin Floor → List Price Ceiling → DOA</div></div>
-    <div class="shared-tag"><div class="num">06</div><div class="label">Principles</div><div class="desc">Learn, don't preset · HW-independent · Channel-agnostic</div></div>
-    <div class="shared-tag"><div class="num">07</div><div class="label">Rollout</div><div class="desc">POC → Pilot → Rollout · Progressive Trust</div></div>
-  </div>
-  <div class="shared-note">
-    <strong>The engine framework can be unified.</strong> The only question is <strong>how to determine the Pen Rate</strong> — rule-based lookup or AI computation.
-  </div>
-
-  <!-- Differences -->
-  <div class="section-title">II. Business Differences Between IDG and ISG</div>
-  <table class="diff-table">
-    <thead><tr><th>Dimension</th><th>ISG (Servers)</th><th>IDG (PCs)</th></tr></thead>
-    <tbody>
-      <tr><td class="dim">HW Variety</td><td>Few models (~dozens), standardized configs, long lifecycle</td><td>Many SKUs (hundreds), frequent seasonal refresh, config explosion</td></tr>
-      <tr><td class="dim">Transaction Profile</td><td>Low-frequency, high-value ($50K–$500K+)</td><td>High-frequency, low-value ($500–$5K)</td></tr>
-      <tr><td class="dim">Historical Data</td><td>Sparse — few transactions per model/config</td><td>Abundant — can train Conversion Probability models</td></tr>
-      <tr><td class="dim">Benchmark Construction</td><td>Same server model × Tier × GEO × Segment</td><td>Same HW value band (PFV range) × Tier × GEO × Segment</td></tr>
-      <tr><td class="dim">Error Cost</td><td>High — large per-deal amount, deviations hurt</td><td>Moderate — small per-deal, errors diluted by volume</td></tr>
-      <tr><td class="dim">Explainability Need</td><td>High — must justify price to customer & approver</td><td>Moderate — some black-box acceptable with supporting rationale</td></tr>
-      <tr><td class="dim">New SKU Frequency</td><td>Low — long model refresh cycles</td><td>High — new configs every quarter</td></tr>
-    </tbody>
-  </table>
-
-  <!-- Two Paths -->
-  <div class="section-title">III. Two Paths — Trade-offs</div>
-  <div class="paths">
-    <!-- Path A: Unified -->
-    <div class="path-card path-a">
-      <h3>Path A — Unified Approach</h3>
-      <div class="tagline">ISG & IDG use the same Pen Rate method</div>
-
-      <div class="subpath">
-        <div class="sp-label">A1: Both use AI (IDG model)</div>
-        <div class="col-label">Pros</div>
-        <ul class="pros">
-          <li>Single model to maintain, lower long-term cost</li>
-          <li>Consistent methodology, lower communication overhead</li>
-          <li>Future product lines can reuse directly</li>
-          <li>ML team skills fully reusable</li>
-        </ul>
-        <div class="col-label">Cons</div>
-        <ul class="cons">
-          <li>ISG lacks sufficient data for meaningful model training</li>
-          <li>ISG cold-start → low confidence → de facto fallback to rules</li>
-          <li>ISG large deal size amplifies model error cost</li>
-          <li>ISG low transaction frequency → stale model updates</li>
-        </ul>
+  <!-- ═══ 1. Goal ═══ -->
+  <div class="section">
+    <div class="section-title">1. What Dynamic Pricing Aims to Achieve</div>
+    <div class="goal-card">
+      <div class="formula">Service Price = HW Price × Pen Rate</div>
+      <div class="desc">
+        At the B2B quoting stage, the engine automatically outputs a Price Band (Floor / Target / Stretch) for each service PN. The recommended price moves with HW price: when HW price rises, service price follows; when HW is discounted, Pen Rate is adjusted upward to prevent service revenue from shrinking proportionally.
       </div>
-
-      <div class="subpath">
-        <div class="sp-label">A2: Both use lookup table (ISG model)</div>
-        <div class="col-label">Pros</div>
-        <ul class="pros">
-          <li>Fast deployment, no historical data dependency</li>
-          <li>Fully controllable & auditable</li>
-          <li>Approval-friendly</li>
-        </ul>
-        <div class="col-label">Cons</div>
-        <ul class="cons">
-          <li>IDG hundreds of SKUs → dimension explosion, unmaintainable</li>
-          <li>Wastes IDG's massive transaction data value</li>
-          <li>IDG cannot respond to HW price fluctuations</li>
-          <li>IDG needs manual rule updates every product season</li>
-        </ul>
+      <div class="goal-constraints">
+        <div class="constraint"><strong>Profitable</strong> &nbsp;Net Price ≥ Cost</div>
+        <div class="constraint"><strong>Reasonable</strong> &nbsp;Net Price ≤ List Price</div>
+        <div class="constraint"><strong>Controlled</strong> &nbsp;DOA triggers manual approval</div>
       </div>
-      <div class="risk-note">⚠ Unified risk: optimizing for one side sacrifices the other</div>
-    </div>
-
-    <!-- Path B: Forked -->
-    <div class="path-card path-b">
-      <h3>Path B — Forked Approach</h3>
-      <div class="tagline">ISG: fixed lookup &nbsp;|&nbsp; IDG: AI computation. Shared engine framework & output format.</div>
-
-      <div class="col-label">Pros</div>
-      <ul class="pros">
-        <li>Best of both — ISG keeps controllability, IDG keeps scale advantage</li>
-        <li>ISG not forced into AI with insufficient data; IDG not limited by rule tables</li>
-        <li>Shared engine framework reduces forking cost</li>
-        <li>Each product line can iterate independently, no cross-blocking</li>
-      </ul>
-
-      <div class="col-label">Cons</div>
-      <ul class="cons">
-        <li>Two maintenance tracks — team manages both rule tables and ML models</li>
-        <li>Inconsistent methodology across product lines — harder to explain to stakeholders</li>
-        <li>Future unification carries migration cost</li>
-        <li>No cross-learning — ISG patterns cannot feed IDG models</li>
-      </ul>
     </div>
   </div>
 
-  <!-- Pending Decisions -->
-  <div class="decision">
-    <h3>Pending Decisions</h3>
-    <table>
-      <thead><tr><th>#</th><th>Question</th><th>Options</th></tr></thead>
+  <!-- ═══ 2. Current Approaches ═══ -->
+  <div class="section">
+    <div class="section-title">2. Current Approaches: IDG vs ISG</div>
+    <div class="compare">
+      <div class="side isg-side">
+        <h3>ISG — Fixed Lookup Table</h3>
+        <div class="tagline">Rule-Driven · Pen Rate defined manually</div>
+        <p>Pricing team defines Pen Rate values in a multi-dimensional matrix. Given dimension combination → look up a fixed percentage. Suits low-frequency, high-value deals ($50K–$500K+) where every deal deserves human judgment.</p>
+      </div>
+      <div class="side idg-side">
+        <h3>IDG — AI Computation</h3>
+        <div class="tagline">Model-Driven · Pen Rate learned from data</div>
+        <p>AI model dynamically outputs a Pen Rate recommendation based on historical transactions, competitive pricing, and customer features. Suits high-frequency, low-value deals ($500–$5K) where humans cannot judge every deal.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 3. Common + Diff ═══ -->
+  <div class="section">
+    <div class="section-title">3. Commonalities & Differences</div>
+    <div class="shared-tags">
+      <span class="stag">Core Formula: ServicePrice=HWPrice×PenRate</span>
+      <span class="stag">6-Step Engine Pipeline</span>
+      <span class="stag">Price Band (F/T/S) Output</span>
+      <span class="stag">4-Dimensional Input</span>
+      <span class="stag">3-Layer Guardrails</span>
+    </div>
+    <table class="diff-table">
+      <thead><tr><th>Dimension</th><th>ISG (Servers)</th><th>IDG (PCs)</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>Pen Rate method</td><td>A. Unified (all AI / all lookup)<br>B. Forked (ISG lookup + IDG AI)</td></tr>
-        <tr><td>2</td><td>If unified on AI</td><td>Is ISG data sufficient? Minimum acceptance criteria?</td></tr>
-        <tr><td>3</td><td>If forked</td><td>How much of the engine is shared? Is dual maintenance acceptable?</td></tr>
-        <tr><td>4</td><td>Roadmap priority</td><td>Start with IDG (data-rich) or ISG (simpler rules)? Or parallel?</td></tr>
+        <tr><td>PenRate Source</td><td>Fixed lookup — manually defined</td><td>AI computed — learned from transactions</td></tr>
+        <tr><td>HW Variety</td><td>Few models, standardized, long lifecycle</td><td>Many SKUs, frequent refresh, config explosion</td></tr>
+        <tr><td>Transaction Profile</td><td>Low-frequency, high-value ($50K–$500K+)</td><td>High-frequency, low-value ($500–$5K)</td></tr>
+        <tr><td>Historical Data</td><td>Sparse — few transactions per model</td><td>Abundant — can train Conversion Probability models</td></tr>
+        <tr><td>Error Cost</td><td>High — large per-deal, deviations hurt</td><td>Moderate — small per-deal, diluted by volume</td></tr>
+        <tr><td>Explainability</td><td>Strong — quotes trace to specific rule cell</td><td>Moderate — Reason Code + Confidence compensate</td></tr>
+        <tr><td>Cold Start</td><td>Easy — domain experts set initial values</td><td>Hard — low confidence without historical data</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- ═══ 4. Pros & Cons ═══ -->
+  <div class="section">
+    <div class="section-title">4. Pros & Cons</div>
+    <div class="proscons">
+      <div class="pc-card isg-card">
+        <h3>ISG — Fixed Lookup</h3>
+        <div class="tagline">Rule-Driven</div>
+        <div class="col-label">Pros</div>
+        <ul class="pros">
+          <li>Fast deployment — no historical data dependency</li>
+          <li>Fully controllable & auditable — approval-friendly</li>
+          <li>Suits high-value deals — conservative approach is safer</li>
+        </ul>
+        <div class="col-label">Cons</div>
+        <ul class="cons">
+          <li>Dimension explosion → unmaintainable at scale</li>
+          <li>No notion of "optimal" — only "what business deems reasonable"</li>
+          <li>Cannot leverage historical transaction data</li>
+          <li>PenRate static when HW price moves</li>
+        </ul>
+      </div>
+      <div class="pc-card idg-card">
+        <h3>IDG — AI Computation</h3>
+        <div class="tagline">Model-Driven</div>
+        <div class="col-label">Pros</div>
+        <ul class="pros">
+          <li>Auto-adapts to HW price fluctuations</li>
+          <li>Captures non-linear patterns — different willingness-to-pay across models</li>
+          <li>Continuous learning — every win/loss improves the model</li>
+          <li>Scale advantage — accuracy improves with transaction volume</li>
+        </ul>
+        <div class="col-label">Cons</div>
+        <ul class="cons">
+          <li>Cold-start problem — falls back to rules in new markets</li>
+          <li>Requires substantial training data</li>
+          <li>Weak explainability — hard to justify "why 12%"</li>
+          <li>Needs ongoing monitoring & retraining</li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 </body>

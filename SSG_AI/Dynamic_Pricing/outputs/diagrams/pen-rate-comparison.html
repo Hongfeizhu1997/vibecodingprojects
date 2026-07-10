@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IDG vs ISG — Dynamic Pricing 方案对比（待决策）</title>
+<title>IDG vs ISG — Dynamic Pricing 方案对比</title>
 <style>
   :root {
     --bg: #0f1117; --card: #161822; --border: #252836;
@@ -17,200 +17,177 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     padding: 48px 40px; display: flex; justify-content: center; min-height: 100vh;
   }
-  .container { max-width: 960px; width: 100%; }
+  .container { max-width: 900px; width: 100%; }
 
-  /* ── Header ── */
-  h1 { font-size: 1.3rem; color: #fff; text-align: center; letter-spacing: -0.02em; margin-bottom: 6px; }
-  .subtitle { text-align: center; font-size: 0.72rem; color: var(--text-dim); margin-bottom: 8px; }
-  .status-badge {
-    display: inline-block; background: #2d1f0e; color: var(--warn); font-size: 0.62rem;
-    padding: 2px 10px; border-radius: 10px; border: 1px solid #3d2f0e;
-    margin: 0 auto 28px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
-  }
+  h1 { font-size: 1.3rem; color: #fff; text-align: center; letter-spacing: -0.02em; margin-bottom: 40px; }
+
+  .section { margin-bottom: 36px; }
   .section-title {
-    font-size: 0.78rem; color: #fff; font-weight: 700; letter-spacing: -0.01em;
-    margin: 32px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    font-size: 0.8rem; color: #fff; font-weight: 700; letter-spacing: -0.01em;
+    margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
   }
 
-  /* ── Shared tags ── */
-  .shared-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-  .shared-tag {
+  /* ── Goal ── */
+  .goal-card {
     background: var(--card); border: 1px solid var(--border); border-left: 3px solid #818cf8;
-    border-radius: 8px; padding: 12px 14px;
+    border-radius: 10px; padding: 20px 24px;
   }
-  .shared-tag .num { font-size: 0.6rem; color: #818cf8; font-weight: 700; letter-spacing: 0.06em; }
-  .shared-tag .label { font-size: 0.72rem; color: #e2e4e9; font-weight: 600; margin: 2px 0 4px; }
-  .shared-tag .desc { font-size: 0.62rem; color: var(--text-dim); line-height: 1.5; }
-  .shared-note {
-    margin-top: 14px; padding: 12px 16px; background: #1a1d2e; border-left: 3px solid #818cf8;
-    border-radius: 6px; font-size: 0.68rem; line-height: 1.5; color: var(--text-dim);
+  .goal-card .formula { font-size: 0.85rem; color: #c4b5fd; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 10px; }
+  .goal-card .desc { font-size: 0.72rem; line-height: 1.6; color: var(--text); }
+  .goal-constraints { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+  .constraint {
+    background: #1a1d2e; border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 12px; font-size: 0.64rem; color: var(--text-dim);
   }
-  .shared-note strong { color: #c4b5fd; }
+  .constraint strong { color: #e2e4e9; }
 
-  /* ── Compare table ── */
-  .diff-table { width: 100%; border-collapse: collapse; font-size: 0.68rem; }
-  .diff-table th { text-align: left; padding: 10px 14px; font-size: 0.64rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--border); }
+  /* ── Current approach cards ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .side {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 22px 24px;
+  }
+  .side h3 { font-size: 0.85rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .side .tagline { font-size: 0.62rem; color: var(--text-dim); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .isg-side { border-top: 3px solid var(--isg); } .isg-side h3 { color: var(--isg); }
+  .idg-side { border-top: 3px solid var(--idg); } .idg-side h3 { color: var(--idg); }
+  .side p { font-size: 0.7rem; line-height: 1.6; color: var(--text); }
+
+  /* ── Common + Diff ── */
+  .shared-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .stag {
+    background: #1a1d2e; border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 10px; font-size: 0.66rem; color: #c4b5fd;
+  }
+
+  .diff-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+  .diff-table th { text-align: left; padding: 8px 14px; font-size: 0.64rem; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--border); }
   .diff-table th:nth-child(2) { color: var(--isg); }
   .diff-table th:nth-child(3) { color: var(--idg); }
-  .diff-table td { padding: 9px 14px; border-bottom: 1px solid #1e2030; vertical-align: top; line-height: 1.5; }
+  .diff-table td { padding: 8px 14px; border-bottom: 1px solid #1e2030; line-height: 1.5; }
   .diff-table tr:last-child td { border-bottom: none; }
-  .diff-table .dim { color: var(--text-dim); font-size: 0.64rem; white-space: nowrap; width: 130px; }
 
-  /* ── Path cards ── */
-  .paths { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .path-card {
+  /* ── Pros/Cons ── */
+  .proscons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .pc-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px;
   }
-  .path-card h3 { font-size: 0.82rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 4px; }
-  .path-card .tagline { font-size: 0.62rem; color: var(--text-dim); margin-bottom: 10px; }
-  .path-a { border-top: 3px solid #818cf8; } .path-a h3 { color: #818cf8; }
-  .path-b { border-top: 3px solid var(--warn); } .path-b h3 { color: var(--warn); }
+  .pc-card h3 { font-size: 0.82rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 3px; }
+  .pc-card .tagline { font-size: 0.62rem; color: var(--text-dim); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .isg-card { border-top: 3px solid var(--isg); } .isg-card h3 { color: var(--isg); }
+  .idg-card { border-top: 3px solid var(--idg); } .idg-card h3 { color: var(--idg); }
 
-  .subpath { margin-top: 12px; padding: 10px 12px; background: #1a1d2e; border-radius: 6px; }
-  .subpath .sp-label { font-size: 0.64rem; color: var(--text-dim); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
-
-  .pros, .cons { list-style: none; }
-  .pros li, .cons li { font-size: 0.7rem; line-height: 1.55; padding: 2px 0; display: flex; gap: 8px; align-items: flex-start; }
+  .col-label { font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
+  .pros, .cons { list-style: none; margin-top: 4px; }
+  .pros li, .cons li { font-size: 0.72rem; line-height: 1.55; padding: 3px 0; display: flex; gap: 8px; align-items: flex-start; }
   .pros li::before { content: '+'; color: var(--green); font-weight: 700; font-size: 0.75rem; flex-shrink: 0; }
   .cons li::before { content: '−'; color: var(--red); font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
 
-  /* ── Decision ── */
-  .decision {
-    background: linear-gradient(135deg, #1f1d0e 0%, #1a1d2e 100%);
-    border: 1px solid #3d2f0e; border-radius: 10px; padding: 20px 26px; margin-top: 24px;
-  }
-  .decision h3 { font-size: 0.76rem; color: var(--warn); margin-bottom: 12px; letter-spacing: -0.01em; }
-  .decision table { width: 100%; border-collapse: collapse; font-size: 0.68rem; }
-  .decision th { text-align: left; padding: 8px 10px; font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #2a2a1e; }
-  .decision td { padding: 8px 10px; border-bottom: 1px solid #1e2030; line-height: 1.5; }
-  .decision td:first-child { font-size: 0.62rem; color: var(--text-dim); white-space: nowrap; width: 36px; }
-  .decision td:nth-child(2) { font-weight: 600; color: #e2e4e9; width: 180px; }
-
-  .col-label { font-size: 0.62rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; font-weight: 600; }
-  .vert-divider { margin: 16px 0 0; border-top: 1px dashed var(--border); padding-top: 12px; }
-  .risk-note { font-size: 0.62rem; color: var(--text-dim); margin-top: 8px; font-style: italic; }
-
   @media (max-width: 720px) {
-    .paths, .shared-grid { grid-template-columns: 1fr; }
+    .compare, .proscons { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>IDG vs ISG — Dynamic Pricing 方案对比</h1>
-  <div class="subtitle">同一个引擎底座，PenRate 确定方式统一还是分叉？</div>
-  <div style="text-align:center"><span class="status-badge">待决策</span></div>
 
-  <!-- ═══════ 共同点 ═══════ -->
-  <div class="section-title">一、共同点 — 两线可共享的引擎底座</div>
-  <div class="shared-grid">
-    <div class="shared-tag"><div class="num">01</div><div class="label">核心公式</div><div class="desc">ServicePrice = HWPrice × PenRate</div></div>
-    <div class="shared-tag"><div class="num">02</div><div class="label">六步引擎</div><div class="desc">Intake → Benchmark → Candidate → Score → Guardrail → Output</div></div>
-    <div class="shared-tag"><div class="num">03</div><div class="label">输出格式</div><div class="desc">Price Band (F/T/S) + Reason + Confidence</div></div>
-    <div class="shared-tag"><div class="num">04</div><div class="label">四维输入</div><div class="desc">HW Context / Economics / Deal / History</div></div>
-    <div class="shared-tag"><div class="num">05</div><div class="label">约束体系</div><div class="desc">Margin Floor → List Price Ceiling → DOA</div></div>
-    <div class="shared-tag"><div class="num">06</div><div class="label">设计原则</div><div class="desc">学习非预设 · 独立于 HW 定价 · 渠道无关</div></div>
-    <div class="shared-tag"><div class="num">07</div><div class="label">落地节奏</div><div class="desc">POC → Pilot → Rollout 渐进信任</div></div>
-  </div>
-  <div class="shared-note">
-    <strong>引擎框架可以统一。</strong>分歧集中在 <strong>PenRate 确定方式</strong> 这一个环节——是用规则查表还是 AI 计算。
-  </div>
-
-  <!-- ═══════ 差异 ═══════ -->
-  <div class="section-title">二、IDG 与 ISG 的业务特征差异</div>
-  <table class="diff-table">
-    <thead><tr><th>维度</th><th>ISG（服务器）</th><th>IDG（PC）</th></tr></thead>
-    <tbody>
-      <tr><td class="dim">HW 特征</td><td>型号少（数十款）、配置标准化、生命周期长</td><td>型号多（数百 SKU）、新季更新频繁、配置组合爆炸</td></tr>
-      <tr><td class="dim">交易特征</td><td>低频大单（$50K–$500K+）</td><td>高频中小单（$500–$5K）</td></tr>
-      <tr><td class="dim">历史数据量</td><td>少 — 同型号交易稀疏</td><td>多 — 可训练 Conversion Probability 模型</td></tr>
-      <tr><td class="dim">Benchmark 构建</td><td>同服务器型号 × Tier × GEO × 客户段</td><td>同 HW 价值段（PFV 区间）× Tier × GEO × 客户段</td></tr>
-      <tr><td class="dim">容错成本</td><td>高 — 单笔金额大，偏差影响显著</td><td>中低 — 单笔金额小，偏差被交易量分摊</td></tr>
-      <tr><td class="dim">可解释性需求</td><td>高 — 大单需向客户/审批方解释</td><td>中 — 可接受一定黑盒，辅助说明即可</td></tr>
-      <tr><td class="dim">新 SKU 频率</td><td>低 — 型号更新周期长</td><td>高 — 每季新配置上线</td></tr>
-    </tbody>
-  </table>
-
-  <!-- ═══════ 两种路径 ═══════ -->
-  <div class="section-title">三、两种路径的利弊</div>
-  <div class="paths">
-    <!-- Path A: 统一 -->
-    <div class="path-card path-a">
-      <h3>路径 A — 统一方案</h3>
-      <div class="tagline">ISG 和 IDG 使用相同的 PenRate 确定方式</div>
-
-      <div class="subpath">
-        <div class="sp-label">A1：都用 AI 计算（IDG 模式）</div>
-        <div class="col-label">优势</div>
-        <ul class="pros">
-          <li>一套模型维护，长期成本低</li>
-          <li>方法论一致，沟通成本低</li>
-          <li>未来新增产品线可直接复用</li>
-          <li>模型团队技能复用</li>
-        </ul>
-        <div class="col-label">劣势</div>
-        <ul class="cons">
-          <li>ISG 数据量不足以训练有意义的模型</li>
-          <li>ISG 冷启动 Confidence 低，退化为规则兜底</li>
-          <li>ISG 单笔金额大，模型偏差代价高</li>
-          <li>ISG 低频交易，模型更新滞后</li>
-        </ul>
+  <!-- ═══ 1. 目标 ═══ -->
+  <div class="section">
+    <div class="section-title">1. Dynamic Pricing 的目标</div>
+    <div class="goal-card">
+      <div class="formula">Service Price = HW Price × Pen Rate</div>
+      <div class="desc">
+        在 B2B 报价环节，系统自动输出每项服务 PN 的 Price Band（Floor / Target / Stretch）。推荐价随 HW 价格联动：HW 涨价服务价跟涨，HW 降价则自动上调 Pen Rate，确保服务收入不因 HW 打折被等比拖低。
       </div>
+      <div class="goal-constraints">
+        <div class="constraint"><strong>不亏</strong> &nbsp;Net Price ≥ Cost</div>
+        <div class="constraint"><strong>合理</strong> &nbsp;Net Price ≤ List Price</div>
+        <div class="constraint"><strong>可控</strong> &nbsp;超 DOA 推人工审批</div>
+      </div>
+    </div>
+  </div>
 
-      <div class="subpath">
-        <div class="sp-label">A2：都用固定查表（ISG 模式）</div>
+  <!-- ═══ 2. 当前方案 ═══ -->
+  <div class="section">
+    <div class="section-title">2. IDG 与 ISG 的当前方案</div>
+    <div class="compare">
+      <div class="side isg-side">
+        <h3>ISG — 固定查表</h3>
+        <div class="tagline">Rule-Driven · Pen Rate 人工定义</div>
+        <p>业务团队在多维矩阵中手工定义 Pen Rate。给定维度组合 → 查表输出固定百分比。适合低频高价值场景（单笔 $50K–$500K+），每一单值得人工判断。</p>
+      </div>
+      <div class="side idg-side">
+        <h3>IDG — AI 计算</h3>
+        <div class="tagline">Model-Driven · Pen Rate 从数据中学</div>
+        <p>AI 模型基于历史成交、竞品价格、客户特征等，动态输出 Pen Rate 推荐值。适合高频中小单场景（单笔 $500–$5K），人工无法逐单判断。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 3. 共同点 + 不同点 ═══ -->
+  <div class="section">
+    <div class="section-title">3. 共同点与不同点</div>
+    <div class="shared-tags">
+      <span class="stag">核心公式 ServicePrice=HWPrice×PenRate</span>
+      <span class="stag">六步引擎流水线</span>
+      <span class="stag">Price Band (F/T/S) 输出</span>
+      <span class="stag">四维输入</span>
+      <span class="stag">三层 Guardrail</span>
+    </div>
+    <table class="diff-table">
+      <thead><tr><th>维度</th><th>ISG（服务器）</th><th>IDG（PC）</th></tr></thead>
+      <tbody>
+        <tr><td>PenRate 来源</td><td>固定查表 — 手工定义</td><td>AI 计算 — 从历史交易中学</td></tr>
+        <tr><td>HW 特征</td><td>型号少、配置标准化、生命周期长</td><td>型号多、新季更新频繁、配置组合爆炸</td></tr>
+        <tr><td>交易特征</td><td>低频大单（$50K–$500K+）</td><td>高频中小单（$500–$5K）</td></tr>
+        <tr><td>历史数据量</td><td>少 — 同型号交易稀疏</td><td>多 — 可训练 Conversion Probability 模型</td></tr>
+        <tr><td>容错成本</td><td>高 — 单笔金额大，偏差影响显著</td><td>中低 — 单笔金额小，偏差被交易量分摊</td></tr>
+        <tr><td>可解释性</td><td>强 — 报价可追溯到具体规则格</td><td>中 — Reason Code + Confidence 补偿黑盒</td></tr>
+        <tr><td>冷启动</td><td>容易 — 业务专家定义初始值</td><td>困难 — 新市场无数据时 Confidence 低</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ 4. Pros & Cons ═══ -->
+  <div class="section">
+    <div class="section-title">4. Pros & Cons</div>
+    <div class="proscons">
+      <div class="pc-card isg-card">
+        <h3>ISG — 固定查表</h3>
+        <div class="tagline">Rule-Driven</div>
         <div class="col-label">优势</div>
         <ul class="pros">
           <li>上线快，不依赖历史数据</li>
-          <li>完全可控可审计</li>
-          <li>审批友好</li>
+          <li>完全可控可审计，审批友好</li>
+          <li>适合低频高价值 — 错了代价高，保守更安全</li>
         </ul>
         <div class="col-label">劣势</div>
         <ul class="cons">
-          <li>IDG 数百 SKU 维度爆炸不可维护</li>
-          <li>放弃 IDG 海量交易数据价值</li>
-          <li>IDG 无法响应 HW 涨/降价</li>
-          <li>IDG 每季新品需人工更新规则</li>
+          <li>维度爆炸后不可维护</li>
+          <li>不存在"最优"— 只是"业务觉得合理"</li>
+          <li>无法利用历史成交数据反哺</li>
+          <li>HW 涨/降价时 PenRate 不动</li>
         </ul>
       </div>
-      <div class="risk-note">⚠ 统一方案的风险：迁就一端就牺牲另一端</div>
+      <div class="pc-card idg-card">
+        <h3>IDG — AI 计算</h3>
+        <div class="tagline">Model-Driven</div>
+        <div class="col-label">优势</div>
+        <ul class="pros">
+          <li>自动适应 HW 涨/降价</li>
+          <li>捕捉非线性 — 同价位不同机型支付意愿不同</li>
+          <li>持续学习 — 每笔成交/丢单优化模型</li>
+          <li>规模效应 — 交易量越大越准</li>
+        </ul>
+        <div class="col-label">劣势</div>
+        <ul class="cons">
+          <li>冷启动困难 — 新市场退化为规则兜底</li>
+          <li>需要大量训练数据</li>
+          <li>可解释性弱 — 销售难理解"为什么推荐 12%"</li>
+          <li>模型需持续监控和重训</li>
+        </ul>
+      </div>
     </div>
-
-    <!-- Path B: 分叉 -->
-    <div class="path-card path-b">
-      <h3>路径 B — 分叉方案</h3>
-      <div class="tagline">ISG 用固定查表 + IDG 用 AI 计算。引擎框架和输出格式共享</div>
-
-      <div class="col-label">优势</div>
-      <ul class="pros">
-        <li>各取所长 — ISG 的"可控"和 IDG 的"规模效应"都不牺牲</li>
-        <li>ISG 不因数据不足被迫上 AI，IDG 不因规则表限制数据价值</li>
-        <li>共享引擎框架降低分叉成本</li>
-        <li>每条线可独立迭代，不互相拖慢</li>
-      </ul>
-
-      <div class="col-label">劣势</div>
-      <ul class="cons">
-        <li>两套维护体系 — 团队需同时维护规则表和 ML 模型</li>
-        <li>跨产品线方法论不统一，汇报需解释"为什么不同"</li>
-        <li>未来统一需迁移成本</li>
-        <li>两条线之间无法共享学习 — ISG 经验不能反哺 IDG 模型</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- ═══════ 待决策 ═══════ -->
-  <div class="decision">
-    <h3>待决策问题</h3>
-    <table>
-      <thead><tr><th>#</th><th>问题</th><th>选项</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>PenRate 确定方式</td><td>A. 统一（都 AI / 都查表）<br>B. 分叉（ISG 查表 + IDG AI）</td></tr>
-        <tr><td>2</td><td>如果统一选 AI</td><td>ISG 数据量是否足够？最低接受标准？</td></tr>
-        <tr><td>3</td><td>如果分叉</td><td>引擎框架共享到哪个粒度？分叉维护成本可接受？</td></tr>
-        <tr><td>4</td><td>路线图优先级</td><td>先 IDG（数据够）还是 ISG（规则简单）？还是并行？</td></tr>
-      </tbody>
-    </table>
   </div>
 </div>
 </body>
