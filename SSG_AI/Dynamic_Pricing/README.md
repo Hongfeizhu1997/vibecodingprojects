@@ -127,6 +127,7 @@ Dynamic_Pricing/
 | 文档 | 版本 | 说明 |
 |------|:--:|------|
 | `product-pricing-recommendation-v3.md` | **V3 · 当前** | 聚焦 B2B Wave 1：6 步引擎流水线 + Price Band (Floor/Target/Stretch) + Reason Code + Confidence。Design Principles → Progressive Trust → Timeline。未来横向拓展渠道 |
+| `idg-vs-isg-comparison.md` | **新增** | IDG vs ISG 方案全维度对比：共同点、差异、优劣分析、落地建议 |
 | `product-pricing-recommendation-v2.md` | V2 (归档) | 通用三 Wave 方案，含贝叶斯 + 弹性模型 |
 | `high-level-design-v1.md` | V1 | 技术架构设计 |
 | `scheme-comparison-paids-vs-standalone.md` | V1 | PAIDS 对比分析 |
