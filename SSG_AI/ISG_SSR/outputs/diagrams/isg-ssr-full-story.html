@@ -675,7 +675,7 @@ body {
       <tbody>
         <tr><td>Handle 300+ bid fields</td><td>Native tabular data</td><td>Contract, geo, hardware, warranty, price — all structured</td></tr>
         <tr><td>Score 56 candidates instantly</td><td>&lt; 1 ms total</td><td>Must respond during live bid workflow — no batching</td></tr>
-        <tr><td>Protect service revenue</td><td>Price-aware loss fn</td><td>Prevents cheap services from dominating rankings</td></tr>
+        <tr><td>Protect service revenue</td><td>Pen Rate-aware loss fn</td><td>Prevents mispriced services from dominating</td></tr>
         <tr><td>Auditable output</td><td>Deterministic + SHAP</td><td>Every recommendation reproducible and defensible</td></tr>
         <tr><td>Work with incomplete data</td><td>Native missing-value</td><td>Real CRM data has gaps — no manual cleanup needed</td></tr>
       </tbody>
@@ -780,7 +780,7 @@ body {
   <div class="reveal scene-label" data-delay="100">Part 2 Overview</div>
   <div class="reveal" data-delay="200" style="font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1rem;">Part 2</div>
   <div class="reveal" data-delay="500" style="font-size:1.6rem;font-weight:800;margin-bottom:1.5rem;">Inside the Recommendation Engine</div>
-  <div class="reveal" data-delay="800" style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.72rem;max-width:550px;"><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">Four-layer architecture: Recall, Ranking, Rules, Add-ons</span></div><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">Price-aware optimization</span></div><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">SHAP explainability — feature impact, step by step</span></div><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">LLM translation of SHAP to natural language</span></div><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">Safety gates before reaching any customer</span></div></div>
+  <div class="reveal" data-delay="800" style="display:flex;flex-direction:column;gap:0.5rem;font-size:0.72rem;max-width:550px;"><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">Four-layer architecture: Recall, Ranking, Rules, Add-ons</span></div><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">Pen Rate-aware optimization</span></div><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">SHAP explainability — feature impact, step by step</span></div><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">LLM translation of SHAP to natural language</span></div><div style="display:flex;align-items:center;gap:0.5rem;"><span style="color:#34d399;font-weight:700;">-</span><span style="color:#cbd5e1;">Safety gates before reaching any customer</span></div></div>
 </div>
 <div class="stage" id="s8">
   <div class="reveal scene-label" data-delay="100">2.1  4-Layer Engine</div>
@@ -809,26 +809,26 @@ body {
   </div>
 </div>
 <div class="stage" id="s9">
-  <div class="reveal scene-label" data-delay="100">2.2  Price-Aware Optimization</div>
-  <div class="scene-title">Key Differentiator — Price-Aware Optimization</div>
+  <div class="reveal scene-label" data-delay="100">2.2  Pen Rate-Aware Optimization</div>
+  <div class="scene-title">Key Differentiator — Pen Rate-Aware Optimization</div>
   <div class="price-row">
     <div class="price-card bad reveal" data-delay="200">
       <h3>Standard ML Approach</h3>
       <div class="desc">Recommend the most statistically likely service</div>
-      <div class="highlight" style="color:#fb7185;">Low-price, high-frequency services dominate rankings</div>
-      <div class="highlight" style="color:#64748b;">→ Service attach revenue at risk</div>
+      <div class="highlight" style="color:#fb7185;">Services with unhealthy Pen Rate dominate — model ignores whether service price is proportional to HW value</div>
+      <div class="highlight" style="color:#64748b;">→ Total (HW+Service) package uncompetitive, or margin leaks on cheap HW</div>
     </div>
     <div class="price-arrow reveal" data-delay="600">→</div>
     <div class="price-card good reveal" data-delay="800">
       <h3>ISG SSR Approach</h3>
       <div class="desc">Recommend the most likely service</div>
-      <div class="highlight" style="color:#34d399;">When probabilities are close — tilt toward the higher-priced option</div>
-      <div class="highlight" style="color:#64748b;">→ Protects service attach revenue</div>
+      <div class="highlight" style="color:#34d399;">When probabilities are close — tilt toward the option with the healthiest Pen Rate for that hardware</div>
+      <div class="highlight" style="color:#64748b;">→ Keeps total package competitive while protecting margin</div>
     </div>
   </div>
   <div class="price-formula reveal" data-delay="1500">
-    <span class="y">Custom Loss</span> = Cross-Entropy + <span class="y">β</span> · Price Tilt<br/>
-    Price Tilt: penalizes low-price services when probabilities are close<br/>
+    <span class="y">Custom Loss</span> = Cross-Entropy + <span class="y">β</span> · Pen Rate Tilt<br/>
+    Pen Rate Tilt: penalizes services whose Pen Rate falls outside the healthy range for that hardware<br/>
     <span class="y">β</span>: <span class="y">0.5 → 0.1</span> adaptive decay &nbsp;·&nbsp; Tunable business dial
   </div>
 </div>
@@ -890,7 +890,7 @@ body {
       </div>
       <div class="wf-step" id="ws5" data-step="5">
         <span class="wf-dot neg"></span>
-        <span class="wf-name">Price Tilt (low-price penalty)</span>
+        <span class="wf-name">Pen Rate Tilt (unhealthy Pen Rate penalty)</span>
         <span class="wf-impact neg">-0.06</span>
       </div>
     </div>
@@ -1072,7 +1072,7 @@ body {
     <div class="c5-title">Not "The AI Said So"</div>
   </div>
   <div class="reveal" data-delay="900">
-    <div class="c5-quote">Every recommendation =<br/>Historical Evidence + Price Optimization + Business Rules</div>
+    <div class="c5-quote">Every recommendation =<br/>Historical Evidence + Pen Rate Optimization + Business Rules</div>
   </div>
   <div class="reveal" data-delay="1800">
     <div class="c5-line">All <span>traceable</span> to specific factors. All <span>auditable</span>. No black boxes.</div>
@@ -1266,7 +1266,7 @@ body {
     <div style="flex:1;display:flex;flex-direction:column;gap:1rem;border-left:1px solid rgba(148,163,184,0.15);padding-left:2rem;">
       <div style="font-size:0.7rem;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;">Key Takeaways</div>
       <div style="display:flex;align-items:flex-start;gap:0.6rem;"><span style="color:#38bdf8;font-weight:700;">Part 1</span><span style="color:#cbd5e1;font-size:0.65rem;">XGBoost is purpose-built for structured ranking — faster, cheaper, and more auditable than an LLM for this task.</span></div>
-      <div style="display:flex;align-items:flex-start;gap:0.6rem;"><span style="color:#34d399;font-weight:700;">Part 2</span><span style="color:#cbd5e1;font-size:0.65rem;">Price-aware optimization + SHAP explainability + LLM translation form a complete loop: rank, explain, communicate.</span></div>
+      <div style="display:flex;align-items:flex-start;gap:0.6rem;"><span style="color:#34d399;font-weight:700;">Part 2</span><span style="color:#cbd5e1;font-size:0.65rem;">Pen Rate-aware optimization + SHAP explainability + LLM translation form a complete loop: rank, explain, communicate.</span></div>
       <div style="display:flex;align-items:flex-start;gap:0.6rem;"><span style="color:#a78bfa;font-weight:700;">Part 3</span><span style="color:#cbd5e1;font-size:0.65rem;">Catalog integration turns model output into production-ready GBB cards — with filtering, safety gates, and role-specific explanations.</span></div>
     </div>
   </div>
@@ -1306,7 +1306,7 @@ const wfValues = [
   { pos:0.30, neg:0, score:0.75, desc:'Enterprise customers typically choose this tier (+0.12)' },
   { pos:0.38, neg:0, score:0.83, desc:'US market standard practice adds +0.08' },
   { pos:0.38, neg:0.05, score:0.78, desc:'One-time deal (not subscription) reduces confidence (-0.05)' },
-  { pos:0.38, neg:0.11, score:0.72, desc:'Price tilt corrects for low-price bias (-0.06) → Final: 0.72' },
+  { pos:0.38, neg:0.11, score:0.72, desc:'Pen Rate tilt corrects for unhealthy Pen Rate bias (-0.06) → Final: 0.72' },
 ];
 let current = 0;
 let paused = false;
