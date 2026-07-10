@@ -16,14 +16,15 @@
 
 ---
 
-## 2026-05 — ISG vs IDG 方法论分叉
+## 2026-05 — ISG vs IDG 方法论分叉（待重新确认）
 
-- **Status**: Active
-- **Context**: 服务器和 PC 的定价逻辑差异很大，能否用一套方法？
-- **Decision**: 分叉处理。ISG 采用固定查表（服务器配置标准化程度高），IDG 采用 AI 计算（PC 型号和配置变化频繁）。
-- **Consequence**:
-  - 两条代码路径，不强行统一
-  - 两条路径共享 Price Band 输出格式
+- **Status**: 🔄 Under Review（2026-07-10 重新讨论中）
+- **Context**: 服务器和 PC 的定价逻辑差异很大，PenRate 确定方式应统一还是分叉？
+- **Previous Stance** (2026-05): 倾向分叉——ISG 固定查表，IDG AI 计算。
+- **Current Status** (2026-07-10): 重新评估。详见 `analysis/insights/idg-vs-isg-comparison.md`。
+  - 路径 A：统一（都 AI 或都查表）
+  - 路径 B：分叉（ISG 查表 + IDG AI）
+- **Consequence**: 待决策。无论选择哪种，两条路径共享 Price Band 输出格式。
 
 ---
 
