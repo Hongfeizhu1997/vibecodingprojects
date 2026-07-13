@@ -5,7 +5,10 @@
 
 # === Raw data files (too large for GitHub) ===
 *.csv
+!GPS_Cost_Pricing_Workbench/sample_data/*.csv
+GPS_Cost_Pricing_Workbench/sample_data/load_test_*.csv
 *.xlsx
+!GPS_Cost_Pricing_Workbench/sample_data/*.xlsx
 *.xls
 
 # === Archive files ===

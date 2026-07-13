@@ -1,0 +1,11 @@
+value_id,type_of_service,geo,status,technical_id,factor_name,factor_values,uplift_ratio
+UV-001,Support Services,EMEA,Released,TYPESRV,Type of Service,Support Services,0.08
+UV-002,Support Services,EMEA,Released,SUBTYPESRV,Sub-Type of Service,Hardware Support,0.04
+UV-003,Support Services,EMEA,Released,GEO,GEO,EMEA,0.03
+UV-004,Support Services,EMEA,Released,SDTYPE,Service Delivery Type,Onsite,0.03
+UV-005,Support Services,EMEA,Released,SRVTERM,Service Term,"12,36,60",0.02
+UV-006,Support Services,NA,Released,TYPESRV,Type of Service,Support Services,0.06
+UV-007,Support Services,NA,Released,SUBTYPESRV,Sub-Type of Service,Hardware Support,0.03
+UV-008,Support Services,NA,Released,GEO,GEO,NA,0.02
+UV-009,Support Services,NA,Released,SDTYPE,Service Delivery Type,Onsite,0.03
+UV-010,Support Services,NA,Released,SRVTERM,Service Term,"12,36,60",0.01
