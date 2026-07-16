@@ -24,177 +24,168 @@
     font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
     background: var(--bg);
     color: var(--text);
-    display: flex;
-    justify-content: center;
-    padding: 48px 24px;
+    display: flex; justify-content: center; padding: 48px 24px;
   }
-  .page { max-width: 1000px; width: 100%; }
+  .page { max-width: 960px; width: 100%; }
 
   .header { text-align: center; margin-bottom: 32px; }
-  .header h1 { font-size: 1.6rem; font-weight: 700; }
-  .header .sub { color: var(--sub); font-size: 0.85rem; margin-top: 4px; }
+  .header h1 { font-size: 1.55rem; font-weight: 700; }
+  .header .sub { color: var(--sub); font-size: 0.82rem; margin-top: 4px; }
 
-  .big-stats { display: flex; gap: 16px; margin-bottom: 32px; }
-  .big-stat {
-    flex: 1; border-radius: 12px; padding: 18px; text-align: center;
-    border: 1px solid var(--border); background: var(--card);
+  /* flow */
+  .flow-wrap {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    margin-bottom: 28px;
   }
-  .big-stat .num { font-size: 1.6rem; font-weight: 800; margin-bottom: 2px; }
-  .big-stat .label { font-size: 0.7rem; color: var(--sub); text-transform: uppercase; letter-spacing: 0.05em; }
-  .big-stat .detail { font-size: 0.68rem; color: var(--sub); margin-top: 4px; }
+  .flow-title {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--sub); margin-bottom: 14px;
+  }
+  .flow-list { display: flex; flex-direction: column; gap: 0; }
+  .flow-row { display: flex; align-items: center; }
 
-  /* --- blocks --- */
-  .block { margin-bottom: 0; }
-  .block-head {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  .flow-step {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; flex: 1; min-width: 0;
   }
-  .block-head .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-  .dot.g { background: var(--green); } .dot.y { background: var(--yellow); } .dot.r { background: var(--red); }
-  .block-head .tag {
-    font-size: 0.63rem; font-weight: 700; letter-spacing: 0.04em;
-    padding: 2px 8px; border-radius: 8px;
+  .flow-step .num {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 700; flex-shrink: 0;
+  }
+  .num.g { background: var(--green-bg); color: var(--green); }
+  .num.y { background: var(--yellow-bg); color: var(--yellow); }
+  .num.r { background: var(--red-bg); color: var(--red); }
+  .flow-step .name { font-size: 0.78rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .flow-step .tag {
+    font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 5px;
+    white-space: nowrap; flex-shrink: 0;
   }
   .tag.g { background: var(--green-bg); color: var(--green); }
   .tag.y { background: var(--yellow-bg); color: var(--yellow); }
   .tag.r { background: var(--red-bg); color: var(--red); }
-  .block-head .sum { font-size: 0.7rem; color: var(--sub); }
+  .tag.k { background: rgba(37,99,235,0.08); color: var(--accent); }
 
-  /* flow row */
-  .flow {
-    display: flex; align-items: center; gap: 0;
-    padding: 12px 0; flex-wrap: wrap;
+  .flow-arrow {
+    display: flex; align-items: center; justify-content: center;
+    width: 28px; flex-shrink: 0;
   }
-  .step {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 10px 14px;
-    font-size: 0.74rem; font-weight: 600;
-    white-space: nowrap;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-    display: flex; align-items: center; gap: 5px;
-  }
-  .step .lt {
-    font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: 5px;
-    white-space: nowrap;
-  }
-  .lt.ok { background: var(--green-bg); color: var(--green); }
-  .lt.warn { background: var(--yellow-bg); color: var(--yellow); }
-  .lt.tbd { background: var(--red-bg); color: var(--red); }
+  .flow-arrow span { color: #c4c8d0; font-size: 0.9rem; }
 
-  .arrow { color: #c4c8d0; font-size: 1rem; margin: 0 5px; font-weight: 300; flex-shrink: 0; }
-  .arrow.down { text-align: center; font-size: 1.1rem; margin: 2px 0; }
+  /* sub-row */
+  .flow-step.sub { padding-left: 48px; }
+  .flow-step.sub .num { visibility: hidden; }
 
-  /* summary */
+  /* summary grid */
   .summary {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 28px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
   }
-  @media (max-width: 600px) { .summary { grid-template-columns: 1fr; } .big-stats { flex-direction: column; } }
+  @media (max-width: 650px) { .summary { grid-template-columns: 1fr; } }
   .sum-card {
     background: var(--card); border: 1px solid var(--border);
     border-radius: 10px; padding: 18px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
-  .sum-card .title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sub); margin-bottom: 6px; }
-  .sum-card .val { font-size: 1.3rem; font-weight: 800; }
-  .sum-card .sub { font-size: 0.7rem; color: var(--sub); margin-top: 4px; line-height: 1.5; }
+  .sum-card .head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+  }
+  .sum-card .head .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .dot.g { background: var(--green); } .dot.y { background: var(--yellow); } .dot.r { background: var(--red); }
+  .sum-card .head .label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; }
+  .sum-card .row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 4px 0; font-size: 0.73rem;
+  }
+  .sum-card .row .dim { color: var(--sub); }
+  .sum-card .row .val { font-weight: 700; }
 </style>
 </head>
 <body>
 <div class="page">
 
   <div class="header">
-    <h1>ISG Price Update — Modernization Status</h1>
-    <div class="sub">From manual Excel workflows → LUDP platform automation</div>
+    <h1>ISG Price Update — End-to-End Modernization</h1>
+    <div class="sub">16 steps · Excel / ad-hoc → LUDP platform automation</div>
   </div>
 
-  <div class="big-stats">
-    <div class="big-stat" style="border-left:3px solid var(--green)">
-      <div class="num" style="color:var(--green)">4</div>
-      <div class="label">Delivered</div>
-      <div class="detail">30K spent</div>
-    </div>
-    <div class="big-stat" style="border-left:3px solid var(--yellow)">
-      <div class="num" style="color:var(--yellow)">6</div>
-      <div class="label">In Evaluation</div>
-      <div class="detail">~60K estimated</div>
-    </div>
-    <div class="big-stat" style="border-left:3px solid var(--red)">
-      <div class="num" style="color:var(--red)">6</div>
-      <div class="label">Not Clarified</div>
-      <div class="detail">TBD</div>
-    </div>
-  </div>
+  <!-- Full Flow -->
+  <div class="flow-wrap">
+    <div class="flow-title">Full Process Flow</div>
+    <div class="flow-list">
 
-  <!-- GREEN -->
-  <div class="block">
-    <div class="block-head">
-      <div class="dot g"></div><div class="tag g">DELIVERED</div><div class="sum">30K</div>
-    </div>
-    <div class="flow">
-      <div class="step">Active PN Listing <span class="lt ok">6→1.5 wks</span></div>
-      <div class="arrow">→</div>
-      <div class="step">PN Master <span class="lt ok">live</span></div>
-      <div class="arrow">→</div>
-      <div class="step">HW-PN Compatibility</div>
-      <div class="arrow">→</div>
-      <div class="step">HW Master Data</div>
-    </div>
-  </div>
+      <div class="flow-row">
+        <div class="flow-step"><div class="num g">1</div><div class="name">Published PN Listing</div><div class="tag g">6→1.5 wks</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step sub"><div class="num g"> </div><div class="name">Not-published PN Listing</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num g">2</div><div class="name">PN Master</div><div class="tag k">live</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num g">3</div><div class="name">HW-PN Compatibility</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num g">4</div><div class="name">HW Master Data</div></div>
+      </div>
 
-  <div class="arrow down">↓</div>
+      <div class="flow-row">
+        <div class="flow-step"><div class="num r">5</div><div class="name">Pricing Dimensions Mapping</div><div class="tag r">TBD</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step sub"><div class="num r"> </div><div class="name">PN → Charge Type (CBSO)</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num y">6</div><div class="name">EOS HW Listing</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num r">7</div><div class="name">Warranty Data (DE/DM/DG/DS)</div><div class="tag r">TBD</div></div>
+      </div>
 
-  <!-- YELLOW -->
-  <div class="block">
-    <div class="block-head">
-      <div class="dot y"></div><div class="tag y">IN EVALUATION</div><div class="sum">~60K</div>
-    </div>
-    <div class="flow">
-      <div class="step">EOS HW Listing</div>
-      <div class="arrow">→</div>
-      <div class="step">Brand Mapping <span class="lt warn">10K</span></div>
-      <div class="arrow">→</div>
-      <div class="step">Channel Discount <span class="lt warn">10K</span></div>
-      <div class="arrow">→</div>
-      <div class="step">List Price Pull <span class="lt ok">3→1.5 wks</span></div>
-      <div class="arrow">→</div>
-      <div class="step">Cost Pull</div>
-      <div class="arrow">→</div>
-      <div class="step">Forex Translation <span class="lt warn">40K</span></div>
-    </div>
-  </div>
+      <div class="flow-row">
+        <div class="flow-step"><div class="num y">8</div><div class="name">Brand Mapping → DP</div><div class="tag y">10K</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num y">9</div><div class="name">Channel Discount</div><div class="tag y">10K</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num r">10</div><div class="name">Finalize PN List</div><div class="tag r">TBD</div></div>
+      </div>
 
-  <div class="arrow down">↓</div>
+      <div class="flow-row">
+        <div class="flow-step"><div class="num y">11</div><div class="name">List Price Pull (CPM)</div><div class="tag y">3→1.5 wks</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num y">12</div><div class="name">Cost Pull (CFE)</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num y">13</div><div class="name">Forex Translation</div><div class="tag y">40K</div></div>
+      </div>
 
-  <!-- RED -->
-  <div class="block">
-    <div class="block-head">
-      <div class="dot r"></div><div class="tag r">NOT CLARIFIED</div><div class="sum">TBD</div>
-    </div>
-    <div class="flow">
-      <div class="step">Pricing Dimensions <span class="lt tbd">TBD</span></div>
-      <div class="arrow">→</div>
-      <div class="step">Warranty Data <span class="lt tbd">TBD</span></div>
-      <div class="arrow">→</div>
-      <div class="step">Finalize PN List <span class="lt tbd">TBD</span></div>
-      <div class="arrow">→</div>
-      <div class="step">PN → CBSO <span class="lt tbd">TBD</span></div>
-      <div class="arrow">→</div>
-      <div class="step">Price Calculation <span class="lt tbd">TBD</span></div>
-      <div class="arrow">→</div>
-      <div class="step">Upload to Tools <span class="lt ok">3→1 wk</span></div>
+      <div class="flow-row">
+        <div class="flow-step"><div class="num r">14</div><div class="name">PN → CBSO Conversion</div><div class="tag r">TBD</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num r">15</div><div class="name">Price Calc & Shaping</div><div class="tag r">TBD</div></div>
+        <div class="flow-arrow"><span>→</span></div>
+        <div class="flow-step"><div class="num r">16</div><div class="name">Upload to Tools</div><div class="tag r">3→1 wk</div></div>
+      </div>
+
     </div>
   </div>
 
+  <!-- Summary -->
   <div class="summary">
     <div class="sum-card">
-      <div class="title">Investment to Date</div>
-      <div class="val" style="color:var(--accent)">~90K</div>
-      <div class="sub">30K delivered + ~60K estimated for items in evaluation</div>
+      <div class="head"><div class="dot g"></div><div class="label" style="color:var(--green)">DELIVERED</div></div>
+      <div class="row"><span class="dim">Steps</span><span class="val">4 of 16</span></div>
+      <div class="row"><span class="dim">Investment</span><span class="val">30K</span></div>
+      <div class="row"><span class="dim">Man-days saved (quantified)</span><span class="val">~23</span></div>
+      <div class="row"><span class="dim">Lead time</span><span class="val">6→1.5 wks</span></div>
     </div>
     <div class="sum-card">
-      <div class="title">Lead Time Potential</div>
-      <div class="val" style="color:var(--green)">~75% reduction</div>
-      <div class="sub">End-to-end: ~3 weeks automated vs. ~12 weeks manual. Each arrow marks a handoff being eliminated.</div>
+      <div class="head"><div class="dot y"></div><div class="label" style="color:var(--yellow)">IN EVALUATION</div></div>
+      <div class="row"><span class="dim">Steps</span><span class="val">6 of 16</span></div>
+      <div class="row"><span class="dim">Est. investment</span><span class="val">~60K</span></div>
+      <div class="row"><span class="dim">Man-days saved (quantified)</span><span class="val">~8</span></div>
+      <div class="row"><span class="dim">Lead time</span><span class="val">3→1.5 wks</span></div>
+    </div>
+    <div class="sum-card">
+      <div class="head"><div class="dot r"></div><div class="label" style="color:var(--red)">NOT CLARIFIED</div></div>
+      <div class="row"><span class="dim">Steps</span><span class="val">6 of 16</span></div>
+      <div class="row"><span class="dim">Sizing</span><span class="val">TBD</span></div>
+      <div class="row"><span class="dim">Man-days saved (quantified)</span><span class="val">~10</span></div>
+      <div class="row"><span class="dim">Lead time</span><span class="val">3→1 wk target</span></div>
     </div>
   </div>
 
