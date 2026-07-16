@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISG Dynamic Pricing — High-Level Summary</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3a;
+    --accent: #4f9cf5;
+    --accent2: #34d399;
+    --accent3: #f59e0b;
+    --text: #e4e5e8;
+    --sub: #8b8fa3;
+    --red: #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+  .page {
+    max-width: 1100px;
+    width: 100%;
+  }
+
+  /* header */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .header .sub {
+    color: var(--sub);
+    font-size: 0.9rem;
+    margin-top: 6px;
+  }
+
+  /* formula hero */
+  .formula-hero {
+    background: linear-gradient(135deg, #1a1d27 0%, #1f2435 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .formula-hero .equation {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 8px;
+  }
+  .formula-hero .equation span.hw { color: var(--accent2); }
+  .formula-hero .equation span.pr { color: var(--accent); }
+  .formula-hero .equation span.eq { color: var(--sub); margin: 0 4px; }
+  .formula-hero .desc {
+    font-size: 0.85rem;
+    color: var(--sub);
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* section label */
+  .section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  /* 4-component grid */
+  .comp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 800px) {
+    .comp-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .comp-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 18px;
+    position: relative;
+  }
+  .comp-card .num {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-size: 0.7rem;
+    color: var(--sub);
+    font-weight: 600;
+  }
+  .comp-card .title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+  .comp-card .body {
+    font-size: 0.78rem;
+    color: var(--sub);
+    line-height: 1.6;
+  }
+  .comp-card.highlight {
+    border-color: var(--accent3);
+  }
+  .comp-card.highlight .title {
+    color: var(--accent3);
+  }
+
+  /* flow row */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .flow-step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .flow-arrow {
+    color: var(--sub);
+    font-size: 1.1rem;
+    margin: 0 6px;
+    font-weight: 300;
+  }
+
+  /* priority bar */
+  .priority-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 32px;
+  }
+  .priority-bar .label {
+    font-size: 0.75rem;
+    color: var(--sub);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .priority-items {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .priority-item {
+    background: #1f2435;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .priority-item.first { border-color: var(--accent3); color: var(--accent3); }
+  .priority-sep {
+    color: var(--sub);
+    font-size: 0.75rem;
+    margin: 0 2px;
+  }
+
+  /* bottom summary */
+  .summary-bar {
+    background: linear-gradient(135deg, #1a2a1d 0%, #1a1d27 100%);
+    border: 1px solid var(--accent2);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .summary-bar .icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .summary-bar .text {
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+  .summary-bar .text strong {
+    color: var(--accent2);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>ISG Dynamic Pricing — 方案总览</h1>
+    <div class="sub">B2B · LBPi · WW | Phase 2 已交付</div>
+  </div>
+
+  <!-- Formula -->
+  <div class="formula-hero">
+    <div class="equation">
+      <span class="hw">服务价格</span>
+      <span class="eq">=</span>
+      <span class="hw">硬件单价</span>
+      <span class="eq">×</span>
+      <span class="pr">Pen Rate</span>
+      <span class="eq">（渗透率）</span>
+    </div>
+    <div class="desc">
+      服务的价格跟着硬件的价格走。HW 涨价，服务价跟涨；HW 降价，Pen Rate 自动上调，服务收入不被等比拖低。
+    </div>
+  </div>
+
+  <!-- 4 Components -->
+  <div class="section-label">LBP 系统中的 Pen Rate 管理（4 个核心组件）</div>
+  <div class="comp-grid">
+
+    <div class="comp-card">
+      <div class="num">01</div>
+      <div class="title">Pen Rate 委派表</div>
+      <div class="body">
+        管理 Pen Rate 规则：哪个 BU / Country / GTM 用哪个 Pen Rate。支持批量导入导出、操作历史追溯。
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="num">02</div>
+      <div class="title">Pen Rate 调整表</div>
+      <div class="body">
+        按硬件单价分档调整 Pen Rate 比例。同一标准 Pen Rate，HW 越贵实际比例越高——贵的硬件服务也值更多。
+      </div>
+    </div>
+
+    <div class="comp-card highlight">
+      <div class="num">⭐</div>
+      <div class="title">优先级逻辑</div>
+      <div class="body">
+        出现多条规则冲突时，按优先级自动裁决。5 个维度精确匹配：Brand · SDF · 基础保修 · RAD · GTM。
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="num">04</div>
+      <div class="title">下游同步</div>
+      <div class="body">
+        Pen Rate 结果自动传递给 LUDP 和 Magellan，确保报价系统和下游系统数据一致。
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Flow -->
+  <div class="section-label">报价时的计算流程</div>
+  <div class="flow-row">
+    <div class="flow-step">报价单</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Brand Mapping<br><span style="font-weight:400;font-size:0.7rem;color:var(--sub)">PN → Branding</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Pen Rate 查表</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">调整计算<br><span style="font-weight:400;font-size:0.7rem;color:var(--sub)">标准 PR × 调整%</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">取 Floor<br><span style="font-weight:400;font-size:0.7rem;color:var(--sub)">min(原委派, 新PR)</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:var(--accent2);color:var(--accent2)">最终服务价格</div>
+  </div>
+
+  <!-- Priority -->
+  <div class="priority-bar">
+    <div class="label">多规则冲突时的优先级</div>
+    <div class="priority-items">
+      <div class="priority-item first">BU</div>
+      <div class="priority-sep">&gt;</div>
+      <div class="priority-item">Country</div>
+      <div class="priority-sep">&gt;</div>
+      <div class="priority-item">EU ID list</div>
+      <div class="priority-sep">&gt;</div>
+      <div class="priority-item">GTM 子细分</div>
+      <div class="priority-sep">&gt;</div>
+      <div class="priority-item">RAD</div>
+    </div>
+  </div>
+
+  <!-- Bottom -->
+  <div class="summary-bar">
+    <div class="icon">💡</div>
+    <div class="text">
+      <strong>Pen Rate 不是固定值。</strong>它根据硬件单价、业务单元、国家、客户细分等多维规则动态调整。
+      最终服务价格取<strong>原 LBP 委派价和新 Pen Rate 价两者中较低的</strong>，确保不因新机制抬高最终报价。
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
