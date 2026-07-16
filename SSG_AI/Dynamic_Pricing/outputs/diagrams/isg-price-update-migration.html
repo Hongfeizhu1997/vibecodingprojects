@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ISG Price Update — Modernization Migration</title>
+<title>ISG Price Update — Modernization Status</title>
 <style>
   :root {
     --bg: #f8f9fb;
     --card: #ffffff;
     --border: #e2e5ea;
     --green: #059669;
-    --green-bg: rgba(5,150,105,0.06);
-    --amber: #d97706;
-    --amber-bg: rgba(217,119,6,0.06);
+    --green-bg: #ecfdf5;
+    --yellow: #d97706;
+    --yellow-bg: #fffbeb;
     --red: #dc2626;
-    --red-bg: rgba(220,38,38,0.05);
+    --red-bg: #fef2f2;
     --accent: #2563eb;
     --text: #1a1d27;
     --sub: #6b7280;
@@ -28,245 +28,148 @@
     justify-content: center;
     padding: 48px 24px;
   }
-  .page { max-width: 1100px; width: 100%; }
+  .page { max-width: 960px; width: 100%; }
 
   .header { text-align: center; margin-bottom: 36px; }
-  .header h1 { font-size: 1.7rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header h1 { font-size: 1.6rem; font-weight: 700; }
   .header .sub { color: var(--sub); font-size: 0.85rem; margin-top: 4px; }
 
-  .stat-bar { display: flex; gap: 16px; margin-bottom: 32px; justify-content: center; }
-  .stat {
+  .big-stats { display: flex; gap: 16px; margin-bottom: 36px; }
+  .big-stat {
+    flex: 1; border-radius: 12px; padding: 20px; text-align: center;
+    border: 1px solid var(--border); background: var(--card);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .big-stat .num { font-size: 1.7rem; font-weight: 800; margin-bottom: 2px; }
+  .big-stat .label { font-size: 0.72rem; color: var(--sub); text-transform: uppercase; letter-spacing: 0.05em; }
+  .big-stat .detail { font-size: 0.7rem; color: var(--sub); margin-top: 4px; }
+
+  .section { margin-bottom: 24px; }
+  .section-head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .section-head .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .section-head .dot.g { background: var(--green); }
+  .section-head .dot.y { background: var(--yellow); }
+  .section-head .dot.r { background: var(--red); }
+  .section-head .tag {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em;
+    padding: 3px 10px; border-radius: 10px;
+  }
+  .tag.g { background: var(--green-bg); color: var(--green); }
+  .tag.y { background: var(--yellow-bg); color: var(--yellow); }
+  .tag.r { background: var(--red-bg); color: var(--red); }
+  .section-head .count { font-size: 0.73rem; color: var(--sub); }
+
+  .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    font-size: 0.76rem; font-weight: 600;
+    padding: 8px 14px; border-radius: 8px;
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px 24px; text-align: center; min-width: 100px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  }
-  .stat .num { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; }
-  .stat .label { font-size: 0.7rem; color: var(--sub); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .stat.green .num { color: var(--green); }
-  .stat.red .num { color: var(--red); }
-
-  .block { margin-bottom: 24px; }
-  .block-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .block-header .letter {
-    background: var(--accent); color: #fff;
-    width: 28px; height: 28px; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 0.8rem;
-  }
-  .block-header .title { font-weight: 700; font-size: 0.95rem; }
-  .block-header .badge {
-    font-size: 0.65rem; font-weight: 600;
-    padding: 3px 10px; border-radius: 12px; letter-spacing: 0.03em;
-  }
-  .badge.done { background: rgba(5,150,105,0.12); color: var(--green); }
-  .badge.mixed { background: rgba(217,119,6,0.10); color: var(--amber); }
-  .badge.pending { background: rgba(220,38,38,0.10); color: var(--red); }
-
-  .step-row { display: flex; align-items: stretch; gap: 0; }
-  .step-card {
-    flex: 1; background: var(--card); border: 1px solid var(--border);
-    border-left: 3px solid var(--border); padding: 14px 16px; min-width: 0;
     box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    display: flex; align-items: center; gap: 6px;
   }
-  .step-card:first-child { border-radius: 8px 0 0 8px; }
-  .step-card:last-child { border-radius: 0 8px 8px 0; }
-  .step-card:only-child { border-radius: 8px; }
-  .step-card.evaluated { border-left-color: var(--green); background: var(--green-bg); }
-  .step-card.not-evaluated { border-left-color: var(--red); background: var(--red-bg); }
-  .step-card.na { border-left-color: var(--amber); background: var(--amber-bg); }
+  .chip .badge {
+    font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+    white-space: nowrap;
+  }
+  .badge.lt { background: var(--yellow-bg); color: var(--yellow); }
+  .badge.tbd { background: var(--red-bg); color: var(--red); }
 
-  .step-card .step-name { font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .step-card .step-detail { font-size: 0.68rem; color: var(--sub); line-height: 1.5; }
-  .step-card .lt-change { margin-top: 6px; font-size: 0.65rem; font-weight: 600; }
-  .step-card .lt-change .old { color: var(--red); text-decoration: line-through; margin-right: 6px; }
-  .step-card .lt-change .arrow { color: var(--sub); margin: 0 3px; }
-  .step-card .lt-change .new { color: var(--green); }
-  .step-card .tag { display: inline-block; font-size: 0.6rem; font-weight: 600; padding: 2px 8px; border-radius: 8px; margin-top: 6px; letter-spacing: 0.02em; }
-  .tag.sized { background: rgba(5,150,105,0.12); color: var(--green); }
-  .tag.unsized { background: rgba(220,38,38,0.10); color: var(--red); }
-  .tag.live { background: rgba(37,99,235,0.10); color: var(--accent); }
-
-  .block-arrow { text-align: center; color: var(--sub); font-size: 1.2rem; margin: -8px 0 -8px; font-weight: 300; }
-
-  .summary-footer { margin-top: 32px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  @media (max-width: 700px) { .summary-footer { grid-template-columns: 1fr; } }
-  .footer-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px; padding: 18px; text-align: center;
+  .summary {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-top: 32px;
+  }
+  @media (max-width: 600px) { .summary { grid-template-columns: 1fr; } .big-stats { flex-direction: column; } }
+  .sum-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
-  .footer-card .big { font-size: 1.5rem; font-weight: 800; }
-  .footer-card .text { font-size: 0.72rem; color: var(--sub); margin-top: 4px; line-height: 1.5; }
+  .sum-card .title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sub); margin-bottom: 8px; }
+  .sum-card .val { font-size: 1.35rem; font-weight: 800; }
+  .sum-card .sub { font-size: 0.72rem; color: var(--sub); margin-top: 4px; line-height: 1.5; }
 </style>
 </head>
 <body>
 <div class="page">
 
   <div class="header">
-    <h1>ISG Price Update — Modernization Migration</h1>
-    <div class="sub">From Excel / Manual → LUDP Platform Automation · 16 Steps · 4 Stages</div>
+    <h1>ISG Price Update — Modernization Status</h1>
+    <div class="sub">From manual Excel workflows → LUDP platform automation</div>
   </div>
 
-  <div class="stat-bar">
-    <div class="stat green">
-      <div class="num">7</div>
-      <div class="label">Evaluated</div>
+  <div class="big-stats">
+    <div class="big-stat" style="border-left:3px solid var(--green)">
+      <div class="num" style="color:var(--green)">4</div>
+      <div class="label">Delivered</div>
+      <div class="detail">30K spent</div>
     </div>
-    <div class="stat red">
-      <div class="num">8</div>
-      <div class="label">Not Evaluated</div>
+    <div class="big-stat" style="border-left:3px solid var(--yellow)">
+      <div class="num" style="color:var(--yellow)">6</div>
+      <div class="label">In Evaluation</div>
+      <div class="detail">~60K estimated</div>
     </div>
-    <div class="stat">
-      <div class="num" style="color:var(--amber)">1</div>
-      <div class="label">N/A / TBD</div>
-    </div>
-  </div>
-
-  <div class="block">
-    <div class="block-header">
-      <div class="letter">A</div>
-      <div class="title">Master Data Preparation</div>
-      <div class="badge mixed">2/7 Evaluated</div>
-    </div>
-    <div class="step-row">
-      <div class="step-card evaluated">
-        <div class="step-name">Active PN Listing</div>
-        <div class="step-detail">As-Is: Excel (quarterly)<br>To-Be: Live Report + LUDP Table</div>
-        <div class="lt-change"><span class="old">6 wks</span><span class="arrow">→</span><span class="new">1.5 wks</span></div>
-        <div class="tag sized">30K Approved</div>
-      </div>
-      <div class="step-card evaluated">
-        <div class="step-name">PN Master</div>
-        <div class="step-detail">Already live on LUDP<br>No migration needed</div>
-        <div class="tag live">Live</div>
-      </div>
-      <div class="step-card not-evaluated">
-        <div class="step-name">HW-PN Compatibility</div>
-        <div class="step-detail">As-Is: Excel manual<br>To-Be: Live Report</div>
-        <div class="tag unsized">Not evaluated</div>
-      </div>
-      <div class="step-card not-evaluated">
-        <div class="step-name">HW Master Data</div>
-        <div class="step-detail">Brand / Category / DoA<br>As-Is: Excel (ad-hoc)</div>
-        <div class="tag unsized">Not evaluated</div>
-      </div>
-    </div>
-    <div class="step-row" style="margin-top:2px">
-      <div class="step-card not-evaluated">
-        <div class="step-name">Pricing Dimensions Mapping</div>
-        <div class="step-detail">SDF-PN-Feature Code<br>As-Is: unavailable / ad-hoc</div>
-        <div class="tag unsized">Not evaluated</div>
-      </div>
-      <div class="step-card na">
-        <div class="step-name">EOS HW Listing</div>
-        <div class="step-detail">As-Is: Excel from Owen<br>To-Be: Live Report</div>
-        <div class="tag" style="background:rgba(217,119,6,0.10);color:var(--amber)">N/A</div>
-      </div>
-      <div class="step-card not-evaluated">
-        <div class="step-name">Warranty Data (DE/DM/DG/DS)</div>
-        <div class="step-detail">Life-stage based pricing<br>As-Is: SN + warranty start</div>
-        <div class="tag unsized">Not evaluated</div>
-      </div>
-      <div class="step-card" style="visibility:hidden"></div>
+    <div class="big-stat" style="border-left:3px solid var(--red)">
+      <div class="num" style="color:var(--red)">6</div>
+      <div class="label">Not Clarified</div>
+      <div class="detail">Sizing TBD</div>
     </div>
   </div>
 
-  <div class="block-arrow">↓</div>
-
-  <div class="block">
-    <div class="block-header">
-      <div class="letter" style="background:var(--green)">B</div>
-      <div class="title">Pricing Input Pull</div>
-      <div class="badge done">5/5 Evaluated</div>
+  <!-- Green -->
+  <div class="section">
+    <div class="section-head">
+      <div class="dot g"></div><div class="tag g">DELIVERED</div><div class="count">4 steps</div>
     </div>
-    <div class="step-row">
-      <div class="step-card evaluated">
-        <div class="step-name">Brand Mapping → DP</div>
-        <div class="step-detail">PR factor / Adjustment factor<br>DOA grid / Brand mapping</div>
-        <div class="tag sized">10K</div>
-      </div>
-      <div class="step-card evaluated">
-        <div class="step-name">Channel Discount</div>
-        <div class="step-detail">Channel / Reseller<br>discount data → LUDP</div>
-        <div class="tag sized">10K</div>
-      </div>
-      <div class="step-card evaluated">
-        <div class="step-name">List Price Pull</div>
-        <div class="step-detail">CPM → LUDP Table<br>CLFO & PN</div>
-        <div class="lt-change"><span class="old">3 wks</span><span class="arrow">→</span><span class="new">1.5 wks</span></div>
-        <div class="tag sized">0</div>
-      </div>
-      <div class="step-card evaluated">
-        <div class="step-name">Cost Pull</div>
-        <div class="step-detail">CFE → LUDP Table<br>CLFO & PN</div>
-        <div class="tag sized">0</div>
-      </div>
-      <div class="step-card evaluated">
-        <div class="step-name">Forex Translation</div>
-        <div class="step-detail">Hedged rates + market rhythm<br>Auto-recommend local price updates</div>
-        <div class="tag sized">40K</div>
-      </div>
+    <div class="chip-row">
+      <div class="chip">Active PN Listing <span class="badge lt">6→1.5 wks</span></div>
+      <div class="chip">PN Master <span class="badge lt">live</span></div>
+      <div class="chip">HW-PN Compatibility</div>
+      <div class="chip">HW Master Data</div>
     </div>
   </div>
 
-  <div class="block-arrow">↓</div>
-
-  <div class="block">
-    <div class="block-header">
-      <div class="letter" style="background:var(--red)">C</div>
-      <div class="title">Calculation & Processing</div>
-      <div class="badge pending">0/3 Evaluated</div>
+  <!-- Yellow -->
+  <div class="section">
+    <div class="section-head">
+      <div class="dot y"></div><div class="tag y">IN EVALUATION</div><div class="count">6 steps · ~60K total</div>
     </div>
-    <div class="step-row">
-      <div class="step-card not-evaluated">
-        <div class="step-name">Finalize PN List</div>
-        <div class="step-detail">Aggregate & validate all<br>upstream step outputs</div>
-        <div class="tag unsized">Not evaluated</div>
-      </div>
-      <div class="step-card not-evaluated">
-        <div class="step-name">PN → CBSO Conversion</div>
-        <div class="step-detail">Rule + forex translation<br>As-Is: ad-hoc → To-Be: rule-based</div>
-        <div class="tag unsized">Not evaluated</div>
-      </div>
-      <div class="step-card not-evaluated">
-        <div class="step-name">Price Calc / Shaping</div>
-        <div class="step-detail">Action-based price-cost<br>calculation & shaping</div>
-        <div class="tag unsized">Not evaluated</div>
-      </div>
+    <div class="chip-row">
+      <div class="chip">EOS HW Listing</div>
+      <div class="chip">Brand Mapping → DP <span class="badge lt">10K</span></div>
+      <div class="chip">Channel Discount <span class="badge lt">10K</span></div>
+      <div class="chip">List Price Pull <span class="badge lt">3→1.5 wks</span></div>
+      <div class="chip">Cost Pull</div>
+      <div class="chip">Forex Translation <span class="badge lt">40K</span></div>
     </div>
   </div>
 
-  <div class="block-arrow">↓</div>
-
-  <div class="block">
-    <div class="block-header">
-      <div class="letter" style="background:var(--red)">D</div>
-      <div class="title">Output & Upload</div>
-      <div class="badge pending">0/1 Evaluated</div>
+  <!-- Red -->
+  <div class="section">
+    <div class="section-head">
+      <div class="dot r"></div><div class="tag r">NOT CLARIFIED</div><div class="count">6 steps · Sizing TBD</div>
     </div>
-    <div class="step-row">
-      <div class="step-card not-evaluated" style="max-width:340px">
-        <div class="step-name">Upload to Tools</div>
-        <div class="step-detail">As-Is: Manual<br>To-Be: Robotic Automation</div>
-        <div class="lt-change"><span class="old">3 wks</span><span class="arrow">→</span><span class="new">1 wk</span></div>
-        <div class="tag unsized">Not evaluated</div>
-      </div>
+    <div class="chip-row">
+      <div class="chip">Pricing Dimensions Mapping <span class="badge tbd">TBD</span></div>
+      <div class="chip">Warranty Data (DE/DM/DG/DS) <span class="badge tbd">TBD</span></div>
+      <div class="chip">Finalize PN List <span class="badge tbd">TBD</span></div>
+      <div class="chip">PN → CBSO Conversion <span class="badge tbd">TBD</span></div>
+      <div class="chip">Price Calc / Shaping <span class="badge tbd">TBD</span></div>
+      <div class="chip">Upload to Tools <span class="badge lt">3→1 wk</span></div>
     </div>
   </div>
 
-  <div class="summary-footer">
-    <div class="footer-card">
-      <div class="big" style="color:var(--green)">3 Items</div>
-      <div class="text">With measurable lead time improvement<br>Greatest: 6 wks → 1.5 wks</div>
+  <div class="summary">
+    <div class="sum-card">
+      <div class="title">Investment to Date</div>
+      <div class="val" style="color:var(--accent)">~90K</div>
+      <div class="sub">30K delivered + 60K estimated for in-evaluation items</div>
     </div>
-    <div class="footer-card">
-      <div class="big" style="color:var(--accent)">~90K</div>
-      <div class="text">Total sizing for evaluated steps<br>List/Cost Pull at zero marginal cost</div>
-    </div>
-    <div class="footer-card">
-      <div class="big" style="color:var(--amber)">Block C+D</div>
-      <div class="text">Calculation + Output/Upload<br>are the next evaluation priority</div>
+    <div class="sum-card">
+      <div class="title">Lead Time Potential</div>
+      <div class="val" style="color:var(--green)">~75% reduction</div>
+      <div class="sub">End-to-end target: ~3 weeks automated vs. ~12 weeks manual today. Remaining 6 unclarified steps hold additional gains — notably Upload (3→1 wk) and ad-hoc data pulls moving to live reports.</div>
     </div>
   </div>
 
