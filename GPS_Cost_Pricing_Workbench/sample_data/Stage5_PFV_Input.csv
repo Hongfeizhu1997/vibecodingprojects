@@ -1,31 +1,31 @@
-tier,term_years,delivery_type,geo,base,adp,kyd,sbty,ticru,priority
-TP Education,1,Onsite,EMEA,52,10,5,5,5,15
-TP Education,1,Onsite,NA,46,8,4,4,4,12
-TP Education,3,Onsite,EMEA,124,10,5,5,5,15
-TP Education,3,Onsite,NA,110,8,4,4,4,12
-TP Education,5,Onsite,EMEA,186,10,5,5,5,15
-TP Education,5,Onsite,NA,166,8,4,4,4,12
-TP Tablet,1,Onsite,EMEA,71,10,5,5,5,15
-TP Tablet,1,Onsite,NA,63,8,4,4,4,12
-TP Tablet,3,Onsite,EMEA,168,10,5,5,5,15
-TP Tablet,3,Onsite,NA,150,8,4,4,4,12
-TP Tablet,5,Onsite,EMEA,252,10,5,5,5,15
-TP Tablet,5,Onsite,NA,225,8,4,4,4,12
-TP Classic,1,Onsite,EMEA,97,10,5,5,5,15
-TP Classic,1,Onsite,NA,86,8,4,4,4,12
-TP Classic,3,Onsite,EMEA,230,10,5,5,5,15
-TP Classic,3,Onsite,NA,205,8,4,4,4,12
-TP Classic,5,Onsite,EMEA,345,10,5,5,5,15
-TP Classic,5,Onsite,NA,308,8,4,4,4,12
-TP Premium,1,Onsite,EMEA,134,10,5,5,5,15
-TP Premium,1,Onsite,NA,119,8,4,4,4,12
-TP Premium,3,Onsite,EMEA,318,10,5,5,5,15
-TP Premium,3,Onsite,NA,283,8,4,4,4,12
-TP Premium,5,Onsite,EMEA,478,10,5,5,5,15
-TP Premium,5,Onsite,NA,426,8,4,4,4,12
-TP Edge,1,Onsite,EMEA,171,10,5,5,5,15
-TP Edge,1,Onsite,NA,153,8,4,4,4,12
-TP Edge,3,Onsite,EMEA,406,10,5,5,5,15
-TP Edge,3,Onsite,NA,362,8,4,4,4,12
-TP Edge,5,Onsite,EMEA,611,10,5,5,5,15
-TP Edge,5,Onsite,NA,545,8,4,4,4,12
+tier,upgrade_years,delivery_type,pfv_value
+TP Education,1,Onsite,49
+TP Education,1,Express Depot,39
+TP Education,3,Onsite,117
+TP Education,3,Express Depot,93
+TP Education,5,Onsite,176
+TP Education,5,Express Depot,140
+TP Tablet,1,Onsite,67
+TP Tablet,1,Express Depot,53
+TP Tablet,3,Onsite,159
+TP Tablet,3,Express Depot,127
+TP Tablet,5,Onsite,238
+TP Tablet,5,Express Depot,190
+TP Classic,1,Onsite,91
+TP Classic,1,Express Depot,72
+TP Classic,3,Onsite,217
+TP Classic,3,Express Depot,173
+TP Classic,5,Onsite,326
+TP Classic,5,Express Depot,260
+TP Premium,1,Onsite,126
+TP Premium,1,Express Depot,100
+TP Premium,3,Onsite,300
+TP Premium,3,Express Depot,240
+TP Premium,5,Onsite,452
+TP Premium,5,Express Depot,361
+TP Edge,1,Onsite,162
+TP Edge,1,Express Depot,129
+TP Edge,3,Onsite,384
+TP Edge,3,Express Depot,307
+TP Edge,5,Onsite,578
+TP Edge,5,Express Depot,462
