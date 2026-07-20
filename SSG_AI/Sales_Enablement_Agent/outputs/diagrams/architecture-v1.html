@@ -171,7 +171,7 @@
 <div class="title-main">SSG Enablement<br>Agent</div>
 <div class="title-sub">AI-Powered Service PN Operations</div>
 <div class="title-divider"></div>
-<div class="title-meta"><span>V1</span><span>·</span><span>June 2026</span><span>·</span><span>Confidential</span></div>
+<div class="title-meta"><span>V1</span><span>·</span><span>July 2026</span><span>·</span><span>+ ISG 16-Step</span><span>·</span><span>Confidential</span></div>
 <div class="title-stats">
 <div class="title-stat"><div class="num">6</div><div class="lbl">Business Roles</div></div>
 <div class="title-stat"><div class="num">13</div><div class="lbl">AI Scenarios</div></div>
@@ -218,7 +218,7 @@
 <div class="role-grid">
 <div class="role-card" style="border-color:rgba(56,189,248,0.2);"><div class="role-name">PN Enablement</div><div class="role-sub">PN · Lifecycle · RAG Pipeline</div><div class="role-what">PN creation &amp; attribute maintenance · duplicate checks · lifecycle mgmt · impact analysis</div></div>
 <div class="role-card"><div class="role-name">SSG Enablement</div><div class="role-sub">Cost Agent</div><div class="role-what">Sales cost calculation · validation · publish to markets</div></div>
-<div class="role-card"><div class="role-name">Pricing Team</div><div class="role-sub">Price · RAG Pipeline</div><div class="role-what">PFV competitive benchmark · sub-tier classification · list/channel pricing</div></div>
+<div class="role-card"><div class="role-name">Pricing Team</div><div class="role-sub">Price · Cost · PN Agents</div><div class="role-what">ISG 16-step full pipeline: PN listing → cost aggregation → pricing · 7/16 steps</div></div>
 <div class="role-card"><div class="role-name">Finance</div><div class="role-sub">Cost Agent</div><div class="role-what">Standard cost data input &amp; validation</div></div>
 <div class="role-card"><div class="role-name">TMO / SMO / SA / ODT</div><div class="role-sub">PN · RAG Pipeline</div><div class="role-what">PN requests · duplicate checks · offering hand-off to PN Enablement</div></div>
 <div class="role-card"><div class="role-name">Portfolio &amp; Inquiry</div><div class="role-sub">RAG Pipeline</div><div class="role-what">PN master data inquiry · Booking reports · Portfolio views · Impact analysis</div></div>
@@ -236,7 +236,7 @@
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem">
 <div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">PN Agent</div><div style="color:var(--dim)">Create · Dedup · Extend<br>Lifecycle · Retirement</div></div>
 <div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">Cost Agent</div><div style="color:var(--dim)">Standard Cost<br>Sales Cost Uplift</div></div>
-<div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">Price Agent</div><div style="color:var(--dim)">Sub-Tier · PFV<br>List/Channel Price</div></div>
+<div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">Price Agent</div><div style="color:var(--dim)">ISG 7/16 Steps<br>PFV · Pricing · CBSO · Forex</div></div>
 <div class="node node-green" style="text-align:center;font-size:.63rem"><div style="font-weight:700;font-size:.65rem;color:#fff">RAG Pipeline</div><div style="color:var(--dim)">Reports · MT Capture<br>Onboarding · Inquiry</div><div style="font-size:.62rem;color:var(--teal);margin-top:.15rem;">← powered by EKP</div></div>
 </div>
 </div>
@@ -361,10 +361,151 @@
     </div>
   </div></div></div>
 
+<!-- 10: ISG PRICE UPDATE — AGENT ROLES -->
+<div class="stage" id="s10"><div class="stage-content">
+<h2><span class="num">ISG</span> ISG Price Update — 16-Step Agent Mapping</h2>
+<p>Three Sub-Agents divide the 16-step ISG Price Update pipeline. <strong style="color:var(--accent);">Price Agent covers 7 steps</strong> — the widest span.</p>
+<div class="col2">
+<div class="col-card"><h4 style="color:var(--accent);">Price Agent (7/16 steps)</h4>
+<p style="font-size:.65rem;line-height:1.5;">
+<strong>Step 5</strong> Pricing Dimensions Mapping<br>
+<strong>Step 5-</strong> Charge Type Auto-Match<br>
+<strong>Step 8</strong> Brand Mapping → DP<br>
+<strong>Step 10</strong> PFV Competitive Analysis<br>
+<strong>Step 11</strong> List Price Pull (CPM)<br>
+<strong>Step 13</strong> Forex Translation<br>
+<strong>Step 14</strong> PN → CBSO Conversion<br>
+<strong>Step 15</strong> Price Calc &amp; Shaping
+</p></div>
+<div class="col-card"><h4 style="color:var(--teal);">Cost Agent (5 steps)</h4>
+<p style="font-size:.65rem;line-height:1.5;">
+<strong>Step 4,6</strong> HW / EOS Data Access<br>
+<strong>Step 9</strong> Channel Discount Mgmt<br>
+<strong>Step 12</strong> Standard Cost Calc<br>
+<strong>—</strong> Sales Cost Uplift<br>
+<strong>—</strong> Sales Cost Validation
+</p></div>
+</div>
+<div class="col2" style="margin-top:.6rem;">
+<div class="col-card"><h4 style="color:var(--purple);">PN Agent (4 steps)</h4>
+<p style="font-size:.65rem;line-height:1.5;">
+<strong>Steps 1-4</strong> PN Listing &amp; Finalize<br>
+&nbsp;&nbsp;① Published PN List<br>
+&nbsp;&nbsp;② Not-published PN List<br>
+&nbsp;&nbsp;③ PN Master Data<br>
+&nbsp;&nbsp;④ HW-PN Compatibility Check<br>
+<strong>Step 10</strong> PN Lock for Pricing
+</p></div>
+<div class="col-card"><h4 style="color:var(--amber);">Shared Infrastructure</h4>
+<p style="font-size:.65rem;line-height:1.5;">
+<strong>Security Layer</strong> — Approval gates at Steps 9, 10, 15<br>
+<strong>RAG Pipeline (EKP)</strong> — PN rules, pricing logic, approval matrix shared across all Agents<br>
+<strong>Step 16</strong> — Upload to Tools (approval gate → CPM/LBP)
+</p></div>
+</div>
+<div class="callout-t"><strong>Key dependency:</strong> Steps 1-4 PN Listing quality directly determines pricing completeness. PN Agent is the first quality gate.</div>
+</div></div>
+
+<!-- 11: ISG CROSS-AGENT PIPELINE -->
+<div class="stage" id="s11"><div class="stage-content">
+<h2><span class="num">ISG</span> Cross-Agent Collaboration Pipeline</h2>
+<p>ISG Price Update 16-step flow — three Agents connected in a <strong style="color:var(--accent);">linear chain</strong> with Security Layer oversight.</p>
+<div class="diagram"><div class="diagram-label">End-to-End Agent Collaboration Flow</div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin-bottom:.5rem;">
+<div>
+<div class="node node-purple" style="text-align:center;font-size:.65rem;padding:.6rem;margin-bottom:.3rem;"><strong>PN Agent</strong><br><span style="font-weight:400;color:var(--dim);">Upstream Input</span></div>
+<div style="display:flex;flex-direction:column;gap:.3rem;">
+<div class="node node-dark node-xs">① Published PN Listing</div>
+<div class="node node-dark node-xs">② Not-published PN List</div>
+<div class="node node-dark node-xs">③ PN Master Data</div>
+<div class="node node-dark node-xs">④ HW-PN Compatibility</div>
+<div class="node node-dark node-xs" style="border-color:rgba(167,139,250,.15);color:var(--purple);">→ ④ Finalize PN List</div>
+</div>
+</div>
+<div>
+<div class="node node-green" style="text-align:center;font-size:.65rem;padding:.6rem;margin-bottom:.3rem;"><strong>Cost Agent</strong><br><span style="font-weight:400;color:var(--dim);">Midstream Data</span></div>
+<div style="display:flex;flex-direction:column;gap:.3rem;">
+<div class="node node-dark node-xs">⑦ EOS HW Listing</div>
+<div class="node node-dark node-xs">⑧ HW/EOS Data Access</div>
+<div class="node node-dark node-xs">⑨ Channel Discount Mgmt</div>
+<div class="node node-dark node-xs">⑫ Standard Cost Calc</div>
+<div class="node node-dark node-xs" style="border-color:rgba(74,222,128,.15);color:var(--green);">→ Inputs ready</div>
+</div>
+</div>
+<div>
+<div class="node node-accent" style="text-align:center;font-size:.65rem;padding:.6rem;margin-bottom:.3rem;"><strong>Price Agent</strong><br><span style="font-weight:400;color:var(--dim);">Downstream Pricing</span></div>
+<div style="display:flex;flex-direction:column;gap:.3rem;">
+<div class="node node-dark node-xs">⑤ Pricing Dimensions Map</div>
+<div class="node node-dark node-xs">⑧ Brand Mapping → DP</div>
+<div class="node node-dark node-xs">⑪ List Price Pull (CPM)</div>
+<div class="node node-dark node-xs">⑬ Forex Translation</div>
+<div class="node node-dark node-xs">⑭ PN → CBSO Convert</div>
+<div class="node node-dark node-xs" style="border-color:rgba(56,189,248,.2);color:var(--accent);">⑮ Price Calc & Shape</div>
+</div>
+</div>
+</div>
+<div style="display:flex;justify-content:center;gap:.8rem;align-items:center;margin-top:.3rem;flex-wrap:wrap;">
+<div class="node node-amber node-xs">🔒 Step 9: Discount Write</div>
+<span style="color:var(--dim);font-size:.62rem;">→</span>
+<div class="node node-amber node-xs">🔒 Step 10: PN Lock</div>
+<span style="color:var(--dim);font-size:.62rem;">→</span>
+<div class="node node-red node-xs">🔒 Step 15: Price Publish</div>
+<span style="color:var(--dim);font-size:.62rem;">→</span>
+<div class="node node-green node-xs">✅ Step 16: Upload to CPM/LBP</div>
+</div>
+<div style="text-align:center;margin-top:.4rem;font-size:.62rem;color:var(--dim);">Security Layer approval gates at every write operation — read freely, write with permission.</div>
+</div>
+</div></div>
+
+<!-- 12: SECURITY AUTO/APPROVAL EXPANDED -->
+<div class="stage" id="s12"><div class="stage-content">
+<h2><span class="num">ISG</span> Security Layer — AUTO vs APPROVAL (Updated)</h2>
+<p>ISG Price Update introduces new automated operations and approval gates across all three Agents.</p>
+<div class="diagram">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:.4rem">
+<div>
+<div class="node node-green node-xs" style="text-align:center;margin-bottom:.4rem;padding:1rem">
+<strong>✅ AUTO</strong> — Agent executes independently
+</div>
+<div style="display:flex;flex-direction:column;gap:.5rem;">
+<div class="node node-dark node-xs">📊 Data queries &amp; PN info</div>
+<div class="node node-dark node-xs">🔍 Duplicate checks</div>
+<div class="node node-dark node-xs">📄 Report generation</div>
+<div class="node node-dark node-xs">📈 PFV research (read-only)</div>
+<div class="node node-dark node-xs">⚠️ Booking Impact alerts</div>
+<div class="node node-dark node-xs" style="border-color:rgba(94,234,212,.15);color:var(--teal);">🆕 Pricing Dimensions Template</div>
+<div class="node node-dark node-xs" style="border-color:rgba(94,234,212,.15);color:var(--teal);">🆕 HW/EOS Data Pull (read-only)</div>
+<div class="node node-dark node-xs" style="border-color:rgba(94,234,212,.15);color:var(--teal);">🆕 Charge Type Auto-Match</div>
+<div class="node node-dark node-xs" style="border-color:rgba(94,234,212,.15);color:var(--teal);">🆕 Forex Rate Translation</div>
+<div class="node node-dark node-xs" style="border-color:rgba(94,234,212,.15);color:var(--teal);">🆕 PN → CBSO Auto-Convert</div>
+<div class="node node-dark node-xs" style="border-color:rgba(94,234,212,.15);color:var(--teal);">🆕 List Price / Cost Pull (read-only)</div>
+</div>
+</div>
+<div>
+<div class="node node-amber node-xs" style="text-align:center;margin-bottom:.4rem;padding:1rem">
+<strong>🔒 APPROVAL</strong> — Human reviews before execution
+</div>
+<div style="display:flex;flex-direction:column;gap:.5rem;">
+<div class="node node-dark node-xs">💰 Cost write to SCFE</div>
+<div class="node node-dark node-xs">💵 Cost write to CPM</div>
+<div class="node node-dark node-xs">🏷 Price publish</div>
+<div class="node node-dark node-xs">🗑 Bulk PN closure</div>
+<div class="node node-dark node-xs">🆕 New portfolio creation</div>
+<div class="node node-dark node-xs" style="border-color:rgba(251,191,36,.15);color:var(--amber);">🆕 Brand Mapping Update</div>
+<div class="node node-dark node-xs" style="border-color:rgba(251,191,36,.15);color:var(--amber);">🆕 Channel Discount Write</div>
+<div class="node node-dark node-xs" style="border-color:rgba(251,191,36,.15);color:var(--amber);">🆕 PN List Lock (Finalize)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout"><strong>Principle unchanged:</strong> read freely, write with permission. ISG expands what qualifies as "read" — dimension mapping, charge matching, forex, CBSO conversion are all zero-risk read/transform ops.</div>
+</div></div>
+
+
 <!-- ====== NEW SLIDES: Delivery Plan V2 (replaces old 10-12) ====== -->
 
-<!-- 10: TIMELINE + OVERVIEW -->
-<div class="stage" id="s10"><div class="stage-content">
+<!-- 13: TIMELINE + OVERVIEW -->
+<div class="stage" id="s13"><div class="stage-content">
 <h2><span class="num">05</span> Delivery Plan — 24-Week Roadmap</h2>
 <p>Five-dimension evaluation framework (Sensitivity · Complexity · Coupling · <strong style="color:var(--teal);">Data Readiness</strong> · <strong style="color:var(--teal);">Value Density</strong>) reorders execution without compressing timeline. Key shift: P3 pricing layer restructured to linear chain — PFV promoted to first.</p>
 <div class="tl-card">
@@ -419,8 +560,8 @@
 <div class="callout-t"><strong>Key shift from original:</strong> PFV (external crawler, 🟢 ready) runs immediately while cost calc awaits SCFE API — zero idle time.</div>
 </div></div>
 
-<!-- 11: FIVE DIMENSIONS + PHASE 1 & 2 -->
-<div class="stage" id="s11"><div class="stage-content">
+<!-- 14: FIVE DIMENSIONS + PHASE 1 & 2 -->
+<div class="stage" id="s14"><div class="stage-content">
 <h2><span class="num">05</span> Five-Dimension Framework</h2>
 <p>Original 3D (Sensitivity · Complexity · Coupling) + <strong style="color:var(--teal);">Data Readiness</strong> (can we start?) + <strong style="color:var(--teal);">Value Density</strong> (should we start first?).</p>
 <div class="fw-grid">
@@ -451,8 +592,8 @@
 <div class="callout"><strong>+Web Workspace with P2.2:</strong> approval queue + PN status dashboard.</div>
 </div></div>
 
-<!-- 12: PHASE 3 + PHASE 4 + MATRIX -->
-<div class="stage" id="s12"><div class="stage-content">
+<!-- 15: PHASE 3 + PHASE 4 + MATRIX -->
+<div class="stage" id="s15"><div class="stage-content">
 <h2><span class="num">05</span> Phase 3 &amp; 4 — Pricing Chain + Ecosystem</h2>
 <div class="pnum">Phase 3 — Intel → Cost → Price · Weeks 14–24</div>
 <div class="flow">
@@ -494,8 +635,8 @@
 </div>
 </div></div>
 
-<!-- 13: DEPENDENCIES + BOTTOM LINE -->
-<div class="stage" id="s13"><div class="stage-content">
+<!-- 16: DEPENDENCIES + BOTTOM LINE -->
+<div class="stage" id="s16"><div class="stage-content">
 <h2><span class="num">06</span> Dependencies &amp; Key Decisions</h2>
 <table>
 <tr><th>Dependency</th><th>Why It Matters</th><th>Status</th></tr>
@@ -512,16 +653,16 @@
 <strong>Phase 1 critical path:</strong> confirm system APIs, populate EKP with SME input, stand up RAG Pipeline on EKP for Teams Q&A. 6 weeks. Low risk. High learning.<br><br>
 <strong>This is a teammate, not a replacement.</strong> The GPS team's expertise is irreplaceable. The Agent handles the mechanical work: lookups, cross-checks, calculations, approval routing.
 </div>
-<div class="footer">SSG AI · SSG Enablement Agent · Architecture V2 · June 2026</div>
+<div class="footer">SSG AI · SSG Enablement Agent · Architecture V2 · July 2026 + ISG Price Update</div>
 </div></div>
 
 <div class="nav-bar">
-<div class="nav-info" id="ni">Slide 1 / 13</div>
+<div class="nav-info" id="ni">Slide 1 / 16</div>
 <div class="nav-hint"><kbd>←</kbd> <kbd>→</kbd> to navigate</div>
 </div>
 
 <script>
-const T=13; let c=0;
+const T=16; let c=0;
 function show(i){
 document.querySelectorAll('.stage').forEach((s,j)=>s.classList.toggle('active',j===i));
 document.getElementById('pf').style.width=((i+1)/T*100)+'%';
