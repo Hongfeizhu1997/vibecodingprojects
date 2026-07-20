@@ -1,6 +1,6 @@
 # SSG Sales Enablement Agent — 架构方案 V1
 
-> 创建：2026-06-03 | 更新：2026-07-09 | 来源：iChain Persona Workspace + Vetra (VetraFlow) 平台 + SSG GPS 业务需求 + ITshare Engineering & AI Workshop (2026 May) + NextOra SW Dev Agent Phase1 方案
+> 创建：2026-06-03 | 更新：2026-07-17 | 来源：iChain Persona Workspace + Vetra (VetraFlow) 平台 + SSG GPS 业务需求 + ITshare Engineering & AI Workshop (2026 May) + NextOra SW Dev Agent Phase1 方案 + ISG Price Update 16 步流程
 
 ---
 
@@ -120,7 +120,7 @@ Vetra 平台定义四大核心组件，SSG 架构的各层直接对其映射：
 
 | 角色 | 主要场景 | 对应 Sub-Agent | Workspace 焦点 |
 |------|---------|---------------|---------------|
-| **Pricing Team** | PFV 分析、定价计算 | Price Agent（共享 Knowledge Pipeline） | 定价工作台、竞品对标 |
+| **Pricing Team** | 16 步 ISG Price Update 全流程：PN 清单 → 定价维度映射 → 成本/汇率/折扣聚合 → 价格计算 → 审批发布 | Price Agent + Cost Agent + PN Agent（共享 Knowledge Pipeline） | 定价工作台：从原始 PN 列表到最终售价的全链路 |
 | **Sales Enablement** | Sales Cost 计算、验证、发布 | Cost Agent | Cost 数据面板、审批 |
 | **Finance Team** | 标准成本计算 | Cost Agent | 成本数据输入 |
 | **GPS PM** | PN 创建、生命周期管理 | PN Agent, Lifecycle Agent | PN 创建视图、审批队列 |
@@ -133,27 +133,45 @@ Vetra 平台定义四大核心组件，SSG 架构的各层直接对其映射：
 
 > **Skill-as-Product 原则**：每个 Sub-Agent 的能力以 Skill 形式封装，遵循独立版本化和独立测试策略。Skill = `prompts` + `tools` + `knowledge` + `tests` 四位一体，可插拔、可独立升级，不相互耦合。新增或修改一个 Skill 不影响其他 Agent 运行。
 
-### 4.1 Price Agent（定价）
-| 场景 | 能力 | 权限 |
-|------|------|------|
-| #10 PFV 分析 | 自动抓取行业/竞品价格 → 生成对标报告 | **自动**（只读研究） |
-| #11 定价计算 | 输入 Std Cost + PFV → 计算 List/Channel Price → 建议 | **审批后发布** |
+### 4.1 Price Agent（定价 — ISG Price Update 16 步核心）
+
+> 基于 ISG Price Update 端到端流程（16 步）扩展。Price Agent 承担从定价维度定义到最终价格产出的完整链路，是 ISG 流程中覆盖步数最多（7/16 步）的 Sub-Agent。
+
+| ISG 步骤 | 场景 | 能力 | 权限 |
+|:--:|------|------|------|
+| **5** | Pricing Dimensions Mapping | 定义每个 PN 的定价维度（GEO × 客户段 × Charge Type × Term），形成标准化定价模板 | **自动**（配置类，只写模板） |
+| **5-** | Charge Type 匹配 | PN → CBSO Charge Type 自动映射，基于 ICP 字段匹配规则 | **自动**（基于规则） |
+| **8** | Brand Mapping → DP | 品牌到 Deal Price 的映射关系维护、查询和异常检测 | **审批后更新** |
+| **10** | #10 PFV 分析 | 自动抓取行业/竞品价格 → 生成对标报告 | **自动**（只读研究） |
+| **11** | List Price Pull（CPM） | 从 CPM 拉取当前 List Price / Channel Price，校验字段完整性 | **自动**（只读） |
+| **13** | Forex Translation | 多 GEO 汇率自动换算，按发布周期刷新汇率表 | **自动** |
+| **14** | PN → CBSO 转换 | 服务 PN 到 CBSO 计费结构的自动转换，输出可比对的价格基准 | **自动**（可人工校验） |
+| **15** | #11 Price Calc & Shaping | 综合 Std Cost + PFV + Channel Discount + Forex → 生成推荐售价，标注置信度 | **审批后发布** |
 
 ### 4.2 Cost Agent（成本管理）
-| 场景 | 能力 | 权限 |
-|------|------|------|
-| #8 标准成本计算 | 从 SCFE 取 PH3 数据 → 加权平均计算 → 展示 | **审批后写入** |
-| #9 Sales Cost Uplift | 分析历史 uplift 规则 → 建议规则和数值 | **审批后写入 CPM** |
-| Sales Cost 验证 | 对标 HW AUR → 完整性检查 → 报告异常 | **自动**（只读） |
+
+> 扩展后覆盖 ISG Price Update 流程中的成本拉取、渠道折扣管理和 HW/Warranty 数据接入。
+
+| ISG 步骤 | 场景 | 能力 | 权限 |
+|:--:|------|------|------|
+| **12** | #8 标准成本计算 | 从 SCFE 取 PH3 数据 → 加权平均计算 → 展示 | **审批后写入** |
+| — | #9 Sales Cost Uplift | 分析历史 uplift 规则 → 建议规则和数值 | **审批后写入 CPM** |
+| **9** | Channel Discount 管理 | 渠道折扣规则查询和数值维护，按 GEO/渠道/客户段分层 | **审批后写入 CPM** |
+| **4,6** | HW / EOS 数据接入 | ICP HW Master Data + EOS HW Listing 作为成本计算的硬件侧输入 | **自动**（只读） |
+| — | Sales Cost 验证 | 对标 HW AUR → 完整性检查 → 报告异常 | **自动**（只读） |
 
 ### 4.3 PN Agent（PN 全生命周期）
-| 场景 | 能力 | 权限 |
-|------|------|------|
-| #2 自动生成 POR/表单 | 接收需求信息 → 调 SPEP API 生成 | **自动** |
-| #3 重复检查 | PN 编号/属性 → 调 SPEP 查重 → 返回建议 | **自动** |
-| #7 创建/扩展判断 | 分析 MT 归属 → 建议 extend 或 create new | **半自动**（涉及新 PN Portfolio 创建需审批） |
+
+| ISG 步骤 | 场景 | 能力 | 权限 |
+|:--:|------|------|------|
+| — | #2 自动生成 POR/表单 | 接收需求信息 → 调 SPEP API 生成 | **自动** |
+| — | #3 重复检查 | PN 编号/属性 → 调 SPEP 查重 → 返回建议 | **自动** |
+| — | #7 创建/扩展判断 | 分析 MT 归属 → 建议 extend 或 create new | **半自动**（涉及新 PN Portfolio 创建需审批） |
+| **1-4,10** | **PN Listing & Finalize** | 拉取 Published / Not-published PN 列表 + PN Master + HW-PN Compatibility → 综合筛选生成最终定价 PN 清单 | **审批后锁定** |
 
 > ⚠️ **优先级调整 (2026-07-09)**：PN Agent 从 Wave 2 后移至 Wave 3。PN 团队当前已在使用 Spark / Copilot / Web Coding 等 AI 工具覆盖重复性编码和表单生成场景，本阶段聚焦团队尚未覆盖的决策辅助与生命周期管理，不重复建设已有能力。
+> 
+> **ISG 流程新增 (2026-07-17)**：PN Agent 新增「PN Listing & Finalize」能力——ISG Price Update 的前 4 步（PN 列表拉取 + 兼容性校验 + 清单锁定）是定价流程的前置输入，PN Agent 负责确保进入定价环节的 PN 清单完整且无遗漏。
 
 ### 4.4 Lifecycle Agent（生命周期管理）
 | 场景 | 能力 | 权限 |
@@ -222,6 +240,56 @@ Wave 1 没有 PN/Cost/Price/Lifecycle Agent，只有查询场景。此时 RAG Kn
 
 到 Wave 2-4，当操作类 Agent 上线后，RAG 回归其共享管线角色，不再直接面向用户。
 
+### 4.6 ISG Price Update Pipeline — 跨 Agent 协作示例
+
+> **来源**：ISG Price Update 端到端 16 步流程。以下展示三个 Sub-Agent 如何串联完成一次完整的定价周期。
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  ISG Price Update — Agent 协作流程                │
+│                                                                   │
+│  PN Agent                        Cost Agent        Price Agent   │
+│  ────────                        ──────────        ───────────   │
+│                                                                   │
+│  ① Published PN Listing ─┐                                       │
+│  ② Not-published PN    ─┤                                       │
+│  ③ PN Master           ─┼─→ ④ Finalize PN List                  │
+│  ④ HW-PN Compatibility ─┘       │                                │
+│                                  ▼                                │
+│                          ⑤ Pricing Dimensions Mapping ──────────→│
+│                          ⑥ Charge Type 匹配 ─────────────────────→│
+│                                                                   │
+│  ⑦ EOS HW Listing ────────────→ ⑧ HW/EOS 数据接入               │
+│                                  │                                │
+│                                  ▼                                │
+│                          ⑨ Channel Discount 管理                 │
+│                          ⑩ Cost Pull (CFE)                        │
+│                                  │                                │
+│                                  ▼                                │
+│                          ⑪ Brand Mapping → DP ───────────────────→│
+│                          ⑫ List Price Pull (CPM) ────────────────→│
+│                          ⑬ Forex Translation ────────────────────→│
+│                                                                   │
+│                                  │              ◄─────────────────│
+│                                  ▼                                │
+│                          ⑭ PN → CBSO 转换 ───────────────────────→│
+│                          ⑮ Price Calc & Shaping ─────────────────→│
+│                                  │              (综合所有输入)     │
+│                                  ▼                                │
+│                          ⑯ Upload to Tools                        │
+│                             (审批 Gate → 自动写入 CPM/LBP)         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**协作模式**：
+- **PN Agent** 负责上游（步骤 1-4,10）：确保进入定价的 PN 清单完整、去重、兼容性已验证
+- **Cost Agent** 负责中游（步骤 6-7,9,12）：提供成本侧输入——HW 数据、渠道折扣、标准成本
+- **Price Agent** 负责下游（步骤 5,8,11,13-15）：定价维度定义、价格拉取、汇率换算、最终价格计算
+- **Security Layer**（贯穿全程）：步骤 10（锁定 PN 清单）、步骤 9（折扣更新）、步骤 15（价格发布）均走审批 Gate
+- **RAG Knowledge Pipeline**（共享基础设施）：所有 Agent 共享 PN 规则、定价逻辑、审批矩阵
+
+**关键依赖**：步骤 1-4 的 PN 清单质量直接决定后续定价的完整性——如果 Published PN 列表有遗漏，整个定价周期失效。因此 PN Agent 的「PN Listing & Finalize」是 ISG 流程的第一道质量门禁。
+
 ---
 
 ## 5. Security Layer 设计
@@ -237,8 +305,14 @@ AUTO（Agent 自主执行）          APPROVAL（需人审批）
 • PFV 竞品研究（只读）          • PN 批量关闭操作
 • Booking Impact 分析           • Sub-Tier 定义确认
 • 审批请求发送                  • 新 PN Portfolio 创建
-• MT Announcement 捕获入库
-• 异常/风险提醒
+• MT Announcement 捕获入库      • Brand Mapping 更新
+• 异常/风险提醒                 • Channel Discount 数值写入
+• Pricing Dimensions 模板定义   • PN 清单锁定（Finalize）
+• HW/EOS 数据拉取（只读）
+• Charge Type 自动匹配
+• Forex 汇率换算
+• PN → CBSO 自动转换
+• List Price / Cost Pull（只读）
 ```
 
 ### 5.2 审批流
@@ -307,9 +381,10 @@ Wave 1（MVP — 4-6 周）
 └── 验证"AI 辅助查询"的实际价值
 
 Wave 2（定价核心 — 6-8 周）
-├── Price Agent（场景 #10, #11）
+├── Price Agent（ISG Price Update 7 步：步骤 5,8,11,13,14,15 + PFV 分析）
+├── Cost Agent 扩展（Channel Discount + HW/EOS 数据接入）
 ├── Web Persona Workspace 上线（Pricing Workspace 优先）
-└── PFV 对标 → List Price / Channel Price 计算 → 定价建议
+└── 目标：从 PN 清单到最终售价的全链路自动化（ISG 16 步定价闭环）
 
 Wave 3（成本计算 — 6-8 周）
 ├── Cost Agent（场景 #8, #9）

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDG vs ISG — Dynamic Pricing 方案对比 [animated]</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#020617;color:#e2e8f0;overflow:hidden;
+  width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;
+}
+
+/* Brand bar */
+.brand{
+  position:fixed;top:0;left:0;right:0;height:40px;
+  background:linear-gradient(90deg,#0f172a 0%,#1e293b 100%);
+  display:flex;align-items:center;padding:0 2rem;z-index:100;
+  border-bottom:1px solid #1e293b;
+}
+.brand span{font-size:0.62rem;font-weight:700;color:#64748b;letter-spacing:0.08em;text-transform:uppercase;}
+.brand .accent{color:#E1251B;margin:0 0.3rem;}
+
+/* Progress bar */
+.progress-wrap{position:fixed;bottom:0;left:0;right:0;height:3px;z-index:100;background:#1e293b;}
+.progress-fill{height:100%;background:#E1251B;transition:width 0.3s ease;}
+
+/* Indicator */
+.indicator{position:fixed;top:12px;right:2rem;font-size:0.65rem;color:#64748b;z-index:101;font-weight:600;}
+
+/* Nav hint */
+.nav-hint{position:fixed;bottom:20px;right:2rem;font-size:0.58rem;color:#475569;z-index:101;}
+
+/* Stages */
+.stage{
+  position:absolute;top:40px;left:0;width:100%;height:calc(100vh - 40px);
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;
+  opacity:0;transition:opacity 0.5s ease;
+  pointer-events:none;padding:2rem 3rem 3rem;
+}
+.stage.active{opacity:1;pointer-events:auto;}
+
+/* Reveal animation */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+
+/* Scene label */
+.scene-label{
+  font-size:0.62rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.12em;color:#E1251B;margin-bottom:0.3rem;text-align:center;
+}
+.scene-title{
+  font-size:1.2rem;font-weight:800;margin-bottom:1rem;text-align:center;color:#f1f5f9;
+}
+
+/* Cards */
+.card-row{display:flex;gap:1.2rem;align-items:flex-start;flex-wrap:wrap;justify-content:center;}
+.card{
+  background:#0f172a;border:1px solid #1e293b;border-radius:10px;
+  padding:1.3rem 1.5rem;min-width:200px;max-width:280px;flex:1;
+}
+.card h4{font-size:0.75rem;font-weight:700;margin-bottom:0.4rem;}
+.card .desc{font-size:0.65rem;color:#94a3b8;line-height:1.6;}
+
+/* Feature row (larger cards) */
+.feat-row{display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;justify-content:center;}
+.feat-card{
+  background:#0f172a;border:1px solid #1e293b;border-radius:10px;
+  padding:1.2rem 1.4rem;width:220px;
+}
+.feat-card h4{font-size:0.72rem;font-weight:700;margin-bottom:0.35rem;}
+.feat-card .desc{font-size:0.63rem;color:#94a3b8;line-height:1.55;}
+
+/* Title stage */
+.title-stage h1{font-size:2rem;font-weight:900;color:#f1f5f9;text-align:center;line-height:1.3;}
+.title-stage .sub{font-size:0.75rem;color:#64748b;margin-top:0.8rem;text-align:center;}
+
+/* Formula display */
+.formula-box{
+  background:#0f172a;border:2px solid #1e293b;border-radius:12px;
+  padding:2rem;text-align:center;margin-bottom:1.8rem;max-width:700px;width:100%;
+}
+.formula-box .eq{font-size:0.9rem;font-weight:800;color:#f1f5f9;letter-spacing:0.02em;}
+.formula-box .eq .op{color:#E1251B;}
+.formula-box .eq .var{color:#38bdf8;}
+.formula-box .eq .var2{color:#f59e0b;}
+.formula-box .label{font-size:0.58rem;color:#64748b;margin-top:0.6rem;text-transform:uppercase;letter-spacing:0.1em;}
+
+/* Flow diagram */
+.flow{display:flex;align-items:center;gap:0.5rem;justify-content:center;flex-wrap:wrap;}
+.flow .node{
+  background:#1e293b;border:1px solid #334155;border-radius:8px;
+  padding:0.5rem 0.8rem;font-size:0.65rem;font-weight:600;color:#e2e8f0;white-space:nowrap;
+}
+.flow .node.hl{background:#0c1929;border-color:#38bdf8;color:#38bdf8;}
+.flow .arrow{font-size:0.7rem;color:#475569;font-weight:700;}
+
+/* Comparison table */
+.comp-table{width:100%;max-width:850px;border-collapse:collapse;font-size:0.66rem;}
+.comp-table th{
+  background:#0f172a;padding:0.55rem 0.8rem;text-align:left;font-weight:700;
+  color:#94a3b8;border-bottom:1px solid #1e293b;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;
+}
+.comp-table th:first-child{width:120px;}
+.comp-table td{
+  padding:0.5rem 0.8rem;border-bottom:1px solid #0f172a;
+  line-height:1.55;font-size:0.65rem;
+}
+.comp-table tr:last-child td{border-bottom:none;}
+.comp-table .dim{color:#64748b;font-weight:600;}
+
+/* Pros/cons */
+.pc-grid{display:flex;gap:1.5rem;align-items:flex-start;justify-content:center;}
+.pc-col{flex:1;max-width:420px;}
+.pc-col h4{font-size:0.75rem;font-weight:700;margin-bottom:0.7rem;display:flex;align-items:center;gap:0.4rem;}
+.pc-col .item{
+  background:#0f172a;border:1px solid #1e293b;border-radius:8px;
+  padding:0.6rem 0.8rem;margin-bottom:0.45rem;font-size:0.63rem;color:#cbd5e1;line-height:1.55;
+}
+.pc-col .item .tag{
+  display:inline-block;font-size:0.55rem;font-weight:700;padding:0.15rem 0.45rem;border-radius:4px;
+  margin-right:0.4rem;text-transform:uppercase;letter-spacing:0.05em;
+}
+.tag-pro{background:rgba(34,197,94,0.15);color:#22c55e;}
+.tag-con{background:rgba(239,68,68,0.15);color:#ef4444;}
+
+/* Philosophy cards */
+.phil-row{display:flex;gap:1rem;align-items:flex-start;justify-content:center;flex-wrap:wrap;}
+.phil-card{
+  background:#0f172a;border:1px solid #1e293b;border-radius:10px;
+  padding:1rem 1.2rem;text-align:center;min-width:260px;
+}
+.phil-card .quote{font-size:0.68rem;font-weight:600;color:#e2e8f0;margin-bottom:0.3rem;}
+.phil-card .attr{font-size:0.58rem;color:#64748b;}
+
+/* Conclusion */
+.conclusion{max-width:700px;text-align:center;}
+.conclusion .big{font-size:0.85rem;font-weight:700;color:#f1f5f9;margin-bottom:0.8rem;}
+.conclusion .detail{font-size:0.65rem;color:#94a3b8;line-height:1.7;}
+
+/* Highlight text */
+.hl-blue{color:#38bdf8;}
+.hl-amber{color:#f59e0b;}
+.hl-red{color:#E1251B;}
+
+/* Approach boxes for s1/s2 */
+.approach-wrap{display:flex;gap:1.5rem;align-items:flex-start;justify-content:center;flex-wrap:wrap;}
+.approach-main{flex:1;min-width:300px;max-width:450px;}
+.approach-feats{display:flex;flex-direction:column;gap:0.5rem;max-width:300px;}
+.approach-feats .af{
+  background:#0f172a;border:1px solid #1e293b;border-radius:8px;
+  padding:0.6rem 0.8rem;font-size:0.63rem;color:#cbd5e1;line-height:1.5;
+  display:flex;align-items:flex-start;gap:0.5rem;
+}
+.approach-feats .af .num{
+  font-size:0.6rem;font-weight:800;color:#E1251B;min-width:16px;text-align:center;
+}
+
+/* Borrow section */
+.borrow-grid{display:flex;gap:1.2rem;align-items:flex-start;justify-content:center;}
+.borrow-col{flex:1;max-width:380px;}
+.borrow-col h4{font-size:0.7rem;font-weight:700;margin-bottom:0.6rem;}
+.borrow-item{
+  background:#0f172a;border:1px solid #1e293b;border-radius:8px;
+  padding:0.55rem 0.7rem;margin-bottom:0.4rem;font-size:0.62rem;color:#cbd5e1;line-height:1.5;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.borrow-item .feas{
+  font-size:0.55rem;font-weight:700;padding:0.1rem 0.35rem;border-radius:3px;white-space:nowrap;
+}
+.feas-high{background:rgba(34,197,94,0.15);color:#22c55e;}
+.feas-mid{background:rgba(245,158,11,0.15);color:#f59e0b;}
+.feas-low{background:rgba(239,68,68,0.15);color:#ef4444;}
+
+/* Badge */
+.badge{
+  display:inline-block;font-size:0.55rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:5px;
+  text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.4rem;
+}
+.badge-idg{background:rgba(56,189,248,0.12);color:#38bdf8;}
+.badge-isg{background:rgba(245,158,11,0.12);color:#f59e0b;}
+
+/* Ensure minimum text contrast */
+@media screen{
+  body{min-width:900px;}
+}
+</style>
+</head>
+<body>
+
+<div class="brand">
+  <span>Lenovo SSG</span><span class="accent">·</span><span>Dynamic Pricing</span>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="prog"></div></div>
+<div class="indicator" id="indicator">1 / 10</div>
+<div class="nav-hint">← → 翻页</div>
+
+<!-- ===== s0: Title ===== -->
+<div class="stage active title-stage" id="s0">
+  <div class="reveal" data-delay="100">
+    <h1>IDG <span class="hl-blue">E-com B2C</span><br>vs<br>ISG <span class="hl-amber">B2B</span></h1>
+  </div>
+  <div class="reveal" data-delay="400">
+    <div class="sub">Dynamic Pricing 方案对比分析 · 2026.07</div>
+  </div>
+  <div class="reveal" data-delay="700" style="margin-top:1.5rem;display:flex;gap:2rem;">
+    <span class="badge badge-idg">算法驱动 · 系统内编码</span>
+    <span class="badge badge-isg">PenRate 驱动 · 系统外维护</span>
+  </div>
+</div>
+
+<!-- ===== s1: IDG 算法驱动 ===== -->
+<div class="stage" id="s1">
+  <div class="reveal" data-delay="100">
+    <div class="scene-label">01 · IDG E-com B2C</div>
+    <div class="scene-title">算法驱动 · 系统内编码</div>
+  </div>
+  <div class="approach-wrap reveal" data-delay="300">
+    <div class="approach-main">
+      <div class="formula-box">
+        <div class="eq">
+          <span class="var">Band</span> <span class="op">×</span>
+          <span class="var">Term</span> <span class="op">×</span>
+          <span class="var">Tier</span> <span class="op">×</span>
+          <span class="var2">αγ</span>
+          <span class="op">=</span> ServicePrice
+        </div>
+        <div class="label">全部在系统内自动计算</div>
+        <div style="margin-top:0.8rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+          <div class="node hl">HW AUR → Band (A–J)</div>
+          <div class="arrow">→</div>
+          <div class="node hl">ln(Term) → TermFactor</div>
+          <div class="arrow">→</div>
+          <div class="node hl">TierFactor (0.55~1.40)</div>
+        </div>
+      </div>
+    </div>
+    <div class="approach-feats">
+      <div class="af"><span class="num">①</span>定价逻辑完全显式编码——每个因子都有明确数学表达</div>
+      <div class="af"><span class="num">②</span>每季度自动校准：重新分桶 → 更新锚值 → 重算全量 SKU</div>
+      <div class="af"><span class="num">③</span>Attach Rate 闭环反馈 → AI 自动微调系数</div>
+      <div class="af"><span class="num">④</span>系统记录的是<span style="color:#38bdf8;">推导过程</span>，不是结果</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== s2: ISG PenRate 驱动 ===== -->
+<div class="stage" id="s2">
+  <div class="reveal" data-delay="100">
+    <div class="scene-label">02 · ISG B2B</div>
+    <div class="scene-title">PenRate 驱动 · 系统外维护</div>
+  </div>
+  <div class="approach-wrap reveal" data-delay="300">
+    <div class="approach-main">
+      <div class="formula-box" style="border-color:#f59e0b;">
+        <div class="eq">
+          <span class="var2">HWPrice</span> <span class="op">×</span>
+          <span class="var2">PenRate</span>
+          <span class="op">=</span> ServicePrice
+        </div>
+        <div class="label">系统只做乘法和查表</div>
+        <div style="margin-top:0.8rem;display:flex;gap:1rem;justify-content:center;">
+          <div style="text-align:center;">
+            <div class="node" style="font-size:0.58rem;">系统内</div>
+            <div style="font-size:0.7rem;color:#94a3b8;margin-top:0.2rem;">HWPrice</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="node" style="font-size:0.58rem;background:#1a1208;border-color:#f59e0b;">系统外（人维护）</div>
+            <div style="font-size:0.7rem;color:#f59e0b;margin-top:0.2rem;">PenRate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="approach-feats">
+      <div class="af"><span class="num">①</span>定价逻辑压缩成一个数字（PenRate）</div>
+      <div class="af"><span class="num">②</span>所有判断复杂度转移到线下——GEO × 客户段 × Charge Type × 竞品 × 历史</div>
+      <div class="af"><span class="num">③</span>PenRate 表需人工维护和更新</div>
+      <div class="af"><span class="num">④</span>系统记录的是<span style="color:#f59e0b;">结果</span>，不是过程</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== s3: 共同之处 ===== -->
+<div class="stage" id="s3">
+  <div class="reveal" data-delay="100">
+    <div class="scene-label">03 · 共同之处</div>
+    <div class="scene-title">起点相同，路径不同</div>
+  </div>
+  <div class="card-row reveal" data-delay="300" style="max-width:850px;">
+    <div class="card">
+      <h4 style="color:#38bdf8;">核心原则</h4>
+      <div class="desc">服务价格 = f(硬件价值)<br>服务价格跟随硬件底盘走</div>
+    </div>
+    <div class="card">
+      <h4 style="color:#38bdf8;">定价锚点</h4>
+      <div class="desc">IDG: HW AUR Band → Base Price<br>ISG: HWPrice → PenRate</div>
+    </div>
+    <div class="card">
+      <h4 style="color:#38bdf8;">防利润侵蚀</h4>
+      <div class="desc">IDG: Floor/Cap + αγ 修正<br>ISG: 人在定 PenRate 时考虑 Margin</div>
+    </div>
+    <div class="card">
+      <h4 style="color:#38bdf8;">业务领域</h4>
+      <div class="desc">同为 SSG GPS 服务 PN 定价<br>不依赖 List Price（独立定价）</div>
+    </div>
+    <div class="card">
+      <h4 style="color:#38bdf8;">输出目标</h4>
+      <div class="desc">推荐售价<br>B2C 直接展示 / B2B 商机报价</div>
+    </div>
+    <div class="card">
+      <h4 style="color:#38bdf8;">共同认知</h4>
+      <div class="desc">"服务价格不应与<br>硬件价格脱钩"</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== s4: 核心差异 ① ===== -->
+<div class="stage" id="s4">
+  <div class="reveal" data-delay="100">
+    <div class="scene-label">04 · 核心差异 ①</div>
+    <div class="scene-title">IDG vs ISG — 关键维度对比</div>
+  </div>
+  <div class="reveal" data-delay="300">
+    <table class="comp-table">
+      <thead>
+        <tr><th>维度</th><th style="color:#38bdf8;">IDG E-com B2C</th><th style="color:#f59e0b;">ISG B2B</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="dim">公式复杂度</td>
+          <td>4 层相乘<br><span style="color:#64748b;">Band × Term × Tier × αγ</span></td>
+          <td>1 层相乘<br><span style="color:#64748b;">HWPrice × PenRate</span></td>
+        </tr>
+        <tr>
+          <td class="dim">定价粒度</td>
+          <td><span style="color:#38bdf8;">细</span> — 10 Band × 4 Tier × 5 Term<br>= 200 个价格点</td>
+          <td><span style="color:#f59e0b;">粗</span> — 1 个 PenRate 覆盖<br>整个 PN/GEO/客群组合</td>
+        </tr>
+        <tr>
+          <td class="dim">透明度</td>
+          <td><span style="color:#22c55e;">高</span> — 每个因子独立可见、可审计</td>
+          <td><span style="color:#ef4444;">低</span> — PenRate 在系统视角是 black box</td>
+        </tr>
+        <tr>
+          <td class="dim">维护方式</td>
+          <td>算法自动校准（季度）+ AI 闭环调优</td>
+          <td>人工维护 PenRate 表</td>
+        </tr>
+        <tr>
+          <td class="dim">可扩展性</td>
+          <td>新 SKU 自动落入 Band → 自动出价</td>
+          <td>新 SKU → 人判断 → 人填表</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== s5: 核心差异 ② ===== -->
+<div class="stage" id="s5">
+  <div class="reveal" data-delay="100">
+    <div class="scene-label">05 · 核心差异 ②</div>
+    <div class="scene-title">IDG vs ISG — 关键维度对比（续）</div>
+  </div>
+  <div class="reveal" data-delay="300">
+    <table class="comp-table">
+      <thead>
+        <tr><th>维度</th><th style="color:#38bdf8;">IDG E-com B2C</th><th style="color:#f59e0b;">ISG B2B</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="dim">一致性</td>
+          <td><span style="color:#22c55e;">同 HW 同价</span> — 算法保证</td>
+          <td><span style="color:#ef4444;">依赖人的判断</span> — 有主观差异风险</td>
+        </tr>
+        <tr>
+          <td class="dim">行为经济学</td>
+          <td><span style="color:#22c55e;">内建</span> — 对数递减感知价值</td>
+          <td>无 — 隐含在 PenRate 选择中</td>
+        </tr>
+        <tr>
+          <td class="dim">风控机制</td>
+          <td><span style="color:#22c55e;">显式</span> — Floor/Cap (% HW AUR)<br>+ αγ 底线</td>
+          <td>隐式 — 人在定 PenRate 时考虑</td>
+        </tr>
+        <tr>
+          <td class="dim">数据依赖</td>
+          <td>HW AUR 分布历史<br>+ Attach Rate 数据</td>
+          <td>成交价格历史<br>+ 竞品信息</td>
+        </tr>
+        <tr>
+          <td class="dim">决策速度</td>
+          <td><span style="color:#38bdf8;">实时</span> — 电商页面加载时计算</td>
+          <td><span style="color:#f59e0b;">天级</span> — 商机报价前查表</td>
+        </tr>
+        <tr>
+          <td class="dim">适用场景</td>
+          <td>B2C 电商：大流量、低接触、标准 SKU</td>
+          <td>B2B 商机：小流量、高接触、定制化交易</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== s6: IDG Pros & Cons ===== -->
+<div class="stage" id="s6">
+  <div class="reveal" data-delay="100">
+    <div class="scene-label">06 · IDG E-com B2C</div>
+    <div class="scene-title">Pros & Cons</div>
+  </div>
+  <div class="pc-grid reveal" data-delay="300">
+    <div class="pc-col">
+      <h4 style="color:#22c55e;">✅ Pros</h4>
+      <div class="item"><span class="tag tag-pro">规模化</span>10 个 Band 管住所有 SKU，新品自动定价，零人工介入</div>
+      <div class="item"><span class="tag tag-pro">一致性</span>同 Band 同价——消除人工判断差异</div>
+      <div class="item"><span class="tag tag-pro">可解释</span>每个因子可追溯——"为什么 $280？因为 Band E × 3Y × PS"</div>
+      <div class="item"><span class="tag tag-pro">自进化</span>季度校准 + Attach Rate 闭环 → 自动适应市场</div>
+      <div class="item"><span class="tag tag-pro">低运营</span>上线后人工维护量 ≈ 0</div>
+      <div class="item"><span class="tag tag-pro">风控</span>α/γ 防长期限亏损；Floor/Cap 防价格漂移</div>
+      <div class="item"><span class="tag tag-pro">学术</span>对数曲线有行为科学支撑</div>
+    </div>
+    <div class="pc-col">
+      <h4 style="color:#ef4444;">❌ Cons</h4>
+      <div class="item"><span class="tag tag-con">冷启动</span>前期工作量大：Band 边界、锚值、α/γ 标定</div>
+      <div class="item"><span class="tag tag-con">Banding 刚性</span>边界附近 HW 可能价格跳动（$1299 vs $1301）</div>
+      <div class="item"><span class="tag tag-con">不适用谈判</span>算法价格无商量空间——"系统说这个价"</div>
+      <div class="item"><span class="tag tag-con">数据敏感</span>HW AUR 不准 → 整个定价表失真</div>
+      <div class="item"><span class="tag tag-con">领域知识</span>α/γ 需要 Delivery 团队提供成本曲线</div>
+      <div class="item"><span class="tag tag-con">无捆绑</span>不支持"买 3Y PS 送 1Y ADP"</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== s7: ISG Pros & Cons ===== -->
+<div class="stage" id="s7">
+  <div class="reveal" data-delay="100">
+    <div class="scene-label">07 · ISG B2B</div>
+    <div class="scene-title">Pros & Cons</div>
+  </div>
+  <div class="pc-grid reveal" data-delay="300">
+    <div class="pc-col">
+      <h4 style="color:#22c55e;">✅ Pros</h4>
+      <div class="item"><span class="tag tag-pro">极简</span>一个公式、一张表——5 分钟能理解</div>
+      <div class="item"><span class="tag tag-pro">灵活</span>大客户压价、竞品突袭——人即时调整 PenRate</div>
+      <div class="item"><span class="tag tag-pro">谈判友好</span>"我帮你申请了一个特别 PenRate"有"人情味"</div>
+      <div class="item"><span class="tag tag-pro">低门槛</span>不需要建模/训练——有经验的定价经理 + Excel</div>
+      <div class="item"><span class="tag tag-pro">复杂交易</span>捆绑、折扣、跨 PN 打包——人"揉进去"</div>
+      <div class="item"><span class="tag tag-pro">快速启动</span>有历史 PenRate 就能跑</div>
+    </div>
+    <div class="pc-col">
+      <h4 style="color:#ef4444;">❌ Cons</h4>
+      <div class="item"><span class="tag tag-con">不可规模化</span>每新增维度组合 → 人工判断 → 线性增长</div>
+      <div class="item"><span class="tag tag-con">不一致</span>两个经理对同一场景可能定出不同 PenRate</div>
+      <div class="item"><span class="tag tag-con">知识流失</span>"为什么是 18%？"——答案在经理脑子里</div>
+      <div class="item"><span class="tag tag-con">黑盒</span>PenRate 就是一个数字——无法审计推导过程</div>
+      <div class="item"><span class="tag tag-con">响应滞后</span>HW 变价 → 等人工判断 → 更新表 → 生效</div>
+      <div class="item"><span class="tag tag-con">无自优化</span>不会从成交/丢单数据中自动学习</div>
+      <div class="item"><span class="tag tag-con">风控依赖人</span>定价经理没理解 Margin 底线 → PenRate 定错</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== s8: 架构哲学 ===== -->
+<div class="stage" id="s8">
+  <div class="reveal" data-delay="100">
+    <div class="scene-label">08 · 架构哲学</div>
+    <div class="scene-title">两种设计哲学</div>
+  </div>
+  <div class="phil-row reveal" data-delay="300">
+    <div class="phil-card" style="border-color:#38bdf8;">
+      <div class="badge badge-idg">IDG · 算法驱动</div>
+      <div class="quote">"把知识写进系统"</div>
+      <div class="attr">让算法做重复判断</div>
+      <div class="attr">自动校准适应变化</div>
+      <div class="attr" style="color:#38bdf8;margin-top:0.5rem;">一致性 &gt; 灵活性</div>
+      <div class="attr">前期投入，后期省力</div>
+    </div>
+    <div style="display:flex;align-items:center;font-size:1.5rem;color:#475569;">vs</div>
+    <div class="phil-card" style="border-color:#f59e0b;">
+      <div class="badge badge-isg">ISG · PenRate 驱动</div>
+      <div class="quote">"把知识留给专家"</div>
+      <div class="attr">让人做综合判断</div>
+      <div class="attr">人工评估响应变化</div>
+      <div class="attr" style="color:#f59e0b;margin-top:0.5rem;">灵活性 &gt; 一致性</div>
+      <div class="attr">前期省力，后期费力</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== s9: 结论 ===== -->
+<div class="stage" id="s9">
+  <div class="reveal" data-delay="100">
+    <div class="scene-label">09 · 结论 &amp; 借鉴</div>
+    <div class="scene-title">场景适配，而非优劣之分</div>
+  </div>
+
+  <div class="reveal" data-delay="300" style="max-width:850px;width:100%;">
+    <div class="conclusion" style="margin-bottom:1.5rem;">
+      <div class="big">
+        <span style="color:#38bdf8;">IDG</span>：B2C 电商 → 标准化 × 大流量 × 零人工接触 → <span style="color:#22c55e;">算法驱动是最优解</span>
+      </div>
+      <div class="big">
+        <span style="color:#f59e0b;">ISG</span>：B2B 商机 → 定制化 × 低流量 × 高接触谈判 → <span style="color:#22c55e;">PenRate 是务实选择</span>
+      </div>
+    </div>
+
+    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:1rem 1.5rem;text-align:center;">
+      <div style="font-size:0.7rem;font-weight:700;color:#f1f5f9;margin-bottom:0.5rem;">ISG 可以向前走一步</div>
+      <div style="font-size:0.65rem;color:#94a3b8;line-height:1.6;">
+        把 PenRate 从一个黑盒数字拆成多个显式维度<br>
+        <span style="color:#38bdf8;">Band × Segment × Term</span>，逐项用数据驱动<br>
+        既不丧失 B2B 的灵活性，又获得算法的可扩展性
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== JS ===== -->
+<script>
+const stages = ['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+const TOTAL = stages.length;
+let current = 0;
+
+function showStage(i){
+  document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+  let el = document.getElementById(stages[i]);
+  el.classList.add('active');
+  current = i;
+
+  // Update indicator
+  document.getElementById('indicator').textContent = `${i+1} / ${TOTAL}`;
+
+  // Update progress bar
+  document.getElementById('prog').style.width = `${((i+1)/TOTAL)*100}%`;
+
+  // Reveal animations
+  let reveals = el.querySelectorAll('.reveal');
+  reveals.forEach(r => r.classList.remove('in'));
+  reveals.forEach(r => {
+    let delay = parseInt(r.dataset.delay) || 0;
+    setTimeout(() => { r.classList.add('in'); }, delay);
+  });
+}
+
+function nextStage(){
+  if(current < TOTAL-1) showStage(current+1);
+}
+
+function prevStage(){
+  if(current > 0) showStage(current-1);
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowRight'){ e.preventDefault(); nextStage(); }
+  if(e.key === 'ArrowLeft'){ e.preventDefault(); prevStage(); }
+});
+
+// Click navigation on left/right halves
+document.addEventListener('click', e => {
+  if(e.target.closest('.stage') || e.target === document.body){
+    if(e.clientX > window.innerWidth/2) nextStage();
+    else prevStage();
+  }
+});
+
+// Init
+showStage(0);
+</script>
+</body>
+</html>
