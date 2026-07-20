@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDG vs ISG — Dynamic Pricing Approach Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#020617; --card:#0f172a; --border:#1e293b;
+  --text:#e2e8f0; --dim:#94a3b8; --muted:#64748b;
+  --blue:#38bdf8; --amber:#f59e0b; --red:#E1251B;
+  --green:#22c55e; --rose:#ef4444; --purple:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+.bar{position:fixed;top:0;left:0;right:0;height:36px;background:#0f172a;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;z-index:10;font-size:0.6rem;font-weight:700;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;gap:0.4rem}
+.bar em{color:var(--red);font-style:normal}
+.container{max-width:1000px;margin:0 auto;padding:4rem 1.5rem 3rem}
+
+/* Section layout */
+.sec{margin-bottom:3.5rem}
+.sec-label{font-size:0.6rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.25rem}
+.sec-title{font-size:1rem;font-weight:800;color:#f1f5f9;margin-bottom:1.2rem}
+
+/* Hero */
+.hero{text-align:center;padding:2.5rem 0 1.5rem}
+.hero h1{font-size:2.2rem;font-weight:900;line-height:1.2;margin-bottom:0.6rem}
+.hero .sub{font-size:0.7rem;color:var(--muted)}
+.hero .badges{display:flex;gap:1rem;justify-content:center;margin-top:1.2rem}
+.badge{display:inline-block;font-size:0.55rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:4px;text-transform:uppercase;letter-spacing:0.05em}
+.badge-idg{background:rgba(56,189,248,0.12);color:var(--blue)}
+.badge-isg{background:rgba(245,158,11,0.12);color:var(--amber)}
+
+/* Formula row */
+.formula-row{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.formula-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.5rem;text-align:center}
+.formula-card .eq{font-size:0.85rem;font-weight:800;margin-bottom:0.6rem;letter-spacing:0.02em}
+.formula-card .eq .op{color:var(--red)}
+.formula-card .sub{font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
+.formula-card .tags{margin-top:0.7rem;display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap}
+.formula-card .tag{font-size:0.56rem;font-weight:600;padding:0.2rem 0.5rem;border-radius:4px}
+.tag-blue{background:rgba(56,189,248,0.1);color:var(--blue);border:1px solid rgba(56,189,248,0.15)}
+.tag-amber{background:rgba(245,158,11,0.1);color:var(--amber);border:1px solid rgba(245,158,11,0.15)}
+.fc-idg{border-color:rgba(56,189,248,0.2)}
+.fc-isg{border-color:rgba(245,158,11,0.2)}
+
+/* Common ground grid */
+.commongrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem}
+.cg-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1rem}
+.cg-card .cg-h{font-size:0.65rem;font-weight:700;color:var(--blue);margin-bottom:0.25rem}
+.cg-card .cg-d{font-size:0.6rem;color:var(--dim);line-height:1.5}
+
+/* Comparison table */
+.comptable{width:100%;border-collapse:collapse;font-size:0.63rem}
+.comptable th{background:var(--card);padding:0.5rem 0.7rem;text-align:left;font-weight:700;color:var(--muted);border-bottom:2px solid var(--border);font-size:0.58rem;text-transform:uppercase;letter-spacing:0.05em}
+.comptable th:first-child{width:130px}
+.comptable td{padding:0.45rem 0.7rem;border-bottom:1px solid rgba(30,41,59,0.6);line-height:1.5}
+.comptable tr:last-child td{border-bottom:none}
+.comptable .td-idg{color:var(--blue)}
+.comptable .td-isg{color:var(--amber)}
+
+/* Pros/Cons grid */
+.pc-row{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.pc-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.2rem 1.3rem}
+.pc-box h4{font-size:0.72rem;font-weight:700;margin-bottom:0.7rem}
+.pros h4{color:var(--green)}
+.cons h4{color:var(--rose)}
+.pc-item{font-size:0.6rem;color:var(--dim);padding:0.35rem 0;border-bottom:1px solid rgba(30,41,59,0.4);line-height:1.45}
+.pc-item:last-child{border-bottom:none}
+.pc-item .kw{font-weight:600;color:var(--text);margin-right:0.3rem}
+
+/* Philosophy */
+.phil-row{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center}
+.phil{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.2rem;text-align:center}
+.phil .phil-badge{margin-bottom:0.5rem}
+.phil .phil-q{font-size:0.68rem;font-weight:700;color:#f1f5f9;margin-bottom:0.5rem}
+.phil .phil-a{font-size:0.58rem;color:var(--dim);margin-bottom:0.15rem}
+.phil .phil-core{font-size:0.62rem;font-weight:700;margin-top:0.6rem;padding-top:0.5rem;border-top:1px solid var(--border)}
+.phil-idg{border-color:rgba(56,189,248,0.2)}
+.phil-isg{border-color:rgba(245,158,11,0.2)}
+.phil-vs{font-size:0.7rem;font-weight:800;color:var(--muted)}
+
+/* Conclusion */
+.conc{background:linear-gradient(135deg,rgba(56,189,248,0.04),rgba(245,158,11,0.04));border:1px solid var(--border);border-radius:10px;padding:1.5rem;text-align:center}
+.conc p{font-size:0.68rem;color:var(--dim);line-height:1.7}
+.conc strong{color:#f1f5f9}
+.conc .hl-box{display:inline-block;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.15);border-radius:6px;padding:0.3rem 0.7rem;font-size:0.65rem;font-weight:700;color:var(--blue);margin-top:0.5rem}
+
+/* Misc */
+.hl-b{color:var(--blue)} .hl-a{color:var(--amber)} .hl-g{color:var(--green)} .hl-r{color:var(--rose)}
+.mono{font-family:'SF Mono','Fira Code',monospace;font-size:0.62rem;color:var(--muted)}
+.flex-center{display:flex;align-items:center;gap:0.3rem}
+.icon-sm{font-size:0.7rem}
+.divider{height:1px;background:var(--border);margin:2.5rem 0}
+
+@media(max-width:800px){
+  .formula-row,.pc-row,.phil-row,.commongrid{grid-template-columns:1fr}
+  .phil-vs{text-align:center;padding:0.5rem 0}
+  .comptable{font-size:0.58rem}
+  .comptable th:first-child{width:90px}
+}
+</style>
+</head>
+<body>
+
+<div class="bar">Lenovo SSG <em>·</em> Dynamic Pricing</div>
+
+<div class="container">
+
+<!-- HERO -->
+<div class="hero">
+  <h1>IDG <span class="hl-b">E-com B2C</span> vs ISG <span class="hl-a">B2B</span></h1>
+  <div class="sub">Dynamic Pricing Approach Comparison · 2026.07</div>
+  <div class="badges">
+    <span class="badge badge-idg">Algorithm-Driven · In-System</span>
+    <span class="badge badge-isg">PenRate-Driven · Off-System</span>
+  </div>
+</div>
+
+<!-- 1. FORMULAS -->
+<div class="sec">
+  <div class="sec-label">01 · Approaches at a Glance</div>
+  <div class="sec-title">Two Formulas, Two Philosophies</div>
+  <div class="formula-row">
+    <div class="formula-card fc-idg">
+      <div class="eq"><span class="hl-b">Band</span> <span class="op">×</span> <span class="hl-b">Term</span> <span class="op">×</span> <span class="hl-b">Tier</span> <span class="op">×</span> <span class="hl-a">αγ</span> <span class="op">=</span> ServicePrice</div>
+      <div class="sub">All computed in-system automatically</div>
+      <div class="tags">
+        <span class="tag tag-blue">HW AUR → Band (A–J)</span>
+        <span class="tag tag-blue">ln(Term) → TermFactor</span>
+        <span class="tag tag-blue">TierFactor 0.55~1.40</span>
+      </div>
+    </div>
+    <div class="formula-card fc-isg">
+      <div class="eq"><span class="hl-a">HWPrice</span> <span class="op">×</span> <span class="hl-a">PenRate</span> <span class="op">=</span> ServicePrice</div>
+      <div class="sub">System only multiplies & looks up tables</div>
+      <div class="tags">
+        <span class="tag tag-amber">In-System: HWPrice</span>
+        <span class="tag tag-amber">Off-System: PenRate (Manual)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 2. COMMON GROUND -->
+<div class="sec">
+  <div class="sec-label">02 · Common Ground</div>
+  <div class="sec-title">Same Starting Point, Different Paths</div>
+  <div class="commongrid">
+    <div class="cg-card"><div class="cg-h">Core Principle</div><div class="cg-d">Service Price = f(HW Value)</div></div>
+    <div class="cg-card"><div class="cg-h">Pricing Anchor</div><div class="cg-d">IDG: HW AUR Band → Base Price<br>ISG: HWPrice → PenRate</div></div>
+    <div class="cg-card"><div class="cg-h">Margin Protection</div><div class="cg-d">IDG: Floor/Cap + αγ<br>ISG: Margin in PenRate</div></div>
+    <div class="cg-card"><div class="cg-h">Business Domain</div><div class="cg-d">SSG GPS service PN pricing<br>Independent of List Price</div></div>
+    <div class="cg-card"><div class="cg-h">Output</div><div class="cg-d">Recommended Price<br>B2C display / B2B deal quote</div></div>
+    <div class="cg-card"><div class="cg-h">Shared Belief</div><div class="cg-d">Service price must not decouple from hardware price</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 3. KEY DIFFERENCES -->
+<div class="sec">
+  <div class="sec-label">03 · Key Differences</div>
+  <div class="sec-title">11 Dimensions Compared</div>
+  <table class="comptable">
+    <thead><tr><th>Dimension</th><th style="color:var(--blue)">IDG E-com B2C</th><th style="color:var(--amber)">ISG B2B</th></tr></thead>
+    <tbody>
+      <tr><td>Formula</td><td class="td-idg">4-layer: Band × Term × Tier × αγ</td><td class="td-isg">1-layer: HWPrice × PenRate</td></tr>
+      <tr><td>Granularity</td><td class="td-idg">Fine — 200 price points (10×4×5)</td><td class="td-isg">Coarse — 1 PenRate per PN/GEO/segment</td></tr>
+      <tr><td>Transparency</td><td class="td-idg"><span class="hl-g">High</span> — each factor auditable</td><td class="td-isg"><span class="hl-r">Low</span> — PenRate is a black box</td></tr>
+      <tr><td>Maintenance</td><td class="td-idg">Quarterly auto-calibration + AI tuning</td><td class="td-isg">Manual PenRate table updates</td></tr>
+      <tr><td>Scalability</td><td class="td-idg">New SKU → auto-falls into Band</td><td class="td-isg">New SKU → human judges → fills table</td></tr>
+      <tr><td>Consistency</td><td class="td-idg"><span class="hl-g">Same HW = Same Price</span> — algorithmic</td><td class="td-isg"><span class="hl-r">Human-dependent</span> — subjective variance</td></tr>
+      <tr><td>Behavioral Econ</td><td class="td-idg"><span class="hl-g">Built-in</span> — logarithmic value decay</td><td class="td-isg">None — implicit in PenRate</td></tr>
+      <tr><td>Risk Control</td><td class="td-idg"><span class="hl-g">Explicit</span> Floor/Cap + αγ floor</td><td class="td-isg">Implicit — setter's judgment</td></tr>
+      <tr><td>Data Need</td><td class="td-idg">HW AUR history + Attach Rate</td><td class="td-isg">Deal history + competitor intel</td></tr>
+      <tr><td>Decision Speed</td><td class="td-idg"><span class="hl-b">Real-time</span> — e-com page load</td><td class="td-isg"><span class="hl-a">Daily</span> — table lookup before quote</td></tr>
+      <tr><td>Scenario</td><td class="td-idg">B2C: high volume, low touch, standard</td><td class="td-isg">B2B: low volume, high touch, customized</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- 4. PROS & CONS -->
+<div class="sec">
+  <div class="sec-label">04 · Pros & Cons</div>
+  <div class="pc-row">
+    <div class="pc-box pros">
+      <h4>✅ IDG E-com B2C — Pros</h4>
+      <div class="pc-item"><span class="kw">Scalable</span>10 Bands govern all SKUs, zero manual work</div>
+      <div class="pc-item"><span class="kw">Consistent</span>Same Band = Same Price, no judgment variance</div>
+      <div class="pc-item"><span class="kw">Explainable</span>Every factor traceable to source</div>
+      <div class="pc-item"><span class="kw">Self-Evolving</span>Quarterly calibration + Attach Rate loop</div>
+      <div class="pc-item"><span class="kw">Low Ops</span>Post-launch maintenance ≈ 0</div>
+      <div class="pc-item"><span class="kw">Risk Ctrl</span>α/γ floor + Floor/Cap guardrails</div>
+    </div>
+    <div class="pc-box cons">
+      <h4>❌ IDG E-com B2C — Cons</h4>
+      <div class="pc-item"><span class="kw">Cold Start</span>Heavy upfront: Band boundaries, α/γ calibration</div>
+      <div class="pc-item"><span class="kw">Band Rigidity</span>Boundary price jumps ($1299 vs $1301)</div>
+      <div class="pc-item"><span class="kw">No Negotiation</span>Algorithm has no flexibility</div>
+      <div class="pc-item"><span class="kw">Data Sensitive</span>Bad HW AUR → entire table distorted</div>
+      <div class="pc-item"><span class="kw">Domain Knowledge</span>α/γ needs Delivery cost curve input</div>
+    </div>
+  </div>
+  <div class="pc-row" style="margin-top:1.2rem">
+    <div class="pc-box pros">
+      <h4>✅ ISG B2B — Pros</h4>
+      <div class="pc-item"><span class="kw">Ultra-Simple</span>One formula, one table, 5-min understanding</div>
+      <div class="pc-item"><span class="kw">Flexible</span>Instant human PenRate adjustment</div>
+      <div class="pc-item"><span class="kw">Negotiation-Ready</span>"Special PenRate" human touch</div>
+      <div class="pc-item"><span class="kw">Low Barrier</span>No ML — pricing manager + Excel</div>
+      <div class="pc-item"><span class="kw">Complex Deals</span>Bundling, discounting — humans fold it in</div>
+      <div class="pc-item"><span class="kw">Fast Start</span>Historical PenRate → ready to go</div>
+    </div>
+    <div class="pc-box cons">
+      <h4>❌ ISG B2B — Cons</h4>
+      <div class="pc-item"><span class="kw">Not Scalable</span>Each new dimension → linear human cost</div>
+      <div class="pc-item"><span class="kw">Inconsistent</span>Two managers, two PenRates</div>
+      <div class="pc-item"><span class="kw">Knowledge Loss</span>"Why 18%?" lives in manager's head</div>
+      <div class="pc-item"><span class="kw">Black Box</span>No auditable derivation trail</div>
+      <div class="pc-item"><span class="kw">Slow Response</span>HW change → wait → update → effect</div>
+      <div class="pc-item"><span class="kw">Human Risk</span>Missed margin floor → wrong PenRate</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 5. PHILOSOPHY -->
+<div class="sec">
+  <div class="sec-label">05 · Design Philosophy</div>
+  <div class="sec-title">Two Worldviews</div>
+  <div class="phil-row">
+    <div class="phil phil-idg">
+      <div class="badge badge-idg phil-badge">IDG · Algorithm-Driven</div>
+      <div class="phil-q">"Encode knowledge into the system"</div>
+      <div class="phil-a">Algorithms make repetitive decisions</div>
+      <div class="phil-a">Auto-calibrate to change</div>
+      <div class="phil-core hl-b">Consistency &gt; Flexibility</div>
+      <div class="phil-a">Invest early, save later</div>
+    </div>
+    <div class="phil-vs">vs</div>
+    <div class="phil phil-isg">
+      <div class="badge badge-isg phil-badge">ISG · PenRate-Driven</div>
+      <div class="phil-q">"Keep knowledge with the experts"</div>
+      <div class="phil-a">Humans make holistic judgments</div>
+      <div class="phil-a">Manual assessment to change</div>
+      <div class="phil-core hl-a">Flexibility &gt; Consistency</div>
+      <div class="phil-a">Save early, pay later</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 6. CONCLUSION -->
+<div class="sec">
+  <div class="sec-label">06 · Conclusion</div>
+  <div class="sec-title">Scenario Fit, Not Better or Worse</div>
+  <div class="conc">
+    <p><strong class="hl-b">IDG</strong>: B2C E-com → Standardized × High Volume × Zero Touch → <strong class="hl-g">Algorithm-driven is optimal</strong></p>
+    <p><strong class="hl-a">ISG</strong>: B2B Deals → Customized × Low Volume × High-Touch → <strong class="hl-g">PenRate is the pragmatic choice</strong></p>
+    <div class="hl-box">ISG Can Take One Step Forward</div>
+    <p style="margin-top:0.8rem">Decompose PenRate from a black-box number into <strong style="color:var(--blue)">Band × Segment × Term</strong> —<br>keep B2B flexibility while gaining algorithmic scalability.</p>
+  </div>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>
