@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSG/IDG Service Scenarios — Dynamic Pricing Coverage Heatmap</title>
+<style>
+  :root {
+    --delivered: #059669;
+    --proposed: #7c3aed;
+    --gap: #dc2626;
+    --na: #d1d5db;
+    --bg: #f8f9fb;
+    --card: #ffffff;
+    --border: #e2e5ea;
+    --text: #1a1d27;
+    --sub: #6b7280;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex; justify-content: center;
+    padding: 40px 20px;
+  }
+  .page { max-width: 1300px; width: 100%; }
+
+  .header { text-align: center; margin-bottom: 32px; }
+  .header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header .sub { font-size: 0.85rem; color: var(--sub); margin-top: 4px; }
+
+  .legend {
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 24px; font-size: 0.75rem;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+  .sw-delivered { background: var(--delivered); }
+  .sw-proposed { background: var(--proposed); }
+  .sw-gap { background: var(--gap); }
+  .sw-na { background: var(--na); }
+
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%; border-collapse: collapse; font-size: 0.78rem;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  th, td { padding: 10px 14px; text-align: left; vertical-align: middle; }
+  th {
+    background: #f3f4f6; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--sub); font-weight: 700;
+    white-space: nowrap; border-bottom: 2px solid var(--border);
+  }
+  td { border-bottom: 1px solid #f0f1f4; }
+
+  .bg-row td { background: #f9fafb; font-weight: 700; font-size: 0.85rem; color: var(--text); border-bottom: 2px solid var(--border); }
+  .cat-row td { font-weight: 600; color: var(--sub); background: #fdfdfe; padding-top: 14px; }
+
+  .cell {
+    display: inline-block; padding: 4px 10px; border-radius: 4px;
+    font-weight: 600; font-size: 0.72rem; white-space: nowrap;
+  }
+  .c-delivered { background: #ecfdf5; color: var(--delivered); border: 1px solid #a7f3d0; }
+  .c-proposed { background: #f5f3ff; color: var(--proposed); border: 1px solid #ddd6fe; }
+  .c-gap { background: #fef2f2; color: var(--gap); border: 1px solid #fecaca; }
+  .c-na { background: #f3f4f6; color: #9ca3af; border: 1px solid #e5e7eb; }
+
+  .note { font-size: 0.73rem; color: var(--sub); line-height: 1.6; margin-top: 20px; }
+  .note strong { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>SSG / IDG Service Business Scenarios — Dynamic Pricing Coverage Heatmap</h1>
+    <div class="sub">按 SSG Business Model Matrix 类目展开 · 颜色 = Dynamic Pricing 提案覆盖状态</div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch sw-delivered"></div> 已交付 (Delivered)</div>
+    <div class="legend-item"><div class="legend-swatch sw-proposed"></div> 有方案 (Proposed)</div>
+    <div class="legend-item"><div class="legend-swatch sw-gap"></div> 同模式但缺方案 (Gap)</div>
+    <div class="legend-item"><div class="legend-swatch sw-na"></div> 不适用 DP 逻辑 (N/A)</div>
+  </div>
+
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>BG</th>
+        <th>类目</th>
+        <th>售时</th>
+        <th>Seg</th>
+        <th>子场景 (BM #)</th>
+        <th style="min-width:130px">DP 提案状态</th>
+        <th>定价模型</th>
+        <th>关键机制</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- ═══════ ISG ═══════ -->
+      <tr class="bg-row"><td colspan="8">ISG (Infrastructure Solutions Group)</td></tr>
+
+      <tr class="cat-row"><td></td><td>Commercial</td><td>POS</td><td>LE / SMB</td>
+        <td>1.3 — Direct/Indirect × Standalone/Hard/Soft Bundle (5)</td>
+        <td><span class="cell c-delivered">Delivered</span></td>
+        <td>Pen Rate</td>
+        <td>Service Price = HW Price × Pen Rate</td></tr>
+
+      <tr><td></td><td></td><td>APOS</td><td>LE / SMB</td>
+        <td>1.4 — Direct/Indirect × Standalone (2)</td>
+        <td><span class="cell c-delivered">Delivered</span></td>
+        <td>Pen Rate</td>
+        <td>复用 1.3 引擎</td></tr>
+
+      <tr class="cat-row"><td></td><td>CBSO</td><td>APOS</td><td>LE / SMB</td>
+        <td>3.2 — Direct/Indirect × Standalone Recurring (2)</td>
+        <td><span class="cell c-gap">Gap</span></td>
+        <td>Pen Rate (待扩)</td>
+        <td>合约制 recurring，Pen Rate 可扩展但未设计</td></tr>
+
+      <tr class="cat-row"><td></td><td colspan="4">Hybrid Cloud / Sustainability / AI / LPS</td>
+        <td><span class="cell c-na">N/A</span></td><td colspan="2">解决方案级 / 项目制定价，非标准服务 PN</td></tr>
+
+
+      <!-- ═══════ IDG ═══════ -->
+      <tr class="bg-row"><td colspan="8">IDG (Intelligent Devices Group)</td></tr>
+
+      <tr class="cat-row"><td></td><td>Commercial</td><td rowspan="2" style="background:#f5f3ff;font-weight:700;color:var(--proposed);">POS<br><span style="font-weight:400;font-size:0.65rem;">← DP 覆盖范围</span></td>
+        <td>SMB</td>
+        <td>1.1 — Direct/Indirect × Standalone/Hard/Soft Bundle (SMB sub)</td>
+        <td><span class="cell c-proposed">Proposed</span></td>
+        <td rowspan="2">Value Band + Term Curve + αγ</td>
+        <td>8 bands A–H, TermFactor=0.55·ln(T)+0.65, αγ per tier</td></tr>
+
+      <tr><td></td><td>Consumer</td>
+        <td>Consumer</td>
+        <td>2.1 — Soft/Hard Bundle × Consumer × One-off/Recurring (4)</td>
+        <td><span class="cell c-proposed">Proposed</span></td>
+        <td>10 bands A–J, αγ 参数略高于 SMB</td></tr>
+
+      <tr class="cat-row"><td></td><td>Commercial</td><td>APOS</td><td>SMB</td>
+        <td>1.2 — Direct/Indirect × Standalone (2)</td>
+        <td><span class="cell c-gap">Gap</span></td>
+        <td rowspan="2">Value Band + Term Curve + αγ (待扩)</td>
+        <td>Band + Term 模型可复用，但 APOS 起点不同（设备已有年龄）</td></tr>
+
+      <tr><td></td><td>Consumer</td><td>APOS</td><td>Consumer</td>
+        <td>2.2 — support.lenovo.com / Vantage / Parts (3)</td>
+        <td><span class="cell c-gap">Gap</span></td>
+        <td>同上，SN 查 Band + 剩余年限 Term 计算</td></tr>
+
+      <tr class="cat-row"><td></td><td>CBSO</td><td>APOS</td><td>LE / SMB</td>
+        <td>3.1 — Direct/Indirect × Standalone Recurring (2)</td>
+        <td><span class="cell c-gap">Gap</span></td>
+        <td>可复用 Band 锚点</td>
+        <td>合约年限超出 1–5Y 范围，Term 曲线需扩展</td></tr>
+
+      <tr class="cat-row"><td></td><td colspan="4">Config / Sustainability / DWS / AI / LPS</td>
+        <td><span class="cell c-na">N/A</span></td><td colspan="2">解决方案级 / 项目制 / 非 HW-Service 联动定价</td></tr>
+
+
+      <!-- ═══════ 汇总 ═══════ -->
+      <tr class="bg-row"><td colspan="8">Coverage Summary</td></tr>
+      <tr>
+        <td colspan="5" style="text-align: right; font-weight: 600;">已覆盖（有 DP 方案）</td>
+        <td colspan="3">
+          <span class="cell c-delivered">ISG POS/APOS</span>
+          <span class="cell c-proposed">IDG POS (SMB)</span>
+          <span class="cell c-proposed">IDG POS (Consumer)</span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5" style="text-align: right; font-weight: 600; color: var(--gap);">同模式但缺方案 (Gap)</td>
+        <td colspan="3">
+          <span class="cell c-gap">IDG APOS (1.2 + 2.2)</span>
+          <span class="cell c-gap">ISG CBSO (3.2)</span>
+          <span class="cell c-gap">IDG CBSO (3.1)</span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5" style="text-align: right; font-weight: 600; color: var(--sub);">不适用 (N/A)</td>
+        <td colspan="3">
+          <span style="font-size:0.73rem;color:var(--sub);">Hybrid Cloud / DWS / SaaS / Managed / DaaS / Lease / Configuration / Sustainability / AI / LPS</span>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <strong>IDG DP 覆盖范围：仅 POS（Point of Sale）。</strong> POS 是客户同时选购硬件+服务的场景——Band 锚点直接对应 HW AUR，Term Curve 覆盖标准 1–5Y 年限。APOS（After POS，设备已有使用年龄）和 CBSO（合约制，年限可能超 5Y）的核心定价逻辑同源（Band + Term），但参数和边界条件不同，目前未纳入 v2.0 方案。
+  </div>
+
+</div>
+</body>
+</html>
