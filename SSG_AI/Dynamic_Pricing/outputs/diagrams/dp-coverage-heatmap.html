@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SSG/IDG Service Scenarios — Dynamic Pricing Coverage Heatmap</title>
+<title>IDG POS Dynamic Pricing — Sub-Scenario Coverage Heatmap</title>
 <style>
   :root {
     --delivered: #059669;
     --proposed: #7c3aed;
+    --partial: #d97706;
     --gap: #dc2626;
     --na: #d1d5db;
     --bg: #f8f9fb;
@@ -24,10 +25,10 @@
     display: flex; justify-content: center;
     padding: 40px 20px;
   }
-  .page { max-width: 1300px; width: 100%; }
+  .page { max-width: 1200px; width: 100%; }
 
   .header { text-align: center; margin-bottom: 32px; }
-  .header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
   .header .sub { font-size: 0.85rem; color: var(--sub); margin-top: 4px; }
 
   .legend {
@@ -36,12 +37,11 @@
   }
   .legend-item { display: flex; align-items: center; gap: 6px; }
   .legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
-  .sw-delivered { background: var(--delivered); }
   .sw-proposed { background: var(--proposed); }
+  .sw-partial { background: var(--partial); }
   .sw-gap { background: var(--gap); }
-  .sw-na { background: var(--na); }
 
-  .table-wrap { overflow-x: auto; }
+  .table-wrap { overflow-x: auto; margin-bottom: 24px; }
   table {
     width: 100%; border-collapse: collapse; font-size: 0.78rem;
     background: var(--card); border: 1px solid var(--border);
@@ -56,146 +56,265 @@
   }
   td { border-bottom: 1px solid #f0f1f4; }
 
-  .bg-row td { background: #f9fafb; font-weight: 700; font-size: 0.85rem; color: var(--text); border-bottom: 2px solid var(--border); }
-  .cat-row td { font-weight: 600; color: var(--sub); background: #fdfdfe; padding-top: 14px; }
+  .seg-row td { background: #f9fafb; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid var(--border); }
 
   .cell {
     display: inline-block; padding: 4px 10px; border-radius: 4px;
     font-weight: 600; font-size: 0.72rem; white-space: nowrap;
+    text-align: center; min-width: 70px;
   }
-  .c-delivered { background: #ecfdf5; color: var(--delivered); border: 1px solid #a7f3d0; }
   .c-proposed { background: #f5f3ff; color: var(--proposed); border: 1px solid #ddd6fe; }
-  .c-gap { background: #fef2f2; color: var(--gap); border: 1px solid #fecaca; }
-  .c-na { background: #f3f4f6; color: #9ca3af; border: 1px solid #e5e7eb; }
+  .c-partial { background: #fffbeb; color: var(--partial); border: 1px solid #fde68a; }
+  .c-gap    { background: #fef2f2; color: var(--gap);    border: 1px solid #fecaca; }
 
-  .note { font-size: 0.73rem; color: var(--sub); line-height: 1.6; margin-top: 20px; }
+  .note { font-size: 0.73rem; color: var(--sub); line-height: 1.6; margin-top: 16px; }
   .note strong { color: var(--text); }
+
+  .model-box {
+    background: linear-gradient(135deg, #f5f3ff 0%, #f0f5ff 100%);
+    border: 1px solid #d4c8f0; border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 24px;
+    text-align: center;
+  }
+  .model-box .eq { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 6px; }
+  .model-box .eq span.b { color: var(--proposed); }
+  .model-box .eq span.t { color: #2563eb; }
+  .model-box .eq span.a { color: var(--partial); }
+  .model-box .eq span.op { color: var(--sub); }
+  .model-box .desc { font-size: 0.78rem; color: var(--sub); }
 </style>
 </head>
 <body>
 <div class="page">
 
   <div class="header">
-    <h1>SSG / IDG Service Business Scenarios — Dynamic Pricing Coverage Heatmap</h1>
-    <div class="sub">按 SSG Business Model Matrix 类目展开 · 颜色 = Dynamic Pricing 提案覆盖状态</div>
+    <h1>IDG POS Dynamic Pricing — Sub-Scenario Coverage</h1>
+    <div class="sub">Scope: Point of Sale only · v2.0 Value Band + Term Curve Model</div>
+  </div>
+
+  <div class="model-box">
+    <div class="eq">
+      <span class="b">Service Price</span>
+      <span class="op">=</span>
+      <span class="b">BasePrice(Band, Tier)</span>
+      <span class="op">×</span>
+      <span class="t">TermFactor(Term)</span>
+      <span class="op">×</span>
+      <span class="a">αγ(Term, Tier)</span>
+    </div>
+    <div class="desc">Two segments: SMB (8 bands A–H) and Consumer (10 bands A–J), each with 4 service tiers and calibrated αγ parameters.</div>
   </div>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-swatch sw-delivered"></div> 已交付 (Delivered)</div>
-    <div class="legend-item"><div class="legend-swatch sw-proposed"></div> 有方案 (Proposed)</div>
-    <div class="legend-item"><div class="legend-swatch sw-gap"></div> 同模式但缺方案 (Gap)</div>
-    <div class="legend-item"><div class="legend-swatch sw-na"></div> 不适用 DP 逻辑 (N/A)</div>
+    <div class="legend-item"><div class="legend-swatch sw-proposed"></div> Fully Modeled</div>
+    <div class="legend-item"><div class="legend-swatch sw-partial"></div> Partially Defined</div>
+    <div class="legend-item"><div class="legend-swatch sw-gap"></div> Not Yet Modeled</div>
   </div>
 
+  <!-- ═══ Table 1: Model Coverage by Segment × Tier ═══ -->
   <div class="table-wrap">
   <table>
     <thead>
       <tr>
-        <th>BG</th>
-        <th>类目</th>
-        <th>售时</th>
-        <th>Seg</th>
-        <th>子场景 (BM #)</th>
-        <th style="min-width:130px">DP 提案状态</th>
-        <th>定价模型</th>
-        <th>关键机制</th>
+        <th>Segment</th>
+        <th>Tier</th>
+        <th>Band Table</th>
+        <th>Base 3Y Anchor</th>
+        <th>Term Curve</th>
+        <th>α (cost rise)</th>
+        <th>γ (tail risk)</th>
+        <th>PSP/PS Ratio</th>
+        <th>Example Pricing</th>
       </tr>
     </thead>
     <tbody>
+      <tr class="seg-row"><td colspan="9">SMB (Commercial POS — 1.1)</td></tr>
+      <tr>
+        <td></td><td>Depot</td>
+        <td><span class="cell c-proposed">8 bands</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">α=0</span></td>
+        <td><span class="cell c-proposed">γ=0</span></td>
+        <td><span class="cell c-na">N/A</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Onsite</td>
+        <td><span class="cell c-proposed">8 bands</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">α=0.02</span></td>
+        <td><span class="cell c-proposed">γ=0</span></td>
+        <td><span class="cell c-na">N/A</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Premier Support</td>
+        <td><span class="cell c-proposed">8 bands</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">α=0.03–0.04</span></td>
+        <td><span class="cell c-proposed">γ=0.03–0.05</span></td>
+        <td><span class="cell c-proposed">1.40×</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Premier Support Plus</td>
+        <td><span class="cell c-proposed">8 bands</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">α=0.07–0.09</span></td>
+        <td><span class="cell c-proposed">γ=0.08–0.10</span></td>
+        <td><span class="cell c-proposed">1.40×</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+      </tr>
 
-      <!-- ═══════ ISG ═══════ -->
-      <tr class="bg-row"><td colspan="8">ISG (Infrastructure Solutions Group)</td></tr>
+      <tr class="seg-row"><td colspan="9">Consumer (Consumer POS — 2.1)</td></tr>
+      <tr>
+        <td></td><td>Depot</td>
+        <td><span class="cell c-proposed">10 bands</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">α=0</span></td>
+        <td><span class="cell c-proposed">γ=0</span></td>
+        <td><span class="cell c-na">N/A</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Onsite</td>
+        <td><span class="cell c-proposed">10 bands</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">α=0.02</span></td>
+        <td><span class="cell c-proposed">γ=0</span></td>
+        <td><span class="cell c-na">N/A</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Premier Care</td>
+        <td><span class="cell c-proposed">10 bands</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">α=0.03–0.04</span></td>
+        <td><span class="cell c-proposed">γ=0.03–0.05</span></td>
+        <td><span class="cell c-proposed">1.70×</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Premier Care Plus</td>
+        <td><span class="cell c-proposed">10 bands</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">α=0.08–1.10</span></td>
+        <td><span class="cell c-proposed">γ=0.09–0.12</span></td>
+        <td><span class="cell c-proposed">1.70×</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
 
-      <tr class="cat-row"><td></td><td>Commercial</td><td>POS</td><td>LE / SMB</td>
-        <td>1.3 — Direct/Indirect × Standalone/Hard/Soft Bundle (5)</td>
-        <td><span class="cell c-delivered">Delivered</span></td>
-        <td>Pen Rate</td>
-        <td>Service Price = HW Price × Pen Rate</td></tr>
-
-      <tr><td></td><td></td><td>APOS</td><td>LE / SMB</td>
-        <td>1.4 — Direct/Indirect × Standalone (2)</td>
-        <td><span class="cell c-delivered">Delivered</span></td>
-        <td>Pen Rate</td>
-        <td>复用 1.3 引擎</td></tr>
-
-      <tr class="cat-row"><td></td><td>CBSO</td><td>APOS</td><td>LE / SMB</td>
-        <td>3.2 — Direct/Indirect × Standalone Recurring (2)</td>
-        <td><span class="cell c-gap">Gap</span></td>
-        <td>Pen Rate (待扩)</td>
-        <td>合约制 recurring，Pen Rate 可扩展但未设计</td></tr>
-
-      <tr class="cat-row"><td></td><td colspan="4">Hybrid Cloud / Sustainability / AI / LPS</td>
-        <td><span class="cell c-na">N/A</span></td><td colspan="2">解决方案级 / 项目制定价，非标准服务 PN</td></tr>
-
-
-      <!-- ═══════ IDG ═══════ -->
-      <tr class="bg-row"><td colspan="8">IDG (Intelligent Devices Group)</td></tr>
-
-      <tr class="cat-row"><td></td><td>Commercial</td><td rowspan="2" style="background:#f5f3ff;font-weight:700;color:var(--proposed);">POS<br><span style="font-weight:400;font-size:0.65rem;">← DP 覆盖范围</span></td>
-        <td>SMB</td>
-        <td>1.1 — Direct/Indirect × Standalone/Hard/Soft Bundle (SMB sub)</td>
+  <!-- ═══ Table 2: Coverage by Bundling Type & RTM ═══ -->
+  <div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Segment</th>
+        <th>RTM</th>
+        <th>Bundling</th>
+        <th>BM #</th>
+        <th>Band Lookup</th>
+        <th>Term Curve</th>
+        <th>αγ Adjust</th>
+        <th>HLS Prototype</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="seg-row"><td colspan="9">SMB Commercial (1.1)</td></tr>
+      <tr>
+        <td></td><td>Direct</td><td>Standalone</td><td>1.1.1</td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-partial">POS only</span></td>
         <td><span class="cell c-proposed">Proposed</span></td>
-        <td rowspan="2">Value Band + Term Curve + αγ</td>
-        <td>8 bands A–H, TermFactor=0.55·ln(T)+0.65, αγ per tier</td></tr>
-
-      <tr><td></td><td>Consumer</td>
-        <td>Consumer</td>
-        <td>2.1 — Soft/Hard Bundle × Consumer × One-off/Recurring (4)</td>
+      </tr>
+      <tr>
+        <td></td><td>Direct</td><td>Hard Bundle</td><td>1.1.2</td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-partial">POS only</span></td>
         <td><span class="cell c-proposed">Proposed</span></td>
-        <td>10 bands A–J, αγ 参数略高于 SMB</td></tr>
-
-      <tr class="cat-row"><td></td><td>Commercial</td><td>APOS</td><td>SMB</td>
-        <td>1.2 — Direct/Indirect × Standalone (2)</td>
-        <td><span class="cell c-gap">Gap</span></td>
-        <td rowspan="2">Value Band + Term Curve + αγ (待扩)</td>
-        <td>Band + Term 模型可复用，但 APOS 起点不同（设备已有年龄）</td></tr>
-
-      <tr><td></td><td>Consumer</td><td>APOS</td><td>Consumer</td>
-        <td>2.2 — support.lenovo.com / Vantage / Parts (3)</td>
-        <td><span class="cell c-gap">Gap</span></td>
-        <td>同上，SN 查 Band + 剩余年限 Term 计算</td></tr>
-
-      <tr class="cat-row"><td></td><td>CBSO</td><td>APOS</td><td>LE / SMB</td>
-        <td>3.1 — Direct/Indirect × Standalone Recurring (2)</td>
-        <td><span class="cell c-gap">Gap</span></td>
-        <td>可复用 Band 锚点</td>
-        <td>合约年限超出 1–5Y 范围，Term 曲线需扩展</td></tr>
-
-      <tr class="cat-row"><td></td><td colspan="4">Config / Sustainability / DWS / AI / LPS</td>
-        <td><span class="cell c-na">N/A</span></td><td colspan="2">解决方案级 / 项目制 / 非 HW-Service 联动定价</td></tr>
-
-
-      <!-- ═══════ 汇总 ═══════ -->
-      <tr class="bg-row"><td colspan="8">Coverage Summary</td></tr>
-      <tr>
-        <td colspan="5" style="text-align: right; font-weight: 600;">已覆盖（有 DP 方案）</td>
-        <td colspan="3">
-          <span class="cell c-delivered">ISG POS/APOS</span>
-          <span class="cell c-proposed">IDG POS (SMB)</span>
-          <span class="cell c-proposed">IDG POS (Consumer)</span>
-        </td>
       </tr>
       <tr>
-        <td colspan="5" style="text-align: right; font-weight: 600; color: var(--gap);">同模式但缺方案 (Gap)</td>
-        <td colspan="3">
-          <span class="cell c-gap">IDG APOS (1.2 + 2.2)</span>
-          <span class="cell c-gap">ISG CBSO (3.2)</span>
-          <span class="cell c-gap">IDG CBSO (3.1)</span>
-        </td>
+        <td></td><td>Indirect</td><td>Standalone</td><td>1.1.3</td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-partial">POS only</span></td>
+        <td><span class="cell c-proposed">Proposed</span></td>
       </tr>
       <tr>
-        <td colspan="5" style="text-align: right; font-weight: 600; color: var(--sub);">不适用 (N/A)</td>
-        <td colspan="3">
-          <span style="font-size:0.73rem;color:var(--sub);">Hybrid Cloud / DWS / SaaS / Managed / DaaS / Lease / Configuration / Sustainability / AI / LPS</span>
-        </td>
+        <td></td><td>Indirect</td><td>Hard Bundle</td><td>1.1.4</td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-partial">POS only</span></td>
+        <td><span class="cell c-proposed">Proposed</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Indirect</td><td>Soft Bundle</td><td>1.1.5</td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-partial">POS only</span></td>
+        <td><span class="cell c-proposed">Proposed</span></td>
       </tr>
 
+      <tr class="seg-row"><td colspan="9">Consumer (2.1)</td></tr>
+      <tr>
+        <td></td><td>Direct</td><td>Soft Bundle</td><td>2.1.1</td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-partial">POS only</span></td>
+        <td><span class="cell c-proposed">Proposed</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Direct</td><td>Soft Bundle (Recurring)</td><td>2.1.2</td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-partial">1–5Y only</span></td>
+        <td><span class="cell c-partial">1–5Y only</span></td>
+        <td><span class="cell c-gap">—</span></td>
+        <td><span class="cell c-partial">Partial</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Direct</td><td>Hard Bundle</td><td>2.1.3</td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-partial">POS only</span></td>
+        <td><span class="cell c-proposed">Proposed</span></td>
+      </tr>
+      <tr>
+        <td></td><td>Direct</td><td>Hard Bundle</td><td>2.1.4</td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-proposed">✓</span></td>
+        <td><span class="cell c-partial">POS only</span></td>
+        <td><span class="cell c-proposed">Proposed</span></td>
+      </tr>
     </tbody>
   </table>
   </div>
 
   <div class="note">
-    <strong>IDG DP 覆盖范围：仅 POS（Point of Sale）。</strong> POS 是客户同时选购硬件+服务的场景——Band 锚点直接对应 HW AUR，Term Curve 覆盖标准 1–5Y 年限。APOS（After POS，设备已有使用年龄）和 CBSO（合约制，年限可能超 5Y）的核心定价逻辑同源（Band + Term），但参数和边界条件不同，目前未纳入 v2.0 方案。
+    <strong>Scope boundary:</strong> v2.0 covers IDG POS (Point of Sale) only — where the customer selects hardware and service together at purchase time. The model prices any standard warranty/upgrade service PN attached to a hardware device, regardless of bundling type or RTM channel. The core pricing engine (Band lookup → Base 3Y → Term Curve → αγ) is bundling-agnostic and RTM-agnostic.<br><br>
+    <strong>Recurring (2.1.2) is partial:</strong> the Term Curve is calibrated for 1–5Y one-off purchases. Recurring subscription models may extend beyond 5 years and require curve extension, though the Band anchor values remain reusable.<br><br>
+    <strong>Not in scope (outside POS):</strong> APOS (After Point of Sale — support.lenovo.com, Vantage), CBSO (Contract-Based recurring services), and all ISG / Hybrid Cloud / DWS / Sustainability / AI / LPS scenarios.
   </div>
 
 </div>
