@@ -53,7 +53,7 @@
     font-weight: 600;
   }
 
-  .comp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .comp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
   @media (max-width: 800px) { .comp-grid { grid-template-columns: repeat(2, 1fr); } }
   .comp-card {
     background: var(--card);
@@ -136,14 +136,18 @@
     </div>
   </div>
 
-  <div class="section-label">Pen Rate Management in LBP (4 Core Components)</div>
+  <div class="section-label">Pen Rate Management in LBP (3 Core Components)</div>
   <div class="comp-grid">
 
     <div class="comp-card">
       <div class="num">01</div>
       <div class="title">Pen Rate Delegation</div>
       <div class="body">
-        Manages Pen Rate rules: which BU / Country / GTM gets which Pen Rate. Supports bulk import/export and full audit history.
+        <ul style="margin:0;padding-left:16px;font-size:0.78rem;color:var(--sub);line-height:1.6;">
+          <li>Manages Pen Rate rules by BU / Country / GTM</li>
+          <li>Supports bulk import/export</li>
+          <li>Full audit history</li>
+        </ul>
       </div>
     </div>
 
@@ -151,7 +155,11 @@
       <div class="num">02</div>
       <div class="title">Pen Rate Adjustment</div>
       <div class="body">
-        Tiered adjustment of Pen Rate% by HW unit price band. Same standard Pen Rate, higher effective rate for higher-value HW — more expensive hardware justifies higher service value.
+        <ul style="margin:0;padding-left:16px;font-size:0.78rem;color:var(--sub);line-height:1.6;">
+          <li>Tiered adjustment of Pen Rate% by HW unit price band</li>
+          <li>Same standard Pen Rate, higher effective rate for higher-value HW</li>
+          <li>More expensive hardware justifies higher service value</li>
+        </ul>
       </div>
     </div>
 
@@ -159,15 +167,10 @@
       <div class="num">⭐</div>
       <div class="title">Priority Logic</div>
       <div class="body">
-        When multiple rules conflict, auto-resolves by priority. 5 exact-match dimensions: Brand · SDF · Base Warranty · RAD · GTM.
-      </div>
-    </div>
-
-    <div class="comp-card">
-      <div class="num">04</div>
-      <div class="title">Downstream Sync</div>
-      <div class="body">
-        Pen Rate results automatically synced to LUDP and Magellan, ensuring pricing consistency across quoting and downstream systems.
+        <ul style="margin:0;padding-left:16px;font-size:0.78rem;color:var(--sub);line-height:1.6;">
+          <li>Auto-resolves conflicts when multiple rules match</li>
+          <li>5 exact-match dimensions: Brand · SDF · Base Warranty · RAD · GTM</li>
+        </ul>
       </div>
     </div>
 
@@ -185,7 +188,7 @@
     <div class="flow-arrow">→</div>
     <div class="flow-step">Take Floor<br><span style="font-weight:400;font-size:0.7rem;color:var(--sub)">min(Orig Deleg, New PR)</span></div>
     <div class="flow-arrow">→</div>
-    <div class="flow-step" style="border-color:var(--accent2);color:var(--accent2)">Final Service Price</div>
+    <div class="flow-step" style="border-color:var(--accent2);color:var(--accent2)">Final Service Price<br><span style="font-weight:400;font-size:0.7rem;color:var(--accent2)">= HW Unit Price × Pen Rate</span></div>
   </div>
 
   <div class="priority-bar">
