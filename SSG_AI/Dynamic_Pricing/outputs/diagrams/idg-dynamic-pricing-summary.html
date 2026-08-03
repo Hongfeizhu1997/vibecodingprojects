@@ -261,7 +261,7 @@
 
   <div class="header">
     <h1>IDG Dynamic Pricing — Solution Overview</h1>
-    <div class="sub">B2B · LBPi · LBPe | Phased: Rule-Based Q.Win → AI-Driven</div>
+    <div class="sub">B2B · LBPi · LBPe | Pre-Study: Adjustment Method Evaluation</div>
   </div>
 
   <div class="formula-hero">
@@ -358,31 +358,33 @@
     </div>
   </div>
 
-  <div class="section-label">Phased Rollout</div>
+  <div class="section-label">Recommended Approaches</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;">
 
-    <div class="comp-card" style="border-color:var(--accent2);background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 100%);">
-      <div class="num" style="color:var(--accent2)">Q.WIN</div>
-      <div class="title" style="color:var(--accent2)">Phase 1 — Rule-Based Quick Win</div>
+    <div class="comp-card" style="border-color:#6c5ce7;background:linear-gradient(135deg,#faf8ff 0%,#f5f3ff 100%);">
+      <div class="num" style="color:#6c5ce7">⭐</div>
+      <div class="title" style="color:#6c5ce7">Tiered — Rule-Based Lookup</div>
       <div class="body">
         <ul style="margin:0;padding-left:16px;font-size:0.78rem;color:var(--sub);line-height:1.6;">
-          <li>Fixed lookup table — same methodology as ISG</li>
+          <li>3–5 HW price bands, fixed Pen Rate per band</li>
           <li>6-dim matrix: Service OH / Tier / Sub Tier / BU / Country / GTM</li>
-          <li>Tiered adjustment by HW unit price band</li>
           <li>Zero data dependency — deploy immediately</li>
+          <li>Same approach as ISG; sales team can memorize</li>
+          <li><strong>Risk:</strong> cliff effect at band boundaries</li>
         </ul>
       </div>
     </div>
 
     <div class="comp-card" style="border-color:var(--accent);background:linear-gradient(135deg,#eff6ff 0%,#eef2ff 100%);">
-      <div class="num" style="color:var(--accent)">AI</div>
-      <div class="title" style="color:var(--accent)">Phase 2 — AI Model Replacement</div>
+      <div class="num" style="color:var(--accent)">⭐</div>
+      <div class="title" style="color:var(--accent)">Power Law — Elasticity-Driven</div>
       <div class="body">
         <ul style="margin:0;padding-left:16px;font-size:0.78rem;color:var(--sub);line-height:1.6;">
-          <li>ML model replaces fixed lookup with data-driven Pen Rate optimization</li>
-          <li>Learns from historical win/loss transaction data</li>
-          <li>Continuous parameter tuning via online learning</li>
-          <li>Requires 2–3 months of Phase 1 data accumulation</li>
+          <li>Single parameter k = price elasticity</li>
+          <li>Smooth curve, no cliff effect</li>
+          <li>Each Service Tier can run its own k</li>
+          <li>Requires Phase 1 data for k calibration</li>
+          <li><strong>Risk:</strong> harder to explain to non-technical stakeholders</li>
         </ul>
       </div>
     </div>
@@ -398,7 +400,7 @@
 
       <!-- 1: Piecewise Tiered ⭐ -->
       <div class="mini-chart-card" style="border-color:#6c5ce7;background:#faf8ff;">
-        <div class="mc-title"><span style="color:#6c5ce7">■</span> Piecewise Tiered <span class="mc-badge rec">⭐ Phase 1</span></div>
+        <div class="mc-title"><span style="color:#6c5ce7">■</span> Piecewise Tiered <span class="mc-badge rec">⭐ Recommended</span></div>
         <div class="mc-formula">Defined per HW price band (3–5 tiers)</div>
         <svg viewBox="0 0 340 240" style="width:100%;height:auto;">
           <line x1="45" y1="210" x2="315" y2="210" stroke="#e5e7eb" stroke-width="1"/>
@@ -421,7 +423,7 @@
 
       <!-- 2: Power Law ⭐ -->
       <div class="mini-chart-card" style="border-color:#2563eb;background:#f8faff;">
-        <div class="mc-title"><span style="color:#2563eb">●</span> Negative Power Law <span class="mc-badge rec">⭐ Phase 2</span></div>
+        <div class="mc-title"><span style="color:#2563eb">●</span> Negative Power Law <span class="mc-badge rec">⭐ Recommended</span></div>
         <div class="mc-formula">PR = a + b · x<sup>−k</sup> &nbsp;(k = price elasticity)</div>
         <svg viewBox="0 0 340 240" style="width:100%;height:auto;">
           <line x1="45" y1="210" x2="315" y2="210" stroke="#e5e7eb" stroke-width="1"/>
@@ -509,7 +511,7 @@
               <li>Mitigate by aligning boundaries with natural product price gaps</li>
             </ul>
           </td>
-          <td><span class="tag tag-p1">Phase 1</span></td>
+          <td><span class="tag tag-p1">Recommended</span></td>
         </tr>
         <tr class="row-rec">
           <td><strong>Power Law ⭐</strong></td>
@@ -526,7 +528,7 @@
               <li>k calibrated from Phase 1 data via log-log regression + LOESS smoothing</li>
             </ul>
           </td>
-          <td><span class="tag tag-p2">Phase 2</span></td>
+          <td><span class="tag tag-p2">Recommended</span></td>
         </tr>
         <tr>
           <td><strong>Exponential</strong></td>
@@ -542,31 +544,31 @@
               <li>Best for broad HW price-span portfolios ($1K–$200K) needing smooth coverage</li>
             </ul>
           </td>
-          <td><span class="tag tag-ok">Backup</span></td>
+          <td><span class="tag tag-ok">Alternative</span></td>
         </tr>
       </tbody>
     </table>
 
     <div class="biz-insight-grid">
       <div class="biz-card p1">
-        <div class="biz-card-title"><span class="dot p1"></span>Phase 1: Tiered — Zero-Risk Quick Win</div>
+        <div class="biz-card-title"><span class="dot p1"></span>Tiered — Best for Immediate Deployment</div>
         <div class="biz-card-body">
-          <strong>Deploy immediately</strong> — no historical data needed. Define 3–5 HW price bands with fixed Pen Rate per band. Sales team can reference a one-page table. ISG already uses this method — IDG reuses the same approach with 3 extra service dimensions.
-          <br><br><strong>Cliff mitigation:</strong> set band boundaries at natural product price gaps (e.g. $15K between mainstream and workstation lines) to minimize edge cases.
+          <strong>Zero data required.</strong> Define 3–5 HW price bands, assign fixed Pen Rate per band. Sales team references a one-page table. ISG already uses this method — IDG reuses the same approach with 3 extra service dimensions. Ideal when speed and auditability are the top priority.
+          <br><br><strong>Trade-off:</strong> cliff effect at band boundaries (e.g. $4,999→$5,001). Mitigate by aligning boundaries with natural product price gaps.
         </div>
       </div>
       <div class="biz-card p2">
-        <div class="biz-card-title"><span class="dot p2"></span>Phase 2: Power Law — AI-Driven Upgrade</div>
+        <div class="biz-card-title"><span class="dot p2"></span>Power Law — Best for Pricing Precision</div>
         <div class="biz-card-body">
-          <strong>Single parameter k controls everything.</strong> k=0.3 → mild adjustment, k=0.5 → balanced, k=0.7 → aggressive service revenue protection. Different Service Tiers can run different k values — premium support gets higher k (more protection).
-          <br><br><strong>Eliminates cliff effect</strong> entirely while preserving business intuition. k is calibrated from Phase 1 historical transaction data: log-log regression gives the initial estimate, then LOESS smoothing validates the curve against real win/loss patterns before quarterly business review.
+          <strong>Single parameter k controls everything.</strong> Smooth curve with no cliff effect. k=0.3 (mild) to k=0.7 (aggressive). Each Service Tier can run its own k. k is calibrated from historical data: log-log regression → LOESS validation → quarterly business review.
+          <br><br><strong>Trade-off:</strong> requires accumulated transaction data; harder to explain to non-technical stakeholders than a lookup table.
         </div>
       </div>
       <div class="biz-card risk">
-        <div class="biz-card-title"><span class="dot risk"></span>Key Risk: Over-Smoothing vs. Business Control</div>
+        <div class="biz-card-title"><span class="dot risk"></span>Decision Criteria</div>
         <div class="biz-card-body">
-          <strong>Smooth curves (Power Law, Exponential) look elegant but harder to audit.</strong> Business stakeholders may prefer visible, explainable tiers over mathematically optimal curves. Phase 1 builds trust with transparent rules; Phase 2 introduces optimization only after stakeholders are comfortable.
-          <br><br><strong>Recommendation:</strong> run both in parallel during transition — Tiered as floor, Power Law as ceiling.
+          <strong>Choose Tiered if</strong> deployment speed and stakeholder transparency are critical. Works immediately with zero data. <strong>Choose Power Law if</strong> pricing precision and eliminating cliff effect justify the calibration effort. The two can coexist — Tiered as the baseline floor, Power Law as the optimized ceiling during transition.
+          <br><br><strong>Exponential</strong> is a fallback: same smooth behavior as Power Law but with less intuitive business parameters (λ vs. k).
         </div>
       </div>
     </div>
