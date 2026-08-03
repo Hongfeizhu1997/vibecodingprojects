@@ -391,15 +391,15 @@
 
   <div class="section-label">Pen Rate Function Candidates</div>
   <div class="chart-section">
-    <div class="chart-title">6 Candidate Curves: Pen Rate vs. HW Unit Price</div>
+    <div class="chart-title">3 Candidate Curves: Pen Rate vs. HW Unit Price</div>
     <div class="chart-sub">All charts share same scale: X = $0–$200K, Y = 5%–35% Pen Rate</div>
 
     <div class="mini-chart-grid">
 
-      <!-- 1: Reciprocal -->
-      <div class="mini-chart-card">
-        <div class="mc-title"><span style="color:#2a9d8f">●</span> Reciprocal (Hyperbolic)</div>
-        <div class="mc-formula">PR = a + b / (x + c)</div>
+      <!-- 1: Piecewise Tiered ⭐ -->
+      <div class="mini-chart-card" style="border-color:#6c5ce7;background:#faf8ff;">
+        <div class="mc-title"><span style="color:#6c5ce7">■</span> Piecewise Tiered <span class="mc-badge rec">⭐ Phase 1</span></div>
+        <div class="mc-formula">Defined per HW price band (3–5 tiers)</div>
         <svg viewBox="0 0 340 240" style="width:100%;height:auto;">
           <line x1="45" y1="210" x2="315" y2="210" stroke="#e5e7eb" stroke-width="1"/>
           <line x1="45" y1="20" x2="45" y2="210" stroke="#e5e7eb" stroke-width="1"/>
@@ -413,12 +413,36 @@
           <text x="45" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$0</text>
           <text x="180" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$100K</text>
           <text x="315" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$200K</text>
-          <polyline points="45,30 59,137 86,167 126,178 180,182 248,185 315,186"
-            fill="none" stroke="#2a9d8f" stroke-width="2"/>
+          <polyline points="45,70 59,70 59,97 86,97 86,137 153,137 153,177 315,177"
+            fill="none" stroke="#6c5ce7" stroke-width="2.5" stroke-dasharray="6,3"/>
+          <text x="100" y="90" font-size="7" fill="#6c5ce7">4 tiers</text>
         </svg>
       </div>
 
-      <!-- 2: Exponential Decay -->
+      <!-- 2: Power Law ⭐ -->
+      <div class="mini-chart-card" style="border-color:#2563eb;background:#f8faff;">
+        <div class="mc-title"><span style="color:#2563eb">●</span> Negative Power Law <span class="mc-badge rec">⭐ Phase 2</span></div>
+        <div class="mc-formula">PR = a + b · x<sup>−k</sup> &nbsp;(k = price elasticity)</div>
+        <svg viewBox="0 0 340 240" style="width:100%;height:auto;">
+          <line x1="45" y1="210" x2="315" y2="210" stroke="#e5e7eb" stroke-width="1"/>
+          <line x1="45" y1="20" x2="45" y2="210" stroke="#e5e7eb" stroke-width="1"/>
+          <line x1="45" y1="175" x2="315" y2="175" stroke="#f3f4f6" stroke-width="0.5"/>
+          <line x1="45" y1="110" x2="315" y2="110" stroke="#f3f4f6" stroke-width="0.5"/>
+          <line x1="45" y1="45" x2="315" y2="45" stroke="#f3f4f6" stroke-width="0.5"/>
+          <text x="42" y="214" text-anchor="end" font-size="8" fill="#9ca3af">5%</text>
+          <text x="42" y="179" text-anchor="end" font-size="8" fill="#9ca3af">10%</text>
+          <text x="42" y="114" text-anchor="end" font-size="8" fill="#9ca3af">25%</text>
+          <text x="42" y="49" text-anchor="end" font-size="8" fill="#9ca3af">35%</text>
+          <text x="45" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$0</text>
+          <text x="180" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$100K</text>
+          <text x="315" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$200K</text>
+          <polyline points="45,57 52,57 59,85 86,124 126,142 180,152 248,159 315,163"
+            fill="none" stroke="#2563eb" stroke-width="2.5"/>
+          <text x="145" y="135" font-size="7" fill="#2563eb" font-weight="600">k=0.35</text>
+        </svg>
+      </div>
+
+      <!-- 3: Exponential Decay -->
       <div class="mini-chart-card">
         <div class="mc-title"><span style="color:#f4a261">●</span> Exponential Decay</div>
         <div class="mc-formula">PR = a + (b−a) · e<sup>−λx</sup></div>
@@ -440,108 +464,12 @@
         </svg>
       </div>
 
-      <!-- 3: Power Law ⭐ -->
-      <div class="mini-chart-card" style="border-color:#2563eb;background:#f8faff;">
-        <div class="mc-title"><span style="color:#2563eb">●</span> Negative Power Law <span class="mc-badge rec">⭐ Recommended</span></div>
-        <div class="mc-formula">PR = a + b · x<sup>−k</sup> &nbsp;(k = price elasticity)</div>
-        <svg viewBox="0 0 340 240" style="width:100%;height:auto;">
-          <line x1="45" y1="210" x2="315" y2="210" stroke="#e5e7eb" stroke-width="1"/>
-          <line x1="45" y1="20" x2="45" y2="210" stroke="#e5e7eb" stroke-width="1"/>
-          <line x1="45" y1="175" x2="315" y2="175" stroke="#f3f4f6" stroke-width="0.5"/>
-          <line x1="45" y1="110" x2="315" y2="110" stroke="#f3f4f6" stroke-width="0.5"/>
-          <line x1="45" y1="45" x2="315" y2="45" stroke="#f3f4f6" stroke-width="0.5"/>
-          <text x="42" y="214" text-anchor="end" font-size="8" fill="#9ca3af">5%</text>
-          <text x="42" y="179" text-anchor="end" font-size="8" fill="#9ca3af">10%</text>
-          <text x="42" y="114" text-anchor="end" font-size="8" fill="#9ca3af">25%</text>
-          <text x="42" y="49" text-anchor="end" font-size="8" fill="#9ca3af">35%</text>
-          <text x="45" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$0</text>
-          <text x="180" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$100K</text>
-          <text x="315" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$200K</text>
-          <polyline points="45,57 52,57 59,85 86,124 126,142 180,152 248,159 315,163"
-            fill="none" stroke="#2563eb" stroke-width="2.5"/>
-          <text x="145" y="135" font-size="7" fill="#2563eb" font-weight="600">k=0.35</text>
-        </svg>
-      </div>
-
-      <!-- 4: Logistic -->
-      <div class="mini-chart-card">
-        <div class="mc-title"><span style="color:#e76f51">●</span> Logistic / Sigmoid</div>
-        <div class="mc-formula">PR = P<sub>min</sub> + ΔP / (1 + e<sup>k(x−x₀)</sup>)</div>
-        <svg viewBox="0 0 340 240" style="width:100%;height:auto;">
-          <line x1="45" y1="210" x2="315" y2="210" stroke="#e5e7eb" stroke-width="1"/>
-          <line x1="45" y1="20" x2="45" y2="210" stroke="#e5e7eb" stroke-width="1"/>
-          <line x1="45" y1="175" x2="315" y2="175" stroke="#f3f4f6" stroke-width="0.5"/>
-          <line x1="45" y1="110" x2="315" y2="110" stroke="#f3f4f6" stroke-width="0.5"/>
-          <line x1="45" y1="45" x2="315" y2="45" stroke="#f3f4f6" stroke-width="0.5"/>
-          <text x="42" y="214" text-anchor="end" font-size="8" fill="#9ca3af">5%</text>
-          <text x="42" y="179" text-anchor="end" font-size="8" fill="#9ca3af">10%</text>
-          <text x="42" y="114" text-anchor="end" font-size="8" fill="#9ca3af">25%</text>
-          <text x="42" y="49" text-anchor="end" font-size="8" fill="#9ca3af">35%</text>
-          <text x="45" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$0</text>
-          <text x="180" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$100K</text>
-          <text x="315" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$200K</text>
-          <polyline points="45,76 59,81 86,100 126,123 180,159 248,182 315,188"
-            fill="none" stroke="#e76f51" stroke-width="2"/>
-          <text x="136" y="118" font-size="7" fill="#e76f51" font-weight="600">x₀=60K</text>
-        </svg>
-      </div>
-
-      <!-- 5: Piecewise Tiered ⭐ -->
-      <div class="mini-chart-card" style="border-color:#6c5ce7;background:#faf8ff;">
-        <div class="mc-title"><span style="color:#6c5ce7">■</span> Piecewise Tiered <span class="mc-badge rec">⭐ Recommended</span></div>
-        <div class="mc-formula">Defined per HW price band (3–5 tiers)</div>
-        <svg viewBox="0 0 340 240" style="width:100%;height:auto;">
-          <line x1="45" y1="210" x2="315" y2="210" stroke="#e5e7eb" stroke-width="1"/>
-          <line x1="45" y1="20" x2="45" y2="210" stroke="#e5e7eb" stroke-width="1"/>
-          <line x1="45" y1="175" x2="315" y2="175" stroke="#f3f4f6" stroke-width="0.5"/>
-          <line x1="45" y1="110" x2="315" y2="110" stroke="#f3f4f6" stroke-width="0.5"/>
-          <line x1="45" y1="45" x2="315" y2="45" stroke="#f3f4f6" stroke-width="0.5"/>
-          <text x="42" y="214" text-anchor="end" font-size="8" fill="#9ca3af">5%</text>
-          <text x="42" y="179" text-anchor="end" font-size="8" fill="#9ca3af">10%</text>
-          <text x="42" y="114" text-anchor="end" font-size="8" fill="#9ca3af">25%</text>
-          <text x="42" y="49" text-anchor="end" font-size="8" fill="#9ca3af">35%</text>
-          <text x="45" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$0</text>
-          <text x="180" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$100K</text>
-          <text x="315" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$200K</text>
-          <polyline points="45,70 59,70 59,97 86,97 86,137 153,137 153,177 315,177"
-            fill="none" stroke="#6c5ce7" stroke-width="2.5" stroke-dasharray="6,3"/>
-          <text x="100" y="90" font-size="7" fill="#6c5ce7">4 tiers</text>
-        </svg>
-      </div>
-
-      <!-- 6: Spline / LOESS -->
-      <div class="mini-chart-card">
-        <div class="mc-title"><span style="color:#b56576">●</span> Cubic Spline / LOESS</div>
-        <div class="mc-formula">Data-driven non-parametric smooth fit</div>
-        <svg viewBox="0 0 340 240" style="width:100%;height:auto;">
-          <line x1="45" y1="210" x2="315" y2="210" stroke="#e5e7eb" stroke-width="1"/>
-          <line x1="45" y1="20" x2="45" y2="210" stroke="#e5e7eb" stroke-width="1"/>
-          <line x1="45" y1="175" x2="315" y2="175" stroke="#f3f4f6" stroke-width="0.5"/>
-          <line x1="45" y1="110" x2="315" y2="110" stroke="#f3f4f6" stroke-width="0.5"/>
-          <line x1="45" y1="45" x2="315" y2="45" stroke="#f3f4f6" stroke-width="0.5"/>
-          <text x="42" y="214" text-anchor="end" font-size="8" fill="#9ca3af">5%</text>
-          <text x="42" y="179" text-anchor="end" font-size="8" fill="#9ca3af">10%</text>
-          <text x="42" y="114" text-anchor="end" font-size="8" fill="#9ca3af">25%</text>
-          <text x="42" y="49" text-anchor="end" font-size="8" fill="#9ca3af">35%</text>
-          <text x="45" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$0</text>
-          <text x="180" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$100K</text>
-          <text x="315" y="224" text-anchor="middle" font-size="7" fill="#9ca3af">$200K</text>
-          <circle cx="45" cy="57" r="2" fill="#b56576"/>
-          <circle cx="86" cy="110" r="2" fill="#b56576"/>
-          <circle cx="126" cy="137" r="2" fill="#b56576"/>
-          <circle cx="180" cy="157" r="2" fill="#b56576"/>
-          <circle cx="315" cy="183" r="2" fill="#b56576"/>
-          <polyline points="45,57 86,110 126,137 180,157 315,183"
-            fill="none" stroke="#b56576" stroke-width="1.8"/>
-        </svg>
-      </div>
-
     </div>
   </div>
 
   <div class="section-label" style="margin-top:32px;">Business Effects Comparison</div>
   <div class="biz-compare">
-    <div class="biz-title">6 Adjustment Methods — Business Impact Matrix</div>
+    <div class="biz-title">3 Adjustment Methods — Business Impact Matrix</div>
     <div class="biz-sub">Comparing implementation readiness, pricing behavior, and operational fit for IDG B2B</div>
 
     <table class="biz-table">
@@ -595,26 +523,10 @@
               <li>k=0.3: mild (HW ↓20% → PR ↑7%); k=0.5: balanced (↑12%); k=0.7: aggressive (↑18%)</li>
               <li>Each Service Tier can run its own k — premium support gets higher k for stronger protection</li>
               <li>Eliminates cliff effect entirely while preserving clear business semantics</li>
-              <li>Calibrate from Phase 1 transaction data via log-log regression</li>
+              <li>k calibrated from Phase 1 data via log-log regression + LOESS smoothing</li>
             </ul>
           </td>
           <td><span class="tag tag-p2">Phase 2</span></td>
-        </tr>
-        <tr>
-          <td><strong>Reciprocal</strong></td>
-          <td style="font-family:monospace;font-size:0.6rem;white-space:nowrap;">PR = a + b / (x + c)</td>
-          <td><span class="tag tag-ok">Medium</span></td>
-          <td><span class="tag tag-ok">Good</span></td>
-          <td><span class="tag tag-ok">Smooth</span></td>
-          <td>
-            <ul style="margin:0;padding-left:14px;font-size:0.65rem;line-height:1.55;">
-              <li>3 parameters — fastest to calibrate among smooth-function methods</li>
-              <li>Low-end PR drops sharply, mid-to-high flattens quickly and becomes unresponsive</li>
-              <li>Cannot tune the "elbow" point — curve shape is fixed once a/b/c are set</li>
-              <li>Works for single-product-line quick pilots with narrow HW price range</li>
-            </ul>
-          </td>
-          <td><span class="tag tag-ok">Backup</span></td>
         </tr>
         <tr>
           <td><strong>Exponential</strong></td>
@@ -632,38 +544,6 @@
           </td>
           <td><span class="tag tag-ok">Backup</span></td>
         </tr>
-        <tr>
-          <td><strong>Logistic</strong></td>
-          <td style="font-family:monospace;font-size:0.6rem;white-space:nowrap;">PR = P<sub>min</sub> + ΔP/(1+e<sup>k(x−x₀)</sup>)</td>
-          <td><span class="tag tag-warn">Hard</span></td>
-          <td><span class="tag tag-warn">Weak</span></td>
-          <td><span class="tag tag-ok">Smooth</span></td>
-          <td>
-            <ul style="margin:0;padding-left:14px;font-size:0.65rem;line-height:1.55;">
-              <li>4 parameters — most complex to calibrate among all candidates</li>
-              <li>Both ends saturate: low-end PR stays high (~29%), high-end stays low (~10%)</li>
-              <li>x₀ precisely controls the transition midpoint — useful for products with natural tier splits</li>
-              <li>Rigid saturation may miss market shifts at extremes; niche applicability only</li>
-            </ul>
-          </td>
-          <td><span class="tag tag-warn">Niche</span></td>
-        </tr>
-        <tr>
-          <td><strong>Spline/LOESS</strong></td>
-          <td style="font-family:monospace;font-size:0.6rem;white-space:nowrap;">Non-parametric smooth fit</td>
-          <td><span class="tag tag-no">N/A</span></td>
-          <td><span class="tag tag-no">None</span></td>
-          <td><span class="tag tag-ok">Smooth</span></td>
-          <td>
-            <ul style="margin:0;padding-left:14px;font-size:0.65rem;line-height:1.55;">
-              <li>Best statistical fit to historical transaction data — reflects real market behavior</li>
-              <li>Cannot extrapolate beyond data range — useless for new SKUs or price segments</li>
-              <li>Zero business explainability — impossible to justify a specific PR to sales or customer</li>
-              <li>Purely an analysis tool for back-testing and calibrating other methods</li>
-            </ul>
-          </td>
-          <td><span class="tag tag-no">Analysis</span></td>
-        </tr>
       </tbody>
     </table>
 
@@ -679,7 +559,7 @@
         <div class="biz-card-title"><span class="dot p2"></span>Phase 2: Power Law — AI-Driven Upgrade</div>
         <div class="biz-card-body">
           <strong>Single parameter k controls everything.</strong> k=0.3 → mild adjustment, k=0.5 → balanced, k=0.7 → aggressive service revenue protection. Different Service Tiers can run different k values — premium support gets higher k (more protection).
-          <br><br><strong>Eliminates cliff effect</strong> entirely while preserving business intuition. Calibrate k from Phase 1 transaction data via log-log regression.
+          <br><br><strong>Eliminates cliff effect</strong> entirely while preserving business intuition. k is calibrated from Phase 1 historical transaction data: log-log regression gives the initial estimate, then LOESS smoothing validates the curve against real win/loss patterns before quarterly business review.
         </div>
       </div>
       <div class="biz-card risk">
