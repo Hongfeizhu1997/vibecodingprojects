@@ -545,6 +545,15 @@
     <div class="biz-sub">Comparing implementation readiness, pricing behavior, and operational fit for IDG B2B</div>
 
     <table class="biz-table">
+      <colgroup>
+        <col style="width:9%;">
+        <col style="width:22%;">
+        <col style="width:8%;">
+        <col style="width:7%;">
+        <col style="width:7%;">
+        <col style="width:38%;">
+        <col style="width:9%;">
+      </colgroup>
       <thead>
         <tr>
           <th>Method</th>
@@ -557,58 +566,102 @@
         </tr>
       </thead>
       <tbody>
+        <tr class="row-p1">
+          <td><strong>Tiered ⭐</strong></td>
+          <td style="font-family:monospace;font-size:0.6rem;white-space:nowrap;">PR ∈ {PR₁, PR₂, …, PRₙ} per band</td>
+          <td><span class="tag tag-p1">Instant</span></td>
+          <td><span class="tag tag-p1">Perfect</span></td>
+          <td><span class="tag tag-warn">⚠ Cliff</span></td>
+          <td>
+            <ul style="margin:0;padding-left:14px;font-size:0.65rem;line-height:1.55;">
+              <li>Zero data dependency — deploy immediately with business-defined bands</li>
+              <li>Sales team can memorize a one-page lookup table; fully auditable</li>
+              <li>Compatible with existing quoting systems — ISG already uses this method</li>
+              <li>Cliff risk at band boundaries (e.g. $4,999→$5,001 drops PR from 28% to 22%)</li>
+              <li>Mitigate by aligning boundaries with natural product price gaps</li>
+            </ul>
+          </td>
+          <td><span class="tag tag-p1">Phase 1</span></td>
+        </tr>
+        <tr class="row-rec">
+          <td><strong>Power Law ⭐</strong></td>
+          <td style="font-family:monospace;font-size:0.6rem;white-space:nowrap;">PR = a + b · x<sup>−k</sup></td>
+          <td><span class="tag tag-ok">Medium</span></td>
+          <td><span class="tag tag-p2">Excellent</span></td>
+          <td><span class="tag tag-ok">Smooth</span></td>
+          <td>
+            <ul style="margin:0;padding-left:14px;font-size:0.65rem;line-height:1.55;">
+              <li><strong>k = price elasticity</strong> — the single parameter business adjusts quarterly</li>
+              <li>k=0.3: mild (HW ↓20% → PR ↑7%); k=0.5: balanced (↑12%); k=0.7: aggressive (↑18%)</li>
+              <li>Each Service Tier can run its own k — premium support gets higher k for stronger protection</li>
+              <li>Eliminates cliff effect entirely while preserving clear business semantics</li>
+              <li>Calibrate from Phase 1 transaction data via log-log regression</li>
+            </ul>
+          </td>
+          <td><span class="tag tag-p2">Phase 2</span></td>
+        </tr>
         <tr>
           <td><strong>Reciprocal</strong></td>
-          <td style="font-family:monospace;font-size:0.62rem;">a + b/(x+c)</td>
+          <td style="font-family:monospace;font-size:0.6rem;white-space:nowrap;">PR = a + b / (x + c)</td>
           <td><span class="tag tag-ok">Medium</span></td>
           <td><span class="tag tag-ok">Good</span></td>
           <td><span class="tag tag-ok">Smooth</span></td>
-          <td>Low-end drops fast, mid-high flattens early. Cannot tune "elbow" point.</td>
+          <td>
+            <ul style="margin:0;padding-left:14px;font-size:0.65rem;line-height:1.55;">
+              <li>3 parameters — fastest to calibrate among smooth-function methods</li>
+              <li>Low-end PR drops sharply, mid-to-high flattens quickly and becomes unresponsive</li>
+              <li>Cannot tune the "elbow" point — curve shape is fixed once a/b/c are set</li>
+              <li>Works for single-product-line quick pilots with narrow HW price range</li>
+            </ul>
+          </td>
           <td><span class="tag tag-ok">Backup</span></td>
         </tr>
         <tr>
           <td><strong>Exponential</strong></td>
-          <td style="font-family:monospace;font-size:0.62rem;">a + (b−a)·e<sup>−λx</sup></td>
+          <td style="font-family:monospace;font-size:0.6rem;white-space:nowrap;">PR = a + (b−a) · e<sup>−λx</sup></td>
           <td><span class="tag tag-ok">Medium</span></td>
           <td><span class="tag tag-ok">Good</span></td>
           <td><span class="tag tag-ok">Smooth</span></td>
-          <td>λ controls decay speed intuitively. High-end keeps declining slowly — may undervalue premium HW.</td>
+          <td>
+            <ul style="margin:0;padding-left:14px;font-size:0.65rem;line-height:1.55;">
+              <li>λ intuitively controls decay speed — "faster HW price drop → faster PR adjustment"</li>
+              <li>High-end PR keeps declining slowly — may underprice premium workstation services</li>
+              <li>Mid-range transition is uniform, lacking ability to target specific price zones</li>
+              <li>Best for broad HW price-span portfolios ($1K–$200K) needing smooth coverage</li>
+            </ul>
+          </td>
           <td><span class="tag tag-ok">Backup</span></td>
-        </tr>
-        <tr class="row-rec">
-          <td><strong>Power Law ⭐</strong></td>
-          <td style="font-family:monospace;font-size:0.62rem;">a + b·x<sup>−k</sup></td>
-          <td><span class="tag tag-ok">Medium</span></td>
-          <td><span class="tag tag-p2">Excellent</span></td>
-          <td><span class="tag tag-ok">Smooth</span></td>
-          <td><strong>k = price elasticity.</strong> Business directly adjusts k to control counter-cyclical intensity. Each Service Tier can have its own k.</td>
-          <td><span class="tag tag-p2">Phase 2</span></td>
         </tr>
         <tr>
           <td><strong>Logistic</strong></td>
-          <td style="font-family:monospace;font-size:0.62rem;">P<sub>min</sub>+ΔP/(1+e<sup>k(x−x₀)</sup>)</td>
+          <td style="font-family:monospace;font-size:0.6rem;white-space:nowrap;">PR = P<sub>min</sub> + ΔP/(1+e<sup>k(x−x₀)</sup>)</td>
           <td><span class="tag tag-warn">Hard</span></td>
           <td><span class="tag tag-warn">Weak</span></td>
           <td><span class="tag tag-ok">Smooth</span></td>
-          <td>Both ends saturate — low-end PR stays flat, high-end PR stays flat. x₀ sets midpoint. Good for products with natural split points.</td>
+          <td>
+            <ul style="margin:0;padding-left:14px;font-size:0.65rem;line-height:1.55;">
+              <li>4 parameters — most complex to calibrate among all candidates</li>
+              <li>Both ends saturate: low-end PR stays high (~29%), high-end stays low (~10%)</li>
+              <li>x₀ precisely controls the transition midpoint — useful for products with natural tier splits</li>
+              <li>Rigid saturation may miss market shifts at extremes; niche applicability only</li>
+            </ul>
+          </td>
           <td><span class="tag tag-warn">Niche</span></td>
-        </tr>
-        <tr class="row-p1">
-          <td><strong>Tiered ⭐</strong></td>
-          <td style="font-family:monospace;font-size:0.62rem;">3–5 fixed PR per band</td>
-          <td><span class="tag tag-p1">Instant</span></td>
-          <td><span class="tag tag-p1">Perfect</span></td>
-          <td><span class="tag tag-warn">⚠ Cliff</span></td>
-          <td><strong>Zero data dependency. Sales can memorize.</strong> Compatible with existing quoting systems. Cliff at band boundaries (e.g. $4,999→$5,001).</td>
-          <td><span class="tag tag-p1">Phase 1</span></td>
         </tr>
         <tr>
           <td><strong>Spline/LOESS</strong></td>
-          <td style="font-family:monospace;font-size:0.62rem;">Data-driven fit</td>
+          <td style="font-family:monospace;font-size:0.6rem;white-space:nowrap;">Non-parametric smooth fit</td>
           <td><span class="tag tag-no">N/A</span></td>
           <td><span class="tag tag-no">None</span></td>
           <td><span class="tag tag-ok">Smooth</span></td>
-          <td>Best fit to real data, but no extrapolation capability. Cannot explain to sales/customer. Analysis tool only.</td>
+          <td>
+            <ul style="margin:0;padding-left:14px;font-size:0.65rem;line-height:1.55;">
+              <li>Best statistical fit to historical transaction data — reflects real market behavior</li>
+              <li>Cannot extrapolate beyond data range — useless for new SKUs or price segments</li>
+              <li>Zero business explainability — impossible to justify a specific PR to sales or customer</li>
+              <li>Purely an analysis tool for back-testing and calibrating other methods</li>
+            </ul>
+          </td>
           <td><span class="tag tag-no">Analysis</span></td>
         </tr>
       </tbody>
