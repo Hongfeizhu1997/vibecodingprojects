@@ -45,7 +45,7 @@ tr:last-child td{border-bottom:none}
 <body>
 <nav class="navbar">
 <span class="brand">ISG SSR POC — Operational KPI Report (Holdout Evaluation)</span>
-<a href="#summary">Executive Summary</a><a href="#warranty-type">Warranty Type</a><a href="#confidence">Confidence</a><a href="#term-type-cross">Term × Type</a><a href="#channel-segment">Channel × Segment</a><a href="#product-line">Product Line</a><a href="#mix-effect">Mix Effect</a>
+<a href="#summary">Executive Summary</a><a href="#warranty-type">Warranty Type</a><a href="#confidence">Confidence</a><a href="#term-type-cross">Term × Type</a><a href="#channel-segment">Channel × Segment</a><a href="#product-line">Product Line</a><a href="#mix-effect">Mix Effect</a><a href="#error-direction">Error Direction</a>
 <span style="margin-left:auto;font-size:11px;color:#90caf9">NA Holdout | n=2,296 | Generated: Aug 11, 2026</span>
 </nav>
 <div class="page">
@@ -305,12 +305,55 @@ tr:last-child td{border-bottom:none}
 <div class="insight" style="margin-top:10px"><strong>Hypothesis:</strong> SLA is binary in this dataset (24x7 4hr Resp vs Next Business Day). The model may not be treating SLA as a separate prediction target — it's embedded in the label string. Recommendation: separate SLA into an independent classification head with its own loss function. The 93.1% overall SLA match rate suggests the signal exists; the 108 misses suggest it's not being optimized directly.</div>
 </div></div>
 
-<!-- ═══ K. PRIORITY IMPROVEMENT ROADMAP ═══ -->
+<!-- ═══ K. ERROR DIRECTION ANALYSIS ═══ -->
+<div class="section" id="error-direction">
+<div class="sec-hdr"><h2>K. Error Direction: Is the Model Aggressive or Conservative?</h2></div>
+<div class="sec-body">
+<p class="insight"><strong>The model is slightly conservative, but the dominant error is Term confusion — not up-tier or down-tier bias.</strong> Of the 340 missed contracts, 46.8% are same-product/wrong-term (60M↔36M mix-up), and 31.8% are SLA-only errors. Pure product-tier misranking accounts for only 21.4% of errors, with downgrades outnumbering upgrades 1.7:1.</p>
+
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #42a5f5;padding-left:10px">Error Decomposition: What Kind of Mistake?</h3>
+<table>
+<tr><th>Error Type</th><th class="num">Count</th><th class="num">% of Misses</th><th>Pattern</th><th>Business Impact</th></tr>
+<tr><td style="color:#1565c0"><strong>SLA Mismatch</strong></td><td class="num">108</td><td class="num">31.8%</td><td>Right product, wrong SLA (e.g. Premier 36M 24x7 → recommended NBD)</td><td style="color:#f57f17">Trust erosion — seller must manually correct SLA</td></tr>
+<tr><td style="color:#f57c00"><strong>Term Mix-up (same product)</strong></td><td class="num">159</td><td class="num">46.8%</td><td>60M ↔ 36M confusion within same warranty type</td><td style="color:#c62828">Largest single error category — 60M→36M loses revenue, 36M→60M is acceptable upsell</td></tr>
+<tr><td style="color:#c62828"><strong>Product Downgrade</strong></td><td class="num">46</td><td class="num">13.5%</td><td>PSP Server → Premier, PESS → lower</td><td style="color:#c62828">Revenue loss: premium product swapped for standard</td></tr>
+<tr><td style="color:#2e7d32"><strong>Product Upgrade</strong></td><td class="num">27</td><td class="num">7.9%</td><td>ESS → Premier, Premier → PSP Server</td><td style="color:#1565c0">Acceptable — seller can always downgrade back</td></tr>
+</table>
+
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;margin-top:18px;border-left:4px solid #f57c00;padding-left:10px">Direction Summary</h3>
+<table>
+<tr><th>Direction</th><th class="num">Count</th><th class="num">% of Misses</th><th>Interpretation</th></tr>
+<tr><td style="color:#c62828"><strong>Conservative</strong> (lower value than actual)</td><td class="num">123</td><td class="num">36.2%</td><td>Model recommends cheaper/shorter product than what customer actually bought</td></tr>
+<tr><td style="color:#2e7d32"><strong>Aggressive</strong> (higher value than actual)</td><td class="num">96</td><td class="num">28.2%</td><td>Model recommends more expensive/longer product than what customer bought</td></tr>
+<tr><td style="color:#1565c0"><strong>Cross-direction</strong> (up type + down term, or vice versa)</td><td class="num">13</td><td class="num">3.8%</td><td>Mixed signal — e.g. shorter term but higher tier</td></tr>
+<tr><td><strong>SLA only</strong> (same product + term)</td><td class="num">108</td><td class="num">31.8%</td><td>Product and term both correct; SLA wrong</td></tr>
+</table>
+
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;margin-top:18px;border-left:4px solid #c62828;padding-left:10px">Top 10 Real → Predicted Mismatch Patterns</h3>
+<table>
+<tr><th>Real (Customer Chose)</th><th>Model Top-1</th><th class="num">Count</th><th>Direction</th></tr>
+<tr><td>60 Months Premier</td><td>36 Months Premier</td><td class="num">76</td><td style="color:#c62828">↓ Shorter term — revenue loss</td></tr>
+<tr><td>36 Months Premier</td><td>36 Months Premier</td><td class="num">70</td><td style="color:#1565c0">SLA mismatch only</td></tr>
+<tr><td>36 Months Premier</td><td>60 Months Premier</td><td class="num">60</td><td style="color:#2e7d32">↑ Longer term — acceptable upsell</td></tr>
+<tr><td>60 Months Premier</td><td>60 Months Premier</td><td class="num">37</td><td style="color:#1565c0">SLA mismatch only</td></tr>
+<tr><td>36 Months PSP Server</td><td>36 Months Premier</td><td class="num">16</td><td style="color:#c62828">↓ Product downgrade — premium→standard</td></tr>
+<tr><td>60 Months PSP Server</td><td>60 Months Premier</td><td class="num">15</td><td style="color:#c62828">↓ Product downgrade — premium→standard</td></tr>
+<tr><td>36 Months ESS</td><td>36 Months Premier</td><td class="num">9</td><td style="color:#2e7d32">↑ Product upgrade</td></tr>
+<tr><td>36 Months PSP Server</td><td>60 Months Premier</td><td class="num">8</td><td style="color:#f57f17">↓ Product + ↑ Term (cross)</td></tr>
+<tr><td>36 Months Premier</td><td>36 Months PSP Server</td><td class="num">6</td><td style="color:#2e7d32">↑ Product upgrade</td></tr>
+<tr><td>48 Months Premier</td><td>60 Months Premier</td><td class="num">6</td><td style="color:#2e7d32">↑ Longer term</td></tr>
+</table>
+
+<div class="insight" style="margin-top:10px"><strong>Key insight:</strong> The two largest single mismatch patterns (76 + 60 = 136 contracts) are both <em>within Premier, just getting the term wrong</em>. Fixing Term prediction alone could recover nearly half of all errors. The 60M→36M direction (76x) is the harmful one — customer wants 5-year warranty, model suggests 3-year. The reverse (36M→60M, 60x) is actually a reasonable upsell that a seller might accept.</div>
+</div></div>
+
+<!-- ═══ L. PRIORITY IMPROVEMENT ROADMAP ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>K. Improvement Priorities</h2></div>
+<div class="sec-hdr"><h2>L. Improvement Priorities</h2></div>
 <div class="sec-body">
 <table>
 <tr><th style="width:40px">P</th><th>Target</th><th>Current Top-1</th><th>Volume</th><th>Action</th></tr>
+<tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>Premier Term Discrimination (60M ↔ 36M)</strong></td><td style="color:#c62828">136 contracts mixed up</td><td>159 (46.8% of errors)</td><td>Largest error category. Add term as a separate feature or prediction target. The 60M→36M direction (76x) is the revenue-loss pattern</td></tr>
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>PSP Server × 60 Months</strong></td><td style="color:#c62828">48.8%</td><td>41 (1.8%)</td><td>Audit training data: class imbalance likely. Add PSP Server 60M samples or use class-weighted loss</td></tr>
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>Premier × 48 Months</strong></td><td style="color:#c62828">50.0%</td><td>16 (0.7%)</td><td>48-Month term is rare across all types. Add synthetic or augmented samples</td></tr>
 <tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>SLA Discrimination</strong></td><td style="color:#f57c00">-4.7pp gap</td><td>108 contracts</td><td>Add separate SLA classification head. The 108 label-only hits with SLA mismatch prove SLA is not being optimized</td></tr>
@@ -321,9 +364,9 @@ tr:last-child td{border-bottom:none}
 </table>
 </div></div>
 
-<!-- ═══ L. PILOT READINESS ═══ -->
+<!-- ═══ M. PILOT READINESS ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>L. POC → Pilot Readiness Assessment</h2></div>
+<div class="sec-hdr"><h2>M. POC → Pilot Readiness Assessment</h2></div>
 <div class="sec-body">
 <table>
 <tr><th>Dimension</th><th>Status</th><th>Evidence</th></tr>
