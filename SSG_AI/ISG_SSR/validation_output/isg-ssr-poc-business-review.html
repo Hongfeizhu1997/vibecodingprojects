@@ -94,6 +94,39 @@ tr:last-child td{border-bottom:none}
 
 </div></div>
 
+<!-- ═══ METHODOLOGY NOTE ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>How to Read This Report: POC vs. Real Production</h2></div>
+<div class="sec-body">
+
+<div class="two-col">
+<div class="good" style="margin-bottom:0">
+<strong>The simple analogy:</strong><br><br>
+<strong>Training data</strong> = the textbook the model studied.<br>
+<strong>POC (Holdout) data</strong> = the final exam — questions the model has <em>never seen before</em>. This report shows its exam score.<br>
+<strong>Production</strong> = the actual job. The model now faces real sellers who can accept, reject, or change its recommendations in real time. The exam score predicts job performance — but it's not the same thing.
+</div>
+<div style="background:#fff3e0;border-left:4px solid #f57c00;padding:12px 16px;border-radius:4px;font-size:13px;color:#bf360c;line-height:1.5">
+<strong>Three things that change in production:</strong><br><br>
+<strong>1. Seller behavior is not in the exam.</strong> In POC, we measure "did the model get it right?" In production, we measure "did the seller <em>accept</em> it?" A correct recommendation that the seller ignores is a different problem.<br><br>
+<strong>2. Data drifts over time.</strong> The holdout set is from a fixed time window. In production, hardware models change, customer mix shifts, new warranty products launch. Accuracy will drift — that's normal and expected.<br><br>
+<strong>3. No ground truth in real time.</strong> In POC, we know what the customer actually bought. In production, we only know after the deal closes — weeks or months later. This is why we track <strong>seller override rate</strong> as a real-time proxy for model quality.
+</div>
+</div>
+
+<table style="margin-top:16px">
+<tr><th></th><th style="text-align:center">Training Set</th><th style="text-align:center;background:#1a237e;color:#fff">POC (Holdout)</th><th style="text-align:center">Production</th></tr>
+<tr><td>What is it?</td><td style="text-align:center">Historical data the model learned from</td><td style="text-align:center;background:#e8eaf6">2,296 contracts the model has <strong>never seen</strong></td><td style="text-align:center">Live deals flowing through the quoting tool</td></tr>
+<tr><td>Has the model seen this before?</td><td style="text-align:center">Yes — this is the study material</td><td style="text-align:center;background:#e8eaf6"><strong>No — this is the blind test</strong></td><td style="text-align:center">No — this is the real world</td></tr>
+<tr><td>What do we measure?</td><td style="text-align:center">Whether the model can learn patterns</td><td style="text-align:center;background:#e8eaf6"><strong>Whether the model generalizes to new data</strong></td><td style="text-align:center">Whether sellers accept the recommendations</td></tr>
+<tr><td>Who decides the outcome?</td><td style="text-align:center">N/A — historical fact</td><td style="text-align:center;background:#e8eaf6">N/A — historical fact</td><td style="text-align:center;color:#f57c00"><strong>The seller, in real time</strong></td></tr>
+<tr><td>85.2% accuracy means…</td><td style="text-align:center">Model may have memorized</td><td style="text-align:center;background:#e8eaf6"><strong>Model genuinely understands the pattern</strong></td><td style="text-align:center">To be measured in Pilot</td></tr>
+</table>
+
+<div class="insight" style="margin-top:12px"><strong>Bottom line:</strong> The 85.2% POC result is the best predictor we have of production performance — but it's a predictor, not a guarantee. The Pilot phase exists precisely to bridge this gap: test the model with real sellers, measure acceptance behavior, and calibrate before full rollout.</div>
+
+</div></div>
+
 <!-- ═══ PART 2: NO TUNING NEEDED ═══ -->
 <div class="section">
 <div class="sec-hdr"><h2>Part 2: Where the Model Performs Well — No Tuning Required</h2></div>
