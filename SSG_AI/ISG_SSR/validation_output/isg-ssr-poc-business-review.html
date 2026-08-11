@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ISG SSR POC — Business Review</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#222;font-size:14px}
+.page{max-width:1100px;margin:0 auto;padding:20px 24px}
+.section{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:24px;overflow:hidden}
+.sec-hdr{background:#1a237e;color:#fff;padding:16px 24px}
+.sec-hdr h2{font-size:18px;font-weight:600}
+.sec-body{padding:20px 24px}
+.hero{background:linear-gradient(135deg,#1a237e,#283593);color:#fff;border-radius:8px;padding:36px 32px;margin-bottom:24px;text-align:center}
+.hero .verdict{font-size:40px;font-weight:800;margin-bottom:8px}
+.hero .subtitle{font-size:16px;opacity:.85;line-height:1.6}
+.hero .metrics{display:flex;justify-content:center;gap:48px;margin-top:24px}
+.hero .metric .num{font-size:32px;font-weight:700}
+.hero .metric .label{font-size:12px;opacity:.7;text-transform:uppercase;letter-spacing:.5px}
+.insight{background:#e3f2fd;border-left:4px solid #1976d2;padding:12px 16px;border-radius:4px;font-size:13px;color:#0d47a1;margin-bottom:14px;line-height:1.5}
+.good{background:#e8f5e9;border-left:4px solid #2e7d32;padding:12px 16px;border-radius:4px;font-size:13px;color:#1b5e20;margin-bottom:14px;line-height:1.5}
+.pass-box{background:#e8f5e9;border:2px solid #2e7d32;border-radius:8px;padding:16px 20px;margin-bottom:20px;text-align:center}
+.pass-box .check{font-size:28px}
+.pass-box .msg{font-size:15px;font-weight:600;color:#1b5e20;margin-top:4px}
+table{border-collapse:collapse;width:100%;font-size:13px;margin-bottom:14px}
+th{background:#37474f;color:#fff;padding:8px 12px;text-align:left;font-weight:600}
+td{padding:7px 12px;border-bottom:1px solid #eee;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.num{text-align:right;font-family:'Courier New',monospace;white-space:nowrap}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.improve-card{border:1px solid #e0e0e0;border-radius:8px;padding:18px;margin-bottom:16px;border-left:5px solid #1a237e}
+.improve-card.p0{border-left-color:#c62828}
+.improve-card.p1{border-left-color:#f57c00}
+.improve-card.p2{border-left-color:#1565c0}
+.improve-card h3{font-size:15px;font-weight:600;margin-bottom:8px}
+.improve-card .meta{font-size:12px;color:#888;margin-bottom:8px}
+.improve-card .what{font-size:13px;color:#444;line-height:1.6;margin-bottom:6px}
+.improve-card .how{font-size:12px;color:#555;line-height:1.5;background:#fafafa;padding:8px 12px;border-radius:4px}
+.tag{display:inline-block;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600;margin-right:4px}
+.tag-p0{background:#ffebee;color:#c62828}
+.tag-p1{background:#fff3e0;color:#e65100}
+.tag-p2{background:#e3f2fd;color:#1565c0}
+.pie-simple{display:flex;gap:16px;align-items:center;margin:12px 0}
+.pie-bar{height:14px;border-radius:7px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+<div class="verdict">POC Passed</div>
+<div class="subtitle">ISG SSR Service Recommendation — NA Holdout Evaluation<br>2,296 contracts | Aug 11, 2026</div>
+<div class="metrics">
+<div class="metric"><div class="num">85.2%</div><div class="label">Top-1 Hit Rate<br>(Label + SLA)</div></div>
+<div class="metric"><div class="num">91.8%</div><div class="label">Top-2 Hit Rate</div></div>
+<div class="metric"><div class="num">87.8%</div><div class="label">Premier Coverage<br>(Core Segment)</div></div>
+</div>
+</div>
+
+<!-- ═══ VERDICT ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>POC Verdict: Pass — Proceed to Pilot</h2></div>
+<div class="sec-body">
+<div class="pass-box">
+<div class="check">✅</div>
+<div class="msg">The recommendation model demonstrates sufficient accuracy to move into a supervised pilot phase.</div>
+</div>
+
+<div class="two-col">
+<div class="good"><strong>What worked well:</strong> Premier warranty (87.8% of volume) achieves 86.8% Top-1 hit rate. Model generalizes evenly across channels, segments, countries, and business verticals — no stratification bias detected. Top-2 escalation recovers 91.8% of all cases.</div>
+<div style="background:#fff3e0;border-left:4px solid #f57c00;padding:12px 16px;border-radius:4px;font-size:13px;color:#bf360c;line-height:1.5"><strong>What needs attention before full rollout:</strong> The 14.8% miss rate reveals three systematic weaknesses: Term confusion (60M ↔ 36M), SLA misclassification, and poor performance on PSP Server products. These are fixable with targeted improvements — none are fundamental model failures.</div>
+</div>
+</div></div>
+
+<!-- ═══ WHAT WE LEARNED ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>Key Findings from POC Data</h2></div>
+<div class="sec-body">
+
+<div class="insight"><strong>Hit rate definition:</strong> A recommendation is counted as "correct" only when both the warranty product AND the service level (SLA) match the actual customer choice. This is a strict standard — looser than what a seller would use in practice, but appropriate for model evaluation.</div>
+
+<table>
+<tr><th>Metric</th><th class="num">Result</th><th>Assessment</th></tr>
+<tr><td>Top-1 Hit Rate (Label + SLA)</td><td class="num" style="font-weight:700">85.2%</td><td>Solid — 1,956 of 2,296 contracts hit on first attempt</td></tr>
+<tr><td>Top-2 Hit Rate</td><td class="num">91.8%</td><td>Showing a 2nd option recovers 152 more contracts</td></tr>
+<tr><td>Premier Warranty Hit Rate</td><td class="num" style="color:#2e7d32">86.8%</td><td>Core segment — mature, consistent, pilot-ready</td></tr>
+<tr><td>PSP Server Hit Rate</td><td class="num" style="color:#c62828">68.5%</td><td>Weakest warranty type — 31.5% miss rate</td></tr>
+<tr><td>Channel × Segment Consistency</td><td class="num">83–86%</td><td>No GTM bias — model works equally across Direct/Indirect</td></tr>
+<tr><td>Country: US vs Canada</td><td class="num">84.7% vs 87.0%</td><td>Near-identical — no geographic bias within NA</td></tr>
+</table>
+</div></div>
+
+<!-- ═══ WHERE THE MODEL MAKES MISTAKES ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>Error Analysis: What Happens in the 14.8% of Misses</h2></div>
+<div class="sec-body">
+
+<div class="insight"><strong>Not all misses are equal.</strong> Of the 340 missed contracts, nearly half are same-product/wrong-term — the model picks the right warranty type but the wrong duration. One-third are SLA-only errors (right product, wrong service level). Only one-fifth are genuine product mismatches.</div>
+
+<table>
+<tr><th>Error Type</th><th class="num">Count</th><th class="num">% of Misses</th><th>Example</th></tr>
+<tr><td style="color:#f57c00">Term Confusion (same product)</td><td class="num">159</td><td class="num">46.8%</td><td>Customer bought 60M Premier → model said 36M Premier</td></tr>
+<tr><td style="color:#1565c0">SLA Only (product correct)</td><td class="num">108</td><td class="num">31.8%</td><td>Premier 36M 24x7 → model said Premier 36M NBD</td></tr>
+<tr><td style="color:#c62828">Product Downgrade</td><td class="num">46</td><td class="num">13.5%</td><td>PSP Server → Premier (premium→standard)</td></tr>
+<tr><td style="color:#2e7d32">Product Upgrade</td><td class="num">27</td><td class="num">7.9%</td><td>ESS → Premier (standard→premium)</td></tr>
+</table>
+
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin:18px 0 10px;border-left:4px solid #42a5f5;padding-left:10px">Most Common Mismatch Patterns</h3>
+<table>
+<tr><th>Customer Actually Chose</th><th>Model Top-1 Recommendation</th><th class="num">Count</th><th>Impact</th></tr>
+<tr><td>60 Months Premier</td><td>36 Months Premier</td><td class="num" style="color:#c62828">76</td><td>Revenue loss — customer wanted 5yr, got 3yr</td></tr>
+<tr><td>36 Months Premier</td><td>60 Months Premier</td><td class="num" style="color:#2e7d32">60</td><td>Acceptable upsell — seller can adjust down</td></tr>
+<tr><td>60 Months PSP Server</td><td>60 Months Premier</td><td class="num" style="color:#c62828">15</td><td>Revenue loss — premium→standard product</td></tr>
+<tr><td>36 Months PSP Server</td><td>36 Months Premier</td><td class="num" style="color:#c62828">16</td><td>Revenue loss — premium→standard product</td></tr>
+</table>
+</div></div>
+
+<!-- ═══ IMPROVEMENT PLAN ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>Improvement Plan: 5 Action Items Before Full Rollout</h2></div>
+<div class="sec-body">
+
+<p class="insight">These improvements are sequenced by impact and feasibility. P0 items must be addressed before expanding beyond Premier scope. P1 items are strongly recommended for the Pilot phase. P2 items can be addressed during Pilot.</p>
+
+<!-- P0-1 -->
+<div class="improve-card p0">
+<h3><span class="tag tag-p0">P0</span> Improve Term Duration Discrimination</h3>
+<div class="meta">Affects 46.8% of all errors | 159 contracts</div>
+<div class="what"><strong>The problem:</strong> The model cannot reliably distinguish between 36-month and 60-month warranty terms within the same product. This is the single largest error category. In 76 cases, the customer chose 60-month coverage and the model recommended 36-month — a direct revenue loss.</div>
+<div class="how"><strong>Proposed fix:</strong> Treat warranty term as an explicit input feature — not just part of the label string. Add term-specific historical patterns (e.g., "Enterprise customers in this vertical typically choose 60-month coverage on Rack Servers"). Consider a two-stage prediction: first predict warranty type, then predict term duration conditional on type.</div>
+</div>
+
+<!-- P0-2 -->
+<div class="improve-card p0">
+<h3><span class="tag tag-p0">P0</span> Expand PSP Server Training Coverage</h3>
+<div class="meta">PSP Server Top-1: 68.5% | 162 contracts (7.1% of volume)</div>
+<div class="what"><strong>The problem:</strong> PSP Server is the premium warranty tier but the model treats it as a rare class. 71% of PSP Server misses are misclassified as Premier — the model defaults to the dominant class when uncertain. If PSP Server share grows in production, this gap will widen.</div>
+<div class="how"><strong>Proposed fix:</strong> Augment training data with additional PSP Server samples. Apply class-weighted loss to penalize PSP Server misclassification more heavily. The model already knows PSP Server exists (Top-3 covers 88.9%) — it just doesn't rank it #1 confidently enough.</div>
+</div>
+
+<!-- P1-1 -->
+<div class="improve-card p1">
+<h3><span class="tag tag-p1">P1</span> Separate SLA Prediction from Product Recommendation</h3>
+<div class="meta">108 contracts (31.8% of misses) | Right product, wrong SLA</div>
+<div class="what"><strong>The problem:</strong> SLA (24x7 4hr Resp vs Next Business Day) is embedded in the product label string and not optimized as an independent target. In 108 cases, the model picks the correct warranty product but the wrong service level — confusing "24x7 4hr" with "Next Business Day" on the same product.</div>
+<div class="how"><strong>Proposed fix:</strong> Add a dedicated SLA classification head with its own loss function. SLA is binary in this dataset, making it a straightforward prediction task. Features like customer segment, hardware price tier, and business vertical are likely strong SLA predictors.</div>
+</div>
+
+<!-- P1-2 -->
+<div class="improve-card p1">
+<h3><span class="tag tag-p1">P1</span> Implement Confidence Calibration</h3>
+<div class="meta">Confidence scores currently uninformative | All 2,296 contracts</div>
+<div class="what"><strong>The problem:</strong> The model's addon probability scores do not predict correctness. Low-confidence recommendations (avg prob 0.68) are nearly as accurate as high-confidence ones (avg prob 0.75). In production, this means the system cannot self-identify risky recommendations for escalation or human review.</div>
+<div class="how"><strong>Proposed fix:</strong> Apply Platt scaling or isotonic regression on the validation set to calibrate probability outputs. Alternatively, use the probability gap between Top-1 and Top-2 rankings as a confidence signal — a narrow gap means the model is uncertain between two options.</div>
+</div>
+
+<!-- P2 -->
+<div class="improve-card p2">
+<h3><span class="tag tag-p2">P2</span> Address Long-Tail Rare Cases</h3>
+<div class="meta">48-Month Term: 52.9% Hit Rate | 72-Month Term: 0% | Small volumes</div>
+<div class="what"><strong>The problem:</strong> 48-month warranties (17 contracts, 0.7% of volume) and 72-month warranties (2 contracts) are too rare for the model to learn reliable patterns. These will naturally improve as more training data accumulates — they are a volume problem, not a model design problem.</div>
+<div class="how"><strong>Proposed fix:</strong> No immediate model changes needed. During Pilot, flag these rare-term recommendations for mandatory seller review. After 3–6 months of production data, retrain with accumulated samples.</div>
+</div>
+
+</div></div>
+
+<!-- ═══ PILOT ROADMAP ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>Recommended Pilot Approach</h2></div>
+<div class="sec-body">
+
+<div class="good" style="margin-bottom:16px"><strong>Recommendation:</strong> Launch Pilot with <strong>Premier warranty scope only</strong> (87.8% of volume, 86.8% hit rate). The model is production-ready for this segment today. Show Top-2 recommendations when the model ranks two options closely — this recovers 91.8% of cases.</div>
+
+<table>
+<tr><th>Phase</th><th>Scope</th><th>Key Activities</th><th>Timeline</th></tr>
+<tr><td><strong>Pre-Pilot</strong></td><td>Model improvement</td><td>Fix P0 items: term discrimination + PSP Server coverage. Apply confidence calibration. Separate SLA prediction head.</td><td>2–3 weeks</td></tr>
+<tr><td><strong>Pilot Wave 1</strong></td><td>Premier warranty only<br>NA region</td><td>Deploy with human-in-the-loop. Seller sees Top-1 recommendation with Top-2 alternative. Track acceptance rate and manual override patterns.</td><td>4–6 weeks</td></tr>
+<tr><td><strong>Pilot Wave 2</strong></td><td>Add PSP Server + ESS<br>NA region</td><td>Expand scope after P0 fixes validated. Monitor per-type hit rates alongside blended rate.</td><td>4–6 weeks</td></tr>
+<tr><td><strong>Full Rollout</strong></td><td>All warranty types<br>All NA</td><td>Remove human-in-the-loop for high-confidence recommendations. Auto-apply Top-1; seller can override.</td><td>After Wave 2 validation</td></tr>
+</table>
+</div></div>
+
+<!-- ═══ APPENDIX ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>Appendix: Data Summary</h2></div>
+<div class="sec-body">
+<table>
+<tr><th>Dimension</th><th>Value</th></tr>
+<tr><td>Dataset</td><td>2,296 holdout contracts, NA region (US 77.5% / CA 22.5%)</td></tr>
+<tr><td>Warranty Types</td><td>Premier 87.8%, PSP Server 7.1%, ESS 4.9%, PESS 0.2%</td></tr>
+<tr><td>Warranty Terms</td><td>36M 57.2%, 60M 40.9%, 84M 1.0%, 48M 0.7%, 72M 0.1%</td></tr>
+<tr><td>Channels</td><td>Indirect 90.8%, Direct 9.2%</td></tr>
+<tr><td>Segments</td><td>SMB 50.4%, COM 49.6%</td></tr>
+<tr><td>Categories</td><td>Servers 95.5%, Storage 4.5%</td></tr>
+<tr><td>Hit Definition</td><td>Strict: warranty product label AND SLA must both match ground truth</td></tr>
+</table>
+</div></div>
+
+</div>
+</body>
+</html>
