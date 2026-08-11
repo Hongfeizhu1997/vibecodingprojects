@@ -41,8 +41,7 @@ tr:last-child td{border-bottom:none}
 .tag-p0{background:#ffebee;color:#c62828}
 .tag-p1{background:#fff3e0;color:#e65100}
 .tag-p2{background:#e3f2fd;color:#1565c0}
-.pie-simple{display:flex;gap:16px;align-items:center;margin:12px 0}
-.pie-bar{height:14px;border-radius:7px}
+.note{font-size:12px;color:#888;background:#fafafa;padding:8px 12px;border-radius:4px;line-height:1.5;margin-top:8px}
 </style>
 </head>
 <body>
@@ -53,8 +52,8 @@ tr:last-child td{border-bottom:none}
 <div class="verdict">POC Passed</div>
 <div class="subtitle">ISG SSR Service Recommendation — NA Holdout Evaluation<br>2,296 contracts | Aug 11, 2026</div>
 <div class="metrics">
-<div class="metric"><div class="num">85.2%</div><div class="label">Top-1 Hit Rate<br>(Label + SLA)</div></div>
-<div class="metric"><div class="num">91.8%</div><div class="label">Top-2 Hit Rate</div></div>
+<div class="metric"><div class="num">85.2%</div><div class="label">Top-1 Product Match<br>(Type + Term + SLA)</div></div>
+<div class="metric"><div class="num">91.8%</div><div class="label">Top-2 Product Match</div></div>
 <div class="metric"><div class="num">87.8%</div><div class="label">Premier Coverage<br>(Core Segment)</div></div>
 </div>
 </div>
@@ -69,99 +68,104 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <div class="two-col">
-<div class="good"><strong>What worked well:</strong> Premier warranty (87.8% of volume) achieves 86.8% Top-1 hit rate. Model generalizes evenly across channels, segments, countries, and business verticals — no stratification bias detected. Top-2 escalation recovers 91.8% of all cases.</div>
-<div style="background:#fff3e0;border-left:4px solid #f57c00;padding:12px 16px;border-radius:4px;font-size:13px;color:#bf360c;line-height:1.5"><strong>What needs attention before full rollout:</strong> The 14.8% miss rate reveals three systematic weaknesses: Term confusion (60M ↔ 36M), SLA misclassification, and poor performance on PSP Server products. These are fixable with targeted improvements — none are fundamental model failures.</div>
+<div class="good"><strong>What worked well:</strong> Premier warranty (87.8% of volume) achieves 86.8% Top-1 product match. Model generalizes evenly across channels, segments, countries, and business verticals — no stratification bias detected. Top-2 escalation recovers 91.8% of all cases.</div>
+<div style="background:#fff3e0;border-left:4px solid #f57c00;padding:12px 16px;border-radius:4px;font-size:13px;color:#bf360c;line-height:1.5"><strong>What needs attention before full rollout:</strong> The 14.8% miss rate reveals three error patterns: Term duration confusion within the same warranty type (46.8% of misses), adjacent product confusion within the same warranty family (31.8%), and cross-type misclassification (21.5%). All are fixable — none are fundamental model failures.</div>
 </div>
+
+<div class="note"><strong>Product definition:</strong> In this analysis, a "product" is defined by its complete specification — Warranty Type + Warranty Term + Service Level (SLA). For example, "36 Months Premier 24x7 4hr Resp" and "36 Months Premier Next Business Day" are two distinct products. This follows the actual product catalog structure where SLA is an integral part of the product definition, not a separate attribute.</div>
 </div></div>
 
-<!-- ═══ WHAT WE LEARNED ═══ -->
+<!-- ═══ KEY FINDINGS ═══ -->
 <div class="section">
 <div class="sec-hdr"><h2>Key Findings from POC Data</h2></div>
 <div class="sec-body">
 
-<div class="insight"><strong>Hit rate definition:</strong> A recommendation is counted as "correct" only when both the warranty product AND the service level (SLA) match the actual customer choice. This is a strict standard — looser than what a seller would use in practice, but appropriate for model evaluation.</div>
+<div class="insight"><strong>Accuracy definition:</strong> A recommendation is counted as "correct" only when the model's #1 predicted product (Type + Term + SLA combined) exactly matches the product the customer actually purchased. Top-2 and Top-3 success means the correct product appears among the model's 2nd or 3rd suggestions.</div>
 
 <table>
 <tr><th>Metric</th><th class="num">Result</th><th>Assessment</th></tr>
-<tr><td>Top-1 Hit Rate (Label + SLA)</td><td class="num" style="font-weight:700">85.2%</td><td>Solid — 1,956 of 2,296 contracts hit on first attempt</td></tr>
-<tr><td>Top-2 Hit Rate</td><td class="num">91.8%</td><td>Showing a 2nd option recovers 152 more contracts</td></tr>
-<tr><td>Premier Warranty Hit Rate</td><td class="num" style="color:#2e7d32">86.8%</td><td>Core segment — mature, consistent, pilot-ready</td></tr>
-<tr><td>PSP Server Hit Rate</td><td class="num" style="color:#c62828">68.5%</td><td>Weakest warranty type — 31.5% miss rate</td></tr>
-<tr><td>Channel × Segment Consistency</td><td class="num">83–86%</td><td>No GTM bias — model works equally across Direct/Indirect</td></tr>
-<tr><td>Country: US vs Canada</td><td class="num">84.7% vs 87.0%</td><td>Near-identical — no geographic bias within NA</td></tr>
+<tr><td>Top-1 Product Match</td><td class="num" style="font-weight:700">85.2%</td><td>1,956 of 2,296 contracts: exact product hit on first attempt</td></tr>
+<tr><td>Top-2 Product Match</td><td class="num">91.8%</td><td>Showing a 2nd product option recovers 152 more contracts</td></tr>
+<tr><td>Top-3 Product Match</td><td class="num">93.3%</td><td>Only 154 contracts missed entirely across all 3 suggestions</td></tr>
+<tr><td>Premier Warranty Match Rate</td><td class="num" style="color:#2e7d32">86.8%</td><td>Core segment — mature, consistent, pilot-ready</td></tr>
+<tr><td>PSP Server Match Rate</td><td class="num" style="color:#c62828">68.5%</td><td>Weakest warranty type — needs training data augmentation</td></tr>
+<tr><td>Channel × Segment Consistency</td><td class="num">83–86%</td><td>No GTM bias — model performs equally across Direct/Indirect/COM/SMB</td></tr>
 </table>
 </div></div>
 
-<!-- ═══ WHERE THE MODEL MAKES MISTAKES ═══ -->
+<!-- ═══ ERROR ANALYSIS ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>Error Analysis: What Happens in the 14.8% of Misses</h2></div>
+<div class="sec-hdr"><h2>Error Analysis: 340 Misses Decomposed</h2></div>
 <div class="sec-body">
 
-<div class="insight"><strong>Not all misses are equal.</strong> Of the 340 missed contracts, nearly half are same-product/wrong-term — the model picks the right warranty type but the wrong duration. One-third are SLA-only errors (right product, wrong service level). Only one-fifth are genuine product mismatches.</div>
+<div class="insight">Each miss is a case where the model's #1 product recommendation was not the product the customer bought. We group these by how far the prediction deviates from the actual choice — from adjacent products in the same family (closest) to completely different warranty types (farthest).</div>
 
 <table>
-<tr><th>Error Type</th><th class="num">Count</th><th class="num">% of Misses</th><th>Example</th></tr>
-<tr><td style="color:#f57c00">Term Confusion (same product)</td><td class="num">159</td><td class="num">46.8%</td><td>Customer bought 60M Premier → model said 36M Premier</td></tr>
-<tr><td style="color:#1565c0">SLA Only (product correct)</td><td class="num">108</td><td class="num">31.8%</td><td>Premier 36M 24x7 → model said Premier 36M NBD</td></tr>
-<tr><td style="color:#c62828">Product Downgrade</td><td class="num">46</td><td class="num">13.5%</td><td>PSP Server → Premier (premium→standard)</td></tr>
-<tr><td style="color:#2e7d32">Product Upgrade</td><td class="num">27</td><td class="num">7.9%</td><td>ESS → Premier (standard→premium)</td></tr>
+<tr><th>Error Type</th><th class="num">Count</th><th class="num">% of Misses</th><th>Example</th><th>Distance</th></tr>
+<tr><td>Same Warranty Family,<br>Different SLA Tier</td><td class="num">108</td><td class="num">31.8%</td><td>Premier 36M 24x7 → Premier 36M NBD<div style="font-size:11px;color:#888">Type and term correct; wrong service level tier within same family</div></td><td style="color:#f57f17">Adjacent</td></tr>
+<tr><td>Same Warranty Type,<br>Different Term Duration</td><td class="num">159</td><td class="num">46.8%</td><td>Premier 60M → Premier 36M<div style="font-size:11px;color:#888">Type correct; recommended wrong warranty duration</div></td><td style="color:#f57c00">Near</td></tr>
+<tr><td>Different Warranty Type</td><td class="num">73</td><td class="num">21.5%</td><td>PSP Server 60M → Premier 60M<div style="font-size:11px;color:#888">Completely different product category</div></td><td style="color:#c62828">Far</td></tr>
 </table>
 
-<h3 style="font-size:14px;font-weight:600;color:#37474f;margin:18px 0 10px;border-left:4px solid #42a5f5;padding-left:10px">Most Common Mismatch Patterns</h3>
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin:18px 0 10px;border-left:4px solid #42a5f5;padding-left:10px">Direction: Is the Model Conservative or Aggressive?</h3>
+<div class="good">The model is <strong>slightly conservative</strong> — among the 340 misses, it recommends a lower-tier product more often than a higher-tier one (36.2% vs 28.2%). The remaining 35.6% are same-tier confusion (wrong term or SLA within the same family). This is preferable to an aggressive upsell bias that would damage seller trust.</div>
+
 <table>
-<tr><th>Customer Actually Chose</th><th>Model Top-1 Recommendation</th><th class="num">Count</th><th>Impact</th></tr>
-<tr><td>60 Months Premier</td><td>36 Months Premier</td><td class="num" style="color:#c62828">76</td><td>Revenue loss — customer wanted 5yr, got 3yr</td></tr>
-<tr><td>36 Months Premier</td><td>60 Months Premier</td><td class="num" style="color:#2e7d32">60</td><td>Acceptable upsell — seller can adjust down</td></tr>
-<tr><td>60 Months PSP Server</td><td>60 Months Premier</td><td class="num" style="color:#c62828">15</td><td>Revenue loss — premium→standard product</td></tr>
-<tr><td>36 Months PSP Server</td><td>36 Months Premier</td><td class="num" style="color:#c62828">16</td><td>Revenue loss — premium→standard product</td></tr>
+<tr><th>Direction</th><th class="num">Count</th><th>Meaning</th></tr>
+<tr><td style="color:#c62828">Conservative (lower value)</td><td class="num">123 (36.2%)</td><td>Model recommends a cheaper or shorter product than what customer bought</td></tr>
+<tr><td style="color:#2e7d32">Aggressive (higher value)</td><td class="num">96 (28.2%)</td><td>Model recommends a more expensive or longer product</td></tr>
+<tr><td style="color:#1565c0">Same product family (term/SLA)</td><td class="num">121 (35.6%)</td><td>Right warranty type, wrong term or SLA — value-neutral confusion</td></tr>
+</table>
+
+<h3 style="font-size:14px;font-weight:600;color:#37474f;margin:18px 0 10px;border-left:4px solid #42a5f5;padding-left:10px">Most Common Miss Patterns</h3>
+<table>
+<tr><th>Customer Bought</th><th>Model Recommended</th><th class="num">Count</th><th>Impact</th></tr>
+<tr><td>Premier 60 Months</td><td>Premier 36 Months</td><td class="num" style="color:#c62828">76</td><td>Revenue risk — 5yr coverage dropped to 3yr</td></tr>
+<tr><td>Premier 36 Months</td><td>Premier 60 Months</td><td class="num" style="color:#2e7d32">60</td><td>Acceptable upsell — seller can adjust down</td></tr>
+<tr><td>Premier 36M 24x7</td><td>Premier 36M NBD</td><td class="num">30</td><td>Adjacent product — same family, lower SLA tier</td></tr>
+<tr><td>Premier 36M NBD</td><td>Premier 36M 24x7</td><td class="num">36</td><td>Adjacent product — same family, higher SLA tier</td></tr>
+<tr><td>PSP Server 60M</td><td>Premier 60M</td><td class="num" style="color:#c62828">15</td><td>Revenue risk — premium→standard product</td></tr>
+<tr><td>PSP Server 36M</td><td>Premier 36M</td><td class="num" style="color:#c62828">16</td><td>Revenue risk — premium→standard product</td></tr>
 </table>
 </div></div>
 
 <!-- ═══ IMPROVEMENT PLAN ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>Improvement Plan: 5 Action Items Before Full Rollout</h2></div>
+<div class="sec-hdr"><h2>Improvement Plan: 4 Action Items Before Full Rollout</h2></div>
 <div class="sec-body">
 
-<p class="insight">These improvements are sequenced by impact and feasibility. P0 items must be addressed before expanding beyond Premier scope. P1 items are strongly recommended for the Pilot phase. P2 items can be addressed during Pilot.</p>
+<p class="insight">These improvements target the three error clusters identified above. P0 items address the largest error sources. P1 items improve production readiness. All are actionable within the Pilot phase.</p>
 
 <!-- P0-1 -->
 <div class="improve-card p0">
-<h3><span class="tag tag-p0">P0</span> Improve Term Duration Discrimination</h3>
-<div class="meta">Affects 46.8% of all errors | 159 contracts</div>
-<div class="what"><strong>The problem:</strong> The model cannot reliably distinguish between 36-month and 60-month warranty terms within the same product. This is the single largest error category. In 76 cases, the customer chose 60-month coverage and the model recommended 36-month — a direct revenue loss.</div>
-<div class="how"><strong>Proposed fix:</strong> Treat warranty term as an explicit input feature — not just part of the label string. Add term-specific historical patterns (e.g., "Enterprise customers in this vertical typically choose 60-month coverage on Rack Servers"). Consider a two-stage prediction: first predict warranty type, then predict term duration conditional on type.</div>
+<h3><span class="tag tag-p0">P0</span> Improve Term Duration Prediction Within Each Warranty Type</h3>
+<div class="meta">Largest error source: 46.8% of all misses | 159 contracts</div>
+<div class="what"><strong>The problem:</strong> The model frequently confuses 36-month and 60-month warranty terms within the same warranty type. This accounts for nearly half of all misses. In 76 cases, the customer bought 60-month coverage and the model recommended 36-month — a product with significantly different value. The reverse (36M→60M, 60 cases) is a more acceptable upsell.</div>
+<div class="how"><strong>Proposed fix:</strong> Strengthen the term duration signal in the feature set. Warranty term is often correlated with hardware lifecycle (server refresh cycles, lease terms) and customer segment behavior. Add features that capture: hardware product generation/lifecycle stage, historical term preferences by customer segment, and term distribution by hardware price tier.</div>
 </div>
 
 <!-- P0-2 -->
 <div class="improve-card p0">
 <h3><span class="tag tag-p0">P0</span> Expand PSP Server Training Coverage</h3>
 <div class="meta">PSP Server Top-1: 68.5% | 162 contracts (7.1% of volume)</div>
-<div class="what"><strong>The problem:</strong> PSP Server is the premium warranty tier but the model treats it as a rare class. 71% of PSP Server misses are misclassified as Premier — the model defaults to the dominant class when uncertain. If PSP Server share grows in production, this gap will widen.</div>
-<div class="how"><strong>Proposed fix:</strong> Augment training data with additional PSP Server samples. Apply class-weighted loss to penalize PSP Server misclassification more heavily. The model already knows PSP Server exists (Top-3 covers 88.9%) — it just doesn't rank it #1 confidently enough.</div>
+<div class="what"><strong>The problem:</strong> PSP Server is the premium warranty tier but appears in only 7.1% of training data. The model defaults to recommending Premier when uncertain about PSP Server products — 71% of PSP Server misses are misclassified as Premier. If PSP Server share grows in production, this gap will widen.</div>
+<div class="how"><strong>Proposed fix:</strong> Augment training data with additional PSP Server samples. Apply class-weighted loss to penalize PSP Server misclassification. The model's Top-3 covers 88.9% of PSP Server cases — it recognizes the product category but lacks confidence to rank it #1.</div>
 </div>
 
 <!-- P1-1 -->
 <div class="improve-card p1">
-<h3><span class="tag tag-p1">P1</span> Separate SLA Prediction from Product Recommendation</h3>
-<div class="meta">108 contracts (31.8% of misses) | Right product, wrong SLA</div>
-<div class="what"><strong>The problem:</strong> SLA (24x7 4hr Resp vs Next Business Day) is embedded in the product label string and not optimized as an independent target. In 108 cases, the model picks the correct warranty product but the wrong service level — confusing "24x7 4hr" with "Next Business Day" on the same product.</div>
-<div class="how"><strong>Proposed fix:</strong> Add a dedicated SLA classification head with its own loss function. SLA is binary in this dataset, making it a straightforward prediction task. Features like customer segment, hardware price tier, and business vertical are likely strong SLA predictors.</div>
-</div>
-
-<!-- P1-2 -->
-<div class="improve-card p1">
-<h3><span class="tag tag-p1">P1</span> Implement Confidence Calibration</h3>
-<div class="meta">Confidence scores currently uninformative | All 2,296 contracts</div>
-<div class="what"><strong>The problem:</strong> The model's addon probability scores do not predict correctness. Low-confidence recommendations (avg prob 0.68) are nearly as accurate as high-confidence ones (avg prob 0.75). In production, this means the system cannot self-identify risky recommendations for escalation or human review.</div>
-<div class="how"><strong>Proposed fix:</strong> Apply Platt scaling or isotonic regression on the validation set to calibrate probability outputs. Alternatively, use the probability gap between Top-1 and Top-2 rankings as a confidence signal — a narrow gap means the model is uncertain between two options.</div>
+<h3><span class="tag tag-p1">P1</span> Improve Adjacent Product Differentiation Within Warranty Families</h3>
+<div class="meta">31.8% of misses | 108 contracts | Same type+term, different SLA tier</div>
+<div class="what"><strong>The problem:</strong> Within the same warranty type and term (e.g., "Premier 36 Months"), the model confuses the two SLA tier variants — "24x7 4hr Resp" and "Next Business Day". These are distinct products in the catalog with different prices. In 108 cases, the model picks the right type and term but the wrong SLA tier. This is balanced: 51 cases recommend NBD when 24x7 was bought, 57 cases the reverse.</div>
+<div class="how"><strong>Proposed fix:</strong> Add features that correlate with SLA tier choice: hardware criticality (mission-critical servers → 24x7), customer industry (healthcare/finance → 24x7), hardware price tier (higher HW value → higher SLA), and subsegment (LE/PS → 24x7, SM/GA → NBD). The pattern is symmetric (equal errors in both directions), suggesting the model simply needs better SLA-tier signal rather than a directional bias correction.</div>
 </div>
 
 <!-- P2 -->
 <div class="improve-card p2">
-<h3><span class="tag tag-p2">P2</span> Address Long-Tail Rare Cases</h3>
-<div class="meta">48-Month Term: 52.9% Hit Rate | 72-Month Term: 0% | Small volumes</div>
-<div class="what"><strong>The problem:</strong> 48-month warranties (17 contracts, 0.7% of volume) and 72-month warranties (2 contracts) are too rare for the model to learn reliable patterns. These will naturally improve as more training data accumulates — they are a volume problem, not a model design problem.</div>
-<div class="how"><strong>Proposed fix:</strong> No immediate model changes needed. During Pilot, flag these rare-term recommendations for mandatory seller review. After 3–6 months of production data, retrain with accumulated samples.</div>
+<h3><span class="tag tag-p2">P2</span> Address Long-Tail Rare Product Variants</h3>
+<div class="meta">48-Month products: 52.9% hit rate | 72-Month: 0% | Small volumes</div>
+<div class="what"><strong>The problem:</strong> 48-month warranties (17 contracts, 0.7%) and 72-month warranties (2 contracts) are too rare for the model to learn reliable patterns. These will naturally improve as more training data accumulates.</div>
+<div class="how"><strong>Proposed fix:</strong> No immediate model changes needed. During Pilot, flag rare-term product recommendations for mandatory seller review. After 3–6 months of production data accumulation, retrain with the expanded dataset.</div>
 </div>
 
 </div></div>
@@ -171,13 +175,13 @@ tr:last-child td{border-bottom:none}
 <div class="sec-hdr"><h2>Recommended Pilot Approach</h2></div>
 <div class="sec-body">
 
-<div class="good" style="margin-bottom:16px"><strong>Recommendation:</strong> Launch Pilot with <strong>Premier warranty scope only</strong> (87.8% of volume, 86.8% hit rate). The model is production-ready for this segment today. Show Top-2 recommendations when the model ranks two options closely — this recovers 91.8% of cases.</div>
+<div class="good" style="margin-bottom:16px"><strong>Recommendation:</strong> Launch Pilot with <strong>Premier warranty scope only</strong> (87.8% of volume, 86.8% hit rate). The model is production-ready for this segment today. Show Top-2 recommendations when confidence is low — this recovers 91.8% of cases. PSP Server and ESS expansion after P0 fixes validated.</div>
 
 <table>
 <tr><th>Phase</th><th>Scope</th><th>Key Activities</th><th>Timeline</th></tr>
-<tr><td><strong>Pre-Pilot</strong></td><td>Model improvement</td><td>Fix P0 items: term discrimination + PSP Server coverage. Apply confidence calibration. Separate SLA prediction head.</td><td>2–3 weeks</td></tr>
-<tr><td><strong>Pilot Wave 1</strong></td><td>Premier warranty only<br>NA region</td><td>Deploy with human-in-the-loop. Seller sees Top-1 recommendation with Top-2 alternative. Track acceptance rate and manual override patterns.</td><td>4–6 weeks</td></tr>
-<tr><td><strong>Pilot Wave 2</strong></td><td>Add PSP Server + ESS<br>NA region</td><td>Expand scope after P0 fixes validated. Monitor per-type hit rates alongside blended rate.</td><td>4–6 weeks</td></tr>
+<tr><td><strong>Pre-Pilot</strong></td><td>Model improvement</td><td>Fix P0 items: strengthen term duration features + augment PSP Server training data. Add SLA-tier signals for adjacent product differentiation.</td><td>2–3 weeks</td></tr>
+<tr><td><strong>Pilot Wave 1</strong></td><td>Premier warranty only<br>NA region</td><td>Deploy with human-in-the-loop. Seller sees Top-1 recommendation with Top-2 alternative. Track product match rate and manual override patterns. Monitor term duration accuracy as primary KPI.</td><td>4–6 weeks</td></tr>
+<tr><td><strong>Pilot Wave 2</strong></td><td>Add PSP Server + ESS<br>NA region</td><td>Expand scope after P0 fixes validated on Premier. Monitor per-warranty-type hit rates alongside blended rate to detect mix effects.</td><td>4–6 weeks</td></tr>
 <tr><td><strong>Full Rollout</strong></td><td>All warranty types<br>All NA</td><td>Remove human-in-the-loop for high-confidence recommendations. Auto-apply Top-1; seller can override.</td><td>After Wave 2 validation</td></tr>
 </table>
 </div></div>
@@ -191,10 +195,11 @@ tr:last-child td{border-bottom:none}
 <tr><td>Dataset</td><td>2,296 holdout contracts, NA region (US 77.5% / CA 22.5%)</td></tr>
 <tr><td>Warranty Types</td><td>Premier 87.8%, PSP Server 7.1%, ESS 4.9%, PESS 0.2%</td></tr>
 <tr><td>Warranty Terms</td><td>36M 57.2%, 60M 40.9%, 84M 1.0%, 48M 0.7%, 72M 0.1%</td></tr>
+<tr><td>SLA Tiers</td><td>Next Business Day / 24x7 4hr Resp (binary)</td></tr>
 <tr><td>Channels</td><td>Indirect 90.8%, Direct 9.2%</td></tr>
 <tr><td>Segments</td><td>SMB 50.4%, COM 49.6%</td></tr>
 <tr><td>Categories</td><td>Servers 95.5%, Storage 4.5%</td></tr>
-<tr><td>Hit Definition</td><td>Strict: warranty product label AND SLA must both match ground truth</td></tr>
+<tr><td>Product Definition</td><td>Warranty Type + Warranty Term + SLA = one distinct product. "36M Premier 24x7" and "36M Premier NBD" are two different products.</td></tr>
 </table>
 </div></div>
 

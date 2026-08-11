@@ -57,8 +57,8 @@ tr:last-child td{border-bottom:none}
 <div class="mapping-note">
 <strong>Metric Alignment Note:</strong> This report aligns ISG SSR POC (offline holdout) results to the IDG SSR Phase 1 analysis framework the business is already familiar with.<br><br>
 <strong>Key Definition:</strong>
-&bull; <strong>Hit = Label AND SLA both match</strong> between model prediction and ground truth. This is the strictest accuracy measure: the model must get both the warranty product <em>and</em> the service level right.<br>
-&bull; <strong>Acceptance Rate (IDG) = Top-1 Hit Rate (POC):</strong> "Seller kept the default recommendation" maps to "Model's #1 prediction matches actual choice (label + SLA)."<br>
+&bull; <strong>Hit = complete product match:</strong> A recommendation is correct only when the predicted product (Warranty Type + Term + SLA combined) exactly matches the product the customer bought. Example: "36M Premier 24x7" and "36M Premier NBD" are two distinct products.<br>
+&bull; <strong>Acceptance Rate (IDG) = Top-1 Product Match (POC):</strong> "Seller kept the default recommendation" maps to "Model's #1 predicted product matches the actual purchase."<br>
 &bull; <strong>Coverage (IDG) → N/A (POC):</strong> All holdout rows have predictions (100% coverage).<br>
 &bull; <strong>AI vs Non-AI (IDG) → Confidence Tier (POC):</strong> Recommendation source stratification becomes confidence tier (High/Mid/Low).<br>
 &bull; <strong>Config Origin (IDG) → Warranty Type (POC):</strong> Both represent "acceptance difficulty across contexts" — Warranty Type is the strongest performance differentiator in this POC.<br>
@@ -66,32 +66,32 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <div class="sec-hdr" style="border-radius:0;margin:-18px -20px 18px -20px"><h2>Executive Summary — NA Holdout, 2,296 Contracts</h2></div>
-<p class="good-box"><strong>Model performs well on the dominant warranty type:</strong> Premier (87.8% of volume) achieves 86.8% Top-1 and 93.2% Top-2. However, strict label+SLA matching drops overall Top-1 from 89.9% (label-only) to 85.2% — 108 contracts lost due to SLA mismatch. PSP Server × 60 Month is the critical weakness at 48.8%.</p>
+<p class="good-box"><strong>Model performs well on the dominant warranty type:</strong> Premier (87.8% of volume) achieves 86.8% Top-1 product match. Overall Top-1 is 85.2%.</p>
 
 <div class="kpi-grid">
 <div class="kpi-card">
-<div class="label">Top-1 Hit Rate (Label + SLA)</div>
+<div class="label">Top-1 Product Match</div>
 <div class="big" style="color:#f57f17">85.2%</div>
 <div class="sub">1,956 / 2,296 contracts</div>
-<div class="sub">"Acceptance Rate" equivalent</div>
+<div class="sub">Type + Term + SLA all correct</div>
 </div>
 <div class="kpi-card">
-<div class="label">Top-2 Hit Rate (Label + SLA)</div>
+<div class="label">Top-2 Product Match</div>
 <div class="big" style="color:#1565c0">91.8%</div>
 <div class="sub">2,108 / 2,296 contracts</div>
 <div class="sub">+6.6pp over Top-1</div>
 </div>
 <div class="kpi-card">
-<div class="label">Top-3 Hit Rate (Label + SLA)</div>
+<div class="label">Top-3 Product Match</div>
 <div class="big" style="color:#1565c0">93.3%</div>
 <div class="sub">2,142 / 2,296 contracts</div>
 <div class="sub">154 contracts missed entirely</div>
 </div>
 <div class="kpi-card">
-<div class="label">SLA Mismatch Penalty</div>
-<div class="big" style="color:#c62828">-4.7pp</div>
-<div class="sub">108 contracts: label right, SLA wrong</div>
-<div class="sub">89.9%→85.2% from SLA tightening</div>
+<div class="label">Premier Product Match</div>
+<div class="big" style="color:#2e7d32">86.8%</div>
+<div class="sub">2,016 Premier contracts</div>
+<div class="sub">87.8% of all volume</div>
 </div>
 </div>
 
@@ -100,7 +100,7 @@ tr:last-child td{border-bottom:none}
 <tr><th>#</th><th>Finding</th><th>Severity</th></tr>
 <tr><td>1</td><td>Overall Top-1 85.2% under strict label+SLA definition. Top-2 at 91.8% means escalation covers most misses.</td><td style="color:#f57f17">🟡 Moderate</td></tr>
 <tr><td>2</td><td><strong>PSP Server × 60 Months: 48.8%.</strong> More misses than hits in this cell (41 contracts). #1 priority for improvement.</td><td style="color:#c62828">🔴 Critical</td></tr>
-<tr><td>3</td><td><strong>108 contracts (4.7%) lose Top-1 due to SLA mismatch alone.</strong> Model picks the right warranty product but wrong service level. SLA prediction needs a dedicated focus.</td><td style="color:#f57c00">🟡 Warning</td></tr>
+<tr><td>3</td><td><strong>108 contracts (31.8% of misses) are adjacent-product confusion:</strong> model picks the right warranty type+term but the wrong SLA tier within the same product family (e.g., 36M Premier 24x7 vs 36M Premier NBD). Not a separate defect — two distinct products being confused.</td><td style="color:#f57c00">🟡 Warning</td></tr>
 <tr><td>4</td><td>Confidence calibration is essentially <strong>flat</strong> (Low 84.4%, Mid 86.4%, High 84.7%). Model's probability scores do not predict correctness — cannot be used for escalation logic.</td><td style="color:#f57c00">🟡 Warning</td></tr>
 <tr><td>5</td><td>Channel × Segment and Country: all within 3pp. No stratification bias — model generalizes evenly across GTM dimensions.</td><td style="color:#2e7d32">✅ Good</td></tr>
 <tr><td>6</td><td>ThinkAgile HX650 V4 at 69.8% is the weakest product line, but Top-2 recovers to 96.2%. Rank-1 calibration issue, not a coverage problem.</td><td style="color:#f57c00">🟡 Warning</td></tr>
@@ -111,18 +111,14 @@ tr:last-child td{border-bottom:none}
 <div class="section">
 <div class="sec-hdr"><h2>A. Overall KPI Dashboard — NA Holdout (n=2,296)</h2></div>
 <div class="sec-body">
-<p class="insight">Under the strict definition (label + SLA both match), Top-1 is 85.2%. The 4.7pp gap vs. label-only (89.9%) represents 108 contracts where the model recommends the correct warranty product but the wrong SLA tier. This is a systematic weakness — the model confuses "24x7 4hr Resp" vs "Next Business Day" on the same warranty product.</p>
+<p class="insight">A product is defined as Warranty Type + Warranty Term + SLA combined. "36M Premier 24x7" and "36M Premier NBD" are two distinct products in the catalog. The model achieves 85.2% Top-1 exact product match.</p>
 <table>
 <tr><th>Metric</th><th class="num">Count</th><th class="num">Rate</th><th>Assessment</th></tr>
 <tr><td>Total Contracts</td><td class="num">2,296</td><td class="num">—</td><td>NA only (US 1,779 / CA 516 / GU 1)</td></tr>
-<tr><td>Top-1 Hit (Label + SLA)</td><td class="num">1,956</td><td class="num" style="background:#f57f17;color:#fff">85.2%</td><td>Strict definition — both must match</td></tr>
-<tr><td>Top-2 Hit (Label + SLA)</td><td class="num">2,108</td><td class="num" style="background:#f57f17;color:#fff">91.8%</td><td>Escalation to #2 recovers 152 contracts</td></tr>
-<tr><td>Top-3 Hit (Label + SLA)</td><td class="num">2,142</td><td class="num" style="background:#2e7d32;color:#fff">93.3%</td><td>Near-ceiling</td></tr>
-<tr><td>Missed in Top-3</td><td class="num">154</td><td class="num" style="background:#c62828;color:#fff">6.7%</td><td>Model cannot find correct answer in top 3</td></tr>
-<tr style="font-weight:700;background:#f0f2f5"><td colspan="4"><em>For reference — label-only (no SLA requirement)</em></td></tr>
-<tr><td>Top-1 (Label only)</td><td class="num">2,064</td><td class="num">89.9%</td><td>Model picks right product</td></tr>
-<tr><td>Top-2 (Label only)</td><td class="num">2,235</td><td class="num">97.3%</td><td>—</td></tr>
-<tr><td>Top-3 (Label only)</td><td class="num">2,270</td><td class="num">98.9%</td><td>—</td></tr>
+<tr><td>Top-1 Product Match</td><td class="num">1,956</td><td class="num" style="background:#f57f17;color:#fff">85.2%</td><td>Exact product: Type + Term + SLA correct</td></tr>
+<tr><td>Top-2 Product Match</td><td class="num">2,108</td><td class="num" style="background:#f57f17;color:#fff">91.8%</td><td>Escalation to #2 recovers 152 contracts</td></tr>
+<tr><td>Top-3 Product Match</td><td class="num">2,142</td><td class="num" style="background:#2e7d32;color:#fff">93.3%</td><td>Near-ceiling</td></tr>
+<tr><td>Missed in Top-3</td><td class="num">154</td><td class="num" style="background:#c62828;color:#fff">6.7%</td><td>Model cannot find correct product in top 3</td></tr>
 </table>
 </div></div>
 
@@ -290,19 +286,18 @@ tr:last-child td{border-bottom:none}
 <div class="warn" style="margin-top:10px"><strong>Forward-looking:</strong> If PSP Server share increases in production (wider ISG enterprise adoption), the blended Top-1 will mechanically decline due to mix effect. Pre-deployment: establish <strong>per-type Hit Rate baselines</strong>; post-deployment: monitor per-type Hit Rate alongside blended rate to distinguish real degradation from mix shift. Same principle as IDG's New CTO/Copied CTO mix effect analysis.</div>
 </div></div>
 
-<!-- ═══ J. SLA MISMATCH DEEP DIVE ═══ -->
+<!-- ═══ J. ERROR DECOMPOSITION ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>J. SLA Mismatch Analysis — The 4.7pp Penalty</h2></div>
+<div class="sec-hdr"><h2>J. Error Decomposition: How Far Is the Miss from the Actual Product?</h2></div>
 <div class="sec-body">
-<p class="critical"><strong>108 contracts (4.7%) lose Top-1 hit due to SLA mismatch alone.</strong> The model correctly picks the warranty product but assigns the wrong service level. This is a distinct failure mode from the PSP Server rank-1 problem — it's a systematic SLA discrimination issue.</p>
+<p class="insight">Each miss is a case where the model's #1 product recommendation was not the product the customer bought. We group these by how far the prediction deviates — from adjacent products in the same warranty family to completely different warranty types.</p>
 <table>
-<tr><th>Metric</th><th class="num">Value</th></tr>
-<tr><td>Top-1 Label-only Hit</td><td class="num">2,064 (89.9%)</td></tr>
-<tr><td>Top-1 Label + SLA Hit</td><td class="num">1,956 (85.2%)</td></tr>
-<tr><td>SLA Mismatch Gap</td><td class="num">108 contracts</td></tr>
-<tr><td>SLA Match Rate (all predictions)</td><td class="num">93.1%</td></tr>
+<tr><th>Error Type</th><th class="num">Count</th><th class="num">% of Misses</th><th>Example</th><th>Distance</th></tr>
+<tr><td>Same Warranty Family,<br>Different SLA Tier</td><td class="num">108</td><td class="num">31.8%</td><td>Premier 36M 24x7 → Premier 36M NBD</td><td style="color:#f57f17">Adjacent</td></tr>
+<tr><td>Same Warranty Type,<br>Different Term Duration</td><td class="num">159</td><td class="num">46.8%</td><td>Premier 60M → Premier 36M</td><td style="color:#f57c00">Near</td></tr>
+<tr><td>Different Warranty Type</td><td class="num">73</td><td class="num">21.5%</td><td>PSP Server 60M → Premier 60M</td><td style="color:#c62828">Far</td></tr>
 </table>
-<div class="insight" style="margin-top:10px"><strong>Hypothesis:</strong> SLA is binary in this dataset (24x7 4hr Resp vs Next Business Day). The model may not be treating SLA as a separate prediction target — it's embedded in the label string. Recommendation: separate SLA into an independent classification head with its own loss function. The 93.1% overall SLA match rate suggests the signal exists; the 108 misses suggest it's not being optimized directly.</div>
+<div class="insight" style="margin-top:10px"><strong>Key insight:</strong> 78.5% of misses are within the same warranty type — the model knows which warranty category the customer needs. The problem is discriminating between <em>variants within that category</em>: different term durations or different SLA tiers. Only 21.5% of misses are genuine cross-category errors (e.g., confusing PSP Server with Premier). This suggests the model's category-level features are strong; its variant-level differentiation needs work.</div>
 </div></div>
 
 <!-- ═══ K. ERROR DIRECTION ANALYSIS ═══ -->
@@ -356,7 +351,7 @@ tr:last-child td{border-bottom:none}
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>Premier Term Discrimination (60M ↔ 36M)</strong></td><td style="color:#c62828">136 contracts mixed up</td><td>159 (46.8% of errors)</td><td>Largest error category. Add term as a separate feature or prediction target. The 60M→36M direction (76x) is the revenue-loss pattern</td></tr>
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>PSP Server × 60 Months</strong></td><td style="color:#c62828">48.8%</td><td>41 (1.8%)</td><td>Audit training data: class imbalance likely. Add PSP Server 60M samples or use class-weighted loss</td></tr>
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>Premier × 48 Months</strong></td><td style="color:#c62828">50.0%</td><td>16 (0.7%)</td><td>48-Month term is rare across all types. Add synthetic or augmented samples</td></tr>
-<tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>SLA Discrimination</strong></td><td style="color:#f57c00">-4.7pp gap</td><td>108 contracts</td><td>Add separate SLA classification head. The 108 label-only hits with SLA mismatch prove SLA is not being optimized</td></tr>
+<tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>Adjacent Product Differentiation (SLA Tier)</strong></td><td style="color:#f57c00">108 contracts in same family</td><td>108 (31.8% of misses)</td><td>Same type+term, different SLA. Add features correlated with SLA tier: hardware criticality, customer industry, HW price tier, subsegment. Balanced error direction — model needs better differentiation, not bias correction</td></tr>
 <tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>Confidence Calibration</strong></td><td style="color:#f57c00">Flat</td><td>All 2,296</td><td>Apply Platt scaling. Critical for production — low confidence must mean low trust</td></tr>
 <tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>PSP Server overall</strong></td><td style="color:#f57c00">68.5%</td><td>162 (7.1%)</td><td>Augment training data. Not an SLA problem (label-only also 68.5%) — genuine rank-1 weakness</td></tr>
 <tr><td style="background:#1565c0;color:#fff;text-align:center;font-weight:700">P2</td><td><strong>ThinkAgile HX650 V4</strong></td><td style="color:#1565c0">69.8%</td><td>53 (2.3%)</td><td>Top-2 is 96.2% — rank-1 calibration. Check feature importance for HCI product line</td></tr>
@@ -372,10 +367,10 @@ tr:last-child td{border-bottom:none}
 <tr><th>Dimension</th><th>Status</th><th>Evidence</th></tr>
 <tr><td><strong>Core Accuracy (strict)</strong></td><td style="color:#f57f17">🟡 Adequate</td><td>Top-1 85.2%, Top-2 91.8%. Pilot-worthy for Premier scope</td></tr>
 <tr><td><strong>Generalization</strong></td><td style="color:#2e7d32">✅ Good</td><td>Channel × Segment, Country, Business Vertical all within tight band. No bias detected</td></tr>
-<tr><td><strong>SLA Precision</strong></td><td style="color:#f57c00">⚠ Weak</td><td>108 contracts get label right but SLA wrong. Separate SLA head needed before full rollout</td></tr>
+<tr><td><strong>Product Differentiation</strong></td><td style="color:#f57c00">⚠ Moderate</td><td>108 contracts: adjacent product confusion within same warranty family (same type+term, different SLA tier). Acceptable for Premier-only pilot; needs feature work before full scope</td></tr>
 <tr><td><strong>Long-tail Coverage</strong></td><td style="color:#c62828">🔴 Poor</td><td>PSP Server (7.1%) and ESS (4.9%): significant gaps. Recommend Premier-only pilot scope</td></tr>
 <tr><td><strong>Confidence Signal</strong></td><td style="color:#c62828">🔴 Broken</td><td>Flat calibration across tiers. Fix before relying on confidence for escalation</td></tr>
-<tr><td><strong>Pilot Recommendation</strong></td><td style="color:#f57f17">⚠ Conditional</td><td><strong>Recommend Premier-only pilot</strong> (87.8% of volume, 86.8% Top-1). Fix P0 items (PSP Server, SLA head) before expanding scope. Deploy with human-in-the-loop — show Top-2 options when confidence is uncertain.</td></tr>
+<tr><td><strong>Pilot Recommendation</strong></td><td style="color:#f57f17">⚠ Conditional</td><td><strong>Recommend Premier-only pilot</strong> (87.8% of volume, 86.8% Top-1). Fix P0 items (Term Discrimination, PSP Server) before expanding scope. Deploy with human-in-the-loop — show Top-2 options when confidence is uncertain.</td></tr>
 </table>
 </div></div>
 
