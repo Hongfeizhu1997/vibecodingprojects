@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ISG SSR POC — Business Review</title>
+<style>
+:root{--bg:#f8f9fb;--card:#fff;--border:#e2e5ea;--accent:#1a237e;--accent2:#059669;--accent3:#d97706;--accent4:#dc2626;--text:#1a1d27;--sub:#6b7280;--dim:#9ca3af}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;width:100vw;height:100vh}
+.brand{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#E1251B,#1a237e,#4D144A,#7A126B);z-index:100}
+.progress-wrap{position:fixed;bottom:0;left:0;right:0;height:2px;background:var(--border);z-index:100}
+.progress-fill{height:100%;background:var(--accent);transition:width .3s}
+.indicator{position:fixed;top:14px;right:22px;font-size:.65rem;color:var(--sub);z-index:100;font-weight:600}
+.nav-hint{position:fixed;bottom:14px;right:22px;font-size:.55rem;color:var(--dim);z-index:100}
+.stage{position:absolute;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .35s ease;pointer-events:none;padding:3rem 2.5rem 2rem}
+.stage.active{opacity:1;pointer-events:auto}
+.reveal{opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease}
+.reveal.in{opacity:1;transform:translateY(0)}
+.stage-inner{width:100%;max-width:960px}
+.scene-label{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:.3rem}
+.scene-title{font-size:1.1rem;font-weight:700;margin-bottom:.7rem;color:var(--text);line-height:1.3}
+.hero-title{font-size:1.8rem;font-weight:800;color:var(--text);line-height:1.2;margin-bottom:.35rem;letter-spacing:-.02em}
+.hero-sub{font-size:.78rem;color:var(--sub);margin-bottom:1.5rem}
+.hero-metrics{display:flex;gap:3rem;flex-wrap:wrap;justify-content:center}
+.hero-met{text-align:center}.hero-met .num{font-size:1.6rem;font-weight:800;color:var(--accent)}.hero-met .lbl{font-size:.52rem;color:var(--sub);text-transform:uppercase;letter-spacing:.05em}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem 1rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card h4{font-size:.65rem;font-weight:700;color:var(--text);margin-bottom:.2rem}
+.num-big{font-size:1.1rem;font-weight:800;color:var(--accent);display:block}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem}
+.four-col{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem}
+.split-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
+.alert{background:#f0f4ff;border-left:3px solid var(--accent);padding:.5rem .75rem;border-radius:0 6px 6px 0;font-size:.55rem;color:var(--sub);line-height:1.5;margin-bottom:.5rem}
+.alert-green{background:#ecfdf5;border-left-color:var(--accent2)}
+.alert-amber{background:#fffbeb;border-left-color:var(--accent3)}
+.alert-red{background:#fef2f2;border-left-color:var(--accent4)}
+.comptable{width:100%;border-collapse:collapse;font-size:.55rem}
+.comptable th{padding:.35rem .5rem;text-align:left;font-weight:600;color:var(--sub);border-bottom:1px solid var(--border);font-size:.5rem;text-transform:uppercase;letter-spacing:.04em}
+.comptable td{padding:.3rem .5rem;border-bottom:1px solid var(--border);color:var(--text)}
+.comptable tr:last-child td{border-bottom:none}
+.tag{display:inline-block;padding:1px 5px;border-radius:3px;font-size:.5rem;font-weight:700}
+.tag-red{background:#fef2f2;color:var(--accent4)}.tag-green{background:#ecfdf5;color:var(--accent2)}
+.tune-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem 1rem;margin-bottom:.5rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.tune-card h3{font-size:.64rem;font-weight:700;color:var(--text);margin-bottom:.2rem}
+.tune-row{display:flex;gap:.45rem;align-items:center;margin-bottom:.3rem}
+.tune-badge{padding:2px 6px;border-radius:10px;font-size:.5rem;font-weight:700;white-space:nowrap}
+.tune-badge-red{background:#fef2f2;color:var(--accent4)}.tune-badge-green{background:#ecfdf5;color:var(--accent2)}
+.opt-row{display:flex;gap:.45rem;margin:.3rem 0}
+.opt-card{flex:1;border-radius:8px;padding:.45rem .6rem;font-size:.52rem;line-height:1.4}
+.opt-good{border:2px solid var(--accent2);background:#f0fdf4}
+.opt-bad{border:1px solid var(--border);color:var(--sub)}
+.data-pair{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin:.3rem 0}
+.data-cell{background:#f9fafb;border-radius:8px;padding:.5rem .6rem;display:flex;align-items:center;gap:.45rem;font-size:.52rem;color:var(--sub);line-height:1.35}
+.data-cell .icon{font-size:.95rem;flex-shrink:0}
+.rec-box{background:linear-gradient(135deg,#eef2ff 0%,#f0f5ff 100%);border:1px solid #c7d2fe;border-radius:10px;padding:.8rem 1rem;margin-top:.6rem}
+.rec-box .big{font-size:.6rem;font-weight:700;color:var(--accent);margin-bottom:.25rem}
+.rec-box ul{margin:0;padding-left:.9rem;font-size:.52rem;color:var(--sub);line-height:1.5}
+.agenda-list{display:flex;flex-direction:column;gap:.4rem;margin-top:.3rem}
+.agenda-item{display:flex;align-items:center;gap:.7rem;padding:.5rem .8rem;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.agenda-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;flex-shrink:0}
+.agenda-text .t{font-size:.58rem;font-weight:700;color:var(--text)}.agenda-text .d{font-size:.5rem;color:var(--sub)}
+.chart-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.chart-tight{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.5rem .6rem;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.summary-table{width:100%;border-collapse:collapse;font-size:.55rem;margin-top:.5rem}
+.summary-table th{background:var(--bg);padding:.4rem .5rem;text-align:left;font-weight:600;color:var(--sub);border-bottom:2px solid var(--border);font-size:.5rem;text-transform:uppercase;letter-spacing:.04em}
+.summary-table td{padding:.4rem .5rem;border-bottom:1px solid var(--border);color:var(--text);line-height:1.5}
+.summary-table tr:last-child td{border-bottom:none}
+.p0{display:inline-block;background:var(--accent4);color:#fff;padding:1px 5px;border-radius:3px;font-size:.48rem;font-weight:700}
+.p1{display:inline-block;background:var(--accent3);color:#fff;padding:1px 5px;border-radius:3px;font-size:.48rem;font-weight:700}
+.p2{display:inline-block;background:#2563eb;color:#fff;padding:1px 5px;border-radius:3px;font-size:.48rem;font-weight:700}
+.done{display:inline-block;background:var(--accent2);color:#fff;padding:1px 5px;border-radius:3px;font-size:.48rem;font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="brand"></div>
+<div class="progress-wrap"><div class="progress-fill" id="prog"></div></div>
+<div class="indicator" id="indicator">1 / 9</div>
+<div class="nav-hint">← → navigate</div>
+
+<!-- ═══ s0: COVER ═══ -->
+<div class="stage active" id="s0">
+<div class="stage-inner reveal" data-delay="100" style="text-align:center">
+  <div class="scene-label reveal" data-delay="200">Lenovo SSG · AI Solutions</div>
+  <div class="hero-title reveal" data-delay="350" style="font-size:2rem">ISG SSR Service Smart Recommendation — POC Review</div>
+  <div class="hero-sub reveal" data-delay="500" style="font-size:.85rem">POC Business Review · NA Holdout · 2,296 Contracts</div>
+  <div class="reveal" data-delay="700" style="margin-top:1rem;font-size:.6rem;color:var(--dim)">Blind generalization test on unseen data</div>
+</div>
+</div>
+
+<!-- ═══ s1: AGENDA ═══ -->
+<div class="stage" id="s1">
+<div class="stage-inner reveal" data-delay="100">
+  <div class="scene-label reveal" data-delay="150" style="text-align:center">ISG SSR · POC Business Review</div>
+  <div class="hero-title reveal" data-delay="250" style="text-align:center;font-size:1.3rem;margin-bottom:.25rem">Agenda</div>
+  <div class="agenda-list reveal" data-delay="450">
+    <div class="agenda-item"><div class="agenda-num">1</div><div class="agenda-text"><div class="t">POC Scope & Overall Result</div><div class="d">Data composition, holdout design, Top-1 match rate</div></div></div>
+    <div class="agenda-item"><div class="agenda-num">2</div><div class="agenda-text"><div class="t">Validation Methodology</div><div class="d">Why blind-test performance differs from production behaviour</div></div></div>
+    <div class="agenda-item"><div class="agenda-num">3</div><div class="agenda-text"><div class="t">Validated — Consistent Across Segments</div><div class="d">Channel, segment, country — all stable, no intervention needed</div></div></div>
+    <div class="agenda-item"><div class="agenda-num">4</div><div class="agenda-text"><div class="t">Adjustments Recommended</div><div class="d">Term duration, PSP coverage, overall posture — 3 targeted improvements</div></div></div>
+    <div class="agenda-item"><div class="agenda-num">5</div><div class="agenda-text"><div class="t">SLA Analysis & Summary</div><div class="d">Symmetric SLA confusion + comprehensive findings with recommendations</div></div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ s2: HERO ═══ -->
+<div class="stage" id="s2">
+<div class="stage-inner reveal" data-delay="100">
+  <div class="scene-label reveal" data-delay="150" style="text-align:center">ISG SSR · Service Recommendation</div>
+  <div class="hero-title reveal" data-delay="250" style="text-align:center">POC Passed — 3 Adjustments Identified</div>
+  <div class="hero-sub reveal" data-delay="350" style="text-align:center">NA Holdout · 2,296 contracts · Blind generalization test</div>
+  <div class="hero-metrics reveal" data-delay="450">
+    <div class="hero-met"><div class="num">2,296</div><div class="lbl">Contracts</div></div>
+    <div class="hero-met"><div class="num">85.2%</div><div class="lbl">Top-1 Match</div></div>
+    <div class="hero-met"><div class="num">3</div><div class="lbl">Adjustments</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ s3: SCOPE ═══ -->
+<div class="stage" id="s3">
+<div class="stage-inner">
+  <div class="scene-label reveal" data-delay="100">01 · POC Scope</div>
+  <div class="scene-title reveal" data-delay="150">2,296 NA contracts — 91% indirect, 50:50 COM/SMB, 95% servers, median $29K</div>
+  <div class="split-row reveal" data-delay="300" style="align-items:stretch">
+    <div style="display:flex;flex-direction:column;justify-content:space-between">
+      <div class="four-col" style="margin-bottom:.5rem">
+        <div class="card" style="text-align:center;padding-top:1rem;padding-bottom:1rem"><div style="font-size:.48rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">Region</div><div class="num-big" style="margin:.1rem 0;font-size:.9rem;color:var(--text)">NA</div><div style="font-size:.45rem;color:var(--dim)">US 1,779 · CA 516</div></div>
+        <div class="card" style="text-align:center;padding-top:1rem;padding-bottom:1rem"><div style="font-size:.48rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">Channel</div><div class="num-big" style="margin:.1rem 0;font-size:.9rem">91%</div><div style="font-size:.45rem;color:var(--dim)">Indirect</div></div>
+        <div class="card" style="text-align:center;padding-top:1rem;padding-bottom:1rem"><div style="font-size:.48rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">Segment</div><div class="num-big" style="margin:.1rem 0;font-size:.9rem">50:50</div><div style="font-size:.45rem;color:var(--dim)">COM · SMB</div></div>
+        <div class="card" style="text-align:center;padding-top:1rem;padding-bottom:1rem"><div style="font-size:.48rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">Hardware</div><div class="num-big" style="margin:.1rem 0;font-size:.9rem">95%</div><div style="font-size:.45rem;color:var(--dim)">Servers</div></div>
+      </div>
+      <div class="card" style="padding-top:1rem;padding-bottom:1rem">
+        <h4 style="font-size:.58rem;margin-bottom:.3rem">Hardware Price Distribution</h4>
+        <div style="font-size:.5rem;line-height:1.6"><span style="color:var(--dim)">Min</span> $2.7K · <span style="color:var(--dim)">P25</span> $14.5K · <span style="font-weight:700;color:var(--text)">Median $29K</span> · <span style="color:var(--dim)">P75</span> $55.6K · <span style="color:var(--dim)">Max</span> $1M</div>
+      </div>
+    </div>
+    <div class="chart-tight">
+      <svg viewBox="0 0 240 130" width="100%" height="130">
+        <text x="3" y="11" fill="#374151" font-size="7.5" font-weight="700">Customer Verticals</text>
+        <rect x="0" y="14" width="230" height="12" rx="2" fill="#e5e7eb"/>
+        <rect x="0" y="14" width="42.9" height="12" rx="2" fill="#1a237e"/><rect x="44" y="15" width="60" height="10" rx="3" fill="rgba(0,0,0,.32)"/><text x="46" y="23" fill="#fff" font-size="6.5" font-weight="800">PS&T 19.5%</text>
+        <rect x="0" y="30" width="230" height="12" rx="2" fill="#e5e7eb"/>
+        <rect x="0" y="30" width="30.8" height="12" rx="2" fill="#4338ca"/><rect x="32" y="31" width="58" height="10" rx="3" fill="rgba(0,0,0,.28)"/><text x="34" y="39" fill="#fff" font-size="6.5" font-weight="800">EDU 14.0%</text>
+        <rect x="0" y="46" width="230" height="12" rx="2" fill="#e5e7eb"/>
+        <rect x="0" y="46" width="28.2" height="12" rx="2" fill="#6366f1"/><rect x="31" y="47" width="44" height="10" rx="3" fill="rgba(0,0,0,.15)"/><text x="33" y="55" fill="#1e1b4b" font-size="6.5" font-weight="700">MFG 12.8%</text>
+        <rect x="0" y="62" width="230" height="12" rx="2" fill="#e5e7eb"/>
+        <rect x="0" y="62" width="26.2" height="12" rx="2" fill="#818cf8"/><rect x="29" y="63" width="46" height="10" rx="3" fill="rgba(0,0,0,.12)"/><text x="31" y="71" fill="#312e81" font-size="6.5" font-weight="700">Retail 11.9%</text>
+        <rect x="0" y="78" width="230" height="12" rx="2" fill="#e5e7eb"/>
+        <rect x="0" y="78" width="21.6" height="12" rx="2" fill="#a5b4fc"/><rect x="24" y="79" width="44" height="10" rx="3" fill="rgba(0,0,0,.12)"/><text x="26" y="87" fill="#312e81" font-size="6.5" font-weight="700">Public 9.8%</text>
+        <rect x="0" y="94" width="230" height="12" rx="2" fill="#e5e7eb"/>
+        <rect x="0" y="94" width="70.4" height="12" rx="2" fill="#c7d2fe"/><rect x="72" y="95" width="48" height="10" rx="3" fill="rgba(0,0,0,.1)"/><text x="74" y="103" fill="#4338ca" font-size="6.5" font-weight="700">Other 32.0%</text>
+        <text x="3" y="122" fill="#6b7280" font-size="6">0%</text><text x="230" y="122" fill="#6b7280" font-size="6" text-anchor="end">35%</text>
+      </svg>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ s4: METHODOLOGY ═══ -->
+<div class="stage" id="s4">
+<div class="stage-inner">
+  <div class="scene-label reveal" data-delay="100">02 · Validation Methodology</div>
+  <div class="scene-title reveal" data-delay="150">The model aced the blind exam; production is the real-world job interview</div>
+  <div class="three-col reveal" data-delay="300">
+    <div class="card" style="text-align:center"><div style="font-size:1.3rem;margin-bottom:.2rem">📖</div><h4 style="font-size:.58rem;color:var(--sub)">Training Data</h4><p style="font-size:.6rem;font-weight:700;color:var(--text)">The Textbook</p><p style="font-size:.5rem;color:var(--dim)">Historical deals<br>model studied from</p></div>
+    <div class="card" style="text-align:center;border-color:var(--accent);border-width:2px;background:#f0f4ff"><div style="font-size:1.3rem;margin-bottom:.2rem">📝</div><h4 style="font-size:.58rem;color:var(--accent)">Validation (POC)</h4><p style="font-size:.6rem;font-weight:700;color:var(--accent)">The Exam</p><p style="font-size:.5rem;color:var(--sub)">2,296 contracts<br>model has <strong>never seen</strong></p></div>
+    <div class="card" style="text-align:center"><div style="font-size:1.3rem;margin-bottom:.2rem">🏢</div><h4 style="font-size:.58rem;color:var(--sub)">Production</h4><p style="font-size:.6rem;font-weight:700;color:var(--text)">The Job</p><p style="font-size:.5rem;color:var(--dim)">Live sellers accept<br>or override</p></div>
+  </div>
+  <div class="alert alert-amber reveal" data-delay="400"><strong>Three production differences:</strong> ① Seller behaviour not captured in validation — correct recommendations can be rejected. ② Product mix shifts over time — accuracy will drift. ③ Track <strong>seller override rate</strong> as proxy for ongoing model quality.</div>
+  <table class="comptable reveal" data-delay="500">
+    <tr><th></th><th style="text-align:center">Training</th><th style="text-align:center;color:var(--accent)">Validation (POC)</th><th style="text-align:center">Production</th></tr>
+    <tr><td>Model has seen this?</td><td style="text-align:center">✅ Yes</td><td style="text-align:center;color:var(--accent)">❌ Blind test</td><td style="text-align:center">❌ Real world</td></tr>
+    <tr><td>Measures…</td><td style="text-align:center">Can it learn?</td><td style="text-align:center;color:var(--accent)">Does it generalise?</td><td style="text-align:center">Do sellers accept?</td></tr>
+    <tr><td>Who decides?</td><td style="text-align:center">N/A</td><td style="text-align:center">N/A</td><td style="text-align:center;color:var(--accent3);font-weight:700">The seller</td></tr>
+  </table>
+</div>
+</div>
+
+<!-- ═══ s5: VALIDATED ═══ -->
+<div class="stage" id="s5">
+<div class="stage-inner">
+  <div class="scene-label reveal" data-delay="100">03 · Validated — Consistent Across Segments</div>
+  <div class="scene-title reveal" data-delay="150">Channel, segment, country — all within ±3pp. The model generalises evenly, no intervention needed.</div>
+  <div class="split-row reveal" data-delay="300" style="align-items:stretch">
+    <div style="display:flex;flex-direction:column;justify-content:space-between">
+      <div class="two-col" style="margin-bottom:.5rem">
+        <div class="card" style="text-align:center;border-color:var(--accent2)"><div style="font-size:.46rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">Indirect · SMB</div><div style="font-size:1.1rem;font-weight:800;color:var(--accent2);margin:.12rem 0">86.0%</div><div style="font-size:.44rem;color:var(--dim)">1,144 contracts</div></div>
+        <div class="card" style="text-align:center;border-color:var(--accent2)"><div style="font-size:.46rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">Indirect · COM</div><div style="font-size:1.1rem;font-weight:800;color:var(--accent2);margin:.12rem 0">84.4%</div><div style="font-size:.44rem;color:var(--dim)">941 contracts</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card" style="text-align:center;border-color:var(--accent2)"><div style="font-size:.46rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">Direct · COM</div><div style="font-size:1.1rem;font-weight:800;color:var(--accent2);margin:.12rem 0">83.3%</div><div style="font-size:.44rem;color:var(--dim)">198 contracts</div></div>
+        <div class="card" style="text-align:center;border-color:var(--accent2)"><div style="font-size:.46rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">US · Canada</div><div style="font-size:1.1rem;font-weight:800;color:var(--accent2);margin:.12rem 0">84.7% · 87.0%</div><div style="font-size:.44rem;color:var(--dim)">Δ 2.3pp — negligible</div></div>
+      </div>
+    </div>
+    <div class="chart-tight">
+      <svg viewBox="0 0 210 135" width="100%" height="135">
+        <text x="5" y="14" fill="#374151" font-size="7.5" font-weight="700">Top-1 Match Rate by Segment</text>
+        <line x1="50" y1="20" x2="205" y2="20" stroke="#e5e7eb" stroke-width="1"/>
+        <line x1="50" y1="118" x2="205" y2="118" stroke="#e2e5ea" stroke-width="1"/>
+        <text x="47" y="121" fill="#6b7280" font-size="6" text-anchor="end">80%</text>
+        <line x1="50" y1="86" x2="205" y2="86" stroke="#f3f4f6" stroke-width=".5" stroke-dasharray="3,3"/>
+        <text x="47" y="89" fill="#6b7280" font-size="6" text-anchor="end">83%</text>
+        <line x1="50" y1="54" x2="205" y2="54" stroke="#f3f4f6" stroke-width=".5" stroke-dasharray="3,3"/>
+        <text x="47" y="57" fill="#6b7280" font-size="6" text-anchor="end">86%</text>
+        <rect x="58" y="53" width="30" height="65" rx="2" fill="#059669" opacity=".85"/><text x="73" y="49" fill="#1a1d27" font-size="7" text-anchor="middle" font-weight="700">86%</text>
+        <rect x="98" y="68" width="30" height="50" rx="2" fill="#059669" opacity=".85"/><text x="113" y="64" fill="#1a1d27" font-size="7" text-anchor="middle" font-weight="700">84.4%</text>
+        <rect x="138" y="78" width="30" height="40" rx="2" fill="#059669" opacity=".7"/><text x="153" y="74" fill="#1a1d27" font-size="7" text-anchor="middle" font-weight="700">83.3%</text>
+        <rect x="178" y="56" width="30" height="62" rx="2" fill="#059669" opacity=".85"/><text x="193" y="52" fill="#1a1d27" font-size="7" text-anchor="middle" font-weight="700">84.7%</text>
+        <text x="73" y="131" fill="#6b7280" font-size="6" text-anchor="middle">SMB</text>
+        <text x="113" y="131" fill="#6b7280" font-size="6" text-anchor="middle">COM</text>
+        <text x="153" y="131" fill="#6b7280" font-size="6" text-anchor="middle">COM</text>
+        <text x="193" y="131" fill="#6b7280" font-size="6" text-anchor="middle">US·CA</text>
+      </svg>
+    </div>
+  </div>
+  <div class="alert alert-green reveal" data-delay="500"><strong>Channel, Segment, Country, Hardware Category:</strong> all within 3pp. No geographic bias, no GTM bias. These dimensions are production-ready without modification.</div>
+</div>
+</div>
+
+<!-- ═══ s6: ADJUSTMENTS ═══ -->
+<div class="stage" id="s6">
+<div class="stage-inner">
+  <div class="scene-label reveal" data-delay="100">04 · Adjustments Recommended</div>
+  <div class="scene-title reveal" data-delay="150">The model is net-conservative — 3 adjustments push toward more appropriate coverage levels</div>
+  <div class="alert reveal" data-delay="200" style="margin-bottom:.6rem">When the model is wrong, it leans conservative (36.2% of misses recommend cheaper/shorter vs 28.2% more expensive/longer). The seller can always downgrade, so aggressive errors are lower-risk. All 3 adjustments push in the same direction.</div>
+  <div class="three-col reveal" data-delay="350">
+    <div class="tune-card" style="margin-bottom:0">
+      <div class="tune-row"><h3>① Term Duration</h3><span class="tune-badge tune-badge-red">P0</span></div>
+      <div style="font-size:.52rem;color:var(--sub);line-height:1.5;margin-bottom:.4rem"><strong style="color:var(--accent4)">76 contracts</strong> got shorter coverage than purchased. 46.8% of all errors are term mix-ups — the #1 error source.</div>
+      <div class="opt-row"><div class="opt-card opt-bad">❌ Keep as-is</div><div class="opt-card opt-good"><strong>✅ Default to longer term</strong><br>Seller retains full control to downgrade</div></div>
+    </div>
+    <div class="tune-card" style="margin-bottom:0">
+      <div class="tune-row"><h3>② PSP Server</h3><span class="tune-badge tune-badge-red">P0</span></div>
+      <div style="font-size:.52rem;color:var(--sub);line-height:1.5;margin-bottom:.4rem"><strong style="color:var(--accent4)">31 of 162</strong> PSP Server customers got Premier instead. Only 7.1% of training data is PSP — class imbalance drives conservative defaulting.</div>
+      <div class="opt-row"><div class="opt-card opt-bad">❌ Data only</div><div class="opt-card opt-good"><strong>✅ Data + PSP bias</strong></div></div>
+    </div>
+    <div class="tune-card" style="margin-bottom:0">
+      <div class="tune-row"><h3>③ Overall Posture</h3><span class="tune-badge tune-badge-red">P1</span></div>
+      <div style="font-size:.52rem;color:var(--sub);line-height:1.5;margin-bottom:.4rem">Current miss ratio: <strong style="color:#2563eb">36.2% conservative</strong> vs <strong style="color:var(--accent4)">28.2% aggressive</strong>. A 3:2 tilt toward cheaper recommendations leaves revenue on the table.</div>
+      <div class="opt-row"><div class="opt-card opt-bad">❌ Keep 36:28</div><div class="opt-card opt-good"><strong>✅ Shift to ~1:1</strong><br>Test threshold in A/B pilot</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ s7: SLA ═══ -->
+<div class="stage" id="s7">
+<div class="stage-inner">
+  <div class="scene-label reveal" data-delay="100">05 · SLA Analysis</div>
+  <div class="scene-title reveal" data-delay="150">SLA confusion is symmetric (51:57) — the model cannot distinguish 24×7 from NBD well enough</div>
+  <div class="split-row reveal" data-delay="250" style="align-items:stretch">
+    <div style="display:flex;flex-direction:column;justify-content:space-between">
+      <div class="tune-card" style="margin-bottom:0">
+        <div class="tune-row"><h3>SLA Tier: Symmetric Confusion</h3><span class="tune-badge tune-badge-green">FEATURE ENHANCEMENT</span></div>
+        <div class="data-pair">
+          <div class="data-cell"><div class="icon">🔵</div><div><span style="font-weight:700;color:#2563eb">51</span> 24×7 → NBD errors</div></div>
+          <div class="data-cell"><div class="icon">🔴</div><div><span style="font-weight:700;color:var(--accent4)">57</span> NBD → 24×7 errors</div></div>
+        </div>
+        <div style="font-size:.52rem;color:var(--sub);margin-top:.3rem;line-height:1.5">
+          <strong>Finding:</strong> Nearly balanced (51:57). The model is not biased toward either SLA tier — it simply cannot tell them apart reliably.<br>
+          <strong>Recommendation:</strong> Do not apply directional tuning. Instead, add stronger features: <strong>hardware criticality scoring</strong> and <strong>customer industry vertical</strong> to help the model distinguish SLA needs.<br>
+          <strong>Priority:</strong> P2 — address after P0 adjustments are validated.
+        </div>
+      </div>
+    </div>
+    <div class="chart-box">
+      <svg viewBox="0 0 200 150" width="100%" height="150">
+        <text x="5" y="14" fill="#374151" font-size="7.5" font-weight="700">SLA Confusion</text>
+        <line x1="15" y1="128" x2="188" y2="128" stroke="#e2e5ea" stroke-width="1"/>
+        <rect x="42" y="48" width="48" height="80" rx="3" fill="#bfdbfe"/><rect x="42" y="48" width="48" height="80" rx="3" fill="#2563eb" opacity=".7"/>
+        <text x="66" y="42" fill="#2563eb" font-size="12" text-anchor="middle" font-weight="800">51</text>
+        <text x="66" y="142" fill="#4b5563" font-size="6" text-anchor="middle">24×7→NBD</text>
+        <rect x="112" y="38" width="48" height="90" rx="3" fill="#fecaca"/><rect x="112" y="38" width="48" height="90" rx="3" fill="#dc2626" opacity=".7"/>
+        <text x="136" y="32" fill="#dc2626" font-size="12" text-anchor="middle" font-weight="800">57</text>
+        <text x="136" y="142" fill="#4b5563" font-size="6" text-anchor="middle">NBD→24×7</text>
+        <text x="100" y="20" fill="#059669" font-size="7" text-anchor="middle" font-weight="700">Δ 6 — Symmetric ✅</text>
+      </svg>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ s8: SUMMARY ═══ -->
+<div class="stage" id="s8">
+<div class="stage-inner">
+  <div class="scene-label reveal" data-delay="100">06 · Summary & Recommendations</div>
+  <div class="scene-title reveal" data-delay="150">One finding stands above all others: 46.8% of errors are term mix-ups — fix this first</div>
+  <table class="summary-table reveal" data-delay="300">
+    <tr><th style="width:18%">Dimension</th><th style="width:16%">Result</th><th style="width:20%">Finding</th><th style="width:26%">Recommendation</th><th style="width:8%">P</th><th style="width:12%">Expected Impact</th></tr>
+    <tr>
+      <td><strong>Term Duration</strong></td>
+      <td><span class="tag tag-red">↓ Conservative</span></td>
+      <td>76 contracts downgraded from 60M to 36M. 46.8% of all errors.</td>
+      <td>Default to longer term when confidence is below threshold. Seller retains override.</td>
+      <td style="text-align:center"><span class="p0">P0</span></td>
+      <td style="color:var(--accent2)">↑ Service revenue on ~3.3% of contracts</td>
+    </tr>
+    <tr>
+      <td><strong>PSP Server</strong></td>
+      <td><span class="tag tag-red">↓ Conservative</span></td>
+      <td>31/162 PSP customers under-served. Driven by 7.1% training data share.</td>
+      <td>Augment PSP training samples + apply modest PSP preference when confidence gap is small.</td>
+      <td style="text-align:center"><span class="p0">P0</span></td>
+      <td style="color:var(--accent2)">↑ PSP attach on server deals</td>
+    </tr>
+    <tr>
+      <td><strong>Overall Posture</strong></td>
+      <td><span class="tag tag-red">3:2 conservative</span></td>
+      <td>36.2% of misses are conservative vs 28.2% aggressive. Model systematically recommends cheaper.</td>
+      <td>Apply small global bias adjustment to balance. Validate threshold in A/B pilot.</td>
+      <td style="text-align:center"><span class="p1">P1</span></td>
+      <td style="color:var(--accent2)">↑ Coverage across all types</td>
+    </tr>
+    <tr>
+      <td><strong>SLA Tier</strong></td>
+      <td><span class="tag tag-green">Neutral</span></td>
+      <td>Symmetric 51:57 confusion. Model cannot distinguish SLA needs — not biased.</td>
+      <td>Add hardware criticality + industry vertical features. No directional tuning.</td>
+      <td style="text-align:center"><span class="p2">P2</span></td>
+      <td style="color:var(--sub)">↓ SLA mismatch long-term</td>
+    </tr>
+    <tr>
+      <td><strong>Channel</strong></td>
+      <td><span class="tag tag-green">Validated</span></td>
+      <td>83–86% flat across Indirect/Direct. No bias.</td>
+      <td>No intervention needed.</td>
+      <td style="text-align:center"><span class="done">✓</span></td>
+      <td style="color:var(--sub)">—</td>
+    </tr>
+    <tr>
+      <td><strong>Segment</strong></td>
+      <td><span class="tag tag-green">Validated</span></td>
+      <td>COM and SMB within 2pp. No bias.</td>
+      <td>No intervention needed.</td>
+      <td style="text-align:center"><span class="done">✓</span></td>
+      <td style="color:var(--sub)">—</td>
+    </tr>
+    <tr>
+      <td><strong>Country</strong></td>
+      <td><span class="tag tag-green">Validated</span></td>
+      <td>US vs Canada Δ 2.3pp — negligible.</td>
+      <td>No intervention needed.</td>
+      <td style="text-align:center"><span class="done">✓</span></td>
+      <td style="color:var(--sub)">—</td>
+    </tr>
+  </table>
+  <div class="rec-box reveal" data-delay="500">
+    <div class="big">Recommended action: Address P0 items first (term duration + PSP data), validate in A/B pilot, then apply P1 posture adjustment</div>
+    <ul>
+      <li>Term duration fix alone addresses 46.8% of current errors — the single highest-impact change</li>
+      <li>All adjustments are low-risk: the seller retains final decision on every recommendation</li>
+      <li>Monitor seller override rate in pilot as the primary quality signal — it replaces the blind-test metric in production</li>
+      <li>Retrain with production feedback loop after 2–3 quarters of live data</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<script>
+const stages=['s0','s1','s2','s3','s4','s5','s6','s7','s8'],TOTAL=stages.length;
+let current=0,animating=false;
+function showStage(i){
+  if(i<0||i>=TOTAL||animating)return;
+  animating=true;
+  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+  let el=document.getElementById(stages[i]);el.classList.add('active');current=i;
+  document.getElementById('indicator').textContent=(i+1)+' / '+TOTAL;
+  document.getElementById('prog').style.width=((i+1)/TOTAL*100)+'%';
+  let reveals=el.querySelectorAll('.reveal'),maxDelay=0;
+  reveals.forEach(r=>{r.classList.remove('in');let d=parseInt(r.dataset.delay)||0;if(d>maxDelay)maxDelay=d;setTimeout(()=>r.classList.add('in'),d)});
+  setTimeout(()=>{animating=false},maxDelay+500);
+}
+function nextStage(){showStage(current+1)}function prevStage(){showStage(current-1)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();nextStage()}
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();prevStage()}
+});
+showStage(0);
+</script>
+</body>
+</html>
