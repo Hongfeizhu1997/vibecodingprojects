@@ -98,8 +98,9 @@ body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--bg
     <div class="agenda-item"><div class="agenda-num">1</div><div class="agenda-text"><div class="t">POC Scope & Overall Result</div><div class="d">Data composition, holdout design, Top-1 match rate</div></div></div>
     <div class="agenda-item"><div class="agenda-num">2</div><div class="agenda-text"><div class="t">Validation Methodology</div><div class="d">Why blind-test performance differs from production behaviour</div></div></div>
     <div class="agenda-item"><div class="agenda-num">3</div><div class="agenda-text"><div class="t">Validated — Consistent Across Segments</div><div class="d">Channel, segment, country — all stable, no intervention needed</div></div></div>
-    <div class="agenda-item"><div class="agenda-num">4</div><div class="agenda-text"><div class="t">Adjustments Recommended</div><div class="d">Term duration, PSP coverage, overall posture — 3 targeted improvements</div></div></div>
-    <div class="agenda-item"><div class="agenda-num">5</div><div class="agenda-text"><div class="t">SLA Analysis & Summary</div><div class="d">Symmetric SLA confusion + comprehensive findings with recommendations</div></div></div>
+    <div class="agenda-item"><div class="agenda-num">4</div><div class="agenda-text"><div class="t">Validated — Strong Across Product Dimensions</div><div class="d">Type, term and SLA — accurate across the product, not just the customer</div></div></div>
+    <div class="agenda-item"><div class="agenda-num">5</div><div class="agenda-text"><div class="t">Adjustments Recommended</div><div class="d">Term duration, PSP coverage, overall posture — 3 targeted improvements</div></div></div>
+    <div class="agenda-item"><div class="agenda-num">6</div><div class="agenda-text"><div class="t">SLA Analysis & Summary</div><div class="d">Symmetric SLA confusion + comprehensive findings with recommendations</div></div></div>
   </div>
 </div>
 </div>
@@ -219,10 +220,44 @@ body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--bg
 </div>
 </div>
 
+<!-- ═══ s5b: VALIDATED PRODUCT DIMENSIONS ═══ -->
+<div class="stage" id="s5b">
+<div class="stage-inner">
+  <div class="scene-label reveal" data-delay="100">04 · Validated — Strong Across Product Dimensions</div>
+  <div class="scene-title reveal" data-delay="150">Beyond segments — the model also gets the product right across type, term and SLA</div>
+  <div class="split-row reveal" data-delay="300" style="align-items:start">
+    <div>
+      <h4 style="font-size:.56rem;color:var(--sub);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.04em">By Warranty Type — Top-1 Match</h4>
+      <div class="two-col" style="gap:.5rem;margin-bottom:.6rem">
+        <div class="card" style="text-align:center;border-color:var(--accent2)"><div style="font-size:.44rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">Premier</div><div style="font-size:1.15rem;font-weight:800;color:var(--accent2);margin:.1rem 0">86.8%</div><div style="font-size:.44rem;color:var(--dim)">2,016 · 87.8% of volume</div></div>
+        <div class="card" style="text-align:center;border-color:var(--accent2)"><div style="font-size:.44rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">ESS</div><div style="font-size:1.15rem;font-weight:800;color:var(--accent2);margin:.1rem 0">83.2%</div><div style="font-size:.44rem;color:var(--dim)">113 · 4.9% of volume</div></div>
+      </div>
+      <h4 style="font-size:.56rem;color:var(--sub);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.04em">By Warranty Term — Top-1 Match</h4>
+      <div class="three-col" style="gap:.5rem">
+        <div class="card" style="text-align:center;border-color:var(--accent2)"><div style="font-size:.44rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">36 Months</div><div style="font-size:1.05rem;font-weight:800;color:var(--accent2);margin:.1rem 0">86.1%</div><div style="font-size:.44rem;color:var(--dim)">1,313 · 57.2%</div></div>
+        <div class="card" style="text-align:center;border-color:var(--accent2)"><div style="font-size:.44rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">60 Months</div><div style="font-size:1.05rem;font-weight:800;color:var(--accent2);margin:.1rem 0">84.7%</div><div style="font-size:.44rem;color:var(--dim)">940 · 40.9%</div></div>
+        <div class="card" style="text-align:center;border-color:var(--accent2)"><div style="font-size:.44rem;color:var(--sub);text-transform:uppercase;letter-spacing:.04em">84 Months</div><div style="font-size:1.05rem;font-weight:800;color:var(--accent2);margin:.1rem 0">87.5%</div><div style="font-size:.44rem;color:var(--dim)">24 · 1.0%</div></div>
+      </div>
+    </div>
+    <div>
+      <h4 style="font-size:.56rem;color:var(--sub);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.04em">Top Product Combinations — Top-1 Match</h4>
+      <table class="comptable">
+        <tr><th>Type × Term</th><th style="text-align:right">n</th><th style="text-align:right">Top-1</th></tr>
+        <tr><td><strong>Premier × 36M</strong></td><td style="text-align:right">1,121</td><td style="text-align:right;color:var(--accent2);font-weight:700">87.6%</td></tr>
+        <tr><td><strong>Premier × 60M</strong></td><td style="text-align:right">855</td><td style="text-align:right;color:var(--accent2);font-weight:700">86.5%</td></tr>
+        <tr><td><strong>Premier × 84M</strong></td><td style="text-align:right">22</td><td style="text-align:right;color:var(--accent2);font-weight:700">86.4%</td></tr>
+        <tr><td><strong>ESS × 36M</strong></td><td style="text-align:right">68</td><td style="text-align:right;color:var(--accent2);font-weight:700">83.8%</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="alert alert-green reveal" data-delay="450"><strong>SLA is part of the product definition — and it lands too:</strong> 1,956 of 2,296 contracts (85.2%) are exact product matches with Type + Term + SLA all correct. SLA-tier confusion is limited to just 108 contracts (4.7%).</div>
+</div>
+</div>
+
 <!-- ═══ s6: ADJUSTMENTS ═══ -->
 <div class="stage" id="s6">
 <div class="stage-inner">
-  <div class="scene-label reveal" data-delay="100">04 · Adjustments Recommended</div>
+  <div class="scene-label reveal" data-delay="100">05 · Adjustments Recommended</div>
   <div class="scene-title reveal" data-delay="150">The model is net-conservative — 3 adjustments push toward more appropriate coverage levels</div>
   <div class="alert reveal" data-delay="200" style="margin-bottom:.6rem">When the model is wrong, it leans conservative (36.2% of misses recommend cheaper/shorter vs 28.2% more expensive/longer). The seller can always downgrade, so aggressive errors are lower-risk. All 3 adjustments push in the same direction.</div>
   <div class="three-col reveal" data-delay="350">
@@ -248,7 +283,7 @@ body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--bg
 <!-- ═══ s7: SLA ═══ -->
 <div class="stage" id="s7">
 <div class="stage-inner">
-  <div class="scene-label reveal" data-delay="100">05 · SLA Analysis</div>
+  <div class="scene-label reveal" data-delay="100">06 · SLA Analysis</div>
   <div class="scene-title reveal" data-delay="150">SLA confusion is symmetric (51:57) — the model cannot distinguish 24×7 from NBD well enough</div>
   <div class="split-row reveal" data-delay="250" style="align-items:stretch">
     <div style="display:flex;flex-direction:column;justify-content:space-between">
@@ -285,7 +320,7 @@ body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--bg
 <!-- ═══ s8: SUMMARY ═══ -->
 <div class="stage" id="s8">
 <div class="stage-inner">
-  <div class="scene-label reveal" data-delay="100">06 · Summary & Recommendations</div>
+  <div class="scene-label reveal" data-delay="100">07 · Summary & Recommendations</div>
   <div class="scene-title reveal" data-delay="150">One finding stands above all others: 46.8% of errors are term mix-ups — fix this first</div>
   <table class="summary-table reveal" data-delay="300">
     <tr><th style="width:18%">Dimension</th><th style="width:16%">Result</th><th style="width:20%">Finding</th><th style="width:26%">Recommendation</th><th style="width:8%">P</th><th style="width:12%">Expected Impact</th></tr>
@@ -359,7 +394,7 @@ body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--bg
 </div>
 
 <script>
-const stages=['s0','s1','s2','s3','s4','s5','s6','s7','s8'],TOTAL=stages.length;
+const stages=['s0','s1','s2','s3','s4','s5','s5b','s6','s7','s8'],TOTAL=stages.length;
 let current=0,animating=false;
 function showStage(i){
   if(i<0||i>=TOTAL||animating)return;
