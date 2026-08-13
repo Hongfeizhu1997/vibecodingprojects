@@ -38,7 +38,6 @@ tr:last-child td{border-bottom:none}
 .tag-premier{background:#d4e6f1;color:#1a5276}
 .tag-psp{background:#f9ebea;color:#922b21}
 .tag-ess{background:#fef9e7;color:#7d6608}
-.tag-pess{background:#e8daef;color:#6c3483}
 .mapping-note{background:#f5f5f5;border:1px dashed #bbb;padding:10px 14px;border-radius:6px;font-size:12px;color:#555;margin-bottom:16px;line-height:1.6}
 </style>
 </head>
@@ -134,9 +133,9 @@ tr:last-child td{border-bottom:none}
 </table>
 </div></div>
 
-<!-- ═══ D. WARRANTY TERM × TYPE CROSS ═══ -->
+<!-- ═══ C. WARRANTY TERM × TYPE CROSS ═══ -->
 <div class="section" id="term-type-cross">
-<div class="sec-hdr"><h2>D. Warranty Term × Type Cross Matrix (Aligns with IDG "Service Product Analysis")</h2></div>
+<div class="sec-hdr"><h2>C. Warranty Term × Type Cross Matrix (Aligns with IDG "Service Product Analysis")</h2></div>
 <div class="sec-body">
 
 <h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #42a5f5;padding-left:10px">By Warranty Term</h3>
@@ -163,9 +162,9 @@ tr:last-child td{border-bottom:none}
 </table>
 </div></div>
 
-<!-- ═══ E. CHANNEL × SEGMENT ═══ -->
+<!-- ═══ D. CHANNEL × SEGMENT ═══ -->
 <div class="section" id="channel-segment">
-<div class="sec-hdr"><h2>E. Hit Rate by Channel × Segment</h2></div>
+<div class="sec-hdr"><h2>D. Hit Rate by Channel × Segment</h2></div>
 <div class="sec-body">
 <p class="insight">All 4 combinations within a tight 83-86% band (Top-1). Model generalizes evenly across GTM channels — no stratification bias. Direct SMB (n=13) is perfect but sample too small to draw conclusions.</p>
 <table>
@@ -177,9 +176,9 @@ tr:last-child td{border-bottom:none}
 </table>
 </div></div>
 
-<!-- ═══ F. CATEGORY & PRODUCT LINE ═══ -->
+<!-- ═══ E. CATEGORY & PRODUCT LINE ═══ -->
 <div class="section" id="product-line">
-<div class="sec-hdr"><h2>F. Category & Product Line Drill-Down (Aligns with IDG "Country Drill-Down")</h2></div>
+<div class="sec-hdr"><h2>E. Category & Product Line Drill-Down (Aligns with IDG "Country Drill-Down")</h2></div>
 <div class="sec-body">
 
 <h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #42a5f5;padding-left:10px">By Category</h3>
@@ -222,9 +221,9 @@ tr:last-child td{border-bottom:none}
 </table>
 </div></div>
 
-<!-- ═══ H. BUSINESS VERTICAL ═══ -->
+<!-- ═══ F. BUSINESS VERTICAL ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>H. Hit Rate by Business Vertical (Top 10)</h2></div>
+<div class="sec-hdr"><h2>F. Hit Rate by Business Vertical (Top 10)</h2></div>
 <div class="sec-body">
 <table>
 <tr><th>Vertical</th><th class="num">n</th><th class="num">Top-1</th><th>Assessment</th></tr>
@@ -241,9 +240,9 @@ tr:last-child td{border-bottom:none}
 </table>
 </div></div>
 
-<!-- ═══ I. MIX EFFECT ═══ -->
+<!-- ═══ G. MIX EFFECT ═══ -->
 <div class="section" id="mix-effect">
-<div class="sec-hdr"><h2>I. Mix Effect Diagnosis (Warranty Type Composition)</h2></div>
+<div class="sec-hdr"><h2>G. Mix Effect Diagnosis (Warranty Type Composition)</h2></div>
 <div class="sec-body">
 <p class="insight">Premier (87.8% of volume, 86.8% Top-1) inflates the blended rate by +1.6pp. PSP Server at 7.1% and 68.5% drags it down by -1.2pp. If PSP Server share grows to 15% in production (e.g., more enterprise deals), the blended Top-1 would drop from 85.2% to ~82.5% purely from mix shift — not model degradation.</p>
 <table>
@@ -256,9 +255,9 @@ tr:last-child td{border-bottom:none}
 <div class="warn" style="margin-top:10px"><strong>Forward-looking:</strong> If PSP Server share increases in production (wider ISG enterprise adoption), the blended Top-1 will mechanically decline due to mix effect. Pre-deployment: establish <strong>per-type Hit Rate baselines</strong>; post-deployment: monitor per-type Hit Rate alongside blended rate to distinguish real degradation from mix shift. Same principle as IDG's New CTO/Copied CTO mix effect analysis.</div>
 </div></div>
 
-<!-- ═══ J. ERROR DECOMPOSITION ═══ -->
+<!-- ═══ H. ERROR DECOMPOSITION ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>J. Error Decomposition: How Far Is the Miss from the Actual Product?</h2></div>
+<div class="sec-hdr"><h2>H. Error Decomposition: How Far Is the Miss from the Actual Product?</h2></div>
 <div class="sec-body">
 <p class="insight">Each miss is a case where the model's #1 product recommendation was not the product the customer bought. We group these by how far the prediction deviates — from adjacent products in the same warranty family to completely different warranty types.</p>
 <table>
@@ -270,9 +269,9 @@ tr:last-child td{border-bottom:none}
 <div class="insight" style="margin-top:10px"><strong>Key insight:</strong> 78.5% of misses are within the same warranty type — the model knows which warranty category the customer needs. The problem is discriminating between <em>distinct products within that category</em>: different term durations or different SLA tiers. Only 21.5% of misses are genuine cross-category errors (e.g., confusing PSP Server with Premier). This suggests the model's category-level features are strong; its product-level differentiation needs work.</div>
 </div></div>
 
-<!-- ═══ K. ERROR DIRECTION ANALYSIS ═══ -->
+<!-- ═══ I. ERROR DIRECTION ANALYSIS ═══ -->
 <div class="section" id="error-direction">
-<div class="sec-hdr"><h2>K. Error Direction: Is the Model Aggressive or Conservative?</h2></div>
+<div class="sec-hdr"><h2>I. Error Direction: Is the Model Aggressive or Conservative?</h2></div>
 <div class="sec-body">
 <p class="insight"><strong>The model is slightly conservative, but the dominant error is term-duration confusion — not up-tier or down-tier bias.</strong> Of the 340 missed contracts, 46.8% recommend the wrong term duration (a different product within the same warranty type, e.g. 60M vs 36M), and 31.8% confuse adjacent products that differ only in SLA tier (same type+term, e.g. 24x7 vs NBD). Only 21.5% are genuine cross-type misclassification, with downgrades outnumbering upgrades 1.7:1.</p>
 
@@ -312,9 +311,9 @@ tr:last-child td{border-bottom:none}
 <div class="insight" style="margin-top:10px"><strong>Key insight:</strong> The two largest single mismatch patterns (76 + 60 = 136 contracts) are both within Premier, confusing the 60-month and 36-month products. Fixing term-duration prediction alone could recover nearly half of all errors. The 60M→36M direction (76x) is the harmful one — customer wants the 5-year product, model suggests the 3-year one. The reverse (36M→60M, 60x) is actually a reasonable upsell that a seller might accept.</div>
 </div></div>
 
-<!-- ═══ L. PRIORITY IMPROVEMENT ROADMAP ═══ -->
+<!-- ═══ J. PRIORITY IMPROVEMENT ROADMAP ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>L. Improvement Priorities</h2></div>
+<div class="sec-hdr"><h2>J. Improvement Priorities</h2></div>
 <div class="sec-body">
 <table>
 <tr><th style="width:40px">P</th><th>Target</th><th>Current Top-1</th><th>Volume</th><th>Action</th></tr>
@@ -322,16 +321,15 @@ tr:last-child td{border-bottom:none}
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>PSP Server × 60 Months</strong></td><td style="color:#c62828">48.8%</td><td>41 (1.8%)</td><td>Audit training data: class imbalance likely. Add PSP Server 60M samples or use class-weighted loss</td></tr>
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>Premier × 48 Months</strong></td><td style="color:#c62828">50.0%</td><td>16 (0.7%)</td><td>48-Month term is rare across all types. Add synthetic or augmented samples</td></tr>
 <tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>Adjacent Product Differentiation</strong></td><td style="color:#f57c00">108 contracts — adjacent products confused</td><td>108 (31.8% of misses)</td><td>Same type+term, but the two SLA-tier variants are distinct products being confused. Add features that separate these adjacent products: hardware criticality, customer industry, HW price tier, subsegment. Balanced error direction — model needs better differentiation, not bias correction</td></tr>
-<tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>Confidence Calibration</strong></td><td style="color:#f57c00">Flat</td><td>All 2,296</td><td>Apply Platt scaling. Critical for production — low confidence must mean low trust</td></tr>
 <tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>PSP Server overall</strong></td><td style="color:#f57c00">68.5%</td><td>162 (7.1%)</td><td>Augment training data. Not an adjacent-product confusion problem (match rate is equally low when SLA tier is ignored) — genuine rank-1 weakness</td></tr>
 <tr><td style="background:#1565c0;color:#fff;text-align:center;font-weight:700">P2</td><td><strong>ThinkAgile HX650 V4</strong></td><td style="color:#1565c0">69.8%</td><td>53 (2.3%)</td><td>Top-2 is 96.2% — rank-1 calibration. Check feature importance for HCI product line</td></tr>
 <tr><td style="background:#1565c0;color:#fff;text-align:center;font-weight:700">P2</td><td><strong>ThinkSystem SR250 V3</strong></td><td style="color:#1565c0">80.7%</td><td>140 (6.1%)</td><td>Largest below-avg server line. Poor Top-2 (84.3%) — not just rank-1</td></tr>
 </table>
 </div></div>
 
-<!-- ═══ M. PILOT READINESS ═══ -->
+<!-- ═══ K. PILOT READINESS ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>M. POC → Pilot Readiness Assessment</h2></div>
+<div class="sec-hdr"><h2>K. POC → Pilot Readiness Assessment</h2></div>
 <div class="sec-body">
 <table>
 <tr><th>Dimension</th><th>Status</th><th>Evidence</th></tr>
@@ -339,8 +337,7 @@ tr:last-child td{border-bottom:none}
 <tr><td><strong>Generalization</strong></td><td style="color:#2e7d32">✅ Good</td><td>Channel × Segment and Business Vertical all within tight band. No bias detected</td></tr>
 <tr><td><strong>Product Differentiation</strong></td><td style="color:#f57c00">⚠ Moderate</td><td>108 contracts: adjacent product confusion within same warranty family (same type+term, different SLA tier). Acceptable for Premier-only pilot; needs feature work before full scope</td></tr>
 <tr><td><strong>Long-tail Coverage</strong></td><td style="color:#c62828">🔴 Poor</td><td>PSP Server (7.1%) and ESS (4.9%): significant gaps. Recommend Premier-only pilot scope</td></tr>
-<tr><td><strong>Confidence Signal</strong></td><td style="color:#c62828">🔴 Broken</td><td>Flat calibration across tiers. Fix before relying on confidence for escalation</td></tr>
-<tr><td><strong>Pilot Recommendation</strong></td><td style="color:#f57f17">⚠ Conditional</td><td><strong>Recommend Premier-only pilot</strong> (87.8% of volume, 86.8% Top-1). Fix P0 items (Term Discrimination, PSP Server) before expanding scope. Deploy with human-in-the-loop — show Top-2 options when confidence is uncertain.</td></tr>
+<tr><td><strong>Pilot Recommendation</strong></td><td style="color:#f57f17">⚠ Conditional</td><td><strong>Recommend Premier-only pilot</strong> (87.8% of volume, 86.8% Top-1). Fix P0 items (Term Discrimination, PSP Server) before expanding scope. Deploy with human-in-the-loop — show Top-2 options when the model is uncertain.</td></tr>
 </table>
 </div></div>
 
