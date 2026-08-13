@@ -45,7 +45,7 @@ tr:last-child td{border-bottom:none}
 <body>
 <nav class="navbar">
 <span class="brand">ISG SSR POC — Operational KPI Report (Holdout Evaluation)</span>
-<a href="#summary">Executive Summary</a><a href="#warranty-type">Warranty Type</a><a href="#confidence">Confidence</a><a href="#term-type-cross">Term × Type</a><a href="#channel-segment">Channel × Segment</a><a href="#product-line">Product Line</a><a href="#mix-effect">Mix Effect</a><a href="#error-direction">Error Direction</a>
+<a href="#summary">Executive Summary</a><a href="#warranty-type">Warranty Type</a><a href="#term-type-cross">Term × Type</a><a href="#channel-segment">Channel × Segment</a><a href="#product-line">Product Line</a><a href="#mix-effect">Mix Effect</a><a href="#error-direction">Error Direction</a>
 <span style="margin-left:auto;font-size:11px;color:#90caf9">NA Holdout | n=2,296 | Generated: Aug 11, 2026</span>
 </nav>
 <div class="page">
@@ -60,7 +60,6 @@ tr:last-child td{border-bottom:none}
 &bull; <strong>Hit = complete product match:</strong> A recommendation is correct only when the predicted product (Warranty Type + Term + SLA combined) exactly matches the product the customer bought. Example: "36M Premier 24x7" and "36M Premier NBD" are two distinct products.<br>
 &bull; <strong>Acceptance Rate (IDG) = Top-1 Product Match (POC):</strong> "Seller kept the default recommendation" maps to "Model's #1 predicted product matches the actual purchase."<br>
 &bull; <strong>Coverage (IDG) → N/A (POC):</strong> All holdout rows have predictions (100% coverage).<br>
-&bull; <strong>AI vs Non-AI (IDG) → Confidence Tier (POC):</strong> Recommendation source stratification becomes confidence tier (High/Mid/Low).<br>
 &bull; <strong>Config Origin (IDG) → Warranty Type (POC):</strong> Both represent "acceptance difficulty across contexts" — Warranty Type is the strongest performance differentiator in this POC.<br>
 &bull; <strong>Limitation:</strong> This is offline holdout simulation, not live transactions. Cannot observe Change Rate, Attach Rate, or real seller behavior. Hit Rate measures "how accurate is the model" but not "how much do sellers trust it."
 </div>
@@ -101,9 +100,8 @@ tr:last-child td{border-bottom:none}
 <tr><td>1</td><td>Overall Top-1 85.2% under the strict complete-product-match definition (Type + Term + SLA). Top-2 at 91.8% means escalation covers most misses.</td><td style="color:#f57f17">🟡 Moderate</td></tr>
 <tr><td>2</td><td><strong>PSP Server × 60 Months: 48.8%.</strong> More misses than hits in this cell (41 contracts). #1 priority for improvement.</td><td style="color:#c62828">🔴 Critical</td></tr>
 <tr><td>3</td><td><strong>108 contracts (31.8% of misses) are adjacent-product confusion:</strong> model picks the right warranty type+term but the wrong SLA tier within the same product family (e.g., 36M Premier 24x7 vs 36M Premier NBD). Not a separate defect — two distinct products being confused.</td><td style="color:#f57c00">🟡 Warning</td></tr>
-<tr><td>4</td><td>Confidence calibration is essentially <strong>flat</strong> (Low 84.4%, Mid 86.4%, High 84.7%). Model's probability scores do not predict correctness — cannot be used for escalation logic.</td><td style="color:#f57c00">🟡 Warning</td></tr>
-<tr><td>5</td><td>Channel × Segment and Country: all within 3pp. No stratification bias — model generalizes evenly across GTM dimensions.</td><td style="color:#2e7d32">✅ Good</td></tr>
-<tr><td>6</td><td>ThinkAgile HX650 V4 at 69.8% is the weakest product line, but Top-2 recovers to 96.2%. Rank-1 calibration issue, not a coverage problem.</td><td style="color:#f57c00">🟡 Warning</td></tr>
+<tr><td>4</td><td>Channel × Segment: all within 3pp. No stratification bias — model generalizes evenly across GTM dimensions.</td><td style="color:#2e7d32">✅ Good</td></tr>
+<tr><td>5</td><td>ThinkAgile HX650 V4 at 69.8% is the weakest product line, but Top-2 recovers to 96.2%. Rank-1 calibration issue, not a coverage problem.</td><td style="color:#f57c00">🟡 Warning</td></tr>
 </table>
 </div></div>
 
@@ -133,22 +131,7 @@ tr:last-child td{border-bottom:none}
 <tr><td><span class="tag tag-premier">Premier</span></td><td class="num">2,016</td><td class="num">87.8%</td><td class="num" style="background:#2e7d32;color:#fff">86.8%</td><td class="num">93.2%</td><td class="num">93.5%</td><td class="num" style="color:#2e7d32">+1.6pp</td><td>Core competency</td></tr>
 <tr><td><span class="tag tag-psp">PSP Server</span></td><td class="num">162</td><td class="num">7.1%</td><td class="num" style="background:#c62828;color:#fff">68.5%</td><td class="num" style="background:#c62828;color:#fff">77.8%</td><td class="num" style="background:#f57f17;color:#fff">88.9%</td><td class="num" style="color:#c62828">-16.7pp</td><td>🔴 Genuine rank-1 failure</td></tr>
 <tr><td><span class="tag tag-ess">ESS</span></td><td class="num">113</td><td class="num">4.9%</td><td class="num" style="background:#f57f17;color:#fff">83.2%</td><td class="num" style="background:#f57f17;color:#fff">89.4%</td><td class="num">95.6%</td><td class="num" style="color:#c62828">-2.0pp</td><td>Below average, moderate volume</td></tr>
-<tr><td><span class="tag tag-pess">PESS</span></td><td class="num">5</td><td class="num">0.2%</td><td class="num" style="background:#c62828;color:#fff">40.0%</td><td class="num" style="background:#c62828;color:#fff">40.0%</td><td class="num" style="background:#2e7d32;color:#fff">100.0%</td><td class="num" style="color:#c62828">-45.2pp</td><td>Negligible volume — monitor</td></tr>
 </table>
-</div></div>
-
-<!-- ═══ C. BY CONFIDENCE TIER ═══ -->
-<div class="section" id="confidence">
-<div class="sec-hdr"><h2>C. Hit Rate by Confidence Tier (Aligns with IDG "AI vs Non-AI")</h2></div>
-<div class="sec-body">
-<p class="warn"><strong>Confidence scores are uninformative.</strong> Under the complete product-match definition (Type + Term + SLA), all three tiers are within a 2pp band (84.4%–86.4%). The model's addon probability scores do not predict correctness. Low-confidence predictions are nearly as accurate as high-confidence ones. Cannot use confidence for escalation logic without recalibration.</p>
-<table>
-<tr><th>Confidence Tier</th><th class="num">Contracts</th><th class="num">Avg Max Addon Prob</th><th class="num">Top-1 Hit Rate</th><th>Expected</th><th>Actual</th></tr>
-<tr><td>Low</td><td class="num">765</td><td class="num">0.68</td><td class="num" style="background:#f57f17;color:#fff">84.4%</td><td>Should be lowest</td><td>Lowest — correct direction</td></tr>
-<tr><td>Mid</td><td class="num">765</td><td class="num">0.71</td><td class="num" style="background:#f57f17;color:#fff">86.4%</td><td>Should be middle</td><td>Highest — inverted</td></tr>
-<tr><td>High</td><td class="num">765</td><td class="num">0.75</td><td class="num" style="background:#f57f17;color:#fff">84.7%</td><td>Should be highest</td><td>Near low — flat</td></tr>
-</table>
-<div class="insight" style="margin-top:10px"><strong>Assessment:</strong> The probability gap between Low (0.68) and High (0.75) is only 0.07 — the model's confidence range is compressed. Combined with near-flat accuracy across tiers, the addon probability is essentially noise. Recommendation: apply Platt scaling or isotonic regression on the validation set before using confidence in production. Alternatively, derive a separate confidence signal from the label probability gap between top-1 and top-2 rankings.</div>
 </div></div>
 
 <!-- ═══ D. WARRANTY TERM × TYPE CROSS ═══ -->
@@ -239,18 +222,6 @@ tr:last-child td{border-bottom:none}
 </table>
 </div></div>
 
-<!-- ═══ G. COUNTRY ═══ -->
-<div class="section">
-<div class="sec-hdr"><h2>G. Country Drill-Down — NA Internal</h2></div>
-<div class="sec-body">
-<p class="insight">US and CA are within 2.3pp. No geographic bias within NA.</p>
-<table>
-<tr><th>Country</th><th class="num">Contracts</th><th class="num">Share</th><th class="num">Top-1</th><th class="num">Top-2</th></tr>
-<tr><td>United States</td><td class="num">1,779</td><td class="num">77.5%</td><td class="num" style="background:#f57f17;color:#fff">84.7%</td><td class="num">91.4%</td></tr>
-<tr><td>Canada</td><td class="num">516</td><td class="num">22.5%</td><td class="num" style="background:#f57f17;color:#fff">87.0%</td><td class="num">93.2%</td></tr>
-</table>
-</div></div>
-
 <!-- ═══ H. BUSINESS VERTICAL ═══ -->
 <div class="section">
 <div class="sec-hdr"><h2>H. Hit Rate by Business Vertical (Top 10)</h2></div>
@@ -280,7 +251,6 @@ tr:last-child td{border-bottom:none}
 <tr><td>Premier</td><td class="num">87.8%</td><td class="num" style="background:#2e7d32;color:#fff">86.8%</td><td class="num" style="color:#2e7d32">76.2pp</td><td class="num" style="color:#2e7d32">+1.6pp</td></tr>
 <tr><td>PSP Server</td><td class="num">7.1%</td><td class="num" style="background:#c62828;color:#fff">68.5%</td><td class="num" style="color:#c62828">4.9pp</td><td class="num" style="color:#c62828">-1.2pp</td></tr>
 <tr><td>ESS</td><td class="num">4.9%</td><td class="num" style="background:#f57f17;color:#fff">83.2%</td><td class="num">4.1pp</td><td class="num">-0.1pp</td></tr>
-<tr><td>PESS</td><td class="num">0.2%</td><td class="num" style="background:#c62828;color:#fff">40.0%</td><td class="num">0.1pp</td><td class="num">-0.1pp</td></tr>
 <tr style="font-weight:700;background:#f0f2f5"><td>BLENDED</td><td class="num">100%</td><td class="num">85.2%</td><td class="num">85.2pp</td><td class="num">—</td></tr>
 </table>
 <div class="warn" style="margin-top:10px"><strong>Forward-looking:</strong> If PSP Server share increases in production (wider ISG enterprise adoption), the blended Top-1 will mechanically decline due to mix effect. Pre-deployment: establish <strong>per-type Hit Rate baselines</strong>; post-deployment: monitor per-type Hit Rate alongside blended rate to distinguish real degradation from mix shift. Same principle as IDG's New CTO/Copied CTO mix effect analysis.</div>
@@ -311,7 +281,7 @@ tr:last-child td{border-bottom:none}
 <tr><th>Error Type</th><th class="num">Count</th><th class="num">% of Misses</th><th>Pattern</th><th>Business Impact</th></tr>
 <tr><td style="color:#1565c0"><strong>Adjacent Product (SLA tier)</strong></td><td class="num">108</td><td class="num">31.8%</td><td>Same type+term, but the two distinct SLA-tier products are confused (e.g. Premier 36M 24x7 ↔ Premier 36M NBD)</td><td style="color:#f57f17">Trust erosion — seller must manually correct to the right product</td></tr>
 <tr><td style="color:#f57c00"><strong>Wrong Term Duration</strong></td><td class="num">159</td><td class="num">46.8%</td><td>60M ↔ 36M products confused within the same warranty type</td><td style="color:#c62828">Largest single error category — 60M→36M loses revenue, 36M→60M is acceptable upsell</td></tr>
-<tr><td style="color:#c62828"><strong>Product Downgrade</strong></td><td class="num">46</td><td class="num">13.5%</td><td>PSP Server → Premier, PESS → lower</td><td style="color:#c62828">Revenue loss: premium product swapped for standard</td></tr>
+<tr><td style="color:#c62828"><strong>Product Downgrade</strong></td><td class="num">46</td><td class="num">13.5%</td><td>PSP Server → Premier</td><td style="color:#c62828">Revenue loss: premium product swapped for standard</td></tr>
 <tr><td style="color:#2e7d32"><strong>Product Upgrade</strong></td><td class="num">27</td><td class="num">7.9%</td><td>ESS → Premier, Premier → PSP Server</td><td style="color:#1565c0">Acceptable — seller can always downgrade back</td></tr>
 </table>
 
@@ -366,7 +336,7 @@ tr:last-child td{border-bottom:none}
 <table>
 <tr><th>Dimension</th><th>Status</th><th>Evidence</th></tr>
 <tr><td><strong>Core Accuracy (strict)</strong></td><td style="color:#f57f17">🟡 Adequate</td><td>Top-1 85.2%, Top-2 91.8%. Pilot-worthy for Premier scope</td></tr>
-<tr><td><strong>Generalization</strong></td><td style="color:#2e7d32">✅ Good</td><td>Channel × Segment, Country, Business Vertical all within tight band. No bias detected</td></tr>
+<tr><td><strong>Generalization</strong></td><td style="color:#2e7d32">✅ Good</td><td>Channel × Segment and Business Vertical all within tight band. No bias detected</td></tr>
 <tr><td><strong>Product Differentiation</strong></td><td style="color:#f57c00">⚠ Moderate</td><td>108 contracts: adjacent product confusion within same warranty family (same type+term, different SLA tier). Acceptable for Premier-only pilot; needs feature work before full scope</td></tr>
 <tr><td><strong>Long-tail Coverage</strong></td><td style="color:#c62828">🔴 Poor</td><td>PSP Server (7.1%) and ESS (4.9%): significant gaps. Recommend Premier-only pilot scope</td></tr>
 <tr><td><strong>Confidence Signal</strong></td><td style="color:#c62828">🔴 Broken</td><td>Flat calibration across tiers. Fix before relying on confidence for escalation</td></tr>
