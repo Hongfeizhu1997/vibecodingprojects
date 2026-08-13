@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ISG SSR POC — Distribution Review</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#222;font-size:14px}
+.page{max-width:1160px;margin:0 auto;padding:20px 24px}
+.hero{background:linear-gradient(135deg,#1a237e,#283593);color:#fff;border-radius:10px;padding:34px 32px;margin-bottom:24px;text-align:center}
+.hero h1{font-size:24px;font-weight:800;margin-bottom:6px}
+.hero .sub{font-size:14px;opacity:.85;margin-bottom:22px}
+.hero .metrics{display:flex;justify-content:center;gap:56px;flex-wrap:wrap}
+.hero .metric .num{font-size:34px;font-weight:800}
+.hero .metric .lbl{font-size:11px;opacity:.72;text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+.section{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:22px;overflow:hidden}
+.sec-hdr{background:#1a237e;color:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between}
+.sec-hdr h2{font-size:17px;font-weight:600}
+.sec-hdr .num-badge{font-size:12px;background:rgba(255,255,255,.16);padding:3px 10px;border-radius:12px}
+.sec-body{padding:20px 22px}
+.intro{font-size:13.5px;color:#444;line-height:1.6;margin-bottom:16px}
+.intro strong{color:#1a237e}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:860px){.grid-2,.grid-3{grid-template-columns:1fr}}
+.panel{border:1px solid #e0e0e0;border-radius:8px;padding:14px 16px}
+.panel h3{font-size:13px;font-weight:700;color:#37474f;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.dot-real{background:#1a237e}
+.dot-ai{background:#059669}
+/* distribution bars */
+.dist-row{display:flex;align-items:center;margin-bottom:9px;font-size:12px}
+.dist-label{width:90px;flex-shrink:0;font-weight:600;color:#37474f}
+.dist-bar{flex:1;height:20px;background:#eef0f4;border-radius:4px;position:relative;overflow:hidden}
+.dist-fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;color:#fff;font-size:10.5px;font-weight:700;min-width:34px}
+.dist-real{background:#1a237e}
+.dist-ai{background:#059669}
+.dist-val{width:56px;text-align:right;font-size:12px;font-weight:700;color:#222;flex-shrink:0;font-family:'Consolas',monospace}
+/* side-by-side paired bars */
+.pair-row{display:flex;align-items:center;margin-bottom:10px;font-size:12px}
+.pair-label{width:120px;flex-shrink:0;font-weight:600;color:#37474f}
+.pair-bars{flex:1}
+.pair-line{display:flex;align-items:center;margin-bottom:2px}
+.pair-line .tag{width:64px;flex-shrink:0;font-size:10.5px;font-weight:700}
+.pair-line .tag-real{color:#1a237e}
+.pair-line .tag-ai{color:#059669}
+.pair-line .bar{height:14px;background:#eef0f4;border-radius:3px;flex:1;overflow:hidden;position:relative}
+.pair-line .fill{height:100%;border-radius:3px}
+.pair-line .val{width:52px;text-align:right;font-size:11.5px;font-weight:700;font-family:'Consolas',monospace;flex-shrink:0}
+/* verdict cards */
+.verdict{display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.vcard{flex:1;min-width:200px;border-radius:8px;padding:16px;text-align:center}
+.vcard .big{font-size:30px;font-weight:800;margin-bottom:4px}
+.vcard .lbl{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.vcard .sub{font-size:11px;color:#666;margin-top:4px}
+.v-green{background:#e8f5e9;border:1.5px solid #2e7d32}
+.v-green .big{color:#2e7d32}.v-green .lbl{color:#1b5e20}
+.v-amber{background:#fff3e0;border:1.5px solid #f57c00}
+.v-amber .big{color:#e65100}.v-amber .lbl{color:#bf360c}
+/* error breakdown */
+.err-table{width:100%;border-collapse:collapse;font-size:13px}
+.err-table th{background:#37474f;color:#fff;padding:8px 12px;text-align:left;font-weight:600}
+.err-table td{padding:8px 12px;border-bottom:1px solid #eee}
+.err-table tr:last-child td{border-bottom:none}
+.err-bar{height:12px;border-radius:6px;display:inline-block;vertical-align:middle;margin-right:8px}
+.callout{border-left:4px solid #1a237e;background:#eef2ff;padding:12px 16px;border-radius:0 6px 6px 0;font-size:13px;color:#1e2a5e;line-height:1.6;margin-top:14px}
+.callout-green{border-left-color:#059669;background:#ecfdf5;color:#064e3b}
+h3.sub-h{font-size:13px;font-weight:700;color:#37474f;margin:16px 0 10px;border-left:4px solid #42a5f5;padding-left:10px}
+.note{font-size:11.5px;color:#888;font-style:italic;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+<h1>ISG SSR Service Recommendation — POC Review</h1>
+<div class="sub">What customers actually bought vs. what the AI recommended · NA holdout · 2,296 contracts</div>
+<div class="metrics">
+<div class="metric"><div class="num">2,296</div><div class="lbl">Contracts</div></div>
+<div class="metric"><div class="num">85.2%</div><div class="lbl">Exact match</div></div>
+<div class="metric"><div class="num">14.8%</div><div class="lbl">To review</div></div>
+</div>
+</div>
+
+<!-- ═══ SECTION 1: THE MARKET ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>1 · The Market — What Customers Actually Bought</h2><span class="num-badge">Ground truth</span></div>
+<div class="sec-body">
+<p class="intro">Across the 2,296 holdout contracts, customer choices are highly concentrated. <strong>Premier</strong> is the dominant warranty type (87.8%), and <strong>36-month and 60-month terms</strong> cover 98.1% of all purchases. The SLA splits almost evenly between <strong>Four Hours</strong> (7×24 Four Hours) and <strong>NBD</strong>.</p>
+
+<div class="grid-2">
+<div class="panel">
+<h3><span class="dot dot-real"></span>By Warranty Type</h3>
+<div class="dist-row"><div class="dist-label">Premier</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:87.8%">87.8%</div></div><div class="dist-val">2,016</div></div>
+<div class="dist-row"><div class="dist-label">PSP Server</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:7.1%">7.1%</div></div><div class="dist-val">162</div></div>
+<div class="dist-row"><div class="dist-label">ESS</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:4.9%">4.9%</div></div><div class="dist-val">113</div></div>
+<div class="dist-row"><div class="dist-label">PESS</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:0.2%">0.2%</div></div><div class="dist-val">5</div></div>
+</div>
+<div class="panel">
+<h3><span class="dot dot-real"></span>By Warranty Term</h3>
+<div class="dist-row"><div class="dist-label">36 Months</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:57.2%">57.2%</div></div><div class="dist-val">1,313</div></div>
+<div class="dist-row"><div class="dist-label">60 Months</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:40.9%">40.9%</div></div><div class="dist-val">940</div></div>
+<div class="dist-row"><div class="dist-label">84 Months</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:1.0%">1.0%</div></div><div class="dist-val">24</div></div>
+<div class="dist-row"><div class="dist-label">48 Months</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:0.7%">0.7%</div></div><div class="dist-val">17</div></div>
+<div class="dist-row"><div class="dist-label">72 Months</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:0.1%">0.1%</div></div><div class="dist-val">2</div></div>
+</div>
+</div>
+
+<h3 class="sub-h">By SLA tier</h3>
+<div class="grid-2">
+<div class="panel">
+<div class="dist-row"><div class="dist-label">Four Hours</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:54.5%">54.5%</div></div><div class="dist-val">1,252</div></div>
+<div class="dist-row"><div class="dist-label">NBD</div><div class="dist-bar"><div class="dist-fill dist-real" style="width:45.5%">45.5%</div></div><div class="dist-val">1,044</div></div>
+</div>
+<div class="panel">
+<h3 style="font-size:12px;color:#666;font-weight:600;margin-bottom:8px">Top type × term combinations</h3>
+<table style="width:100%;font-size:12px;border-collapse:collapse">
+<tr style="color:#888;text-align:left"><th style="padding:3px 0;font-weight:600">Combination</th><th style="text-align:right">n</th><th style="text-align:right">Share</th></tr>
+<tr><td style="padding:3px 0"><strong>Premier × 36M</strong></td><td style="text-align:right">1,121</td><td style="text-align:right">48.8%</td></tr>
+<tr><td style="padding:3px 0"><strong>Premier × 60M</strong></td><td style="text-align:right">855</td><td style="text-align:right">37.2%</td></tr>
+<tr><td style="padding:3px 0">PSP × 36M</td><td style="text-align:right">119</td><td style="text-align:right">5.2%</td></tr>
+<tr><td style="padding:3px 0">ESS × 36M</td><td style="text-align:right">68</td><td style="text-align:right">3.0%</td></tr>
+<tr><td style="padding:3px 0">ESS × 60M</td><td style="text-align:right">44</td><td style="text-align:right">1.9%</td></tr>
+<tr><td style="padding:3px 0">PSP × 60M</td><td style="text-align:right">41</td><td style="text-align:right">1.8%</td></tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ═══ SECTION 2: THE AI RECOMMENDATION ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>2 · The AI Recommendation — What the Model Recommended</h2><span class="num-badge">Top-1 prediction</span></div>
+<div class="sec-body">
+<p class="intro">The model's Top-1 recommendation reproduces the market shape almost exactly — the same dominant type, the same two main terms, and the same balanced SLA split.</p>
+
+<div class="grid-2">
+<div class="panel">
+<h3><span class="dot dot-ai"></span>By Warranty Type</h3>
+<div class="dist-row"><div class="dist-label">Premier</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:90.1%">90.1%</div></div><div class="dist-val">2,068</div></div>
+<div class="dist-row"><div class="dist-label">PSP Server</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:5.5%">5.5%</div></div><div class="dist-val">126</div></div>
+<div class="dist-row"><div class="dist-label">ESS</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:4.4%">4.4%</div></div><div class="dist-val">100</div></div>
+<div class="dist-row"><div class="dist-label">PESS</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:0.1%">0.1%</div></div><div class="dist-val">2</div></div>
+</div>
+<div class="panel">
+<h3><span class="dot dot-ai"></span>By Warranty Term</h3>
+<div class="dist-row"><div class="dist-label">36 Months</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:57.8%">57.8%</div></div><div class="dist-val">1,328</div></div>
+<div class="dist-row"><div class="dist-label">60 Months</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:40.7%">40.7%</div></div><div class="dist-val">935</div></div>
+<div class="dist-row"><div class="dist-label">84 Months</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:1.0%">1.0%</div></div><div class="dist-val">23</div></div>
+<div class="dist-row"><div class="dist-label">48 Months</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:0.4%">0.4%</div></div><div class="dist-val">10</div></div>
+<div class="dist-row"><div class="dist-label">72 Months</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:0%">0%</div></div><div class="dist-val">0</div></div>
+</div>
+</div>
+
+<h3 class="sub-h">By SLA tier</h3>
+<div class="grid-2">
+<div class="panel">
+<div class="dist-row"><div class="dist-label">Four Hours</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:54.0%">54.0%</div></div><div class="dist-val">1,239</div></div>
+<div class="dist-row"><div class="dist-label">NBD</div><div class="dist-bar"><div class="dist-fill dist-ai" style="width:46.0%">46.0%</div></div><div class="dist-val">1,057</div></div>
+</div>
+<div class="panel">
+<h3 style="font-size:12px;color:#666;font-weight:600;margin-bottom:8px">Top type × term combinations</h3>
+<table style="width:100%;font-size:12px;border-collapse:collapse">
+<tr style="color:#888;text-align:left"><th style="padding:3px 0;font-weight:600">Combination</th><th style="text-align:right">n</th><th style="text-align:right">Share</th></tr>
+<tr><td style="padding:3px 0"><strong>Premier × 36M</strong></td><td style="text-align:right">1,166</td><td style="text-align:right">50.8%</td></tr>
+<tr><td style="padding:3px 0"><strong>Premier × 60M</strong></td><td style="text-align:right">872</td><td style="text-align:right">38.0%</td></tr>
+<tr><td style="padding:3px 0">PSP × 36M</td><td style="text-align:right">99</td><td style="text-align:right">4.3%</td></tr>
+<tr><td style="padding:3px 0">ESS × 36M</td><td style="text-align:right">61</td><td style="text-align:right">2.7%</td></tr>
+<tr><td style="padding:3px 0">ESS × 60M</td><td style="text-align:right">38</td><td style="text-align:right">1.7%</td></tr>
+<tr><td style="padding:3px 0">PSP × 60M</td><td style="text-align:right">25</td><td style="text-align:right">1.1%</td></tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ═══ SECTION 3: SIDE BY SIDE ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>3 · Side by Side — How Close Is the Model?</h2><span class="num-badge">Real vs AI</span></div>
+<div class="sec-body">
+<p class="intro">Place the two distributions next to each other and the accuracy becomes self-evident: <strong>the model's recommendation shape tracks the market almost perfectly</strong>, with only a small, consistent tilt toward Premier (and away from the rarer PSP Server).</p>
+
+<h3 class="sub-h">Warranty Term — Real vs AI</h3>
+<div class="pair-row"><div class="pair-label">36 Months</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:57.2%"></div></div><span class="val">57.2%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:57.8%"></div></div><span class="val">57.8%</span></div>
+</div></div>
+<div class="pair-row"><div class="pair-label">60 Months</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:40.9%"></div></div><span class="val">40.9%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:40.7%"></div></div><span class="val">40.7%</span></div>
+</div></div>
+<div class="pair-row"><div class="pair-label">84 Months</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:1.0%"></div></div><span class="val">1.0%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:1.0%"></div></div><span class="val">1.0%</span></div>
+</div></div>
+<div class="pair-row"><div class="pair-label">48 Months</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:0.7%"></div></div><span class="val">0.7%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:0.4%"></div></div><span class="val">0.4%</span></div>
+</div></div>
+<div class="pair-row"><div class="pair-label">72 Months</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:0.1%"></div></div><span class="val">0.1%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:0%"></div></div><span class="val">0%</span></div>
+</div></div>
+
+<h3 class="sub-h">Warranty Type — Real vs AI</h3>
+<div class="pair-row"><div class="pair-label">Premier</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:87.8%"></div></div><span class="val">87.8%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:90.1%"></div></div><span class="val">90.1%</span></div>
+</div></div>
+<div class="pair-row"><div class="pair-label">PSP Server</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:7.1%"></div></div><span class="val">7.1%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:5.5%"></div></div><span class="val">5.5%</span></div>
+</div></div>
+<div class="pair-row"><div class="pair-label">ESS</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:4.9%"></div></div><span class="val">4.9%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:4.4%"></div></div><span class="val">4.4%</span></div>
+</div></div>
+
+<h3 class="sub-h">SLA Tier — Real vs AI</h3>
+<div class="pair-row"><div class="pair-label">Four Hours</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:54.5%"></div></div><span class="val">54.5%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:54.0%"></div></div><span class="val">54.0%</span></div>
+</div></div>
+<div class="pair-row"><div class="pair-label">NBD</div><div class="pair-bars">
+<div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:45.5%"></div></div><span class="val">45.5%</span></div>
+<div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:46.0%"></div></div><span class="val">46.0%</span></div>
+</div></div>
+
+<div class="callout callout-green"><strong>Takeaway:</strong> The AI reproduces the market distribution almost exactly. The only visible difference is a mild tilt toward Premier (+2.3pp) and away from PSP Server (−1.6pp) — the model slightly "plays it safe" toward the most common product.</div>
+</div>
+</div>
+
+<!-- ═══ SECTION 4: WHERE THEY DIFFER ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>4 · Where They Differ — The 14.8%</h2><span class="num-badge">Mismatch breakdown</span></div>
+<div class="sec-body">
+
+<div class="verdict">
+<div class="vcard v-green"><div class="big">85.2%</div><div class="lbl">Exact match</div><div class="sub">1,956 of 2,296 — type + term + SLA all correct</div></div>
+<div class="vcard v-amber"><div class="big">14.8%</div><div class="lbl">Mismatch</div><div class="sub">340 contracts — a different product was recommended</div></div>
+</div>
+
+<p class="intro">Of the 340 mismatches, the model almost always gets the <strong>warranty type</strong> right (only 21.5% cross to a different type). The two main error forms are <strong>wrong term duration</strong> and <strong>wrong SLA tier</strong> — both "adjacent product" confusions, not category-level failures.</p>
+
+<table class="err-table">
+<tr><th style="width:32%">Mismatch form</th><th style="width:12%;text-align:right">Count</th><th style="width:14%;text-align:right">% of mismatches</th><th>What happened</th></tr>
+<tr>
+<td><strong>Wrong term duration</strong></td>
+<td style="text-align:right">159</td><td style="text-align:right">46.8%</td>
+<td>Same type, wrong length — e.g. customer bought 60M, model said 36M</td>
+</tr>
+<tr>
+<td><strong>Wrong SLA tier</strong></td>
+<td style="text-align:right">108</td><td style="text-align:right">31.8%</td>
+<td>Same type + term, but Four Hours ↔ NBD confused</td>
+</tr>
+<tr>
+<td><strong>Wrong warranty type</strong></td>
+<td style="text-align:right">73</td><td style="text-align:right">21.5%</td>
+<td>Different category — e.g. PSP Server recommended as Premier</td>
+</tr>
+</table>
+
+<div class="callout"><strong>Reading it for the business:</strong> the model knows <em>which product family</em> the customer needs — 78.5% of mismatches stay inside the same type. The remaining gap is about telling apart <em>near-identical products</em> (36M vs 60M, Four Hours vs NBD), which is exactly what the next round of tuning addresses.</div>
+</div>
+</div>
+
+<!-- ═══ SECTION 5: WHAT IT MEANS ═══ -->
+<div class="section">
+<div class="sec-hdr"><h2>5 · What This Means — Where the Tuning Lands</h2><span class="num-badge">Next steps</span></div>
+<div class="sec-body">
+<p class="intro">The distribution view points to the same three adjustments already identified in the analysis — they now map directly onto the visible gaps.</p>
+
+<div class="grid-3">
+<div class="panel">
+<h3>① Term duration <span style="color:#dc2626;font-size:11px;font-weight:700">P0</span></h3>
+<p style="font-size:12px;color:#555;line-height:1.6">The #1 mismatch (46.8%). The 60M→36M direction (76 contracts) loses coverage the customer already bought. <strong>Fix:</strong> default to the longer term when uncertain — seller keeps override.</p>
+</div>
+<div class="panel">
+<h3>② PSP Server <span style="color:#dc2626;font-size:11px;font-weight:700">P0</span></h3>
+<p style="font-size:12px;color:#555;line-height:1.6">Visible in the type comparison: AI under-recommends PSP (−1.6pp). Driven by only 7.1% training share. <strong>Fix:</strong> augment PSP data + modest PSP preference.</p>
+</div>
+<div class="panel">
+<h3>③ SLA tier <span style="color:#2563eb;font-size:11px;font-weight:700">P2</span></h3>
+<p style="font-size:12px;color:#555;line-height:1.6">Four Hours ↔ NBD confusion is symmetric (51:57) — no directional bias. <strong>Fix:</strong> add hardware criticality + industry features, not a tuning tilt.</p>
+</div>
+</div>
+
+<div class="callout callout-green" style="margin-top:16px"><strong>Bottom line:</strong> 85.2% of recommendations are an exact product match, and the overall distribution is near-identical to what customers actually buy. The 14.8% gap is concentrated in two fixable, adjacent-product confusions — term length and SLA tier — that the P0/P2 adjustments target directly.</div>
+</div>
+</div>
+
+</div>
+</body>
+</html>
