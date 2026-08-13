@@ -98,7 +98,7 @@ tr:last-child td{border-bottom:none}
 <h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #42a5f5;padding-left:10px">Key Findings at a Glance</h3>
 <table>
 <tr><th>#</th><th>Finding</th><th>Severity</th></tr>
-<tr><td>1</td><td>Overall Top-1 85.2% under strict label+SLA definition. Top-2 at 91.8% means escalation covers most misses.</td><td style="color:#f57f17">🟡 Moderate</td></tr>
+<tr><td>1</td><td>Overall Top-1 85.2% under the strict complete-product-match definition (Type + Term + SLA). Top-2 at 91.8% means escalation covers most misses.</td><td style="color:#f57f17">🟡 Moderate</td></tr>
 <tr><td>2</td><td><strong>PSP Server × 60 Months: 48.8%.</strong> More misses than hits in this cell (41 contracts). #1 priority for improvement.</td><td style="color:#c62828">🔴 Critical</td></tr>
 <tr><td>3</td><td><strong>108 contracts (31.8% of misses) are adjacent-product confusion:</strong> model picks the right warranty type+term but the wrong SLA tier within the same product family (e.g., 36M Premier 24x7 vs 36M Premier NBD). Not a separate defect — two distinct products being confused.</td><td style="color:#f57c00">🟡 Warning</td></tr>
 <tr><td>4</td><td>Confidence calibration is essentially <strong>flat</strong> (Low 84.4%, Mid 86.4%, High 84.7%). Model's probability scores do not predict correctness — cannot be used for escalation logic.</td><td style="color:#f57c00">🟡 Warning</td></tr>
@@ -126,7 +126,7 @@ tr:last-child td{border-bottom:none}
 <div class="section" id="warranty-type">
 <div class="sec-hdr"><h2>B. Hit Rate by Warranty Type (Aligns with IDG "Config Origin")</h2></div>
 <div class="sec-body">
-<p class="insight">Warranty Type is the strongest performance differentiator. Premier (87.8% of volume) at 86.8% carries the blended rate. PSP Server at 68.5% is the weakest by a wide margin. PSP Server's poor performance is NOT due to SLA confusion (label-only is also 68.5%) — it's a genuine rank-1 problem.</p>
+<p class="insight">Warranty Type is the strongest performance differentiator. Premier (87.8% of volume) at 86.8% carries the blended rate. PSP Server at 68.5% is the weakest by a wide margin. PSP Server's poor performance is NOT due to adjacent-product confusion (same term, different SLA tier) — its match rate is equally low when SLA tier is ignored, confirming a genuine rank-1 problem.</p>
 <div class="legend"><span style="background:#2e7d32">Strong</span><span style="background:#f57f17">Moderate</span><span style="background:#c62828">Weak</span></div>
 <table>
 <tr><th>Warranty Type</th><th class="num">Contracts</th><th class="num">Share</th><th class="num">Top-1</th><th class="num">Top-2</th><th class="num">Top-3</th><th class="num">Δ vs Avg</th><th>Assessment</th></tr>
@@ -141,7 +141,7 @@ tr:last-child td{border-bottom:none}
 <div class="section" id="confidence">
 <div class="sec-hdr"><h2>C. Hit Rate by Confidence Tier (Aligns with IDG "AI vs Non-AI")</h2></div>
 <div class="sec-body">
-<p class="warn"><strong>Confidence scores are uninformative.</strong> Under the strict label+SLA definition, all three tiers are within a 2pp band (84.4%–86.4%). The model's addon probability scores do not predict correctness. Low-confidence predictions are nearly as accurate as high-confidence ones. Cannot use confidence for escalation logic without recalibration.</p>
+<p class="warn"><strong>Confidence scores are uninformative.</strong> Under the complete product-match definition (Type + Term + SLA), all three tiers are within a 2pp band (84.4%–86.4%). The model's addon probability scores do not predict correctness. Low-confidence predictions are nearly as accurate as high-confidence ones. Cannot use confidence for escalation logic without recalibration.</p>
 <table>
 <tr><th>Confidence Tier</th><th class="num">Contracts</th><th class="num">Avg Max Addon Prob</th><th class="num">Top-1 Hit Rate</th><th>Expected</th><th>Actual</th></tr>
 <tr><td>Low</td><td class="num">765</td><td class="num">0.68</td><td class="num" style="background:#f57f17;color:#fff">84.4%</td><td>Should be lowest</td><td>Lowest — correct direction</td></tr>
@@ -293,24 +293,24 @@ tr:last-child td{border-bottom:none}
 <p class="insight">Each miss is a case where the model's #1 product recommendation was not the product the customer bought. We group these by how far the prediction deviates — from adjacent products in the same warranty family to completely different warranty types.</p>
 <table>
 <tr><th>Error Type</th><th class="num">Count</th><th class="num">% of Misses</th><th>Example</th><th>Distance</th></tr>
-<tr><td>Same Warranty Family,<br>Different SLA Tier</td><td class="num">108</td><td class="num">31.8%</td><td>Premier 36M 24x7 → Premier 36M NBD</td><td style="color:#f57f17">Adjacent</td></tr>
+<tr><td>Adjacent Product —<br>Different SLA Tier</td><td class="num">108</td><td class="num">31.8%</td><td>Premier 36M 24x7 → Premier 36M NBD</td><td style="color:#f57f17">Adjacent</td></tr>
 <tr><td>Same Warranty Type,<br>Different Term Duration</td><td class="num">159</td><td class="num">46.8%</td><td>Premier 60M → Premier 36M</td><td style="color:#f57c00">Near</td></tr>
 <tr><td>Different Warranty Type</td><td class="num">73</td><td class="num">21.5%</td><td>PSP Server 60M → Premier 60M</td><td style="color:#c62828">Far</td></tr>
 </table>
-<div class="insight" style="margin-top:10px"><strong>Key insight:</strong> 78.5% of misses are within the same warranty type — the model knows which warranty category the customer needs. The problem is discriminating between <em>variants within that category</em>: different term durations or different SLA tiers. Only 21.5% of misses are genuine cross-category errors (e.g., confusing PSP Server with Premier). This suggests the model's category-level features are strong; its variant-level differentiation needs work.</div>
+<div class="insight" style="margin-top:10px"><strong>Key insight:</strong> 78.5% of misses are within the same warranty type — the model knows which warranty category the customer needs. The problem is discriminating between <em>distinct products within that category</em>: different term durations or different SLA tiers. Only 21.5% of misses are genuine cross-category errors (e.g., confusing PSP Server with Premier). This suggests the model's category-level features are strong; its product-level differentiation needs work.</div>
 </div></div>
 
 <!-- ═══ K. ERROR DIRECTION ANALYSIS ═══ -->
 <div class="section" id="error-direction">
 <div class="sec-hdr"><h2>K. Error Direction: Is the Model Aggressive or Conservative?</h2></div>
 <div class="sec-body">
-<p class="insight"><strong>The model is slightly conservative, but the dominant error is Term confusion — not up-tier or down-tier bias.</strong> Of the 340 missed contracts, 46.8% are same-product/wrong-term (60M↔36M mix-up), and 31.8% are SLA-only errors. Pure product-tier misranking accounts for only 21.4% of errors, with downgrades outnumbering upgrades 1.7:1.</p>
+<p class="insight"><strong>The model is slightly conservative, but the dominant error is term-duration confusion — not up-tier or down-tier bias.</strong> Of the 340 missed contracts, 46.8% recommend the wrong term duration (a different product within the same warranty type, e.g. 60M vs 36M), and 31.8% confuse adjacent products that differ only in SLA tier (same type+term, e.g. 24x7 vs NBD). Only 21.5% are genuine cross-type misclassification, with downgrades outnumbering upgrades 1.7:1.</p>
 
 <h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;border-left:4px solid #42a5f5;padding-left:10px">Error Decomposition: What Kind of Mistake?</h3>
 <table>
 <tr><th>Error Type</th><th class="num">Count</th><th class="num">% of Misses</th><th>Pattern</th><th>Business Impact</th></tr>
-<tr><td style="color:#1565c0"><strong>SLA Mismatch</strong></td><td class="num">108</td><td class="num">31.8%</td><td>Right product, wrong SLA (e.g. Premier 36M 24x7 → recommended NBD)</td><td style="color:#f57f17">Trust erosion — seller must manually correct SLA</td></tr>
-<tr><td style="color:#f57c00"><strong>Term Mix-up (same product)</strong></td><td class="num">159</td><td class="num">46.8%</td><td>60M ↔ 36M confusion within same warranty type</td><td style="color:#c62828">Largest single error category — 60M→36M loses revenue, 36M→60M is acceptable upsell</td></tr>
+<tr><td style="color:#1565c0"><strong>Adjacent Product (SLA tier)</strong></td><td class="num">108</td><td class="num">31.8%</td><td>Same type+term, but the two distinct SLA-tier products are confused (e.g. Premier 36M 24x7 ↔ Premier 36M NBD)</td><td style="color:#f57f17">Trust erosion — seller must manually correct to the right product</td></tr>
+<tr><td style="color:#f57c00"><strong>Wrong Term Duration</strong></td><td class="num">159</td><td class="num">46.8%</td><td>60M ↔ 36M products confused within the same warranty type</td><td style="color:#c62828">Largest single error category — 60M→36M loses revenue, 36M→60M is acceptable upsell</td></tr>
 <tr><td style="color:#c62828"><strong>Product Downgrade</strong></td><td class="num">46</td><td class="num">13.5%</td><td>PSP Server → Premier, PESS → lower</td><td style="color:#c62828">Revenue loss: premium product swapped for standard</td></tr>
 <tr><td style="color:#2e7d32"><strong>Product Upgrade</strong></td><td class="num">27</td><td class="num">7.9%</td><td>ESS → Premier, Premier → PSP Server</td><td style="color:#1565c0">Acceptable — seller can always downgrade back</td></tr>
 </table>
@@ -321,25 +321,25 @@ tr:last-child td{border-bottom:none}
 <tr><td style="color:#c62828"><strong>Conservative</strong> (lower value than actual)</td><td class="num">123</td><td class="num">36.2%</td><td>Model recommends cheaper/shorter product than what customer actually bought</td></tr>
 <tr><td style="color:#2e7d32"><strong>Aggressive</strong> (higher value than actual)</td><td class="num">96</td><td class="num">28.2%</td><td>Model recommends more expensive/longer product than what customer bought</td></tr>
 <tr><td style="color:#1565c0"><strong>Cross-direction</strong> (up type + down term, or vice versa)</td><td class="num">13</td><td class="num">3.8%</td><td>Mixed signal — e.g. shorter term but higher tier</td></tr>
-<tr><td><strong>SLA only</strong> (same product + term)</td><td class="num">108</td><td class="num">31.8%</td><td>Product and term both correct; SLA wrong</td></tr>
+<tr><td><strong>Adjacent product</strong> (same type+term, different SLA tier)</td><td class="num">108</td><td class="num">31.8%</td><td>Type and term match, but it is a different product — the two SLA-tier variants are confused</td></tr>
 </table>
 
 <h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;margin-top:18px;border-left:4px solid #c62828;padding-left:10px">Top 10 Real → Predicted Mismatch Patterns</h3>
 <table>
 <tr><th>Real (Customer Chose)</th><th>Model Top-1</th><th class="num">Count</th><th>Direction</th></tr>
-<tr><td>60 Months Premier</td><td>36 Months Premier</td><td class="num">76</td><td style="color:#c62828">↓ Shorter term — revenue loss</td></tr>
-<tr><td>36 Months Premier</td><td>36 Months Premier</td><td class="num">70</td><td style="color:#1565c0">SLA mismatch only</td></tr>
-<tr><td>36 Months Premier</td><td>60 Months Premier</td><td class="num">60</td><td style="color:#2e7d32">↑ Longer term — acceptable upsell</td></tr>
-<tr><td>60 Months Premier</td><td>60 Months Premier</td><td class="num">37</td><td style="color:#1565c0">SLA mismatch only</td></tr>
-<tr><td>36 Months PSP Server</td><td>36 Months Premier</td><td class="num">16</td><td style="color:#c62828">↓ Product downgrade — premium→standard</td></tr>
-<tr><td>60 Months PSP Server</td><td>60 Months Premier</td><td class="num">15</td><td style="color:#c62828">↓ Product downgrade — premium→standard</td></tr>
-<tr><td>36 Months ESS</td><td>36 Months Premier</td><td class="num">9</td><td style="color:#2e7d32">↑ Product upgrade</td></tr>
-<tr><td>36 Months PSP Server</td><td>60 Months Premier</td><td class="num">8</td><td style="color:#f57f17">↓ Product + ↑ Term (cross)</td></tr>
-<tr><td>36 Months Premier</td><td>36 Months PSP Server</td><td class="num">6</td><td style="color:#2e7d32">↑ Product upgrade</td></tr>
-<tr><td>48 Months Premier</td><td>60 Months Premier</td><td class="num">6</td><td style="color:#2e7d32">↑ Longer term</td></tr>
+<tr><td>Premier 60 Months</td><td>Premier 36 Months</td><td class="num">76</td><td style="color:#c62828">↓ Shorter term — revenue loss</td></tr>
+<tr><td>Premier 36 Months</td><td>Premier 60 Months</td><td class="num">60</td><td style="color:#2e7d32">↑ Longer term — acceptable upsell</td></tr>
+<tr><td>Premier 36M NBD</td><td>Premier 36M 24x7</td><td class="num">36</td><td style="color:#2e7d32">↑ Adjacent product (higher SLA)</td></tr>
+<tr><td>Premier 36M 24x7</td><td>Premier 36M NBD</td><td class="num">30</td><td style="color:#c62828">↓ Adjacent product (lower SLA)</td></tr>
+<tr><td>Premier 60M 24x7</td><td>Premier 60M NBD</td><td class="num">21</td><td style="color:#c62828">↓ Adjacent product (lower SLA)</td></tr>
+<tr><td>PSP Server 36 Months</td><td>Premier 36 Months</td><td class="num">16</td><td style="color:#c62828">↓ Product downgrade — premium→standard</td></tr>
+<tr><td>Premier 60M NBD</td><td>Premier 60M 24x7</td><td class="num">15</td><td style="color:#2e7d32">↑ Adjacent product (higher SLA)</td></tr>
+<tr><td>PSP Server 60 Months</td><td>Premier 60 Months</td><td class="num">15</td><td style="color:#c62828">↓ Product downgrade — premium→standard</td></tr>
+<tr><td>ESS 36 Months</td><td>Premier 36 Months</td><td class="num">9</td><td style="color:#2e7d32">↑ Product upgrade</td></tr>
+<tr><td>PSP Server 36 Months</td><td>Premier 60 Months</td><td class="num">8</td><td style="color:#f57f17">↓ Product + ↑ Term (cross)</td></tr>
 </table>
 
-<div class="insight" style="margin-top:10px"><strong>Key insight:</strong> The two largest single mismatch patterns (76 + 60 = 136 contracts) are both <em>within Premier, just getting the term wrong</em>. Fixing Term prediction alone could recover nearly half of all errors. The 60M→36M direction (76x) is the harmful one — customer wants 5-year warranty, model suggests 3-year. The reverse (36M→60M, 60x) is actually a reasonable upsell that a seller might accept.</div>
+<div class="insight" style="margin-top:10px"><strong>Key insight:</strong> The two largest single mismatch patterns (76 + 60 = 136 contracts) are both within Premier, confusing the 60-month and 36-month products. Fixing term-duration prediction alone could recover nearly half of all errors. The 60M→36M direction (76x) is the harmful one — customer wants the 5-year product, model suggests the 3-year one. The reverse (36M→60M, 60x) is actually a reasonable upsell that a seller might accept.</div>
 </div></div>
 
 <!-- ═══ L. PRIORITY IMPROVEMENT ROADMAP ═══ -->
@@ -351,9 +351,9 @@ tr:last-child td{border-bottom:none}
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>Premier Term Discrimination (60M ↔ 36M)</strong></td><td style="color:#c62828">136 contracts mixed up</td><td>159 (46.8% of errors)</td><td>Largest error category. Add term as a separate feature or prediction target. The 60M→36M direction (76x) is the revenue-loss pattern</td></tr>
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>PSP Server × 60 Months</strong></td><td style="color:#c62828">48.8%</td><td>41 (1.8%)</td><td>Audit training data: class imbalance likely. Add PSP Server 60M samples or use class-weighted loss</td></tr>
 <tr><td style="background:#c62828;color:#fff;text-align:center;font-weight:700">P0</td><td><strong>Premier × 48 Months</strong></td><td style="color:#c62828">50.0%</td><td>16 (0.7%)</td><td>48-Month term is rare across all types. Add synthetic or augmented samples</td></tr>
-<tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>Adjacent Product Differentiation (SLA Tier)</strong></td><td style="color:#f57c00">108 contracts in same family</td><td>108 (31.8% of misses)</td><td>Same type+term, different SLA. Add features correlated with SLA tier: hardware criticality, customer industry, HW price tier, subsegment. Balanced error direction — model needs better differentiation, not bias correction</td></tr>
+<tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>Adjacent Product Differentiation</strong></td><td style="color:#f57c00">108 contracts — adjacent products confused</td><td>108 (31.8% of misses)</td><td>Same type+term, but the two SLA-tier variants are distinct products being confused. Add features that separate these adjacent products: hardware criticality, customer industry, HW price tier, subsegment. Balanced error direction — model needs better differentiation, not bias correction</td></tr>
 <tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>Confidence Calibration</strong></td><td style="color:#f57c00">Flat</td><td>All 2,296</td><td>Apply Platt scaling. Critical for production — low confidence must mean low trust</td></tr>
-<tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>PSP Server overall</strong></td><td style="color:#f57c00">68.5%</td><td>162 (7.1%)</td><td>Augment training data. Not an SLA problem (label-only also 68.5%) — genuine rank-1 weakness</td></tr>
+<tr><td style="background:#f57c00;color:#fff;text-align:center;font-weight:700">P1</td><td><strong>PSP Server overall</strong></td><td style="color:#f57c00">68.5%</td><td>162 (7.1%)</td><td>Augment training data. Not an adjacent-product confusion problem (match rate is equally low when SLA tier is ignored) — genuine rank-1 weakness</td></tr>
 <tr><td style="background:#1565c0;color:#fff;text-align:center;font-weight:700">P2</td><td><strong>ThinkAgile HX650 V4</strong></td><td style="color:#1565c0">69.8%</td><td>53 (2.3%)</td><td>Top-2 is 96.2% — rank-1 calibration. Check feature importance for HCI product line</td></tr>
 <tr><td style="background:#1565c0;color:#fff;text-align:center;font-weight:700">P2</td><td><strong>ThinkSystem SR250 V3</strong></td><td style="color:#1565c0">80.7%</td><td>140 (6.1%)</td><td>Largest below-avg server line. Poor Top-2 (84.3%) — not just rank-1</td></tr>
 </table>
