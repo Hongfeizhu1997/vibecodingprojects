@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISG B2B Pen Rate Mapping — Logic &amp; Calculation</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3a;
+    --accent: #4f9cf5;
+    --green: #34d399;
+    --amber: #f59e0b;
+    --purple: #8b5cf6;
+    --red: #ef4444;
+    --text: #e4e5e8;
+    --sub: #8b8fa3;
+    --tag-bg: #1f2435;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    padding: 48px 24px;
+    line-height: 1.6;
+  }
+  .page { max-width: 1200px; width: 100%; }
+
+  .header { text-align: center; margin-bottom: 40px; }
+  .header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header .sub { color: var(--sub); font-size: 0.85rem; margin-top: 4px; }
+
+  .section-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin: 32px 0 12px;
+    font-weight: 600;
+  }
+
+  /* Architecture diagram */
+  .arch-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .arch-card {
+    flex: 1; min-width: 200px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px;
+  }
+  .arch-card .card-num {
+    font-size: 0.65rem; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
+  }
+  .arch-card .card-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; }
+  .arch-card .card-desc { font-size: 0.72rem; color: var(--sub); line-height: 1.6; }
+
+  /* Tables */
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.68rem; margin-bottom: 16px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+  }
+  .data-table th {
+    background: #1f2435; text-align: left; padding: 7px 10px;
+    font-weight: 600; font-size: 0.63rem; color: var(--sub);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td {
+    padding: 6px 10px; border-bottom: 1px solid #1f2435;
+    color: var(--text);
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table .highlight { color: var(--green); font-weight: 700; }
+  .data-table .mid { color: var(--amber); font-weight: 600; }
+  .data-table .low { color: var(--sub); }
+
+  /* Flow */
+  .flow-container {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 28px 24px; margin-bottom: 24px;
+  }
+  .flow-steps { display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+  .flow-step {
+    background: #1a1d27; border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 16px;
+    font-size: 0.73rem; font-weight: 600; text-align: center;
+  }
+  .flow-arrow { color: var(--sub); font-size: 1.2rem; margin: 0 6px; font-weight: 300; flex-shrink: 0; }
+
+  /* Calculation */
+  .calc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .calc-grid { grid-template-columns: 1fr; } }
+  .calc-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px;
+  }
+  .calc-card .example-label {
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em;
+    font-weight: 700; margin-bottom: 8px;
+  }
+  .calc-card .example-label.a { color: var(--green); }
+  .calc-card .example-label.b { color: var(--purple); }
+  .calc-card .example-label.c { color: var(--amber); }
+  .calc-card .calc-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.7rem; padding: 5px 0;
+    border-bottom: 1px solid #1f2435;
+  }
+  .calc-card .calc-row:last-child { border-bottom: none; }
+  .calc-card .calc-row .val { font-weight: 700; }
+  .calc-card .calc-row.result { font-size: 0.8rem; color: var(--green); font-weight: 700; padding-top: 8px; }
+
+  /* Key insight */
+  .insight-bar {
+    background: linear-gradient(135deg, #1a2a1d 0%, #1a1d27 100%);
+    border: 1px solid var(--green);
+    border-radius: 10px; padding: 20px 24px;
+    display: flex; align-items: flex-start; gap: 12px;
+    margin: 24px 0;
+  }
+  .insight-bar .icon { font-size: 1.3rem; flex-shrink: 0; }
+  .insight-bar .text { font-size: 0.8rem; line-height: 1.7; color: var(--sub); }
+  .insight-bar .text strong { color: var(--green); }
+
+  /* Maintenance */
+  .maint-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; margin-bottom: 24px; }
+  .maint-table th {
+    background: #1f2435; text-align: left; padding: 8px 12px;
+    font-weight: 600; color: var(--sub); font-size: 0.63rem;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+  }
+  .maint-table td { padding: 8px 12px; border-bottom: 1px solid #1f2435; }
+  .maint-table tr:last-child td { border-bottom: none; }
+
+  /* Detailed table view - collapsible-like sections */
+  .table-block { margin-bottom: 20px; }
+  .table-block .block-title {
+    font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .table-block .block-sub { font-size: 0.68rem; color: var(--sub); margin-bottom: 10px; }
+
+  .badge {
+    font-size: 0.63rem; padding: 2px 8px; border-radius: 4px;
+    font-weight: 600; letter-spacing: 0.02em;
+  }
+  .badge.auto { background: rgba(52,211,153,0.12); color: var(--green); }
+  .badge.pricer { background: rgba(79,156,245,0.12); color: var(--accent); }
+  .badge.cfo { background: rgba(245,158,11,0.12); color: var(--amber); }
+  .badge.sm { background: rgba(139,92,246,0.12); color: var(--purple); }
+  .badge.sr { background: rgba(239,68,68,0.12); color: var(--red); }
+
+  .tag-high { background: rgba(239,68,68,0.10); color: var(--red); padding: 1px 6px; border-radius: 3px; font-size: 0.62rem; font-weight: 600; }
+  .tag-mid { background: rgba(245,158,11,0.10); color: var(--amber); padding: 1px 6px; border-radius: 3px; font-size: 0.62rem; font-weight: 600; }
+  .tag-low { background: rgba(52,211,153,0.10); color: var(--green); padding: 1px 6px; border-radius: 3px; font-size: 0.62rem; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <h1>ISG B2B Pen Rate Mapping — Data Logic &amp; Calculation</h1>
+    <div class="sub">Three-table architecture · Role-based delegation · HW-price-driven adjustment</div>
+  </div>
+
+  <!-- ====== ARCHITECTURE ====== -->
+  <div class="section-label">1. Overall Architecture</div>
+  <div class="arch-row">
+    <div class="arch-card">
+      <div class="card-num">Table 1</div>
+      <div class="card-title">Brand Mapping</div>
+      <div class="card-desc">Maps a service PN's ProductCategory Level3 → Brand Code (e.g. CSP-TS68, CSP-OEM).<br>11 rows maintained by MDM.</div>
+    </div>
+    <div class="arch-card">
+      <div class="card-num">Table 2</div>
+      <div class="card-title">Pen Rate Delegation</div>
+      <div class="card-desc">Role + 9 business dimensions → Standard Pen Rate% (the ceiling).<br>Different roles see different rates: LBP-E auto 8–30%, Sales Rep 80–85%.</div>
+    </div>
+    <div class="arch-card">
+      <div class="card-num">Table 3</div>
+      <div class="card-title">Pen Rate Adjustment</div>
+      <div class="card-desc">HW Entitled Price band → Adjustment Factor (10–70%).<br>Higher HW price → higher adjustment → higher effective Pen Rate.</div>
+    </div>
+  </div>
+
+  <!-- ====== TABLE 1: BRAND MAPPING ====== -->
+  <div class="section-label">2. Table 1 — Brand Mapping</div>
+  <div class="table-block">
+    <div class="block-sub">Input: service PN&rsquo;s ProductCategory Level3 &nbsp;→&nbsp; Output: Brand Code</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Brand Code</th><th>Level1</th><th>Level2</th><th>Level3</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>CSP-STD</td><td>Services</td><td>Post Warranty Services</td><td>Post Warranty Services - Other</td></tr>
+        <tr><td>CSP-STD</td><td>Services</td><td>Post Warranty Services</td><td>Post Warranty Services - x86</td></tr>
+        <tr><td>CSP-STD</td><td>Services</td><td>Post Warranty Services</td><td>Post Warranty Services - Networking</td></tr>
+        <tr><td>CSP-PRE</td><td>Services</td><td>Post Warranty Services</td><td>Premier Post Warranty Services - x86</td></tr>
+        <tr><td>CSP-PRE</td><td>Services</td><td>Post Warranty Services</td><td>Premier Post Warranty Services - Other</td></tr>
+        <tr><td>CSP-TS</td><td>Services</td><td>Post Warranty Services</td><td>Post Warranty Services - ThinkSystem</td></tr>
+        <tr><td>CSP-TSP</td><td>Services</td><td>Post Warranty Services</td><td>Premier Post Warranty Services - ThinkSystem</td></tr>
+        <tr><td>CSP-PRN</td><td>Services</td><td>Post Warranty Services</td><td>Premier Post Warranty Services - Networking</td></tr>
+        <tr><td>CSP-TS68</td><td>Services</td><td>Post Warranty Services</td><td>Post Warranty Services - ThinkSystem SR68x</td></tr>
+        <tr><td>CSP-TS78</td><td>Services</td><td>Post Warranty Services</td><td>Post Warranty Services - ThinkSystem SR78x</td></tr>
+        <tr><td>CSP-AI</td><td>Services</td><td>Post Warranty Services</td><td>Post Warranty Services - Large AI Optimized Server</td></tr>
+        <tr><td>CSP-OEM</td><td>Services</td><td>Post Warranty Services</td><td>Post Warranty Services - OEM/Third-Party</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="font-size:0.65rem;color:var(--sub);margin:-8px 0 16px;">
+    Fallback logic: Level3 not found → try Level2 → try Level1 → if all fail, block quoting with error.
+  </div>
+
+  <!-- ====== TABLE 2: DELEGATION ====== -->
+  <div class="section-label">3. Table 2 — Pen Rate Delegation (by Role)</div>
+  <div class="table-block">
+    <div class="block-sub">Standard Pen Rate = ceiling per role. Same product &amp; customer, different role → different ceiling.</div>
+
+    <!-- LBP-E auto -->
+    <div class="block-title"><span class="badge auto">LBP-E auto</span> System-generated (most conservative)</div>
+    <table class="data-table">
+      <thead><tr><th>Grid Name</th><th>Role</th><th>BU</th><th>Geo</th><th>Country</th><th>GTM</th><th>RAD</th><th>Brand</th><th>SDF</th><th>Warr</th><th style="text-align:right">Std PR%</th></tr></thead>
+      <tbody>
+        <tr><td>ECU_LA_auto</td><td>LBP-E auto</td><td>DCG</td><td>NA</td><td>—</td><td>—</td><td>—</td><td>CSP-STD</td><td>ZQM</td><td>36</td><td style="text-align:right" class="highlight">10</td></tr>
+        <tr><td>ECU_LA_auto</td><td>LBP-E auto</td><td>DCG</td><td>NA</td><td>—</td><td>—</td><td>—</td><td>CSP-AI</td><td>ZPV</td><td>12</td><td style="text-align:right" class="mid">25</td></tr>
+        <tr><td>ECU_LA_auto</td><td>LBP-E auto</td><td>DCG</td><td>NA</td><td>—</td><td>—</td><td>—</td><td>CSP-AI</td><td>ZPV</td><td>36</td><td style="text-align:right" class="mid">20</td></tr>
+        <tr><td>ECU_LA_auto</td><td>LBP-E auto</td><td>DCG</td><td>NA</td><td>—</td><td>—</td><td>—</td><td>CSP-OEM</td><td>ZV2</td><td>36</td><td style="text-align:right" class="mid">30</td></tr>
+        <tr><td>auto_EMEA_std</td><td>LBP-E auto</td><td>DCG</td><td>EMEA</td><td>DE</td><td>GA</td><td>SmBiz</td><td>CSP-STD</td><td>ZQR</td><td>36</td><td style="text-align:right">12</td></tr>
+        <tr><td>auto_EMEA_ent</td><td>LBP-E auto</td><td>DCG</td><td>EMEA</td><td>DE</td><td>GA</td><td>Ent</td><td>CSP-TS</td><td>ZQW</td><td>36</td><td style="text-align:right">8</td></tr>
+        <tr><td>auto_AP_std</td><td>LBP-E auto</td><td>DCG</td><td>AP</td><td>JP</td><td>GA</td><td>SmBiz</td><td>CSP-STD</td><td>ZQN</td><td>36</td><td style="text-align:right">11</td></tr>
+        <tr><td>auto_AP_ent</td><td>LBP-E auto</td><td>DCG</td><td>AP</td><td>JP</td><td>GA</td><td>Ent</td><td>CSP-TS</td><td>ZQP</td><td>36</td><td style="text-align:right">9</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Pricer -->
+    <div class="block-title" style="margin-top:12px"><span class="badge pricer">Pricer</span> Pricing specialist</div>
+    <table class="data-table">
+      <thead><tr><th>Grid Name</th><th>Role</th><th>BU</th><th>Country</th><th>GTM</th><th>RAD</th><th>Brand</th><th>SDF</th><th>Warr</th><th style="text-align:right">Std PR%</th></tr></thead>
+      <tbody>
+        <tr><td>pricer_US_PS</td><td>Pricer</td><td>DCG</td><td>US</td><td>PS</td><td>Ret VS</td><td>CSP-STD</td><td>ZV2</td><td>36</td><td style="text-align:right" class="highlight">65</td></tr>
+        <tr><td>pricer_US_PS</td><td>Pricer</td><td>DCG</td><td>US</td><td>PS</td><td>Ret VS</td><td>CSP-OEM</td><td>ZV2</td><td>36</td><td style="text-align:right" class="highlight">60</td></tr>
+        <tr><td>pricer_JP_GA</td><td>Pricer</td><td>DCG</td><td>JP</td><td>GA</td><td>Ret VS</td><td>CSP-OEM</td><td>ZQR</td><td>36</td><td style="text-align:right" class="highlight">60</td></tr>
+      </tbody>
+    </table>
+
+    <!-- CFO -->
+    <div class="block-title" style="margin-top:12px"><span class="badge cfo">CFO</span> Finance approval</div>
+    <table class="data-table">
+      <thead><tr><th>Grid Name</th><th>Role</th><th>BU</th><th>Country</th><th>GTM</th><th>RAD</th><th>Brand</th><th>SDF</th><th>Warr</th><th style="text-align:right">Std PR%</th></tr></thead>
+      <tbody>
+        <tr><td>cfo_US_PS</td><td>CFO</td><td>DCG</td><td>US</td><td>PS</td><td>Ret VS</td><td>CSP-OEM</td><td>ZV2</td><td>36</td><td style="text-align:right" class="mid">50</td></tr>
+        <tr><td>cfo_US_PS</td><td>CFO</td><td>DCG</td><td>US</td><td>PS</td><td>Ret VS</td><td>CSP-STD</td><td>ZV2</td><td>36</td><td style="text-align:right" class="mid">55</td></tr>
+        <tr><td>cfo_JP_GA</td><td>CFO</td><td>DCG</td><td>JP</td><td>GA</td><td>Ret VS</td><td>CSP-OEM</td><td>ZQR</td><td>36</td><td style="text-align:right" class="mid">50</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Sales Manager -->
+    <div class="block-title" style="margin-top:12px"><span class="badge sm">Sales Manager</span></div>
+    <table class="data-table">
+      <thead><tr><th>Grid Name</th><th>Role</th><th>BU</th><th>Country</th><th>GTM</th><th>RAD</th><th>Brand</th><th>SDF</th><th>Warr</th><th style="text-align:right">Std PR%</th></tr></thead>
+      <tbody>
+        <tr><td>sm_US_PS</td><td>Sales Mgr</td><td>DCG</td><td>US</td><td>PS</td><td>Ret VS</td><td>CSP-OEM</td><td>ZV2</td><td>36</td><td style="text-align:right" class="highlight">75</td></tr>
+        <tr><td>sm_US_PS</td><td>Sales Mgr</td><td>DCG</td><td>US</td><td>PS</td><td>Ret VS</td><td>CSP-STD</td><td>ZV2</td><td>36</td><td style="text-align:right" class="highlight">83</td></tr>
+      </tbody>
+    </table>
+
+    <!-- Sales Rep -->
+    <div class="block-title" style="margin-top:12px"><span class="badge sr">Sales Rep</span> Highest ceiling (85% max)</div>
+    <table class="data-table">
+      <thead><tr><th>Grid Name</th><th>Role</th><th>BU</th><th>Country</th><th>GTM</th><th>RAD</th><th>Brand</th><th>SDF</th><th>Warr</th><th style="text-align:right">Std PR%</th></tr></thead>
+      <tbody>
+        <tr><td>sr_US_PS</td><td>Sales Rep</td><td>DCG</td><td>US</td><td>PS</td><td>Ret VS</td><td>CSP-OEM</td><td>ZV2</td><td>36</td><td style="text-align:right"><span class="tag-high">85</span></td></tr>
+        <tr><td>sr_US_PS</td><td>Sales Rep</td><td>DCG</td><td>US</td><td>PS</td><td>Ret VS</td><td>CSP-STD</td><td>ZV2</td><td>36</td><td style="text-align:right"><span class="tag-high">80</span></td></tr>
+        <tr><td>sr_JP_GA</td><td>Sales Rep</td><td>DCG</td><td>JP</td><td>GA</td><td>Ret VS</td><td>CSP-OEM</td><td>ZQR</td><td>36</td><td style="text-align:right"><span class="tag-high">80</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ====== TABLE 3: ADJUSTMENT ====== -->
+  <div class="section-label">4. Table 3 — Pen Rate Adjustment</div>
+  <div class="table-block">
+    <div class="block-sub">Input: HW Entitled Price from bid &nbsp;→&nbsp; Output: Adjustment Factor (multiplier on Std PR)</div>
+    <table class="data-table" style="max-width:500px">
+      <thead><tr><th style="width:30%">HW Price From</th><th style="width:30%">HW Price To</th><th style="width:40%;text-align:right">Adjustment to Pen Rate%</th></tr></thead>
+      <tbody>
+        <tr><td>$0.01</td><td>$1,000</td><td style="text-align:right"><span class="tag-low">10%</span></td></tr>
+        <tr><td>$1,000</td><td>$5,000</td><td style="text-align:right"><span class="tag-low">20%</span></td></tr>
+        <tr><td>$5,000</td><td>$6,000</td><td style="text-align:right"><span class="tag-mid">30%</span></td></tr>
+        <tr><td>$6,000</td><td>$10,000</td><td style="text-align:right"><span class="tag-mid">31%</span></td></tr>
+        <tr><td>$10,000</td><td>$30,000</td><td style="text-align:right"><span class="tag-mid">40%</span></td></tr>
+        <tr><td>$30,000</td><td>$70,000</td><td style="text-align:right"><span class="tag-high">49%</span></td></tr>
+        <tr><td>$70,000</td><td>$150,000</td><td style="text-align:right"><span class="tag-high">55%</span></td></tr>
+        <tr><td>$150,000</td><td>$500,000</td><td style="text-align:right"><span class="tag-high">62%</span></td></tr>
+        <tr><td>$500,000</td><td>$9,999,999</td><td style="text-align:right"><span class="tag-high">70%</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ====== CALCULATION FLOW ====== -->
+  <div class="section-label">5. End-to-End Calculation Flow</div>
+  <div class="flow-container">
+    <div class="flow-steps">
+      <div class="flow-step">Bid<br><span style="font-weight:400;font-size:0.62rem;color:var(--sub)">PN + Price</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:var(--accent)">Step 1<br><span style="font-weight:400;font-size:0.62rem;color:var(--accent)">Brand Mapping</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:var(--purple)">Step 2<br><span style="font-weight:400;font-size:0.62rem;color:var(--purple)">Delegation Lookup</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:var(--amber)">Step 3<br><span style="font-weight:400;font-size:0.62rem;color:var(--amber)">Adjustment</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:var(--green);color:var(--green)">Final Pen Rate<br><span style="font-weight:400;font-size:0.62rem;color:var(--green)">Std PR × Adj%</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" style="border-color:var(--green);color:var(--green)">Floor Rule<br><span style="font-weight:400;font-size:0.62rem;color:var(--green)">min(Orig, New)</span></div>
+    </div>
+
+    <!-- 3 Examples -->
+    <div class="calc-grid">
+      <!-- Example A -->
+      <div class="calc-card">
+        <div class="example-label a">Example A &mdash; Mid-Range Standard</div>
+        <div class="calc-row"><span>Role</span><span class="val">LBP-E auto</span></div>
+        <div class="calc-row"><span>ProductCategory L3</span><span class="val" style="font-size:0.62rem">ThinkSystem SR68x</span></div>
+        <div class="calc-row"><span>→ Brand Code</span><span class="val" style="color:var(--accent)">CSP-TS68</span></div>
+        <div class="calc-row"><span>→ Std Pen Rate</span><span class="val" style="color:var(--purple)">10%</span></div>
+        <div class="calc-row"><span>HW Price</span><span class="val">$50,000</span></div>
+        <div class="calc-row"><span>→ Adjustment</span><span class="val" style="color:var(--amber)">49%</span></div>
+        <div class="calc-row"><span>Adjusted Pen Rate</span><span class="val">10% × 49%</span></div>
+        <div class="calc-row result"><span>Final Pen Rate</span><span class="val">4.9%</span></div>
+        <div class="calc-row"><span>Service Price</span><span class="val">$2,450</span></div>
+      </div>
+
+      <!-- Example B -->
+      <div class="calc-card">
+        <div class="example-label b">Example B &mdash; High-End OEM (Sales Rep)</div>
+        <div class="calc-row"><span>Role</span><span class="val">Sales Rep</span></div>
+        <div class="calc-row"><span>ProductCategory L3</span><span class="val" style="font-size:0.62rem">OEM/Third-Party</span></div>
+        <div class="calc-row"><span>→ Brand Code</span><span class="val" style="color:var(--accent)">CSP-OEM</span></div>
+        <div class="calc-row"><span>→ Std Pen Rate</span><span class="val" style="color:var(--purple)">85%</span></div>
+        <div class="calc-row"><span>HW Price</span><span class="val">$120,000</span></div>
+        <div class="calc-row"><span>→ Adjustment</span><span class="val" style="color:var(--amber)">55%</span></div>
+        <div class="calc-row"><span>Adjusted Pen Rate</span><span class="val">85% × 55%</span></div>
+        <div class="calc-row result"><span>Final Pen Rate</span><span class="val">46.8%</span></div>
+        <div class="calc-row"><span>Service Price</span><span class="val">$56,160</span></div>
+        <div class="calc-row" style="font-size:0.62rem;color:var(--sub)">Floor Rule: min(orig $60K, $56K) = $56K</div>
+      </div>
+
+      <!-- Example C -->
+      <div class="calc-card">
+        <div class="example-label c">Example C &mdash; AI Server (Pricer)</div>
+        <div class="calc-row"><span>Role</span><span class="val">Pricer</span></div>
+        <div class="calc-row"><span>ProductCategory L3</span><span class="val" style="font-size:0.62rem">Large AI Optimized</span></div>
+        <div class="calc-row"><span>→ Brand Code</span><span class="val" style="color:var(--accent)">CSP-AI</span></div>
+        <div class="calc-row"><span>→ Std Pen Rate</span><span class="val" style="color:var(--purple)">25%</span></div>
+        <div class="calc-row"><span>HW Price</span><span class="val">$350,000</span></div>
+        <div class="calc-row"><span>→ Adjustment</span><span class="val" style="color:var(--amber)">62%</span></div>
+        <div class="calc-row"><span>Adjusted Pen Rate</span><span class="val">25% × 62%</span></div>
+        <div class="calc-row result"><span>Final Pen Rate</span><span class="val">15.5%</span></div>
+        <div class="calc-row"><span>Service Price</span><span class="val">$54,250</span></div>
+        <div class="calc-row" style="font-size:0.62rem;color:var(--sub)">Floor Rule: min(orig $50K, $54K) = $50K</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== KEY INSIGHT ====== -->
+  <div class="insight-bar">
+    <div class="icon">💡</div>
+    <div class="text">
+      <strong>Standard Pen Rate is the ceiling — Adjustment Factor brings it down to reality.</strong><br>
+      LBP-E auto delegates at 8–30% (conservative baseline). Sales Rep gets 80–85% (negotiation room).<br>
+      The Adjustment table then scales by HW price: lower HW → lower adjustment, higher HW → higher adjustment.<br>
+      Final effective Pen Rate typically lands at <strong>~5%</strong> for system-generated mid-range quotes — exactly the user-observed figure.<br><br>
+      <strong>Floor Rule safeguard:</strong> Final Delegation = min(Original LBP Delegation, New Pen Rate Price). The new mechanism never inflates quotes.
+    </div>
+  </div>
+
+  <!-- ====== PRIORITY ====== -->
+  <div class="section-label">6. Priority Logic — Multi-Rule Conflict Resolution</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 24px;margin-bottom:24px;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <span style="background:#1f2435;border:1px solid var(--amber);border-radius:6px;padding:6px 14px;font-size:0.75rem;font-weight:600;color:var(--amber)">BU</span>
+      <span style="color:var(--sub)">&gt;</span>
+      <span style="background:#1f2435;border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:0.75rem;font-weight:600">Country</span>
+      <span style="color:var(--sub)">&gt;</span>
+      <span style="background:#1f2435;border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:0.75rem;font-weight:600">EU ID List</span>
+      <span style="color:var(--sub)">&gt;</span>
+      <span style="background:#1f2435;border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:0.75rem;font-weight:600">GTM Sub-Seg</span>
+      <span style="color:var(--sub)">&gt;</span>
+      <span style="background:#1f2435;border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:0.75rem;font-weight:600">RAD</span>
+      <span style="color:var(--sub)">&gt;</span>
+      <span style="background:#1f2435;border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:0.75rem;font-weight:600">Brand</span>
+      <span style="color:var(--sub)">&gt;</span>
+      <span style="background:#1f2435;border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:0.75rem;font-weight:600">SDF</span>
+      <span style="color:var(--sub)">&gt;</span>
+      <span style="background:#1f2435;border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:0.75rem;font-weight:600">Warranty</span>
+    </div>
+    <div style="font-size:0.65rem;color:var(--sub);margin-top:10px;">
+      When multiple Delegation rows match the same bid (due to NULL/wildcard dimensions), the row with the highest-priority non-NULL field wins.
+    </div>
+  </div>
+
+  <!-- ====== MAINTENANCE ====== -->
+  <div class="section-label">7. Data Maintenance</div>
+  <table class="maint-table" style="background:var(--card);border:1px solid var(--border);border-radius:10px;">
+    <thead><tr><th>Table</th><th>Maintained By</th><th>Update Frequency</th><th>Approval</th></tr></thead>
+    <tbody>
+      <tr><td>Brand Mapping</td><td>MDM (Master Data)</td><td>On new product launch</td><td>Product Manager</td></tr>
+      <tr><td>Pen Rate Delegation</td><td>Pricing Manager</td><td>Quarterly review + ad-hoc</td><td>Regional CFO</td></tr>
+      <tr><td>Pen Rate Adjustment</td><td>Pricing Manager</td><td>Quarterly review</td><td>Regional CFO</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ====== FOOTER ====== -->
+  <div style="text-align:center;font-size:0.62rem;color:var(--sub);margin-top:40px;padding-top:20px;border-top:1px solid var(--border);">
+    ISG B2B Dynamic Pricing &middot; Pen Rate Mapping Logic v1.0 &middot; SSG AI &middot; August 2026<br>
+    Based on real Data Center Group Excel tables — Brand Mapping, Delegation Pen Rate, Pen Rate Adjustment
+  </div>
+
+</div>
+</body>
+</html>
