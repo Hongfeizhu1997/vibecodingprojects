@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Local caches and OS files
+.cache/
+.tmp/
+temp/
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Build and generated outputs
+dist/
+build/
+out/
+coverage/
+
+# Logs
+*.log
+logs/
+
+# Local runtime/database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Test/browser artifacts
+test-results/
+playwright-report/
+
+# ⚠️ 敏感个人信息：个人画像 + 参考资料，永不提交
+profile/
+references/
+*.docx
+*.pdf
+
+# Keep project assets and sanitized examples trackable
+!fixtures/
+!tests/fixtures/
+!assets/
+!docs/
+!release/README.md
