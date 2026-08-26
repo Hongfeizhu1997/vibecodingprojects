@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ISG SSR POC — PSP Probability Increment Analysis</title>
+<style>
+:root{--bg:#f8f9fb;--card:#fff;--border:#e2e5ea;--accent:#1a237e;--text:#1a1d27;--sub:#6b7280;--dim:#9ca3af}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.55}
+.brand{position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#E1251B,#11184F,#4D144A,#7A126B);z-index:100}
+.page{max-width:1040px;margin:0 auto;padding:30px 24px}
+.hero{background:linear-gradient(135deg,#f0f4ff,#eef3ff);border:1px solid var(--border);border-radius:10px;padding:28px 24px;margin-bottom:20px}
+.hero h1{font-size:22px;font-weight:700;margin-bottom:6px}
+.hero .sub{font-size:14px;color:var(--sub);margin-bottom:18px}
+.hero .facts{display:flex;gap:16px;flex-wrap:wrap}
+.fact{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 18px;min-width:150px}
+.fact .k{font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.fact .v{font-size:20px;font-weight:700;color:var(--accent)}
+.section{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden}
+.sec-hdr{padding:18px 24px;border-bottom:1px solid var(--border)}
+.sec-hdr h2{font-size:17px;font-weight:600}
+.sec-hdr .note{font-size:13px;color:var(--sub);margin-top:4px;line-height:1.55}
+.sec-body{padding:20px 24px}
+.legend{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:12px}
+.lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text)}
+.lg .line{width:20px;height:0;border-top:2.5px solid;flex-shrink:0}
+.lg .dash{width:20px;height:0;border-top:2.5px dashed;flex-shrink:0}
+.lg .bar{width:12px;height:12px;background:rgba(26,35,126,0.12);border:1.5px solid #1a237e;border-radius:2px;flex-shrink:0}
+.chart{width:100%}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{padding:9px 12px;text-align:left;font-weight:600;color:var(--sub);border-bottom:2px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+td.num{text-align:right;font-family:'SF Mono',Consolas,monospace}
+td.pos{color:#059669;font-weight:600}
+td.neg{color:#dc2626;font-weight:600}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fafbfc}
+.foot{font-size:12px;color:var(--dim);margin-top:16px;text-align:center}
+</style>
+</head>
+<body>
+<div class="brand"></div>
+<div class="page">
+
+<div class="hero">
+  <h1>ISG SSR POC — PSP Server Probability Increment Analysis</h1>
+  <div class="sub">PSP probability increment (business-rule boost) against Top-1 accuracy and PSP recommendation volume</div>
+  <div class="facts">
+    <div class="fact"><div class="k">Sample Size</div><div class="v">2,597</div></div>
+    <div class="fact"><div class="k">Increment Range</div><div class="v">0.00 – 0.50</div></div>
+    <div class="fact"><div class="k">Test Points</div><div class="v">11</div></div>
+    <div class="fact"><div class="k">Step</div><div class="v">0.05</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-hdr"><h2>Top-1 Accuracy by PSP Probability Increment</h2>
+  <div class="note">Left axis — Top-1 accuracy (%). Right axis — accuracy change vs. baseline (percentage points).</div></div>
+  <div class="sec-body">
+    <div class="legend">
+      <span class="lg"><span class="line" style="border-color:#1a237e"></span>Top-1 Accuracy</span>
+      <span class="lg"><span class="dash" style="border-color:#d97706"></span>Accuracy Change (pp, right axis)</span>
+    </div>
+    <div class="chart"><svg viewBox="0 0 880 360" width="100%" preserveAspectRatio="xMidYMid meet"><line x1="70" y1="310.0" x2="830" y2="310.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="313.0" text-anchor="end" font-size="10" fill="#6b7280">74</text>
+<line x1="70" y1="271.4" x2="830" y2="271.4" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="274.4" text-anchor="end" font-size="10" fill="#6b7280">75</text>
+<line x1="70" y1="232.9" x2="830" y2="232.9" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="235.9" text-anchor="end" font-size="10" fill="#6b7280">76</text>
+<line x1="70" y1="194.3" x2="830" y2="194.3" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="197.3" text-anchor="end" font-size="10" fill="#6b7280">77</text>
+<line x1="70" y1="155.7" x2="830" y2="155.7" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="158.7" text-anchor="end" font-size="10" fill="#6b7280">78</text>
+<line x1="70" y1="117.1" x2="830" y2="117.1" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="120.1" text-anchor="end" font-size="10" fill="#6b7280">79</text>
+<line x1="70" y1="78.6" x2="830" y2="78.6" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="81.6" text-anchor="end" font-size="10" fill="#6b7280">80</text>
+<line x1="70" y1="40.0" x2="830" y2="40.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="43.0" text-anchor="end" font-size="10" fill="#6b7280">81</text>
+<text x="70.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0</text>
+<text x="222.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.10</text>
+<text x="374.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.20</text>
+<text x="526.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.30</text>
+<text x="678.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.40</text>
+<text x="830.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.50</text>
+<path d="M 70.0,89.8 L 146.0,84.0 L 222.0,79.3 L 298.0,77.8 L 374.0,76.6 L 450.0,77.8 L 526.0,92.8 L 602.0,100.2 L 678.0,144.9 L 754.0,214.7 L 830.0,284.5" fill="none" stroke="#1a237e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="70.0" cy="89.8" r="3.4" fill="#1a237e"/>
+<circle cx="146.0" cy="84.0" r="3.4" fill="#1a237e"/>
+<circle cx="222.0" cy="79.3" r="3.4" fill="#1a237e"/>
+<circle cx="298.0" cy="77.8" r="3.4" fill="#1a237e"/>
+<circle cx="374.0" cy="76.6" r="3.4" fill="#1a237e"/>
+<circle cx="450.0" cy="77.8" r="3.4" fill="#1a237e"/>
+<circle cx="526.0" cy="92.8" r="3.4" fill="#1a237e"/>
+<circle cx="602.0" cy="100.2" r="3.4" fill="#1a237e"/>
+<circle cx="678.0" cy="144.9" r="3.4" fill="#1a237e"/>
+<circle cx="754.0" cy="214.7" r="3.4" fill="#1a237e"/>
+<circle cx="830.0" cy="284.5" r="3.4" fill="#1a237e"/>
+<text x="70.0" y="80.8" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">79.71</text>
+<text x="146.0" y="75.0" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">79.86</text>
+<text x="222.0" y="70.3" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">79.98</text>
+<text x="298.0" y="68.8" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">80.02</text>
+<text x="374.0" y="67.6" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">80.05</text>
+<text x="450.0" y="68.8" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">80.02</text>
+<text x="526.0" y="83.8" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">79.63</text>
+<text x="602.0" y="91.2" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">79.44</text>
+<text x="678.0" y="135.9" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">78.28</text>
+<text x="754.0" y="205.7" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">76.47</text>
+<text x="830.0" y="275.5" text-anchor="middle" font-size="10" font-weight="600" fill="#1a237e">74.66</text>
+<path d="M 70.0,85.0 L 146.0,78.2 L 222.0,72.9 L 298.0,71.1 L 374.0,69.3 L 450.0,71.1 L 526.0,88.6 L 602.0,97.1 L 678.0,148.9 L 754.0,230.4 L 830.0,311.8" fill="none" stroke="#d97706" stroke-width="2.2" stroke-dasharray="5,4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="70.0" cy="85.0" r="3.4" fill="#d97706"/>
+<circle cx="146.0" cy="78.2" r="3.4" fill="#d97706"/>
+<circle cx="222.0" cy="72.9" r="3.4" fill="#d97706"/>
+<circle cx="298.0" cy="71.1" r="3.4" fill="#d97706"/>
+<circle cx="374.0" cy="69.3" r="3.4" fill="#d97706"/>
+<circle cx="450.0" cy="71.1" r="3.4" fill="#d97706"/>
+<circle cx="526.0" cy="88.6" r="3.4" fill="#d97706"/>
+<circle cx="602.0" cy="97.1" r="3.4" fill="#d97706"/>
+<circle cx="678.0" cy="148.9" r="3.4" fill="#d97706"/>
+<circle cx="754.0" cy="230.4" r="3.4" fill="#d97706"/>
+<circle cx="830.0" cy="311.8" r="3.4" fill="#d97706"/><text x="838" y="313.0" text-anchor="start" font-size="10" fill="#d97706">-5</text><text x="838" y="268.0" text-anchor="start" font-size="10" fill="#d97706">-4</text><text x="838" y="223.0" text-anchor="start" font-size="10" fill="#d97706">-3</text><text x="838" y="178.0" text-anchor="start" font-size="10" fill="#d97706">-2</text><text x="838" y="133.0" text-anchor="start" font-size="10" fill="#d97706">-1</text><text x="838" y="88.0" text-anchor="start" font-size="10" fill="#d97706">+0</text><text x="838" y="43.0" text-anchor="start" font-size="10" fill="#d97706">+1</text></svg></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-hdr"><h2>PSP Recommendation Volume by PSP Probability Increment</h2>
+  <div class="note">Bars — PSP Top-1 recommendation count (left axis, value shown in bar). Line — PSP recommendation share of all recommendations (right axis).</div></div>
+  <div class="sec-body">
+    <div class="legend">
+      <span class="lg"><span class="bar"></span>PSP Recommendation Count</span>
+      <span class="lg"><span class="line" style="border-color:#d97706"></span>PSP Recommendation Share (right axis)</span>
+    </div>
+    <div class="chart"><svg viewBox="0 0 880 360" width="100%" preserveAspectRatio="xMidYMid meet"><line x1="70" y1="310.0" x2="830" y2="310.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="313.0" text-anchor="end" font-size="10" fill="#6b7280">0</text>
+<line x1="70" y1="256.0" x2="830" y2="256.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="259.0" text-anchor="end" font-size="10" fill="#6b7280">100</text>
+<line x1="70" y1="202.0" x2="830" y2="202.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="205.0" text-anchor="end" font-size="10" fill="#6b7280">200</text>
+<line x1="70" y1="148.0" x2="830" y2="148.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="151.0" text-anchor="end" font-size="10" fill="#6b7280">300</text>
+<line x1="70" y1="94.0" x2="830" y2="94.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="97.0" text-anchor="end" font-size="10" fill="#6b7280">400</text>
+<line x1="70" y1="40.0" x2="830" y2="40.0" stroke="#e5e7eb" stroke-width="1"/>
+<text x="62" y="43.0" text-anchor="end" font-size="10" fill="#6b7280">500</text>
+<text x="838" y="313.0" text-anchor="start" font-size="10" fill="#d97706">0%</text>
+<text x="838" y="245.5" text-anchor="start" font-size="10" fill="#d97706">5%</text>
+<text x="838" y="178.0" text-anchor="start" font-size="10" fill="#d97706">10%</text>
+<text x="838" y="110.5" text-anchor="start" font-size="10" fill="#d97706">15%</text>
+<text x="838" y="43.0" text-anchor="start" font-size="10" fill="#d97706">20%</text>
+<text x="70.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0</text>
+<text x="222.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.10</text>
+<text x="374.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.20</text>
+<text x="526.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.30</text>
+<text x="678.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.40</text>
+<text x="830.0" y="328" text-anchor="middle" font-size="10" fill="#6b7280">0.50</text>
+<rect x="58.0" y="253.8" width="24" height="56.2" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="70.0" y="281.9" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">104</text>
+<rect x="134.0" y="251.7" width="24" height="58.3" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="146.0" y="280.8" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">108</text>
+<rect x="210.0" y="248.4" width="24" height="61.6" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="222.0" y="279.2" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">114</text>
+<rect x="286.0" y="245.7" width="24" height="64.3" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="298.0" y="277.9" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">119</text>
+<rect x="362.0" y="244.1" width="24" height="65.9" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="374.0" y="277.1" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">122</text>
+<rect x="438.0" y="242.5" width="24" height="67.5" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="450.0" y="276.2" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">125</text>
+<rect x="514.0" y="230.1" width="24" height="79.9" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="526.0" y="270.0" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">148</text>
+<rect x="590.0" y="205.8" width="24" height="104.2" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="602.0" y="257.9" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">193</text>
+<rect x="666.0" y="168.0" width="24" height="142.0" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="678.0" y="239.0" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">263</text>
+<rect x="742.0" y="118.8" width="24" height="191.2" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="754.0" y="214.4" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">354</text>
+<rect x="818.0" y="47.0" width="24" height="263.0" rx="2" fill="#1a237e" fill-opacity="0.12" stroke="#1a237e" stroke-opacity="0.45" stroke-width="1.2"/>
+<text x="830.0" y="178.5" text-anchor="middle" font-size="9" font-weight="600" fill="#1a237e">487</text>
+<path d="M 70.0,256.0 L 146.0,253.8 L 222.0,250.7 L 298.0,248.2 L 374.0,246.6 L 450.0,245.1 L 526.0,233.1 L 602.0,209.7 L 678.0,173.2 L 754.0,126.0 L 830.0,56.9" fill="none" stroke="#d97706" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="70.0" cy="256.0" r="3.6" fill="#d97706"/>
+<text x="70.0" y="247.0" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">4.00%</text>
+<circle cx="146.0" cy="253.8" r="3.6" fill="#d97706"/>
+<text x="146.0" y="244.8" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">4.16%</text>
+<circle cx="222.0" cy="250.7" r="3.6" fill="#d97706"/>
+<text x="222.0" y="241.7" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">4.39%</text>
+<circle cx="298.0" cy="248.2" r="3.6" fill="#d97706"/>
+<text x="298.0" y="239.2" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">4.58%</text>
+<circle cx="374.0" cy="246.6" r="3.6" fill="#d97706"/>
+<text x="374.0" y="237.6" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">4.70%</text>
+<circle cx="450.0" cy="245.1" r="3.6" fill="#d97706"/>
+<text x="450.0" y="236.1" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">4.81%</text>
+<circle cx="526.0" cy="233.1" r="3.6" fill="#d97706"/>
+<text x="526.0" y="224.1" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">5.70%</text>
+<circle cx="602.0" cy="209.7" r="3.6" fill="#d97706"/>
+<text x="602.0" y="200.7" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">7.43%</text>
+<circle cx="678.0" cy="173.2" r="3.6" fill="#d97706"/>
+<text x="678.0" y="164.2" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">10.13%</text>
+<circle cx="754.0" cy="126.0" r="3.6" fill="#d97706"/>
+<text x="754.0" y="117.0" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">13.63%</text>
+<circle cx="830.0" cy="56.9" r="3.6" fill="#d97706"/>
+<text x="830.0" y="47.9" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">18.75%</text></svg></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-hdr"><h2>Complete Data</h2>
+  <div class="note">All test points across the PSP probability increment range.</div></div>
+  <div class="sec-body" style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Increment</th><th class="num">Top-1 Acc</th><th class="num">Acc Δ</th>
+        <th class="num">PSP Prec</th><th class="num">PSP Recall</th><th class="num">PSP F1</th>
+        <th class="num">PSP Count</th><th class="num">PSP Share</th><th class="num">PSP Growth</th>
+      </tr></thead>
+      <tbody>
+<tr><td>0.00</td><td class="num">79.71%</td><td class="num pos">+0.00</td><td class="num">86.54%</td><td class="num">49.18%</td><td class="num">62.72%</td><td class="num">104</td><td class="num">4.00%</td><td class="num">0.00%</td></tr>
+<tr><td>0.05</td><td class="num">79.86%</td><td class="num pos">+0.15</td><td class="num">87.04%</td><td class="num">51.37%</td><td class="num">64.60%</td><td class="num">108</td><td class="num">4.16%</td><td class="num">3.85%</td></tr>
+<tr><td>0.10</td><td class="num">79.98%</td><td class="num pos">+0.27</td><td class="num">85.96%</td><td class="num">53.55%</td><td class="num">65.99%</td><td class="num">114</td><td class="num">4.39%</td><td class="num">9.62%</td></tr>
+<tr><td>0.15</td><td class="num">80.02%</td><td class="num pos">+0.31</td><td class="num">84.87%</td><td class="num">55.19%</td><td class="num">66.89%</td><td class="num">119</td><td class="num">4.58%</td><td class="num">14.42%</td></tr>
+<tr><td>0.20</td><td class="num">80.05%</td><td class="num pos">+0.35</td><td class="num">83.61%</td><td class="num">55.74%</td><td class="num">66.89%</td><td class="num">122</td><td class="num">4.70%</td><td class="num">17.31%</td></tr>
+<tr><td>0.25</td><td class="num">80.02%</td><td class="num pos">+0.31</td><td class="num">82.40%</td><td class="num">56.28%</td><td class="num">66.88%</td><td class="num">125</td><td class="num">4.81%</td><td class="num">20.19%</td></tr>
+<tr><td>0.30</td><td class="num">79.63%</td><td class="num neg">-0.08</td><td class="num">71.62%</td><td class="num">57.92%</td><td class="num">64.05%</td><td class="num">148</td><td class="num">5.70%</td><td class="num">42.31%</td></tr>
+<tr><td>0.35</td><td class="num">79.44%</td><td class="num neg">-0.27</td><td class="num">59.59%</td><td class="num">62.84%</td><td class="num">61.17%</td><td class="num">193</td><td class="num">7.43%</td><td class="num">85.58%</td></tr>
+<tr><td>0.40</td><td class="num">78.28%</td><td class="num neg">-1.42</td><td class="num">44.87%</td><td class="num">64.48%</td><td class="num">52.91%</td><td class="num">263</td><td class="num">10.13%</td><td class="num">152.88%</td></tr>
+<tr><td>0.45</td><td class="num">76.47%</td><td class="num neg">-3.23</td><td class="num">35.03%</td><td class="num">67.76%</td><td class="num">46.18%</td><td class="num">354</td><td class="num">13.63%</td><td class="num">240.38%</td></tr>
+<tr><td>0.50</td><td class="num">74.66%</td><td class="num neg">-5.04</td><td class="num">28.54%</td><td class="num">75.96%</td><td class="num">41.49%</td><td class="num">487</td><td class="num">18.75%</td><td class="num">368.27%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="foot">Sample size 2,597 · PSP probability increment 0.00–0.50 · step 0.05</div>
+
+</div>
+</body>
+</html>
