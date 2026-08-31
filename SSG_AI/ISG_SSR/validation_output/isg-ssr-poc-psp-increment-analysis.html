@@ -37,6 +37,16 @@ td.neg{color:#dc2626;font-weight:600}
 tr:last-child td{border-bottom:none}
 tbody tr:hover{background:#fafbfc}
 .foot{font-size:12px;color:var(--dim);margin-top:16px;text-align:center}
+.alert{background:#f0f4ff;border-left:3px solid #1a237e;padding:12px 16px;border-radius:0 6px 6px 0;font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:14px}
+.alert-green{background:#ecfdf5;border-left-color:#059669}
+.alert-amber{background:#fffbeb;border-left-color:#d97706}
+.alert-red{background:#fef2f2;border-left-color:#dc2626}
+.rec-box{background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #a7f3d0;border-radius:10px;padding:20px 24px;margin-bottom:0}
+.rec-box h3{font-size:16px;font-weight:700;color:#065f46;margin-bottom:10px}
+.rec-box ul{margin-left:20px;font-size:13.5px;line-height:1.7;color:var(--text)}
+.rec-box li{margin-bottom:8px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.two-col{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -45,7 +55,7 @@ tbody tr:hover{background:#fafbfc}
 
 <div class="hero">
   <h1>ISG SSR POC — PSP Server Probability Increment Analysis</h1>
-  <div class="sub">PSP probability increment (business-rule boost) against Top-1 accuracy and PSP recommendation volume</div>
+  <div class="sub">PSP probability increment (business-rule boost) against Top-1 accuracy and PSP recommendation volume. Extended with per-contract holdout predictions (offset +0.35–+0.50): false-recommendation breakdown and decision guidance.</div>
   <div class="facts">
     <div class="fact"><div class="k">Sample Size</div><div class="v">2,597</div></div>
     <div class="fact"><div class="k">Increment Range</div><div class="v">0.00 – 0.50</div></div>
@@ -228,7 +238,112 @@ tbody tr:hover{background:#fafbfc}
   </div>
 </div>
 
-<div class="foot">Sample size 2,597 · PSP probability increment 0.00–0.50 · step 0.05</div>
+<div class="section">
+  <div class="sec-hdr"><h2>Top-3 Accuracy by PSP Probability Increment</h2>
+  <div class="note">Top-3 accuracy — the true label appears anywhere in the model's Top-1/2/3. Computed from the four per-contract holdout versions (+0.35–+0.50).</div></div>
+  <div class="sec-body">
+    <table>
+      <thead><tr><th>Increment</th><th class="num">Top-1 Acc</th><th class="num">Top-3 Acc</th><th class="num">Top-3 Lift</th></tr></thead>
+      <tbody>
+        <tr><td>+0.35</td><td class="num">79.44%</td><td class="num">87.14%</td><td class="num pos">+7.70</td></tr>
+        <tr><td>+0.40</td><td class="num">78.28%</td><td class="num">84.79%</td><td class="num pos">+6.51</td></tr>
+        <tr><td>+0.45</td><td class="num">76.47%</td><td class="num">82.29%</td><td class="num pos">+5.82</td></tr>
+        <tr><td>+0.50</td><td class="num">74.66%</td><td class="num">79.71%</td><td class="num pos">+5.05</td></tr>
+      </tbody>
+    </table>
+    <div class="alert" style="margin-top:14px;margin-bottom:0"><strong>The increment damages more than Top-1.</strong> Top-3 accuracy falls from 87.1% to 79.7% — a higher offset does not just flip the top pick; it pushes correct Premier/PSP labels out of the top three entirely.</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-hdr"><h2>What Each Step of Increment Actually Buys</h2>
+  <div class="note">Marginal effect per step, from the per-contract predictions: how many new PSP recommendations, how many are correct, how many are wrong.</div></div>
+  <div class="sec-body">
+    <table>
+      <thead><tr>
+        <th>Increment Step</th><th class="num">New PSP Rec'd</th><th class="num">Correct (true PSP)</th><th class="num">Wrong (false PSP)</th><th class="num">Wrong per Correct</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>+0.35 → +0.40</td><td class="num">+70</td><td class="num pos">+3</td><td class="num neg">+67</td><td class="num neg">~22</td></tr>
+        <tr><td>+0.40 → +0.45</td><td class="num">+91</td><td class="num pos">+6</td><td class="num neg">+85</td><td class="num neg">~14</td></tr>
+        <tr><td>+0.45 → +0.50</td><td class="num">+133</td><td class="num pos">+15</td><td class="num neg">+118</td><td class="num neg">~8</td></tr>
+      </tbody>
+    </table>
+    <div class="alert alert-amber" style="margin-top:14px;margin-bottom:0"><strong>The exchange rate is poor.</strong> True PSP is fixed at 183. From +0.35 to +0.50 the model adds 294 PSP recommendations, but only 24 land on real PSP orders — the other 270 tell Premier/ESS customers "PSP".</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-hdr"><h2>Where the False Recommendations Land</h2>
+  <div class="note">False PSP = the customer actually bought something else, but the model recommended PSP. Broken down by what they actually bought.</div></div>
+  <div class="sec-body">
+    <div class="two-col">
+      <table>
+        <thead><tr><th colspan="2">At +0.35 (78 false PSP)</th></tr></thead>
+        <tbody>
+          <tr><td>Premier</td><td class="num">67 (86%)</td></tr>
+          <tr><td>ESS</td><td class="num">9 (12%)</td></tr>
+          <tr><td>PESS</td><td class="num">2 (3%)</td></tr>
+          <tr><td>…of which 36 Months</td><td class="num">53 (68%)</td></tr>
+          <tr><td>…of which 60 Months</td><td class="num">24 (31%)</td></tr>
+        </tbody>
+      </table>
+      <table>
+        <thead><tr><th colspan="2">At +0.50 (348 false PSP)</th></tr></thead>
+        <tbody>
+          <tr><td>Premier</td><td class="num">308 (88%)</td></tr>
+          <tr><td>ESS</td><td class="num">37 (11%)</td></tr>
+          <tr><td>PESS</td><td class="num">3 (1%)</td></tr>
+          <tr><td>…of which 36 Months</td><td class="num">203 (58%)</td></tr>
+          <tr><td>…of which 60 Months</td><td class="num">128 (37%)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-red" style="margin-top:14px;margin-bottom:0"><strong>The root cause is a product-boundary blur, not a tuning problem.</strong> 88% of false PSP are Premier orders, and the largest bucket is 36-Month contracts — while 74% of <em>true</em> PSP orders are also 36 Months. The model cannot tell "36M PSP" from "36M Premier" apart, so raising the increment pulls a flood of 36M Premier along with it.</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-hdr"><h2>Missed PSP — Where the Remaining PSP Orders Go</h2>
+  <div class="note">Even at +0.50, 44 true PSP orders are still not recommended as PSP. Where did they land instead?</div></div>
+  <div class="sec-body">
+    <div class="two-col">
+      <table>
+        <thead><tr><th colspan="2">At +0.35 (68 missed)</th></tr></thead>
+        <tbody>
+          <tr><td>Recommended Premier 36M</td><td class="num">37</td></tr>
+          <tr><td>Recommended Premier 60M</td><td class="num">29</td></tr>
+          <tr><td>Recommended ESS 36M</td><td class="num">1</td></tr>
+          <tr><td>Recommended Premier 84M</td><td class="num">1</td></tr>
+        </tbody>
+      </table>
+      <table>
+        <thead><tr><th colspan="2">At +0.50 (44 missed)</th></tr></thead>
+        <tbody>
+          <tr><td>Recommended Premier 36M</td><td class="num">23</td></tr>
+          <tr><td>Recommended Premier 60M</td><td class="num">19</td></tr>
+          <tr><td>Recommended ESS 36M</td><td class="num">1</td></tr>
+          <tr><td>Recommended Premier 84M</td><td class="num">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert" style="margin-top:14px;margin-bottom:0"><strong>Two sides of the same coin.</strong> The missed PSP are almost always recommended as Premier — the model keeps confusing PSP with Premier in both directions. That is why a higher increment hits a ceiling: it cannot fix a boundary that the current features simply do not separate.</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="rec-box">
+    <h3>Decision Guidance: Hold at +0.35 — Fix the Boundary, Not the Knob</h3>
+    <ul>
+      <li><strong>Among these four versions, +0.35 is the clear choice.</strong> Top-1 accuracy 79.4%, Top-3 87.1%, only 78 false PSP, still covering 115 of 183 true PSP orders.</li>
+      <li><strong>The accuracy peak sits even lower.</strong> The full 0.00–0.30 range above peaked at ~80.0% accuracy with PSP hit rate above 80% around 0.20–0.25. +0.30 is the inflection point.</li>
+      <li><strong>The real lever is separating PSP from Premier, not raising the increment.</strong> Since 88% of false PSP are Premier 36M orders, the highest-value next step is adding features that distinguish PSP from Premier (entitlement / hardware criticality / industry signals).</li>
+      <li><strong>Only consider +0.50 if PSP is a strategic product</strong> and the business accepts that ~7 in 10 PSP recommendations will be wrong — an exposure play, not an accuracy play.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="foot">Sample 2,597 contracts · PSP probability increment 0.00–0.50 · step 0.05 · extended with per-contract holdout predictions (+0.35–+0.50)</div>
 
 </div>
 </body>
