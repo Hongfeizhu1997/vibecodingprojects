@@ -38,6 +38,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#222;font-
 .dist-real{background:#1a237e}
 .dist-ai{background:#059669}
 .dist-ai35{background:#d97706}
+.dist-ai40{background:#ea580c}
+.dist-ai45{background:#c2410c}
+.dist-ai50{background:#9a3412}
 .dist-val{width:56px;text-align:right;font-size:12px;font-weight:700;color:#222;flex-shrink:0;font-family:'Consolas',monospace}
 /* side-by-side paired bars */
 .pair-row{display:flex;align-items:center;margin-bottom:10px;font-size:12px}
@@ -48,6 +51,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#222;font-
 .pair-line .tag-real{color:#1a237e}
 .pair-line .tag-ai{color:#059669}
 .pair-line .tag-ai35{color:#d97706}
+.pair-line .tag-ai40{color:#ea580c}
+.pair-line .tag-ai45{color:#c2410c}
+.pair-line .tag-ai50{color:#9a3412}
 .pair-line .bar{height:14px;background:#eef0f4;border-radius:3px;flex:1;overflow:hidden;position:relative}
 .pair-line .fill{height:100%;border-radius:3px}
 .pair-line .val{width:52px;text-align:right;font-size:11.5px;font-weight:700;font-family:'Consolas',monospace;flex-shrink:0}
@@ -295,32 +301,44 @@ h3.sub-h{font-size:13px;font-weight:700;color:#37474f;margin:16px 0 10px;border-
 </div>
 </div>
 
-<!-- ═══ SECTION 6: THREE-WAY COMPARISON ═══ -->
+<!-- ═══ SECTION 6: INCREMENT SWEEP ═══ -->
 <div class="section">
-<div class="sec-hdr"><h2>6 · Three-Way Comparison — Real vs AI vs AI (PSP + 0.35)</h2><span class="num-badge">Percent of contracts</span></div>
+<div class="sec-hdr"><h2>6 · Increment Sweep — Real vs AI vs PSP Offset (+0.35 → +0.50)</h2><span class="num-badge">Percent of contracts</span></div>
 <div class="sec-body">
-<p class="intro">A +0.35 probability increment on PSP Server shifts the recommendation distribution. Comparing all three — <strong>Real</strong> (what customers bought), <strong>AI</strong> (original recommendation), and <strong>AI (PSP + 0.35)</strong> (increment applied) — shows exactly where the increment lands. <em>All values are percentages so the distributions stay comparable as the holdout grows with incoming orders.</em></p>
+<p class="intro">A PSP Server probability increment (offset) shifts the recommendation distribution. Sweeping from <strong>+0.35</strong> to <strong>+0.50</strong> shows exactly where each increment lands against <strong>Real</strong> (what customers bought) and <strong>AI</strong> (original recommendation). <em>All values are percentages so the distributions stay comparable as the holdout grows with incoming orders.</em></p>
 
 <h3 class="sub-h">Warranty Type</h3>
 <div class="pair-row"><div class="pair-label">Premier</div><div class="pair-bars">
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:87.8%"></div></div><span class="val">87.8%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:90.1%"></div></div><span class="val">90.1%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:89.9%"></div></div><span class="val">89.9%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:87.3%"></div></div><span class="val">87.3%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:83.8%"></div></div><span class="val">83.8%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:78.8%"></div></div><span class="val">78.8%</span></div>
 </div></div>
 <div class="pair-row"><div class="pair-label">PSP Server</div><div class="pair-bars">
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:7.1%"></div></div><span class="val">7.1%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:5.5%"></div></div><span class="val">5.5%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:7.4%"></div></div><span class="val">7.4%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:10.1%"></div></div><span class="val">10.1%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:13.6%"></div></div><span class="val">13.6%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:18.8%"></div></div><span class="val">18.8%</span></div>
 </div></div>
 <div class="pair-row"><div class="pair-label">ESS</div><div class="pair-bars">
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:4.9%"></div></div><span class="val">4.9%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:4.4%"></div></div><span class="val">4.4%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:2.7%"></div></div><span class="val">2.7%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:2.5%"></div></div><span class="val">2.5%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:2.5%"></div></div><span class="val">2.5%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:2.4%"></div></div><span class="val">2.4%</span></div>
 </div></div>
 <div class="pair-row"><div class="pair-label">PESS</div><div class="pair-bars">
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:0.2%"></div></div><span class="val">0.2%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:0.1%"></div></div><span class="val">0.1%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:0%"></div></div><span class="val">0.0%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:0%"></div></div><span class="val">0.0%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:0%"></div></div><span class="val">0.0%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:0%"></div></div><span class="val">0.0%</span></div>
 </div></div>
 
 <h3 class="sub-h">Warranty Term</h3>
@@ -328,21 +346,33 @@ h3.sub-h{font-size:13px;font-weight:700;color:#37474f;margin:16px 0 10px;border-
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:57.2%"></div></div><span class="val">57.2%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:57.8%"></div></div><span class="val">57.8%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:59.6%"></div></div><span class="val">59.6%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:60.1%"></div></div><span class="val">60.1%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:60.8%"></div></div><span class="val">60.8%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:62.1%"></div></div><span class="val">62.1%</span></div>
 </div></div>
 <div class="pair-row"><div class="pair-label">60 Months</div><div class="pair-bars">
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:40.9%"></div></div><span class="val">40.9%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:40.7%"></div></div><span class="val">40.7%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:38.8%"></div></div><span class="val">38.8%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:38.4%"></div></div><span class="val">38.4%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:37.7%"></div></div><span class="val">37.7%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:36.5%"></div></div><span class="val">36.5%</span></div>
 </div></div>
 <div class="pair-row"><div class="pair-label">84 Months</div><div class="pair-bars">
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:1.0%"></div></div><span class="val">1.0%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:1.0%"></div></div><span class="val">1.0%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:1.0%"></div></div><span class="val">1.0%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:1.0%"></div></div><span class="val">1.0%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:1.0%"></div></div><span class="val">1.0%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:1.0%"></div></div><span class="val">1.0%</span></div>
 </div></div>
 <div class="pair-row"><div class="pair-label">48 Months</div><div class="pair-bars">
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:0.7%"></div></div><span class="val">0.7%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:0.4%"></div></div><span class="val">0.4%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:0.7%"></div></div><span class="val">0.7%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:0.6%"></div></div><span class="val">0.6%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:0.6%"></div></div><span class="val">0.6%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:0.5%"></div></div><span class="val">0.5%</span></div>
 </div></div>
 
 <h3 class="sub-h">SLA Tier</h3>
@@ -350,14 +380,20 @@ h3.sub-h{font-size:13px;font-weight:700;color:#37474f;margin:16px 0 10px;border-
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:54.5%"></div></div><span class="val">54.5%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:54.0%"></div></div><span class="val">54.0%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:55.1%"></div></div><span class="val">55.1%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:57.1%"></div></div><span class="val">57.1%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:58.9%"></div></div><span class="val">58.9%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:61.4%"></div></div><span class="val">61.4%</span></div>
 </div></div>
 <div class="pair-row"><div class="pair-label">NBD</div><div class="pair-bars">
 <div class="pair-line"><span class="tag tag-real">Real</span><div class="bar"><div class="fill dist-real" style="width:45.5%"></div></div><span class="val">45.5%</span></div>
 <div class="pair-line"><span class="tag tag-ai">AI</span><div class="bar"><div class="fill dist-ai" style="width:46.0%"></div></div><span class="val">46.0%</span></div>
 <div class="pair-line"><span class="tag tag-ai35">AI (PSP + 0.35)</span><div class="bar"><div class="fill dist-ai35" style="width:44.9%"></div></div><span class="val">44.9%</span></div>
+<div class="pair-line"><span class="tag tag-ai40">AI (PSP + 0.40)</span><div class="bar"><div class="fill dist-ai40" style="width:42.9%"></div></div><span class="val">42.9%</span></div>
+<div class="pair-line"><span class="tag tag-ai45">AI (PSP + 0.45)</span><div class="bar"><div class="fill dist-ai45" style="width:41.1%"></div></div><span class="val">41.1%</span></div>
+<div class="pair-line"><span class="tag tag-ai50">AI (PSP + 0.50)</span><div class="bar"><div class="fill dist-ai50" style="width:38.6%"></div></div><span class="val">38.6%</span></div>
 </div></div>
 
-<div class="callout"><strong>Takeaway:</strong> the +0.35 increment closes the PSP gap — PSP Server rises from 5.5% (under-recommended against 7.1% real) to 7.4%, nearly matching reality. The cost lands on <strong>ESS</strong>, which falls from 4.4% to 2.7% (reality is 4.9%). Warranty term tilts slightly longer (36 Months +1.8pp), and SLA is barely affected.</div>
+<div class="callout"><strong>Takeaway:</strong> the sweep overshoots fast. <strong>+0.35</strong> nearly closes the PSP gap (5.5% → 7.4%, reality 7.1%). But <strong>+0.40</strong> already exceeds reality (10.1%), <strong>+0.45</strong> reaches 13.6%, and <strong>+0.50</strong> hits 18.8% — nearly 3× the real share. The cost lands on <strong>Premier</strong> (90.1% → 78.8%), with term and SLA shifting in lockstep toward longer terms and Four Hours. <strong>Bottom line: +0.35 is the closest match to reality — larger offsets over-recommend PSP Server.</strong></div>
 </div>
 </div>
 
