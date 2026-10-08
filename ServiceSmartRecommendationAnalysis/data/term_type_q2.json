@@ -1,0 +1,610 @@
+{
+  "AP": {
+    "null": {
+      "Other / Add-on": {
+        "total": 1817,
+        "acceptance": 67.8,
+        "change": 28.7,
+        "att_fail": 3.5
+      }
+    },
+    "3Y": {
+      "Premier Support": {
+        "total": 6936,
+        "acceptance": 32.4,
+        "change": 38.0,
+        "att_fail": 29.6
+      },
+      "Onsite": {
+        "total": 1275,
+        "acceptance": 38.5,
+        "change": 32.7,
+        "att_fail": 28.8
+      },
+      "null": {
+        "total": 364,
+        "acceptance": 69.0,
+        "change": 28.6,
+        "att_fail": 2.5
+      },
+      "Premier Support Plus": {
+        "total": 988,
+        "acceptance": 32.5,
+        "change": 50.1,
+        "att_fail": 17.4
+      },
+      "Depot / Mail-in": {
+        "total": 462,
+        "acceptance": 19.0,
+        "change": 25.8,
+        "att_fail": 55.2
+      }
+    },
+    "4Y": {
+      "Premier Support": {
+        "total": 3417,
+        "acceptance": 26.1,
+        "change": 43.1,
+        "att_fail": 30.8
+      },
+      "null": {
+        "total": 203,
+        "acceptance": 79.3,
+        "change": 17.7,
+        "att_fail": 3.0
+      },
+      "Premier Support Plus": {
+        "total": 279,
+        "acceptance": 57.3,
+        "change": 36.6,
+        "att_fail": 6.1
+      },
+      "Onsite": {
+        "total": 169,
+        "acceptance": 56.8,
+        "change": 29.0,
+        "att_fail": 14.2
+      },
+      "Depot / Mail-in": {
+        "total": 56,
+        "acceptance": 28.6,
+        "change": 39.3,
+        "att_fail": 32.1
+      }
+    },
+    "1Y": {
+      "Premier Support": {
+        "total": 9100,
+        "acceptance": 40.2,
+        "change": 47.5,
+        "att_fail": 12.4
+      },
+      "Premier Support Plus": {
+        "total": 425,
+        "acceptance": 51.5,
+        "change": 42.4,
+        "att_fail": 6.1
+      },
+      "null": {
+        "total": 60,
+        "acceptance": 41.7,
+        "change": 46.7,
+        "att_fail": 11.7
+      },
+      "Onsite": {
+        "total": 36,
+        "acceptance": 36.1,
+        "change": 44.4,
+        "att_fail": 19.4
+      },
+      "Depot / Mail-in": {
+        "total": 50,
+        "acceptance": 52.0,
+        "change": 32.0,
+        "att_fail": 16.0
+      }
+    },
+    "5Y": {
+      "Premier Support": {
+        "total": 6613,
+        "acceptance": 25.3,
+        "change": 44.2,
+        "att_fail": 30.4
+      },
+      "Onsite": {
+        "total": 497,
+        "acceptance": 38.2,
+        "change": 29.0,
+        "att_fail": 32.8
+      },
+      "null": {
+        "total": 312,
+        "acceptance": 77.2,
+        "change": 20.8,
+        "att_fail": 1.9
+      },
+      "Premier Support Plus": {
+        "total": 572,
+        "acceptance": 50.5,
+        "change": 37.6,
+        "att_fail": 11.9
+      },
+      "Depot / Mail-in": {
+        "total": 59,
+        "acceptance": 50.8,
+        "change": 28.8,
+        "att_fail": 20.3
+      }
+    },
+    "2Y": {
+      "Premier Support": {
+        "total": 62,
+        "acceptance": 37.1,
+        "change": 54.8,
+        "att_fail": 8.1
+      },
+      "Onsite": {
+        "total": 16,
+        "acceptance": 18.8,
+        "change": 81.2,
+        "att_fail": 0.0
+      },
+      "null": {
+        "total": 2,
+        "acceptance": 50.0,
+        "change": 50.0,
+        "att_fail": 0.0
+      },
+      "Premier Support Plus": {
+        "total": 39,
+        "acceptance": 76.9,
+        "change": 17.9,
+        "att_fail": 5.1
+      },
+      "Depot / Mail-in": {
+        "total": 2,
+        "acceptance": 100.0,
+        "change": 0.0,
+        "att_fail": 0.0
+      }
+    }
+  },
+  "EMEA": {
+    "1Y": {
+      "Premier Support": {
+        "total": 196,
+        "acceptance": 50.5,
+        "change": 38.8,
+        "att_fail": 10.7
+      },
+      "null": {
+        "total": 47,
+        "acceptance": 53.2,
+        "change": 46.8,
+        "att_fail": 0.0
+      },
+      "Onsite": {
+        "total": 42,
+        "acceptance": 50.0,
+        "change": 42.9,
+        "att_fail": 7.1
+      },
+      "Premier Support Plus": {
+        "total": 3,
+        "acceptance": 100.0,
+        "change": 0.0,
+        "att_fail": 0.0
+      }
+    },
+    "3Y": {
+      "Premier Support": {
+        "total": 3970,
+        "acceptance": 40.8,
+        "change": 30.8,
+        "att_fail": 28.4
+      },
+      "Onsite": {
+        "total": 3841,
+        "acceptance": 50.0,
+        "change": 30.6,
+        "att_fail": 19.3
+      },
+      "Premier Support Plus": {
+        "total": 291,
+        "acceptance": 56.4,
+        "change": 34.7,
+        "att_fail": 8.9
+      },
+      "Depot / Mail-in": {
+        "total": 789,
+        "acceptance": 60.1,
+        "change": 23.8,
+        "att_fail": 16.1
+      },
+      "null": {
+        "total": 1121,
+        "acceptance": 85.9,
+        "change": 12.4,
+        "att_fail": 1.7
+      },
+      "Other / Add-on": {
+        "total": 3,
+        "acceptance": 66.7,
+        "change": 0.0,
+        "att_fail": 33.3
+      }
+    },
+    "5Y": {
+      "Onsite": {
+        "total": 723,
+        "acceptance": 50.5,
+        "change": 29.3,
+        "att_fail": 20.2
+      },
+      "Premier Support": {
+        "total": 266,
+        "acceptance": 50.4,
+        "change": 32.7,
+        "att_fail": 16.9
+      },
+      "Premier Support Plus": {
+        "total": 57,
+        "acceptance": 59.6,
+        "change": 28.1,
+        "att_fail": 12.3
+      },
+      "null": {
+        "total": 305,
+        "acceptance": 87.5,
+        "change": 11.5,
+        "att_fail": 1.0
+      },
+      "Depot / Mail-in": {
+        "total": 31,
+        "acceptance": 61.3,
+        "change": 32.3,
+        "att_fail": 6.5
+      }
+    },
+    "null": {
+      "Other / Add-on": {
+        "total": 1320,
+        "acceptance": 76.4,
+        "change": 22.5,
+        "att_fail": 1.1
+      },
+      "Premier Support": {
+        "total": 10,
+        "acceptance": 100.0,
+        "change": 0.0,
+        "att_fail": 0.0
+      }
+    },
+    "4Y": {
+      "Onsite": {
+        "total": 279,
+        "acceptance": 65.6,
+        "change": 30.5,
+        "att_fail": 3.9
+      },
+      "null": {
+        "total": 214,
+        "acceptance": 91.1,
+        "change": 8.4,
+        "att_fail": 0.5
+      },
+      "Premier Support": {
+        "total": 178,
+        "acceptance": 58.4,
+        "change": 28.7,
+        "att_fail": 12.9
+      },
+      "Depot / Mail-in": {
+        "total": 106,
+        "acceptance": 51.9,
+        "change": 30.2,
+        "att_fail": 17.9
+      },
+      "Premier Support Plus": {
+        "total": 28,
+        "acceptance": 46.4,
+        "change": 10.7,
+        "att_fail": 42.9
+      }
+    },
+    "2Y": {
+      "Depot / Mail-in": {
+        "total": 92,
+        "acceptance": 8.7,
+        "change": 26.1,
+        "att_fail": 65.2
+      },
+      "Onsite": {
+        "total": 19,
+        "acceptance": 68.4,
+        "change": 21.1,
+        "att_fail": 10.5
+      },
+      "null": {
+        "total": 5,
+        "acceptance": 100.0,
+        "change": 0.0,
+        "att_fail": 0.0
+      }
+    }
+  },
+  "LA": {
+    "4Y": {
+      "null": {
+        "total": 15,
+        "acceptance": 93.3,
+        "change": 6.7,
+        "att_fail": 0.0
+      },
+      "Onsite": {
+        "total": 216,
+        "acceptance": 28.7,
+        "change": 15.3,
+        "att_fail": 56.0
+      },
+      "Premier Support": {
+        "total": 204,
+        "acceptance": 9.3,
+        "change": 22.5,
+        "att_fail": 68.1
+      },
+      "Premier Support Plus": {
+        "total": 27,
+        "acceptance": 51.9,
+        "change": 48.1,
+        "att_fail": 0.0
+      }
+    },
+    "5Y": {
+      "Premier Support": {
+        "total": 117,
+        "acceptance": 18.8,
+        "change": 14.5,
+        "att_fail": 66.7
+      },
+      "Premier Support Plus": {
+        "total": 97,
+        "acceptance": 26.8,
+        "change": 15.5,
+        "att_fail": 57.7
+      },
+      "Onsite": {
+        "total": 39,
+        "acceptance": 46.2,
+        "change": 33.3,
+        "att_fail": 20.5
+      },
+      "null": {
+        "total": 10,
+        "acceptance": 90.0,
+        "change": 10.0,
+        "att_fail": 0.0
+      }
+    },
+    "3Y": {
+      "Premier Support Plus": {
+        "total": 231,
+        "acceptance": 48.1,
+        "change": 28.1,
+        "att_fail": 23.8
+      },
+      "Premier Support": {
+        "total": 838,
+        "acceptance": 28.6,
+        "change": 28.8,
+        "att_fail": 42.6
+      },
+      "Onsite": {
+        "total": 695,
+        "acceptance": 64.0,
+        "change": 30.2,
+        "att_fail": 5.8
+      },
+      "null": {
+        "total": 100,
+        "acceptance": 86.0,
+        "change": 10.0,
+        "att_fail": 4.0
+      },
+      "Depot / Mail-in": {
+        "total": 2,
+        "acceptance": 0.0,
+        "change": 100.0,
+        "att_fail": 0.0
+      }
+    },
+    "null": {
+      "Other / Add-on": {
+        "total": 189,
+        "acceptance": 82.0,
+        "change": 18.0,
+        "att_fail": 0.0
+      }
+    },
+    "1Y": {
+      "Premier Support": {
+        "total": 222,
+        "acceptance": 12.6,
+        "change": 8.1,
+        "att_fail": 79.3
+      },
+      "Onsite": {
+        "total": 59,
+        "acceptance": 61.0,
+        "change": 18.6,
+        "att_fail": 20.3
+      }
+    },
+    "2Y": {
+      "Premier Support": {
+        "total": 3,
+        "acceptance": 0.0,
+        "change": 0.0,
+        "att_fail": 100.0
+      }
+    }
+  },
+  "NA": {
+    "null": {
+      "Other / Add-on": {
+        "total": 1240,
+        "acceptance": 85.4,
+        "change": 13.5,
+        "att_fail": 1.1
+      }
+    },
+    "3Y": {
+      "Depot / Mail-in": {
+        "total": 552,
+        "acceptance": 27.2,
+        "change": 24.5,
+        "att_fail": 48.4
+      },
+      "Premier Support": {
+        "total": 10838,
+        "acceptance": 46.2,
+        "change": 29.4,
+        "att_fail": 24.4
+      },
+      "Premier Support Plus": {
+        "total": 1309,
+        "acceptance": 51.0,
+        "change": 37.7,
+        "att_fail": 11.2
+      },
+      "Onsite": {
+        "total": 1485,
+        "acceptance": 54.7,
+        "change": 29.9,
+        "att_fail": 15.4
+      },
+      "null": {
+        "total": 1370,
+        "acceptance": 86.8,
+        "change": 11.1,
+        "att_fail": 2.1
+      }
+    },
+    "5Y": {
+      "Onsite": {
+        "total": 440,
+        "acceptance": 47.0,
+        "change": 19.5,
+        "att_fail": 33.4
+      },
+      "null": {
+        "total": 227,
+        "acceptance": 82.8,
+        "change": 15.4,
+        "att_fail": 1.8
+      },
+      "Premier Support": {
+        "total": 302,
+        "acceptance": 54.6,
+        "change": 38.7,
+        "att_fail": 6.6
+      },
+      "Premier Support Plus": {
+        "total": 138,
+        "acceptance": 59.4,
+        "change": 37.0,
+        "att_fail": 3.6
+      },
+      "Depot / Mail-in": {
+        "total": 28,
+        "acceptance": 35.7,
+        "change": 17.9,
+        "att_fail": 46.4
+      }
+    },
+    "1Y": {
+      "Premier Support": {
+        "total": 56,
+        "acceptance": 14.3,
+        "change": 83.9,
+        "att_fail": 1.8
+      },
+      "null": {
+        "total": 32,
+        "acceptance": 31.2,
+        "change": 68.8,
+        "att_fail": 0.0
+      },
+      "Onsite": {
+        "total": 73,
+        "acceptance": 23.3,
+        "change": 58.9,
+        "att_fail": 17.8
+      },
+      "Depot / Mail-in": {
+        "total": 7,
+        "acceptance": 71.4,
+        "change": 0.0,
+        "att_fail": 28.6
+      },
+      "Premier Support Plus": {
+        "total": 1,
+        "acceptance": 0.0,
+        "change": 0.0,
+        "att_fail": 100.0
+      }
+    },
+    "4Y": {
+      "Onsite": {
+        "total": 438,
+        "acceptance": 44.5,
+        "change": 26.7,
+        "att_fail": 28.8
+      },
+      "Premier Support": {
+        "total": 581,
+        "acceptance": 54.0,
+        "change": 34.9,
+        "att_fail": 11.0
+      },
+      "null": {
+        "total": 475,
+        "acceptance": 82.1,
+        "change": 16.0,
+        "att_fail": 1.9
+      },
+      "Depot / Mail-in": {
+        "total": 290,
+        "acceptance": 14.5,
+        "change": 20.0,
+        "att_fail": 65.5
+      },
+      "Premier Support Plus": {
+        "total": 485,
+        "acceptance": 61.9,
+        "change": 33.6,
+        "att_fail": 4.5
+      }
+    },
+    "2Y": {
+      "Depot / Mail-in": {
+        "total": 4,
+        "acceptance": 100.0,
+        "change": 0.0,
+        "att_fail": 0.0
+      },
+      "null": {
+        "total": 1,
+        "acceptance": 0.0,
+        "change": 100.0,
+        "att_fail": 0.0
+      },
+      "Premier Support": {
+        "total": 1,
+        "acceptance": 100.0,
+        "change": 0.0,
+        "att_fail": 0.0
+      }
+    }
+  }
+}
