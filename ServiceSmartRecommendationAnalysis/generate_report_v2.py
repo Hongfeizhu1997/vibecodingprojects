@@ -159,6 +159,17 @@ def cross_geo_table(kpi):
             f'<td class="num" {c_chg(d["change"])}>{d["change"]}%</td>'
             f'<td class="num">{d["influence"]}%</td>'
             f'<td class="num" {c_af(d["attach_failure"])}>{d["attach_failure"]}%</td></tr>')
+    ov = kpi['overall']
+    html.append(
+        f'<tr style="font-weight:700;background:#f0f2f5"><td><strong>Global (All 4 GEOs)</strong></td>'
+        f'<td class="num">{fmt(ov["total"])}</td>'
+        f'<td class="num" {c_cov(ov["coverage"])}>{ov["coverage"]}%</td>'
+        f'<td class="num">{ov["ai_coverage"]}%</td>'
+        f'<td class="num">{ov["attach"]}%</td>'
+        f'<td class="num" {c_acc(ov["acceptance"])}>{ov["acceptance"]}%</td>'
+        f'<td class="num" {c_chg(ov["change"])}>{ov["change"]}%</td>'
+        f'<td class="num">{ov["influence"]}%</td>'
+        f'<td class="num" {c_af(ov["attach_failure"])}>{ov["attach_failure"]}%</td></tr>')
     html.append('</table>')
     return '\n'.join(html)
 
@@ -281,8 +292,8 @@ def country_section(g, cs, top=15):
     return '\n'.join(html)
 
 
-def monthly_section(g, gm):
-    html = ['<div class="sub"><h3>E. Monthly Trend</h3>',
+def monthly_section(gm, title='E. Monthly Trend'):
+    html = [f'<div class="sub"><h3>{title}</h3>',
             '<table><tr><th>Month</th><th class="num">Configs</th><th class="num">Coverage</th>'
             '<th class="num">Attach</th><th class="num">Acceptance</th><th class="num">Change</th>'
             '<th class="num">AI Cov</th><th class="num">Att.Fail</th></tr>']
@@ -300,7 +311,7 @@ def monthly_section(g, gm):
     return '\n'.join(html)
 
 
-def term_type_section(tt_geo):
+def term_type_section(tt_geo, title='F. Service Product Analysis \u2014 Term \u00d7 Type'):
     term_agg = {}
     type_agg = {}
     combos = []
@@ -318,7 +329,7 @@ def term_type_section(tt_geo):
 
     n_parsed = sum(v['total'] for v in term_agg.values())
 
-    html = ['<div class="sub"><h3>F. Service Product Analysis \u2014 Term \u00d7 Type</h3>',
+    html = [f'<div class="sub"><h3>{title}</h3>',
             f'<p class="insight">{fmt(n_parsed)} configs with parsable term (1Y\u20135Y) and type.</p>']
     html.append('<h4>By Term</h4><table><tr><th>Term</th><th class="num">Configs</th>'
                 '<th class="num">Acceptance</th><th class="num">Change</th><th class="num">Att.Fail</th></tr>')
@@ -351,6 +362,40 @@ def term_type_section(tt_geo):
                     f'<td class="num" {c_acc(acc)}>{acc}%</td><td class="num" {c_chg(chg)}>{chg}%</td></tr>')
     html.append('</table></div>')
     return '\n'.join(html)
+
+
+def merge_term_type_global(tt):
+    """Merge per-GEO term_type into a single global {term: {type: {...}}} structure."""
+    merged = {}
+    for g in GEO_ORDER:
+        geo_tt = tt.get(g, {})
+        for term, types in geo_tt.items():
+            for typ, c in types.items():
+                m = merged.setdefault(term, {}).setdefault(typ, {'total': 0, 'acc_w': 0.0, 'chg_w': 0.0, 'af_w': 0.0})
+                m['total'] += c['total']
+                m['acc_w'] += c['total'] * c['acceptance']
+                m['chg_w'] += c['total'] * c['change']
+                m['af_w'] += c['total'] * c['att_fail']
+    out = {}
+    for term, types in merged.items():
+        for typ, m in types.items():
+            t = m['total']
+            out.setdefault(term, {})[typ] = {
+                'total': t,
+                'acceptance': round(m['acc_w'] / t, 1) if t else 0,
+                'change': round(m['chg_w'] / t, 1) if t else 0,
+                'att_fail': round(m['af_w'] / t, 1) if t else 0,
+            }
+    return out
+
+
+def global_analysis_section(kpi, tt):
+    """Global (all-4-GEO) Monthly Trend + Service Product Analysis for the exec summary."""
+    gtt = merge_term_type_global(tt)
+    return '\n'.join([
+        monthly_section(kpi['month'], title='Global Monthly Trend (All 4 GEOs)'),
+        term_type_section(gtt, title='Global Service Product Analysis \u2014 Term \u00d7 Type'),
+    ])
 
 
 def cross_geo_product(tt, kpi):
@@ -498,6 +543,7 @@ def gen_report(q, kpi, tt, prev_kpi=None):
     parts.append(cross_geo_table(kpi))
     for f in findings_narrative(kpi, prev_kpi):
         parts.append(f)
+    parts.append(global_analysis_section(kpi, tt))
     parts.append('</div></div>')
 
     # GEO sections
@@ -511,7 +557,7 @@ def gen_report(q, kpi, tt, prev_kpi=None):
         parts.append(origin_section(g, kpi['geo_origin'].get(g, {})))
         parts.append(source_section(g, kpi['geo_source'].get(g, {})))
         parts.append(country_section(g, kpi['country'].get(g, {})))
-        parts.append(monthly_section(g, kpi['geo_month'].get(g, {})))
+        parts.append(monthly_section(kpi['geo_month'].get(g, {})))
         parts.append(term_type_section(tt.get(g, {})))
         parts.append('</div></div>')
 
