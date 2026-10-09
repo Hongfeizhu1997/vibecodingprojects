@@ -75,6 +75,28 @@ tr:last-child td{border-bottom:none}
 .trend-up{color:#2e7d32;font-weight:700}
 .trend-down{color:#c62828;font-weight:700}
 .trend-flat{color:#f57f17;font-weight:700}
+.findings-section{border:2px solid #1a237e;border-radius:10px;overflow:hidden;margin-top:24px;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.findings-hdr{background:linear-gradient(135deg,#1a237e,#283593);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:10px}
+.findings-hdr h2{font-size:16px;font-weight:700}
+.findings-hdr .badge{background:#ffd54f;color:#333;font-size:11px;font-weight:700;padding:2px 10px;border-radius:10px}
+.findings-body{padding:16px 20px;background:#fbfbfe}
+.finding{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:8px;margin-bottom:10px;border:1px solid #e0e0e0;background:#fff}
+.finding:last-child{margin-bottom:0}
+.finding .sev{flex:0 0 auto;font-weight:800;font-size:11px;padding:4px 10px;border-radius:12px;color:#fff;white-space:nowrap;letter-spacing:.3px}
+.finding .body{flex:1;font-size:13px;line-height:1.55;color:#222}
+.finding .dim{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:3px;margin-right:7px;text-transform:uppercase;letter-spacing:.3px}
+.dim-headline{background:#e3f2fd;color:#1565c0}
+.dim-geo{background:#f3e5f5;color:#6a1b9a}
+.dim-origin{background:#e8f5e9;color:#2e7d32}
+.dim-term{background:#fff3e0;color:#e65100}
+.dim-type{background:#e0f7fa;color:#00695c}
+.dim-monthly{background:#fce4ec;color:#c2185b}
+.sev-critical{background:#c62828}
+.sev-warning{background:#f57c00}
+.sev-good{background:#2e7d32}
+.finding-critical{border-left:5px solid #c62828}
+.finding-warning{border-left:5px solid #f57c00}
+.finding-good{border-left:5px solid #2e7d32}
 </style>"""
 
 # ---- color helpers (thresholds aligned with the V2 template) ----
@@ -170,34 +192,6 @@ def cross_geo_table(kpi):
         f'<td class="num" {c_chg(ov["change"])}>{ov["change"]}%</td>'
         f'<td class="num">{ov["influence"]}%</td>'
         f'<td class="num" {c_af(ov["attach_failure"])}>{ov["attach_failure"]}%</td></tr>')
-    html.append('</table>')
-    return '\n'.join(html)
-
-
-def new_cto_trend_table(kpi, prev):
-    html = ['<table><tr><th>GEO</th><th class="num">New CTO Acc (Prev)</th>'
-            '<th class="num">New CTO Acc (Current)</th><th class="num">\u0394</th>'
-            '<th class="num">New CTO Share</th><th>Assessment</th></tr>']
-    for g in GEO_ORDER:
-        go = kpi['geo_origin'].get(g, {})
-        nc = go.get('New CTO', {})
-        if not nc: continue
-        cur = nc['acceptance']
-        share = round(nc['total'] / kpi['geo'][g]['total'] * 100, 1) if kpi['geo'][g]['total'] else 0
-        if prev and prev['geo_origin'].get(g, {}).get('New CTO', {}):
-            pv = prev['geo_origin'][g]['New CTO']['acceptance']
-            d = round(cur - pv, 1)
-            pv_s = f'{pv}%'
-            if d >= 3: assess = 'Improving'
-            elif d <= -2: assess = '\u26a0 Genuine decline'
-            else: assess = 'Flat / marginal'
-            d_s = f'<td class="num" style="color:{"#2e7d32" if d>=0 else "#c62828"};font-weight:700">{pct(d, sign=True)}pp</td>'
-        else:
-            pv_s = '\u2014'; d_s = '<td class="num">\u2014</td>'; assess = 'Baseline'
-        html.append(
-            f'<tr><td><strong>{g}</strong></td><td class="num">{pv_s}</td>'
-            f'<td class="num" {c_acc(cur)}>{cur}%</td>{d_s}'
-            f'<td class="num">{share}%</td><td>{assess}</td></tr>')
     html.append('</table>')
     return '\n'.join(html)
 
@@ -453,68 +447,141 @@ def exec_narrative(kpi, prev, meta):
     return '\n'.join(parts)
 
 
-def findings_narrative(kpi, prev):
-    """Generate QoQ critical-finding + concern narrative. Returns a list of HTML strings."""
-    if not prev:
-        return []
-    ov_cur = kpi['overall']['acceptance']
-    ov_d = round(ov_cur - prev['overall']['acceptance'], 1)
-    improving, declining = [], []
-    for g in GEO_ORDER:
-        cur = kpi['geo_origin'].get(g, {}).get('New CTO', {})
-        pv = prev['geo_origin'].get(g, {}).get('New CTO', {})
-        if not (cur and pv):
-            continue
-        d = round(cur['acceptance'] - pv['acceptance'], 1)
-        if d >= 3:
-            improving.append((g, pv['acceptance'], cur['acceptance'], d))
-        elif d <= -2:
-            declining.append((g, pv['acceptance'], cur['acceptance'], d))
+def _term_type_aggs(tt):
+    """Return (term_agg, type_agg) as {name: (total, acceptance)} across all GEOs."""
+    gtt = merge_term_type_global(tt)
+    term, typ = {}, {}
+    for t, types in gtt.items():
+        if t not in TERM_ORDER: continue
+        tot = acc_s = 0
+        for ty, c in types.items():
+            if ty not in TYPE_ORDER: continue
+            tot += c['total']; acc_s += c['total'] * c['acceptance']
+        if tot: term[t] = (tot, round(acc_s / tot, 1))
+    for ty in TYPE_ORDER:
+        tot = acc_s = 0
+        for t, types in gtt.items():
+            c = types.get(ty)
+            if not c: continue
+            tot += c['total']; acc_s += c['total'] * c['acceptance']
+        if tot: typ[ty] = (tot, round(acc_s / tot, 1))
+    return term, typ
 
-    out = []
-    # Critical finding: New CTO acceptance trend
-    if improving or declining:
-        seg = []
-        if improving:
-            seg.append('New CTO acceptance <strong>improved</strong> in '
-                       + ', '.join(f'{g} ({pv}% \u2192 {cur}%, {pct(d, sign=True)}pp)'
-                                   for g, pv, cur, d in improving))
-        if declining:
-            seg.append('New CTO acceptance <strong>declined</strong> in '
-                       + ', '.join(f'{g} ({pv}% \u2192 {cur}%, {pct(d, sign=True)}pp)'
-                                   for g, pv, cur, d in declining))
-        body = '; '.join(seg) + '.'
-        out.append(
-            '<div style="margin-top:20px">'
-            '<h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;'
-            'border-left:4px solid #c62828;padding-left:10px">\u26a0 Critical Finding: New CTO Acceptance Trend</h3>'
-            f'<p class="critical">Headline acceptance moved {pct(ov_d, sign=True)}pp to {ov_cur}%. '
-            f'Beneath the headline, {body}</p>')
-        out.append(new_cto_trend_table(kpi, prev))
-        out.append('</div>')
 
-    # Concern: GEOs with genuine overall acceptance decline
-    decl_geo = []
+def _finding(sev, dim, text, rank):
+    return {'sev': sev, 'dim': dim, 'text': text, 'rank': rank}
+
+
+def _qoq_findings(kpi, prev, tt, prev_tt):
+    f = []
+    ov, pov = kpi['overall'], prev['overall']
+    # Headline KPI drift
+    for metric, label, bad_dir, thresh in [
+        ('acceptance', 'Acceptance', 'down', 2), ('coverage', 'Coverage', 'down', 2),
+        ('attach', 'Attach', 'down', 2), ('influence', 'Influence', 'down', 3),
+        ('change', 'Change', 'up', 3), ('attach_failure', 'Attach Failure', 'up', 3),
+    ]:
+        d = round(ov[metric] - pov[metric], 1)
+        if abs(d) < thresh: continue
+        is_bad = (bad_dir == 'down' and d < 0) or (bad_dir == 'up' and d > 0)
+        sev = ('critical' if abs(d) >= 5 else 'warning') if is_bad else 'good'
+        arrow = '\u2191' if d > 0 else '\u2193'
+        f.append(_finding(sev, 'Headline', f'{label}: {pov[metric]}% \u2192 {ov[metric]}% ({arrow}{abs(d)}pp)', abs(d)))
+    # GEO acceptance drift
     for g in GEO_ORDER:
-        cur = kpi['geo'].get(g, {}).get('acceptance')
-        pv = prev['geo'].get(g, {}).get('acceptance')
-        if cur is None or pv is None:
-            continue
+        cur = kpi['geo'].get(g, {}).get('acceptance'); pv = prev['geo'].get(g, {}).get('acceptance')
+        if cur is None or pv is None: continue
         d = round(cur - pv, 1)
-        if d <= -2:
-            decl_geo.append((g, pv, cur, d))
-    if decl_geo:
-        items = '; '.join(f'{g}: {pv}% \u2192 {cur}% ({pct(d, sign=True)}pp)'
-                          for g, pv, cur, d in decl_geo)
-        out.append(
-            '<div style="margin-top:16px">'
-            '<h3 style="font-size:14px;font-weight:600;color:#37474f;margin-bottom:10px;'
-            'border-left:4px solid #f57c00;padding-left:10px">\u26a0 Overall Acceptance Declining \u2014 Genuine Concern</h3>'
-            f'<p class="warn">{items}. These GEOs need investigation \u2014 cross-check New CTO trend in the table above.</p></div>')
-    return out
+        if d >= 3: f.append(_finding('good', 'GEO', f'{g}: acceptance {pv}% \u2192 {cur}% (+{d}pp)', d))
+        elif d <= -2: f.append(_finding('critical' if d <= -4 else 'warning', 'GEO', f'{g}: acceptance {pv}% \u2192 {cur}% ({d}pp)', abs(d)))
+    # New CTO (per-GEO)
+    for g in GEO_ORDER:
+        cur = kpi['geo_origin'].get(g, {}).get('New CTO', {}).get('acceptance')
+        pv = prev['geo_origin'].get(g, {}).get('New CTO', {}).get('acceptance')
+        if cur is None or pv is None: continue
+        d = round(cur - pv, 1)
+        if d >= 3: f.append(_finding('good', 'Origin', f'{g} New CTO: {pv}% \u2192 {cur}% (+{d}pp)', d))
+        elif d <= -2: f.append(_finding('critical' if d <= -5 else 'warning', 'Origin', f'{g} New CTO: {pv}% \u2192 {cur}% ({d}pp)', abs(d)))
+    # Term / Type drift (global, large volume)
+    term_c, type_c = _term_type_aggs(tt); term_p, type_p = _term_type_aggs(prev_tt)
+    for name, (tot, acc) in term_c.items():
+        pv = term_p.get(name)
+        if not pv or tot < 1000: continue
+        d = round(acc - pv[1], 1)
+        if abs(d) >= 4:
+            sev = ('critical' if d <= -8 else 'warning') if d < 0 else 'good'
+            f.append(_finding(sev, 'Term', f'{name} term: acceptance {pv[1]}% \u2192 {acc}% ({d:+.1f}pp), n={tot:,}', abs(d)))
+    for name, (tot, acc) in type_c.items():
+        pv = type_p.get(name)
+        if not pv or tot < 1000: continue
+        d = round(acc - pv[1], 1)
+        if abs(d) >= 4:
+            sev = ('critical' if d <= -8 else 'warning') if d < 0 else 'good'
+            f.append(_finding(sev, 'Type', f'{name}: acceptance {pv[1]}% \u2192 {acc}% ({d:+.1f}pp), n={tot:,}', abs(d)))
+    # Monthly within-quarter acceptance drop
+    months = sorted(kpi['month'].keys())
+    if len(months) >= 2:
+        drops = []
+        for i in range(1, len(months)):
+            a = kpi['month'][months[i-1]]['acceptance']; b = kpi['month'][months[i]]['acceptance']
+            d = round(b - a, 1)
+            if d <= -2.5: drops.append((months[i-1], months[i], a, b, d))
+        if drops:
+            m1, m2, a, b, d = max(drops, key=lambda x: -x[4])
+            f.append(_finding('warning', 'Monthly', f'{m1} \u2192 {m2}: acceptance {a}% \u2192 {b}% ({d}pp) within-quarter drop', abs(d)))
+    return f
 
 
-def gen_report(q, kpi, tt, prev_kpi=None):
+def _baseline_findings(kpi, tt):
+    f = []
+    geos = [(g, kpi['geo'][g]['acceptance'], kpi['geo'][g]['total']) for g in GEO_ORDER if g in kpi['geo'] and kpi['geo'][g]['total']]
+    if geos:
+        w = min(geos, key=lambda x: x[1]); b = max(geos, key=lambda x: x[1])
+        f.append(_finding('critical', 'GEO', f'{w[0]}: lowest acceptance {w[1]}% (n={w[2]:,})', 60 - w[1]))
+        f.append(_finding('good', 'GEO', f'{b[0]}: highest acceptance {b[1]}% (n={b[2]:,})', b[1]))
+    afs = [(g, kpi['geo'][g]['attach_failure']) for g in GEO_ORDER if g in kpi['geo']]
+    if afs:
+        waf = max(afs, key=lambda x: x[1])
+        if waf[1] >= 25: f.append(_finding('warning', 'GEO', f'{waf[0]}: attach failure {waf[1]}% (highest)', waf[1]))
+    nc = kpi['origin'].get('New CTO', {}).get('acceptance'); cc = kpi['origin'].get('Copied CTO', {}).get('acceptance')
+    if nc is not None and cc is not None:
+        gap = round(cc - nc, 1)
+        f.append(_finding('warning', 'Origin', f'New CTO {nc}% vs Copied CTO {cc}% \u2014 {gap}pp gap on hard cases', gap))
+    term_c, _ = _term_type_aggs(tt)
+    terms = [(n, tot, acc) for n, (tot, acc) in term_c.items() if tot >= 1000]
+    if terms:
+        wt = min(terms, key=lambda x: x[2])
+        f.append(_finding('warning', 'Term', f'{wt[0]} term: lowest acceptance {wt[2]}% (n={wt[1]:,})', 60 - wt[2]))
+    return f
+
+
+def detect_findings(kpi, prev, tt, prev_tt):
+    findings = _baseline_findings(kpi, tt) if prev is None else _qoq_findings(kpi, prev, tt, prev_tt)
+    sev_rank = {'critical': 0, 'warning': 1, 'good': 2}
+    findings.sort(key=lambda x: (sev_rank[x['sev']], -x['rank']))
+    return findings[:6]
+
+
+def render_findings(findings, prev):
+    if not findings:
+        return ''
+    mode = 'QoQ vs prior quarter' if prev else 'Baseline snapshot'
+    labels = {'critical': 'CRITICAL', 'warning': 'WARNING', 'good': 'GOOD'}
+    dim_cls = {'Headline': 'dim-headline', 'GEO': 'dim-geo', 'Origin': 'dim-origin',
+               'Term': 'dim-term', 'Type': 'dim-type', 'Monthly': 'dim-monthly'}
+    cards = []
+    for x in findings:
+        cards.append(
+            f'<div class="finding finding-{x["sev"]}">'
+            f'<span class="sev sev-{x["sev"]}">{labels[x["sev"]]}</span>'
+            f'<div class="body"><span class="dim {dim_cls[x["dim"]]}">{x["dim"]}</span>{x["text"]}</div></div>')
+    return ('<div class="findings-section">'
+            '<div class="findings-hdr"><h2>Critical Findings</h2>'
+            f'<span class="badge">AUTO-DETECTED \u00b7 {mode}</span></div>'
+            '<div class="findings-body">' + '\n'.join(cards) + '</div></div>')
+
+
+def gen_report(q, kpi, tt, prev_kpi=None, prev_tt=None):
     meta = QMETA[q]
     fy = meta['fy']; qlabel = f'{q} {fy} ({meta["range"]})'
     title = f'SSR Operational KPI Report \u2014 {q} {fy}'
@@ -541,9 +608,8 @@ def gen_report(q, kpi, tt, prev_kpi=None):
     parts.append('<div class="legend"><span style="background:#2e7d32">Good</span>'
                  '<span style="background:#f57f17">Moderate</span><span style="background:#c62828">Needs attention</span></div>')
     parts.append(cross_geo_table(kpi))
-    for f in findings_narrative(kpi, prev_kpi):
-        parts.append(f)
     parts.append(global_analysis_section(kpi, tt))
+    parts.append(render_findings(detect_findings(kpi, prev_kpi, tt, prev_tt), prev_kpi))
     parts.append('</div></div>')
 
     # GEO sections
@@ -576,9 +642,10 @@ def main():
         loaded[q] = (kpi, tt)
     for q in ['Q4', 'Q1', 'Q2']:
         kpi, tt = loaded[q]
-        prev = loaded[PREV[q]][0] if PREV[q] else None
+        prev_kpi = loaded[PREV[q]][0] if PREV[q] else None
+        prev_tt = loaded[PREV[q]][1] if PREV[q] else None
         meta = QMETA[q]
-        html = gen_report(q, kpi, tt, prev_kpi=prev)
+        html = gen_report(q, kpi, tt, prev_kpi=prev_kpi, prev_tt=prev_tt)
         out = OUT / f'phase1_operational_kpi_report_v2_{meta["fy"].lower()}{q.lower()}.html'
         out.write_text(html, encoding='utf-8')
         print(f'Written: {out} ({len(html):,} bytes)')
