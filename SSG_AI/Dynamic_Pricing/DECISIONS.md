@@ -91,3 +91,12 @@
   - V3 方案已按此原则重写
   - 评审时检查是否有自造术语
   - 未来方案沿用此标准
+
+---
+
+## 2026-10 — IDG DP Business Case 口径问题（待财务确认）
+
+- **Status**: 🔄 Under Review
+- **Context**: 收到 IDG DP Business Case（9.30 xlsb + 9.29 pptx），分析时发现 Summary 里两个都叫 "DP Benefit" 的表：+$204M（完整数据）vs −$13M（另一套数据 HW $3.56B）。
+- **Working Conclusion（暂时结论）**: $204M 已逐行验证正确（Calc = HW × Target PR，DP Benefit = Calc − SVC）。−$13M 表是"ESS → Pen Rate 口径转换"的调整量（方向对、数值为旧版数据）。本质三步：ESS 口径 →（−转换调整）→ Pen Rate 口径 →（+提价到 Dell 目标）→ 净 $204M。
+- **Consequence**: 已发邮件问财务 3 个本质问题（转换是否改 revenue / $204M 是否净额 / ESS 是否有溢价）。待回复后重算转换调整量，把 $204M 拆成"提价收益 − 转换损失"。

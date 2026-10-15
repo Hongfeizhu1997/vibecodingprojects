@@ -1,0 +1,90 @@
+Agents overview - Microsoft Copilot Studio | Microsoft Learn
+Skip to main content
+Skip to Ask Learn chat experience
+This browser is no longer supported.
+Upgrade to Microsoft Edge to take advantage of the latest features, security updates, and technical support.
+Download Microsoft Edge
+More info about Internet Explorer and Microsoft Edge
+Table of contents
+Exit editor mode
+Ask Learn
+Reading mode
+Table of contents
+Read in English
+Add
+Add to Plans
+Edit
+Copy Markdown
+Print
+Note
+Access to this page requires authorization. You can try signing in or changing directories .
+Access to this page requires authorization. You can try changing directories .
+Agents overview
+Feedback
+Summarize this article for me
+In this article
+Agents in Microsoft Copilot Studio are AI-powered assistants that understand your business context and take action on your behalf. You build agents on one of three harnesses: the GitHub Copilot harness for reasoning-heavy, multistep work, the standard harness for rule-based, predictable conversations, or the Copilot chat harness for extending Microsoft 365 Copilot Chat with your organization's knowledge. All harnesses let you combine generative AI, knowledge, and actions to create modern agents built for how your teams actually work.
+You can deploy agents across multiple channels - from Microsoft Teams and web to enterprise applications. Agents can hand off to other agents, call workflows, and integrate with your business systems through connectors, REST APIs, and MCP servers.
+Note
+This article applies to multiple harnesses . The harness you use affects the billing, features, and capabilities of what you build.
+Benefits of agents
+Agents offer several benefits.
+Reasoning-heavy automation : GitHub Copilot harness agents think through complex, multistep business processes, break them into steps, and adapt when circumstances change. They work like a capable teammate, not just a script.
+Predictable responses : Standard harness agents follow the topics and rules you define, providing consistent answers to well-understood questions with no surprises.
+Action-ready : Agents can automate tasks by calling workflows, connectors, REST APIs, MCP servers, and other agents. They connect to your business systems to take real action.
+File-ready : GitHub Copilot harness agents can create, edit, and reason over Word, Excel, PowerPoint, and PDF files natively, making them ideal for document-intensive processes.
+Conversational context : Both the GitHub Copilot and standard harnesses support natural conversations with memory and context awareness so agents improve over time.
+M365 Copilot integration : Copilot chat harness agents connect your enterprise knowledge to Microsoft 365 Copilot Chat so employees get grounded answers without leaving their everyday experience.
+Three harnesses, three approaches
+All agents in Copilot Studio run on one of three harnesses, each designed for different scenarios.
+GitHub Copilot harness
+The GitHub Copilot harness powers agents built for reasoning-heavy, multistep business processes. These agents break down complex goals into steps, reason through problems, recover from errors, and adapt to changing requests. They're ideal for:
+Complex business processes : Accounts payable, contract review, hiring workflows, or other multistep processes that require judgment and adaptation.
+File-intensive work : Agents that create, edit, and reason over documents.
+Multitool orchestration : Tasks that require calling several tools or agents in sequence and deciding what to do based on results.
+Agentic reasoning : Work that benefits from the agent thinking through a problem rather than following a fixed script.
+GitHub Copilot harness agents have native support for skills and memory , and run in a secure sandbox. They use Copilot Credits for billing. Learn more in Overview of billing for agents powered by the GitHub Copilot harness .
+Standard harness
+The standard harness powers rule-based agents built for structured, repeatable conversations. These agents follow the topics you define and respond predictably to well-understood questions. They're ideal for:
+Help-desk and support : Internal help agents that answer common questions and route simple requests.
+Information lookup : Agents that provide consistent answers based on your enterprise knowledge.
+Structured conversations : Scenarios where you want the agent to guide the conversation predictably.
+Standard harness agents work with existing prompt libraries and enterprise knowledge. They use the Copilot Studio capacity model for billing. Learn more in Licensing for agents powered by the standard harness .
+Copilot chat harness
+The Copilot chat harness powers agents that extend Microsoft 365 Copilot Chat with your organization's knowledge. These agents connect enterprise content to the M365 Copilot Chat experience so employees get answers grounded in your data without leaving their everyday tools. They're ideal for:
+Knowledge-first scenarios : Employee onboarding agents, policy FAQ agents, or any scenario where the priority is connecting people to information.
+M365 Copilot extension : Adding domain-specific or company-specific knowledge to the Microsoft 365 Copilot Chat experience.
+Internal publishing : Reaching employees directly through Microsoft 365 Copilot without building a separate channel.
+Copilot chat harness agents run on current chat models and publish to internal teams. Billing is consumption-based or included in a Microsoft 365 Copilot user subscription license. Learn more in Licensing for agents powered by the standard harness .
+Feedback
+Was this page helpful?
+Yes
+No
+Need help with this topic?
+Want to try using Ask Learn to clarify or guide you through this topic?
+Ask Learn
+Suggest a fix?
+Additional resources
+Last updated on
+2026-08-03
+In this article
+Was this page helpful?
+Need help with this topic?
+Want to try using Ask Learn to clarify or guide you through this topic?
+Ask Learn
+Suggest a fix?
+en-us
+Your Privacy Choices
+Theme
+Light
+Dark
+High contrast
+AI Disclaimer
+Previous Versions
+Blog
+Contribute
+Privacy
+Consumer Health Privacy
+Terms of Use
+Trademarks
+© Microsoft 2026
